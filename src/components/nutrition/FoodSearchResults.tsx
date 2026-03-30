@@ -34,17 +34,32 @@ export default function FoodSearchResults({
 
   return (
     <div className="flex flex-col gap-1.5">
-      {results.map((a) => (
+      {results.map((a, i) => (
         <button
-          key={a.id}
+          key={a.id || `off-${i}`}
           onClick={() => onSelect(a)}
           className="flex items-center justify-between w-full px-3 py-3 rounded-xl text-left"
           style={{ background: 'var(--bg-card)' }}
         >
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-              {a.nom}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                {a.nom}
+              </p>
+              {a.source === 'openfoodfacts' && (
+                <span
+                  className="shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium"
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}
+                >
+                  OFT
+                </span>
+              )}
+            </div>
+            {a.marque && (
+              <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
+                {a.marque}
+              </p>
+            )}
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
               P&nbsp;{a.proteines ?? 0}g · G&nbsp;{a.glucides ?? 0}g · L&nbsp;{a.lipides ?? 0}g
               &nbsp;/ 100g

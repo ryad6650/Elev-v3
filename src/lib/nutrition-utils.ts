@@ -1,12 +1,18 @@
 // Utilitaires purs nutrition — utilisables côté client ET serveur
 
 export interface NutritionAliment {
-  id: string;
+  id: string; // '' si résultat OFT pas encore en DB locale
   nom: string;
+  marque?: string | null;
   calories: number;
   proteines: number | null;
   glucides: number | null;
   lipides: number | null;
+  fibres?: number | null;
+  sucres?: number | null;
+  sel?: number | null;
+  code_barres?: string | null;
+  source?: 'local' | 'openfoodfacts';
 }
 
 export interface NutritionEntry {

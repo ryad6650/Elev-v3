@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
+import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
 
 export default async function DashboardPage() {
   let data: DashboardData;
@@ -132,7 +133,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-3 gap-3">
         <MiniStat emoji="💧" value="—" label="Hydratation" />
         <MiniStat emoji="💪" value={String(data.seancesCetteSemaine)} label="Séances / sem" />
-        <MiniStat emoji="😴" value="—" label="Sommeil" />
+        <SleepMiniStat initialMinutes={data.sommeilMinutes} />
       </div>
 
     </main>

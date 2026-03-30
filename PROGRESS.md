@@ -209,6 +209,35 @@ Bugs connus / Limitations MVP :
 
 ---
 
+### Base de données aliments 50k + OpenFoodFacts (fait le 2026-03-30)
+
+Fichiers créés :
+- `supabase/migrations/006_aliments_enrichi.sql` — Ajout colonnes marque/code_barres/fibres/sucres/sel + extension pg_trgm + index GIN trigram sur nom + index code_barres
+- `scripts/seed-aliments-off.mjs` — Script Node.js ESM pour importer ~50k produits français depuis OpenFoodFacts (trié par unique_scans_n)
+
+Fichiers modifiés :
+- `src/lib/nutrition-utils.ts` — NutritionAliment étendu : marque, fibres, sucres, sel, code_barres, source ('local'|'openfoodfacts')
+- `src/types/database.ts` — Table aliments mise à jour (7 nouvelles colonnes)
+- `src/app/api/aliments/route.ts` — Recherche parallèle DB locale + OFT, déduplication par code_barres/nom
+- `src/app/actions/nutrition.ts` — Ajout upsertExternalAliment (sauvegarde résultat OFT avant log), update getRecentAliments (nouvelles colonnes)
+- `src/components/nutrition/FoodSearchResults.tsx` — Affichage marque + badge "OFT" pour résultats externes
+- `src/components/nutrition/AddFoodModal.tsx` — handleConfirm gère résultats OFT (id='') → upsertExternalAliment avant addNutritionEntry
+
+Décisions techniques :
+- OpenFoodFacts = base externe (gratuit, millions de produits, pas d'auth)
+- Seed script : 100 pages × 500 = 50k produits, triés par popularité France, insérés en batches de 100
+- Parallélisme : `Promise.all([local, searchOFF(q)])` avec timeout 3s sur OFT
+- OFT results id='' → upsertExternalAliment vérifie code_barres avant insert (évite doublons)
+- Seed script reprend là où il s'est arrêté avec `--start-page=N`
+
+Usage seed :
+```bash
+SUPABASE_URL=xxx SUPABASE_SERVICE_ROLE_KEY=xxx node scripts/seed-aliments-off.mjs
+# Options : --pages=100 --start-page=1 --dry-run
+```
+
+---
+
 ### Poids — Redesign v2 (fait le 2026-03-30)
 
 Fichiers créés :
@@ -345,6 +374,28 @@ Décisions techniques :
 - PRs calculés côté serveur depuis les 100 dernières séances (max poids par exercice)
 - Chart toujours sur 8 semaines glissantes (indépendant du filtre)
 - Volume formaté en "k" au-dessus de 1000 kg
+
+---
+
+### Sommeil — Saisie depuis le dashboard (fait le 2026-03-30)
+
+Fichiers créés :
+- `supabase/migrations/007_sommeil.sql` — table `sommeil` (user_id, date, duree_minutes, UNIQUE user+date) + RLS
+- `src/app/actions/sommeil.ts` — Server Actions : saveSommeil (upsert), deleteSommeil
+- `src/components/dashboard/SleepModal.tsx` — bottom sheet avec steppers heures (0-12) + minutes (0/15/30/45)
+- `src/components/dashboard/SleepMiniStat.tsx` — mini stat cliquable, affiche la durée en "7h30", bordure orange si renseigné
+
+Fichiers modifiés :
+- `src/lib/dashboard.ts` — ajout `sommeilMinutes` dans DashboardData + fetch parallèle depuis table sommeil
+- `src/app/(app)/dashboard/page.tsx` — remplacement MiniStat sommeil statique par SleepMiniStat
+- `src/types/database.ts` — ajout type table `sommeil`
+
+Décisions techniques :
+- Upsert sur conflit (user_id, date) — 1 seule entrée par jour
+- Minutes par pas de 15 (0, 15, 30, 45) — cohérent avec granularité montre connectée
+- Valeur affichée : "7h30", "8h", "6h45" selon les minutes
+- Bordure orange sur la mini stat si le sommeil est renseigné (feedback visuel)
+- État local dans SleepMiniStat — mise à jour sans re-render RSC via onSaved callback
 
 ---
 

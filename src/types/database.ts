@@ -249,20 +249,30 @@ export interface Database {
           id: string;
           user_id: string | null;
           nom: string;
+          marque: string | null;
+          code_barres: string | null;
           calories: number;
           proteines: number | null;
           glucides: number | null;
           lipides: number | null;
+          fibres: number | null;
+          sucres: number | null;
+          sel: number | null;
           is_global: boolean;
         };
         Insert: {
           id?: string;
           user_id?: string | null;
           nom: string;
+          marque?: string | null;
+          code_barres?: string | null;
           calories: number;
           proteines?: number | null;
           glucides?: number | null;
           lipides?: number | null;
+          fibres?: number | null;
+          sucres?: number | null;
+          sel?: number | null;
           is_global?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["aliments"]["Insert"]>;
@@ -310,6 +320,24 @@ export interface Database {
           poids: number;
         };
         Update: Partial<Database["public"]["Tables"]["poids_history"]["Insert"]>;
+        Relationships: [];
+      };
+      sommeil: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          duree_minutes: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          duree_minutes: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["sommeil"]["Insert"]>;
         Relationships: [];
       };
     };

@@ -29,6 +29,7 @@ export interface DashboardData {
   poidsJoursCetteSemaine: number;
   weightHistory: { date: string; poids: number }[];
   prochaineRoutine: ProchaineRoutine | null;
+  sommeilMinutes: number | null;
 }
 
 function getTodayString(): string {
@@ -85,7 +86,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const thirtyDaysAgo = getNDaysAgo(30);
   const sevenWeeksAgo = getNDaysAgo(49);
 
-  const [profileRes, nutritionRes, workoutsWeekRes, poidsRes, weightHistoryRes, nutritionDatesRes, workoutDatesRes, routinesRes] =
+  const [profileRes, nutritionRes, workoutsWeekRes, poidsRes, weightHistoryRes, nutritionDatesRes, workoutDatesRes, routinesRes, sommeilRes] =
     await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -119,6 +120,12 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         .order("created_at", { ascending: false })
         .limit(1)
         .single(),
+      supabase
+        .from("sommeil")
+        .select("duree_minutes")
+        .eq("user_id", user.id)
+        .eq("date", today)
+        .maybeSingle(),
     ]);
 
   const profil = profileRes.data;
@@ -177,7 +184,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     const exos = routineData.routine_exercises ?? [];
     const nbExercices = exos.length;
     const totalSets = exos.reduce((sum, e) => sum + (e.series_cible ?? 3), 0);
-    const dureeEstimee = totalSets > 0 ? Math.round(totalSets * 2.5) : null;
+    const dureeEstimee = totalSets > 0 ? Math.round(totalSets * 3.5) : null;
     const groupesRaw = exos.map((e) => e.exercises?.groupe_musculaire).filter(Boolean) as string[];
     const groupesMusculaires = [...new Set(groupesRaw)].slice(0, 3);
 
@@ -211,5 +218,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     poidsJoursCetteSemaine,
     weightHistory: weightHistoryRes.data ?? [],
     prochaineRoutine,
+    sommeilMinutes: sommeilRes.data?.duree_minutes ?? null,
   };
 }

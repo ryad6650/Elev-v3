@@ -44,6 +44,61 @@ export async function deleteNutritionEntry(id: string): Promise<void> {
   revalidatePath("/nutrition");
 }
 
+/**
+ * Sauvegarde un aliment externe (OFT) en tant qu'aliment utilisateur.
+ * Vérifie d'abord si le code_barres existe déjà (évite les doublons).
+ */
+export async function upsertExternalAliment(aliment: {
+  nom: string;
+  marque?: string | null;
+  calories: number;
+  proteines: number | null;
+  glucides: number | null;
+  lipides: number | null;
+  fibres?: number | null;
+  sucres?: number | null;
+  sel?: number | null;
+  code_barres?: string | null;
+}): Promise<{ id: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  // Vérifier si déjà en base (par code_barres)
+  if (aliment.code_barres) {
+    const { data: existing } = await supabase
+      .from("aliments")
+      .select("id")
+      .eq("code_barres", aliment.code_barres)
+      .maybeSingle();
+    if (existing) return { id: existing.id };
+  }
+
+  const { data, error } = await supabase
+    .from("aliments")
+    .insert({
+      user_id: user.id,
+      nom: aliment.nom,
+      marque: aliment.marque ?? null,
+      calories: aliment.calories,
+      proteines: aliment.proteines,
+      glucides: aliment.glucides,
+      lipides: aliment.lipides,
+      fibres: aliment.fibres ?? null,
+      sucres: aliment.sucres ?? null,
+      sel: aliment.sel ?? null,
+      code_barres: aliment.code_barres ?? null,
+      is_global: false,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) throw new Error(error?.message ?? "Erreur création aliment");
+  return { id: data.id };
+}
+
 export async function createCustomAliment(
   nom: string,
   calories: number,
@@ -76,7 +131,7 @@ export async function getRecentAliments() {
 
   const { data } = await supabase
     .from("nutrition_entries")
-    .select("aliment_id, aliments(id, nom, calories, proteines, glucides, lipides)")
+    .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres)")
     .eq("user_id", user.id)
     .order("date", { ascending: false })
     .limit(50);

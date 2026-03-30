@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import { X, Search, Plus, ChevronLeft } from 'lucide-react';
+import { X, Search, Plus, ChevronLeft, ScanBarcode } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { addNutritionEntry, createCustomAliment, getRecentAliments } from '@/app/actions/nutrition';
+import { addNutritionEntry, createCustomAliment, getRecentAliments, upsertExternalAliment } from '@/app/actions/nutrition';
 import FoodSearchResults from './FoodSearchResults';
+import BarcodeScanner from './BarcodeScanner';
 import type { NutritionAliment } from '@/lib/nutrition-utils';
 
 const REPAS_LABELS: Record<string, string> = {
@@ -14,7 +15,7 @@ const REPAS_LABELS: Record<string, string> = {
   'snacks': 'Collations',
 };
 
-type Step = 'search' | 'quantity' | 'custom';
+type Step = 'search' | 'scan' | 'quantity' | 'custom';
 type Repas = 'petit-dejeuner' | 'dejeuner' | 'diner' | 'snacks';
 
 interface Props {
@@ -58,6 +59,22 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
     return () => clearTimeout(t);
   }, [query, search]);
 
+  async function handleBarcode(code: string) {
+    setStep('search');
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/aliments?barcode=${encodeURIComponent(code)}`);
+      const data: NutritionAliment[] = await res.json();
+      if (data.length > 0) {
+        handleSelect(data[0]);
+      } else {
+        setQuery(code);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleSelect(aliment: NutritionAliment) {
     setSelected(aliment);
     setStep('quantity');
@@ -68,7 +85,13 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
     const qty = parseFloat(quantite);
     if (isNaN(qty) || qty <= 0) return;
     startTransition(async () => {
-      await addNutritionEntry(repas, selected.id, qty, date);
+      let alimentId = selected.id;
+      // Résultat OFT pas encore en DB — sauvegarder d'abord
+      if (!alimentId && selected.source === 'openfoodfacts') {
+        const { id } = await upsertExternalAliment(selected);
+        alimentId = id;
+      }
+      await addNutritionEntry(repas, alimentId, qty, date);
       router.refresh();
       onClose();
     });
@@ -97,17 +120,23 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col justify-end"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-end"
       style={{ background: 'rgba(0,0,0,0.65)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="rounded-t-3xl flex flex-col"
-        style={{ background: 'var(--bg-secondary)', maxHeight: '88vh' }}
+        className="w-full max-w-[430px] px-3 mb-20 flex flex-col"
+      >
+      <div
+        className="rounded-3xl flex flex-col w-full"
+        style={{
+          background: 'var(--bg-secondary)',
+          maxHeight: 'calc(100dvh - 100px - env(safe-area-inset-top, 20px))',
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
-          {step !== 'search' ? (
+          {step !== 'search' && step !== 'scan' ? (
             <button onClick={() => setStep('search')} className="p-1">
               <ChevronLeft size={20} style={{ color: 'var(--text-primary)' }} />
             </button>
@@ -119,6 +148,16 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
             <X size={20} style={{ color: 'var(--text-muted)' }} />
           </button>
         </div>
+
+        {/* Étape scan */}
+        {step === 'scan' && (
+          <div className="px-4 pb-6">
+            <BarcodeScanner
+              onDetected={handleBarcode}
+              onClose={() => setStep('search')}
+            />
+          </div>
+        )}
 
         {/* Étape recherche */}
         {step === 'search' && (
@@ -136,6 +175,9 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
                 className="bg-transparent flex-1 text-sm outline-none"
                 style={{ color: 'var(--text-primary)' }}
               />
+              <button onClick={() => setStep('scan')} className="p-1">
+                <ScanBarcode size={18} style={{ color: 'var(--accent)' }} />
+              </button>
             </div>
             {!query.trim() && recents.length > 0 && (
               <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
@@ -230,6 +272,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
             </button>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

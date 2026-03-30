@@ -98,12 +98,13 @@ export async function fetchWorkoutPageData(): Promise<WorkoutPageData> {
       }
     }
     const exercisesCount = r.routine_exercises.length;
+    const totalSets = r.routine_exercises.reduce((sum, e) => sum + (e.series_cible ?? 3), 0);
     return {
       id: r.id,
       nom: r.nom,
       exercisesCount,
       groupes: Array.from(groupesSet),
-      dureeEstimee: Math.max(10, Math.round(exercisesCount * 9)),
+      dureeEstimee: Math.max(10, Math.round(totalSets * 3.5)),
       derniereSeance: lastWorkoutMap.get(r.id) ?? null,
     };
   });
