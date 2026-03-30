@@ -25,31 +25,24 @@ export default function FoodItem({ entry }: Props) {
 
   return (
     <div
-      className="flex items-center gap-3 py-3"
+      className="flex items-center gap-2 py-2.5"
       style={{ borderBottom: '1px solid var(--border)' }}
     >
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-          {entry.aliment.nom}
-        </p>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          {entry.quantite_g}g · P&nbsp;{n.proteines}g · G&nbsp;{n.glucides}g · L&nbsp;{n.lipides}g
-        </p>
-      </div>
-      <span
-        className="text-sm font-bold shrink-0"
-        style={{ color: 'var(--accent-text)' }}
-      >
-        {n.calories} kcal
-      </span>
+      <p className="flex-1 min-w-0 text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+        {entry.aliment.nom}{' '}
+        <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({entry.quantite_g}g)</span>
+      </p>
+      <p className="text-xs shrink-0 tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+        P&nbsp;{n.proteines}g&ensp;G&nbsp;{n.glucides}g&ensp;L&nbsp;{n.lipides}g
+      </p>
       <button
         onClick={handleDelete}
         disabled={pending}
-        className="p-1.5 rounded-lg transition-opacity"
-        style={{ background: 'var(--bg-card)', opacity: pending ? 0.4 : 1 }}
+        className="p-1 rounded-lg shrink-0 transition-opacity"
+        style={{ opacity: pending ? 0.3 : 0.5 }}
         aria-label="Supprimer"
       >
-        <Trash2 size={14} style={{ color: 'var(--danger)' }} />
+        <Trash2 size={13} style={{ color: 'var(--text-muted)' }} />
       </button>
     </div>
   );

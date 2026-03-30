@@ -1,5 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 
+export interface ProchaineRoutine {
+  id: string;
+  nom: string;
+  nbExercices: number;
+  jours: string[];
+}
+
 export interface DashboardData {
   prenom: string | null;
   objectifCalories: number;
@@ -18,6 +25,7 @@ export interface DashboardData {
   nutritionJoursCetteSemaine: number;
   poidsJoursCetteSemaine: number;
   weightHistory: { date: string; poids: number }[];
+  prochaineRoutine: ProchaineRoutine | null;
 }
 
 function getTodayString(): string {
@@ -74,7 +82,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const thirtyDaysAgo = getNDaysAgo(30);
   const sevenWeeksAgo = getNDaysAgo(49);
 
-  const [profileRes, nutritionRes, workoutsWeekRes, poidsRes, weightHistoryRes, nutritionDatesRes, workoutDatesRes] =
+  const [profileRes, nutritionRes, workoutsWeekRes, poidsRes, weightHistoryRes, nutritionDatesRes, workoutDatesRes, routinesRes] =
     await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -101,6 +109,13 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         .eq("user_id", user.id)
         .gte("date", sevenWeeksAgo),
       supabase.from("workouts").select("date").eq("user_id", user.id).gte("date", sevenWeeksAgo),
+      supabase
+        .from("routines")
+        .select("id, nom, jours, routine_exercises(count)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single(),
     ]);
 
   const profil = profileRes.data;
@@ -150,6 +165,17 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     (poidsData ?? []).filter((d) => d.date >= weekStart).map((d) => d.date)
   ).size;
 
+  // Prochaine routine
+  const routineData = routinesRes.data as { id: string; nom: string; jours: string[]; routine_exercises: { count: number }[] } | null;
+  const prochaineRoutine: ProchaineRoutine | null = routineData
+    ? {
+        id: routineData.id,
+        nom: routineData.nom,
+        jours: routineData.jours ?? [],
+        nbExercices: routineData.routine_exercises?.[0]?.count ?? 0,
+      }
+    : null;
+
   return {
     prenom: profil?.prenom ?? null,
     objectifCalories: profil?.objectif_calories ?? 2000,
@@ -168,5 +194,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     nutritionJoursCetteSemaine,
     poidsJoursCetteSemaine,
     weightHistory: weightHistoryRes.data ?? [],
+    prochaineRoutine,
   };
 }

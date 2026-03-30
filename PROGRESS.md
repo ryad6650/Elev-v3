@@ -75,11 +75,95 @@ Décisions techniques :
 - Séance libre : ouvre ExerciseSearch immédiatement
 - Sauvegarde via Server Action (pas d'API route)
 
+### Bibliothèque d'exercices — Enrichissement (fait le 2026-03-30)
+
+Fichiers créés :
+- `supabase/migrations/003_exercise_seed.sql` — ~110 exercices globaux : Pectoraux (13), Dos (16), Épaules (14), Biceps (12), Triceps (13), Abdominaux (12), Quadriceps (15), Ischio-jambiers (8), Fessiers (10), Mollets (6)
+  - Équipements : Barre, Haltères, Machine, Poulie / Câble, Poids du corps, Corde, Kettlebell, Smith machine, Bande élastique
+
+Fichiers modifiés :
+- `src/app/api/exercises/route.ts` — limit 30 → 100 + filtre `?equipement=`
+- `src/components/workout/ExerciseSearch.tsx` — debounce 300ms, filtre équipement (accordion avec badges colorés), badge équipement sur chaque résultat, compteur résultats
+
+Décisions techniques :
+- Debounce 300ms sur saisie texte (évite flood API)
+- Filtre équipement en accordion (économise l'espace vertical)
+- Badge coloré par équipement (9 couleurs distinctes) pour scan visuel rapide
+- Filtre équipement transmis à l'API comme `?equipement=` (eq exact)
+
+---
+
+### Routines — Ajout (fait le 2026-03-30)
+
+Fichiers créés :
+- `src/components/workout/CreateRoutineModal.tsx` — plein écran : nom + liste exercices (stepper séries/reps) + ExerciseSearch intégré
+
+Fichiers modifiés :
+- `src/app/actions/workout.ts` — ajout `createRoutine`, `deleteRoutine`, `getRoutineExercises`
+- `src/components/workout/ExerciseSearch.tsx` — prop `onSelect` optionnelle (retourne exercice sans l'ajouter au store)
+- `src/components/workout/WorkoutPageClient.tsx` — le + ouvre un bottom sheet "Séance libre" / "Nouvelle routine"
+- `src/components/workout/WorkoutHub.tsx` — bouton `...` sur chaque card → menu (Lancer / Supprimer) ; lancement avec exercices pré-chargés via `getRoutineExercises`
+- `src/components/workout/RoutineCard.tsx` — prop `onOptions`, remplacement ChevronRight → MoreVertical
+
+Décisions techniques :
+- `getRoutineExercises` = server action (pas d'API route), appelée client-side avant `startWorkout`
+- Lancement d'une routine pré-charge les exercices avec les séries/reps cibles définies
+- Fallback si fetch échoue : lance la routine sans exercices pré-chargés
+
+### Améliorations UI Workout (fait le 2026-03-30)
+
+Fichiers modifiés :
+- `src/components/workout/ActiveWorkout.tsx` — Header redesigné : ← + nom routine orange + "En cours..." italic serif + card timer (grand chrono + Pause + Fin)
+- `src/components/workout/WorkoutTimer.tsx` — Props `pausedAt`, `totalPausedMs`, `large` pour affichage grand format et gestion pause locale
+- `src/components/workout/RoutineCard.tsx` — Clic = accordion déroulant avec exercices + fourchette reps + bouton "Démarrer la séance" ; ChevronDown animé ; bordure orange si dépliée
+- `src/components/workout/WorkoutHub.tsx` — Expand logic + cache exercices + "Modifier la routine" dans le menu `...`
+- `src/app/actions/workout.ts` — Server Action `updateRoutine` (update nom + delete/re-insert routine_exercises)
+
+Fichiers créés :
+- `src/components/workout/EditRoutineModal.tsx` — Modal plein écran : pré-charge exercices via `getRoutineExercises`, édition nom/séries/reps, sauvegarde via `updateRoutine`
+
+Décisions techniques :
+- Pause = état local dans `ActiveWorkout` (non persisté) — suffisant MVP, évite de toucher le store
+- Cache exercices dans `WorkoutHub` par routineId — évite refetch si l'utilisateur replie/déplie
+- `EditRoutineModal` charge ses propres exercices via server action au montage
+
+### Exercice personnalisé — Ajout (fait le 2026-03-30)
+
+Fichiers créés :
+- `src/components/workout/CreateExerciseModal.tsx` — Bottom sheet : nom + groupe musculaire (obligatoires) + équipement (optionnel) + server action + feedback loading/erreur
+
+Fichiers modifiés :
+- `src/app/actions/workout.ts` — ajout `createExercise` (insert avec `is_global: false`, `user_id` du user)
+- `src/components/workout/ExerciseSearch.tsx` — bouton "Créer" dans le header + CTA "Créer" dans l'état vide (pré-remplit le nom si une recherche est en cours)
+
+Décisions techniques :
+- L'exercice créé est immédiatement ajouté à la séance (ou retourné via `onSelect`) sans re-fetch
+- Visible uniquement par le créateur (RLS déjà en place via `is_global = false` + `user_id`)
+
+### Fourchette de reps dans les routines (fait le 2026-03-30)
+
+Fichiers créés :
+- `supabase/migrations/004_reps_cible_max.sql` — colonne `reps_cible_max INTEGER` nullable sur `routine_exercises`
+
+Fichiers modifiés :
+- `src/types/database.ts` — ajout `reps_cible_max` dans Row/Insert de `routine_exercises`
+- `src/store/workoutStore.ts` — ajout `repsCibleMax: number | null` dans `WorkoutSet` et `WorkoutExercise`, propagé dans `buildSets` et `addSet`
+- `src/app/actions/workout.ts` — `getRoutineExercises` et `createRoutine` gèrent `repsCibleMax`
+- `src/components/workout/CreateRoutineModal.tsx` — toggle "unique / fourchette" par exercice, deux steppers min/max en mode fourchette
+- `src/components/workout/SetRow.tsx` — affiche "8-12" si fourchette, "×10" si unique
+- `src/components/workout/ExerciseSearch.tsx` — `repsCibleMax: null` ajouté au défaut lors d'un ajout séance libre
+
+Décisions techniques :
+- `repsCibleMax: null` = chiffre unique (rétrocompatible)
+- Toggle pill "unique / fourchette" par exercice, en haut à droite de la section reps
+- Le min ne peut pas dépasser le max (auto-ajustement si nécessaire)
+- Stepper max a `min = repsCible + 1` pour garantir fourchette valide
+
 Bugs connus / Limitations MVP :
 - Pas de pré-remplissage "valeurs dernière séance" (poidsRef = null)
 - Pas de détection PR automatique
 - Pas de notifications sonores/vibration timer repos
-- Routines depuis programmes : liste sans exercices pré-chargés (à ajouter manuellement)
+- ~~Pas d'édition de routine~~ → EditRoutineModal implémenté (2026-03-30)
 
 ---
 
@@ -185,13 +269,55 @@ Bugs connus / Limitations MVP :
 
 ---
 
+## Phase 2 (suite) — Programmes (fait le 2026-03-30)
+
+Fichiers créés :
+- `supabase/migrations/002_programmes.sql` — tables `programmes` + `programme_routines` + colonnes `programme_actif_id` / `programme_actif_debut` sur `profiles` + RLS complet
+- `src/types/database.ts` — ajout types `programmes`, `programme_routines`, nouvelles colonnes `profiles`
+- `src/lib/programmes.ts` — `fetchProgrammesData()` : RSC, requêtes parallèles, calcul progression
+- `src/app/actions/programmes.ts` — Server Actions : `createProgramme`, `activerProgramme`, `desactiverProgramme`, `deleteProgramme`
+- `src/components/programmes/SemaineVisuelle.tsx` — 7 cercles jours (statique + interactif)
+- `src/components/programmes/ProgrammeActifCard.tsx` — card CTA orange + barre progression
+- `src/components/programmes/ProgrammeCard.tsx` — card liste avec tags difficulté + meta
+- `src/components/programmes/ProgrammeDetail.tsx` — bottom sheet détail (planning, routines, CTA activer/supprimer)
+- `src/components/programmes/CreateProgrammeModal.tsx` — bottom sheet 3 étapes (infos → jours → routines par jour)
+- `src/components/programmes/ProgrammesPageClient.tsx` — hub client (filtres pills, état vide)
+- `src/app/(app)/programmes/page.tsx` — page RSC remplacée (était placeholder)
+
+Décisions techniques :
+- Progression calculée côté serveur depuis `programme_actif_debut` (floor(diffDays / 7) + 1)
+- Filtres pills : matching par mots-clés dans nom+description (PPL, Full Body, Upper/Lower, Force)
+- Cascade SQL : suppression programme → suppression programme_routines automatique
+- `desactiverProgramme` revalidate /dashboard aussi (pour widget futur)
+
+---
+
+## Historique — Détail (fait le 2026-03-30)
+
+Fichiers créés :
+- `src/lib/historique.ts` — fetch RSC (100 dernières séances + count total), calcul streak + PRs
+- `src/app/(app)/historique/page.tsx` — page RSC
+- `src/components/historique/HistoriqueStatsCards.tsx` — 3 cards (séances / volume / streak), réactif au filtre période
+- `src/components/historique/HistoriqueVolumeChart.tsx` — bar chart SVG 8 semaines, bar pic mis en valeur avec tooltip
+- `src/components/historique/PRSection.tsx` — top 3 records perso (fond ambré)
+- `src/components/historique/HistoriqueList.tsx` — séances groupées par semaine avec dividers
+- `src/components/historique/HistoriquePageClient.tsx` — hub client, pills période (7j/30j/3mois/Tout), filtre côté client
+
+Décisions techniques :
+- Filtre période côté client (pas de re-fetch) — données sur 100 séances suffisantes pour MVP
+- PRs calculés côté serveur depuis les 100 dernières séances (max poids par exercice)
+- Chart toujours sur 8 semaines glissantes (indépendant du filtre)
+- Volume formaté en "k" au-dessus de 1000 kg
+
+---
+
 ## Phase 3 — Fonctionnalités avancées
 
 - [x] Offline / Service Worker / sync optimiste
 - [ ] IA — suggestions charges + assistant chat
 - [ ] Notifications push
 - [ ] Export CSV / PDF
-- [ ] PWA manifest + icônes (manifest créé, icônes PNG à générer dans public/icons/)
+- [x] PWA manifest + icônes
 
 ---
 
@@ -220,8 +346,21 @@ Décisions techniques :
 
 Limitations :
 - Pas d'UI optimiste immédiate (les mutations queued ne s'affichent pas avant sync) — accepté MVP
-- Icônes PWA placeholder — besoin de fichiers PNG réels pour "Add to Home Screen"
 - Safari ne supporte pas Background Sync → replay uniquement via event `online`
+
+---
+
+### PWA Manifest + Icônes — Détail (fait le 2026-03-30)
+
+Fichiers créés :
+- `public/icons/icon-192.png` — Icône 192×192 (fond sombre + cercle orange + "É" blanc)
+- `public/icons/icon-512.png` — Icône 512×512
+- `public/icons/apple-touch-icon.png` — Icône 180×180 pour iOS
+- `scripts/generate-icons.js` — Générateur PNG sans dépendance (Node.js + zlib built-in)
+
+Fichiers modifiés :
+- `public/manifest.json` — Séparation `purpose: "any"` et `purpose: "maskable"` (bonne pratique)
+- `src/app/layout.tsx` — Ajout `icons.apple` pour balise `<link rel="apple-touch-icon">`
 
 ---
 

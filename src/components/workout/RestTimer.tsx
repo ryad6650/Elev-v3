@@ -32,7 +32,7 @@ export default function RestTimer() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 px-6"
+      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col items-center justify-center gap-6 px-6"
       style={{ background: 'rgba(12, 10, 9, 0.92)', backdropFilter: 'blur(8px)' }}
     >
       <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>

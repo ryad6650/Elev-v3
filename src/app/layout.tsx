@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Élev",
   },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -40,10 +43,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>
-      <body className="min-h-dvh">
+      <body className="min-h-dvh flex items-start justify-center" style={{ background: "var(--bg-primary)" }}>
+        <div className="relative w-full max-w-[430px] min-h-dvh overflow-x-hidden" style={{ background: "var(--bg-primary)" }}>
           <ServiceWorkerRegistration />
           {children}
-        </body>
+        </div>
+      </body>
     </html>
   );
 }

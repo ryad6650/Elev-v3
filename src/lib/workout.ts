@@ -4,6 +4,9 @@ export interface Routine {
   id: string;
   nom: string;
   exercisesCount: number;
+  groupes: string[];
+  dureeEstimee: number;
+  derniereSeance: string | null;
 }
 
 export interface WorkoutHistoryItem {
@@ -19,6 +22,17 @@ export interface WorkoutPageData {
   routines: Routine[];
   historique: WorkoutHistoryItem[];
 }
+
+type RoutineExerciseWithEx = {
+  id: string;
+  exercises: { groupe_musculaire: string } | null;
+};
+
+type RoutineWithExercises = {
+  id: string;
+  nom: string;
+  routine_exercises: RoutineExerciseWithEx[];
+};
 
 type SetJoin = {
   exercise_id: string;
@@ -43,10 +57,10 @@ export async function fetchWorkoutPageData(): Promise<WorkoutPageData> {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
-  const [routinesRes, workoutsRes] = await Promise.all([
+  const [routinesRes, workoutsRes, lastWorkoutsRes] = await Promise.all([
     supabase
       .from("routines")
-      .select("id, nom, routine_exercises(id)")
+      .select("id, nom, routine_exercises(id, exercises(groupe_musculaire))")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase
@@ -59,13 +73,40 @@ export async function fetchWorkoutPageData(): Promise<WorkoutPageData> {
       .eq("user_id", user.id)
       .order("date", { ascending: false })
       .limit(5),
+    supabase
+      .from("workouts")
+      .select("routine_id, date")
+      .eq("user_id", user.id)
+      .not("routine_id", "is", null)
+      .order("date", { ascending: false }),
   ]);
 
-  const routines: Routine[] = (routinesRes.data ?? []).map((r) => ({
-    id: r.id,
-    nom: r.nom,
-    exercisesCount: (r.routine_exercises as { id: string }[]).length,
-  }));
+  const lastWorkoutMap = new Map<string, string>();
+  for (const w of lastWorkoutsRes.data ?? []) {
+    if (w.routine_id && !lastWorkoutMap.has(w.routine_id)) {
+      lastWorkoutMap.set(w.routine_id, w.date);
+    }
+  }
+
+  const routines: Routine[] = (
+    (routinesRes.data ?? []) as unknown as RoutineWithExercises[]
+  ).map((r) => {
+    const groupesSet = new Set<string>();
+    for (const re of r.routine_exercises) {
+      if (re.exercises?.groupe_musculaire) {
+        groupesSet.add(re.exercises.groupe_musculaire.toLowerCase());
+      }
+    }
+    const exercisesCount = r.routine_exercises.length;
+    return {
+      id: r.id,
+      nom: r.nom,
+      exercisesCount,
+      groupes: Array.from(groupesSet),
+      dureeEstimee: Math.max(10, Math.round(exercisesCount * 9)),
+      derniereSeance: lastWorkoutMap.get(r.id) ?? null,
+    };
+  });
 
   const historique: WorkoutHistoryItem[] = (
     (workoutsRes.data ?? []) as unknown as WorkoutJoin[]

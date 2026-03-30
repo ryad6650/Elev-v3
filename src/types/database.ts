@@ -21,6 +21,8 @@ export interface Database {
           objectif_lipides: number | null;
           photo_url: string | null;
           theme: "dark" | "light";
+          programme_actif_id: string | null;
+          programme_actif_debut: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -35,10 +37,52 @@ export interface Database {
           objectif_lipides?: number | null;
           photo_url?: string | null;
           theme?: "dark" | "light";
+          programme_actif_id?: string | null;
+          programme_actif_debut?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      programmes: {
+        Row: {
+          id: string;
+          user_id: string;
+          nom: string;
+          description: string | null;
+          difficulte: string;
+          duree_semaines: number;
+          jours: number[];
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          nom: string;
+          description?: string | null;
+          difficulte?: string;
+          duree_semaines?: number;
+          jours?: number[];
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["programmes"]["Insert"]>;
+        Relationships: [];
+      };
+      programme_routines: {
+        Row: {
+          id: string;
+          programme_id: string;
+          routine_id: string;
+          jour: number;
+        };
+        Insert: {
+          id?: string;
+          programme_id: string;
+          routine_id: string;
+          jour: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["programme_routines"]["Insert"]>;
         Relationships: [];
       };
       exercises: {
@@ -95,6 +139,7 @@ export interface Database {
           ordre: number;
           series_cible: number;
           reps_cible: number;
+          reps_cible_max: number | null;
         };
         Insert: {
           id?: string;
@@ -103,6 +148,7 @@ export interface Database {
           ordre: number;
           series_cible?: number;
           reps_cible?: number;
+          reps_cible_max?: number | null;
         };
         Update: Partial<Database["public"]["Tables"]["routine_exercises"]["Insert"]>;
         Relationships: [

@@ -40,7 +40,7 @@ export default function AddPoidsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end"
+      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex items-end"
       style={{ background: "rgba(0,0,0,0.6)" }}
       onClick={onClose}
     >

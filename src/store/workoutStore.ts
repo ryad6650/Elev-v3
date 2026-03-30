@@ -8,7 +8,9 @@ export interface WorkoutSet {
   poids: number | null;
   completed: boolean;
   repsCible: number;
-  poidsRef: number | null; // valeur de la dernière séance
+  repsCibleMax: number | null; // null = chiffre unique, sinon max de la fourchette
+  poidsRef: number | null; // poids de la dernière séance
+  repsRef: number | null;  // reps de la dernière séance
 }
 
 export interface WorkoutExercise {
@@ -19,6 +21,7 @@ export interface WorkoutExercise {
   ordre: number;
   seriesCible: number;
   repsCible: number;
+  repsCibleMax: number | null; // null = chiffre unique, sinon max de la fourchette
   sets: WorkoutSet[];
 }
 
@@ -51,7 +54,7 @@ interface WorkoutStore {
   clearWorkout: () => void;
 }
 
-function buildSets(seriesCible: number, repsCible: number): WorkoutSet[] {
+function buildSets(seriesCible: number, repsCible: number, repsCibleMax: number | null = null): WorkoutSet[] {
   return Array.from({ length: seriesCible }, (_, i) => ({
     id: crypto.randomUUID(),
     numSerie: i + 1,
@@ -59,7 +62,9 @@ function buildSets(seriesCible: number, repsCible: number): WorkoutSet[] {
     poids: null,
     completed: false,
     repsCible,
+    repsCibleMax,
     poidsRef: null,
+    repsRef: null,
   }));
 }
 
@@ -75,7 +80,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
           ...e,
           uid: crypto.randomUUID(),
           ordre: i,
-          sets: buildSets(e.seriesCible, e.repsCible),
+          sets: buildSets(e.seriesCible, e.repsCible, e.repsCibleMax ?? null),
         }));
         set({
           activeWorkout: {
@@ -95,7 +100,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
           ...exercise,
           uid: crypto.randomUUID(),
           ordre: activeWorkout.exercises.length,
-          sets: buildSets(exercise.seriesCible, exercise.repsCible),
+          sets: buildSets(exercise.seriesCible, exercise.repsCible, exercise.repsCibleMax ?? null),
         };
         set({ activeWorkout: { ...activeWorkout, exercises: [...activeWorkout.exercises, newEx] } });
       },
@@ -127,7 +132,9 @@ export const useWorkoutStore = create<WorkoutStore>()(
                 poids: last?.poids ?? null,
                 completed: false,
                 repsCible: e.repsCible,
+                repsCibleMax: e.repsCibleMax ?? null,
                 poidsRef: last?.poidsRef ?? null,
+                repsRef: null,
               };
               return { ...e, sets: [...e.sets, newSet] };
             }),

@@ -33,7 +33,7 @@ export interface QueuedOperation {
 }
 
 const DB_NAME = 'elev-offline';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = 'operations';
 
 function openDB(): Promise<IDBDatabase> {

@@ -42,7 +42,7 @@ export default function WorkoutSummary({ workout }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 overflow-y-auto"
+      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col items-center justify-center px-4 overflow-y-auto"
       style={{ background: 'var(--bg-primary)' }}
     >
       <div className="w-full max-w-sm space-y-5 py-8">
