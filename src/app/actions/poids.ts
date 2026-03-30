@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { MensurationsData } from "@/components/poids/MensurationsCard";
 
 export async function upsertPoids(date: string, poids: number): Promise<void> {
   const supabase = await createClient();
@@ -51,4 +52,32 @@ export async function deletePoids(id: string): Promise<void> {
   if (error) throw new Error(error.message);
   revalidatePath("/poids");
   revalidatePath("/dashboard");
+}
+
+export async function saveMensurations(data: MensurationsData): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const { error } = await supabase
+    .from("mensurations")
+    .upsert(
+      {
+        user_id: user.id,
+        cou: data.cou,
+        tour_taille: data.tour_taille,
+        poitrine: data.poitrine,
+        hanches: data.hanches,
+        bras: data.bras,
+        cuisse: data.cuisse,
+        mollet: data.mollet,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/poids");
 }

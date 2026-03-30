@@ -209,7 +209,7 @@ Bugs connus / Limitations MVP :
 
 ---
 
-### Poids — Détail (fait le 2026-03-30)
+### Poids — Redesign v2 (fait le 2026-03-30)
 
 Fichiers créés :
 - `src/lib/poids.ts` — fetch RSC (historique trié par date + taille du profil)
@@ -229,10 +229,28 @@ Décisions techniques :
 - IMC affiché seulement si taille renseignée dans le profil
 - revalidatePath sur /dashboard aussi pour mettre à jour le mini-graphique
 
+Fichiers créés :
+- `supabase/migrations/005_mensurations.sql` — table mensurations (cou, tour_taille, poitrine, hanches, bras, cuisse, mollet) + RLS
+- `src/components/poids/PoidsHero.tsx` — grand affichage poids + delta + saisie inline + bouton Enregistrer
+- `src/components/poids/PoidsComposition.tsx` — IMC + barre gradient + masse grasse Navy (si mensurations renseignées)
+- `src/components/poids/MensurationsCard.tsx` — grille 2 col éditable, sauvegarde via server action
+
+Fichiers modifiés :
+- `src/components/poids/PoidsChart.tsx` — pills v2 style (coral-dim actif), périodes 7j/30j/3m/1an
+- `src/components/poids/PoidsPageClient.tsx` — nouveau layout : hero → chart → composition → mensurations → historique
+- `src/lib/poids.ts` — fetch mensurations en parallèle
+- `src/app/actions/poids.ts` — ajout saveMensurations (upsert sur user_id)
+
+Décisions :
+- Saisie du poids inline (hero card) — plus de bouton "Peser" header
+- PoidsStats et PoidsIMC remplacés par PoidsHero et PoidsComposition
+- Masse grasse calculée via formule Navy si cou + tour_taille renseignés
+- MensurationsCard : mode lecture / mode édition (toggle bouton "Modifier" → "Sauvegarder")
+
 Bugs connus / Limitations MVP :
-- Pas de poids cible (objectif_poids absent du schéma profiles) — ligne pointillée non implémentée
-- Pas de saisie offline (IndexedDB prévu en Phase 3)
-- Pas de rappel matinal (notifications Phase 3)
+- Pas de poids cible (objectif_poids absent du schéma profiles)
+- Formule Navy (masse grasse) = version hommes uniquement (pas de genre en DB)
+- Mensurations = 1 ligne par utilisateur (pas d'historique des mensurations)
 
 ---
 
@@ -306,16 +324,21 @@ Décisions techniques :
 
 ---
 
-## Historique — Détail (fait le 2026-03-30)
+## Historique — Redesign v2 (fait le 2026-03-30)
 
 Fichiers créés :
-- `src/lib/historique.ts` — fetch RSC (100 dernières séances + count total), calcul streak + PRs
-- `src/app/(app)/historique/page.tsx` — page RSC
-- `src/components/historique/HistoriqueStatsCards.tsx` — 3 cards (séances / volume / streak), réactif au filtre période
-- `src/components/historique/HistoriqueVolumeChart.tsx` — bar chart SVG 8 semaines, bar pic mis en valeur avec tooltip
-- `src/components/historique/PRSection.tsx` — top 3 records perso (fond ambré)
-- `src/components/historique/HistoriqueList.tsx` — séances groupées par semaine avec dividers
-- `src/components/historique/HistoriquePageClient.tsx` — hub client, pills période (7j/30j/3mois/Tout), filtre côté client
+- `src/components/historique/HistoriqueCalendar.tsx` — calendrier mensuel avec navigation, dots séances, highlight aujourd'hui, streak
+
+Fichiers modifiés :
+- `src/components/historique/HistoriqueStatsCards.tsx` — 3 chips avec barre colorée gauche (coral/amber/blue), style v2
+- `src/components/historique/PRSection.tsx` — grille 2 colonnes, poids en or (#D4A843), trophy emoji
+- `src/components/historique/HistoriqueList.tsx` — session cards style v2 (barre accent gauche, chips ⏱/🏋/📦)
+- `src/components/historique/HistoriquePageClient.tsx` — suppression pills période, ajout calendrier, layout v2
+
+Décisions :
+- Pills période supprimées (non présentes dans la maquette v2)
+- Volume stats = all-time (totalSeances + all workouts volume)
+- Calendrier navigable mois par mois côté client
 
 Décisions techniques :
 - Filtre période côté client (pas de re-fetch) — données sur 100 séances suffisantes pour MVP

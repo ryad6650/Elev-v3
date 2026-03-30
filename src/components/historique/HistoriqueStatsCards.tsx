@@ -24,33 +24,31 @@ export default function HistoriqueStatsCards({
   const volume = workouts.reduce((sum, w) => sum + w.volume, 0);
 
   const stats = [
-    { emoji: "💪", value: seances, label: "Séances" },
-    { emoji: "⚡", value: formatVolume(volume), label: "Volume kg" },
-    { emoji: "🔥", value: streakActuel, label: "Streak" },
+    { val: seances, label: "séances", color: "var(--accent)" },
+    { val: `🔥 ${streakActuel} j`, label: "streak", color: "#F5A623" },
+    { val: formatVolume(volume), label: "kg volume", color: "#5B9BF5" },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2.5 mb-5">
-      {stats.map(({ emoji, value, label }) => (
+    <div className="flex gap-2 mb-3">
+      {stats.map(({ val, label, color }) => (
         <div
           key={label}
-          className="rounded-2xl p-3.5 text-center"
-          style={{
-            background: "var(--bg-secondary)",
-            border: "1px solid var(--border)",
-          }}
+          className="flex-1 relative overflow-hidden rounded-[18px] p-3"
+          style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
         >
-          <div className="text-[22px] mb-1.5">{emoji}</div>
+          {/* Barre colorée gauche */}
           <div
-            className="text-xl font-bold leading-none mb-1"
-            style={{ color: "var(--accent-text)" }}
+            className="absolute left-0 top-0 bottom-0"
+            style={{ width: 3, borderRadius: "0 2px 2px 0", background: color }}
+          />
+          <div
+            className="font-bold leading-snug"
+            style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
           >
-            {value}
+            {val}
           </div>
-          <div
-            className="text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: "var(--text-muted)" }}
-          >
+          <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", marginTop: 2 }}>
             {label}
           </div>
         </div>

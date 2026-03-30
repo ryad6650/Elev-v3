@@ -1,85 +1,88 @@
 "use client";
 
 import { useState } from "react";
-import { Scale } from "lucide-react";
+import PoidsHero from "./PoidsHero";
 import PoidsChart from "./PoidsChart";
-import PoidsStats from "./PoidsStats";
-import PoidsIMC from "./PoidsIMC";
+import PoidsComposition from "./PoidsComposition";
 import PoidsHistorique from "./PoidsHistorique";
+import MensurationsCard from "./MensurationsCard";
 import AddPoidsModal from "./AddPoidsModal";
 import type { PoidsPageData, PoidsEntry } from "@/lib/poids";
+
+const EMPTY_MENSURATIONS = {
+  cou: null,
+  tour_taille: null,
+  poitrine: null,
+  hanches: null,
+  bras: null,
+  cuisse: null,
+  mollet: null,
+};
 
 interface Props {
   data: PoidsPageData;
 }
 
 export default function PoidsPageClient({ data }: Props) {
-  const [modal, setModal] = useState<{
-    open: boolean;
-    entry?: PoidsEntry;
-  }>({ open: false });
+  const [modal, setModal] = useState<{ open: boolean; entry?: PoidsEntry }>({
+    open: false,
+  });
 
-  const currentPoids =
-    data.entries.length > 0
-      ? data.entries[data.entries.length - 1].poids
-      : null;
+  const entries = data.entries;
+  const current = entries.length > 0 ? entries[entries.length - 1] : null;
+  const previous = entries.length > 1 ? entries[entries.length - 2] : null;
 
   return (
     <main
       className="px-4 pt-6 pb-28 page-enter"
       style={{ maxWidth: 520, margin: "0 auto" }}
     >
-      <div className="flex items-center justify-between mb-5">
+      {/* En-tête */}
+      <div className="mb-5">
+        <div
+          className="font-semibold uppercase mb-1"
+          style={{ fontSize: "0.65rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}
+        >
+          Suivi corporel
+        </div>
         <h1
-          className="text-3xl leading-tight"
+          className="leading-tight"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
+            fontSize: "1.9rem",
             color: "var(--text-primary)",
           }}
         >
           Poids
         </h1>
-        <button
-          onClick={() => setModal({ open: true })}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
-          style={{ background: "var(--accent)", color: "#fff" }}
-        >
-          <Scale size={16} />
-          Peser
-        </button>
       </div>
 
-      <PoidsStats entries={data.entries} />
-
-      <PoidsChart entries={data.entries} />
-
-      <PoidsIMC poids={currentPoids} taille={data.taille} />
-
-      <PoidsHistorique
-        entries={data.entries}
-        onEdit={(entry) => setModal({ open: true, entry })}
+      {/* Hero — grand chiffre + saisie inline */}
+      <PoidsHero
+        poidsActuel={current?.poids ?? null}
+        poidsVeille={previous?.poids ?? null}
       />
 
-      {data.entries.length === 0 && (
-        <div
-          className="rounded-2xl p-8 text-center"
-          style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
-        >
-          <p
-            className="text-4xl mb-3"
-            style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "var(--text-primary)" }}
-          >
-            ⚖️
-          </p>
-          <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
-            Commencez le suivi
-          </p>
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Enregistrez votre première pesée pour voir votre progression.
-          </p>
-        </div>
-      )}
+      {/* Graphique */}
+      <PoidsChart entries={entries} />
+
+      {/* Composition (IMC + masse grasse) */}
+      <PoidsComposition
+        poids={current?.poids ?? null}
+        taille={data.taille}
+        mensurationsCou={data.mensurations?.cou ?? null}
+        mensurationsTaille={data.mensurations?.tour_taille ?? null}
+      />
+
+      {/* Mensurations */}
+      <MensurationsCard initial={data.mensurations ?? EMPTY_MENSURATIONS} />
+
+      {/* Historique des pesées */}
+      <PoidsHistorique
+        entries={entries}
+        onEdit={(entry) => setModal({ open: true, entry })}
+      />
 
       {modal.open && (
         <AddPoidsModal

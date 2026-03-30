@@ -1,34 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import type { HistoriquePageData } from "@/lib/historique";
 import HistoriqueStatsCards from "./HistoriqueStatsCards";
-import HistoriqueVolumeChart from "./HistoriqueVolumeChart";
+import HistoriqueCalendar from "./HistoriqueCalendar";
 import PRSection from "./PRSection";
 import HistoriqueList from "./HistoriqueList";
-
-const PERIODES = [
-  { label: "7 j", days: 7 },
-  { label: "30 j", days: 30 },
-  { label: "3 mois", days: 90 },
-  { label: "Tout", days: Infinity },
-];
 
 interface Props {
   data: HistoriquePageData;
 }
 
 export default function HistoriquePageClient({ data }: Props) {
-  const [periodeDays, setPeriodeDays] = useState(30);
-
-  const workoutsFiltres = useMemo(() => {
-    if (!isFinite(periodeDays)) return data.workouts;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - periodeDays);
-    const cutoffStr = cutoff.toISOString().split("T")[0];
-    return data.workouts.filter((w) => w.date >= cutoffStr);
-  }, [data.workouts, periodeDays]);
-
   return (
     <main
       className="px-4 pt-6 pb-28 page-enter"
@@ -36,11 +18,18 @@ export default function HistoriquePageClient({ data }: Props) {
     >
       {/* En-tête */}
       <div className="mb-5">
+        <div
+          className="font-semibold uppercase mb-1"
+          style={{ fontSize: "0.65rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}
+        >
+          Journal
+        </div>
         <h1
-          className="text-3xl leading-tight"
+          className="leading-tight"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
+            fontSize: "1.9rem",
             color: "var(--text-primary)",
           }}
         >
@@ -48,55 +37,33 @@ export default function HistoriquePageClient({ data }: Props) {
         </h1>
       </div>
 
-      {/* Période pills */}
-      <div
-        className="flex gap-2 overflow-x-auto pb-1 mb-5"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {PERIODES.map(({ label, days }) => (
-          <button
-            key={label}
-            onClick={() => setPeriodeDays(days)}
-            className="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95"
-            style={
-              periodeDays === days
-                ? { background: "var(--accent)", color: "#fff", border: "none" }
-                : {
-                    background: "transparent",
-                    color: "var(--text-secondary)",
-                    border: "1px solid var(--border)",
-                  }
-            }
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Stats */}
+      {/* Stats globales */}
       <HistoriqueStatsCards
-        workouts={workoutsFiltres}
+        workouts={data.workouts}
         totalSeances={data.totalSeances}
         streakActuel={data.streakActuel}
-        estTout={!isFinite(periodeDays)}
+        estTout={true}
       />
 
-      {/* Graphique volume hebdo */}
-      <HistoriqueVolumeChart workouts={data.workouts} />
+      {/* Calendrier mensuel */}
+      <HistoriqueCalendar
+        workouts={data.workouts}
+        streakActuel={data.streakActuel}
+      />
 
-      {/* Records */}
+      {/* Liste des séances */}
+      <div className="mb-3">
+        <div
+          className="font-semibold uppercase mb-2.5"
+          style={{ fontSize: "0.7rem", color: "var(--text-secondary)", letterSpacing: "0.07em" }}
+        >
+          Dernières séances
+        </div>
+        <HistoriqueList workouts={data.workouts} />
+      </div>
+
+      {/* Records personnels */}
       <PRSection prs={data.prsRecents} />
-
-      {/* Label section */}
-      <p
-        className="text-[11px] font-semibold uppercase tracking-wider mb-1"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Mes séances
-      </p>
-
-      {/* Liste */}
-      <HistoriqueList workouts={workoutsFiltres} />
     </main>
   );
 }

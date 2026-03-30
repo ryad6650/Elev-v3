@@ -8,40 +8,34 @@ export default function PRSection({ prs }: Props) {
   if (prs.length === 0) return null;
 
   return (
-    <div
-      className="rounded-2xl p-4 mb-5"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(232,134,12,0.12), rgba(232,134,12,0.04))",
-        border: "1px solid rgba(232,134,12,0.25)",
-      }}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-base">🏆</span>
-        <p
-          className="text-[11px] font-semibold uppercase tracking-wider"
-          style={{ color: "var(--accent-text)" }}
-        >
-          Records personnels
-        </p>
+    <div className="mb-4">
+      <div
+        className="font-semibold uppercase mb-2.5"
+        style={{ fontSize: "0.7rem", color: "var(--text-secondary)", letterSpacing: "0.07em" }}
+      >
+        Records personnels 🏆
       </div>
-
-      <div className="space-y-0">
+      <div className="grid grid-cols-2 gap-2">
         {prs.map((pr, i) => (
-          <div key={i}>
-            {i > 0 && (
+          <div
+            key={i}
+            className="flex items-center gap-2 rounded-[18px] px-3.5 py-3"
+            style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+          >
+            <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>🥇</span>
+            <div className="flex-1 min-w-0">
               <div
-                className="h-px my-2.5"
-                style={{ background: "rgba(255,255,255,0.06)" }}
-              />
-            )}
-            <div className="flex items-center justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                className="truncate"
+                style={{ fontSize: "0.68rem", color: "var(--text-secondary)", marginBottom: 2 }}
+              >
                 {pr.exerciceNom}
-              </span>
-              <span className="text-sm font-bold" style={{ color: "var(--accent-text)" }}>
-                {pr.poidsMax} kg × {pr.repsAuMax}
-              </span>
+              </div>
+              <div
+                className="font-bold"
+                style={{ fontSize: "0.9rem", color: "#D4A843" }}
+              >
+                {pr.poidsMax} kg
+              </div>
             </div>
           </div>
         ))}

@@ -8,6 +8,7 @@ const navItems = [
   { href: "/workout", emoji: "💪", label: "Séance" },
   { href: "/dashboard", emoji: "🏠", label: "Accueil" },
   { href: "/nutrition", emoji: "🥗", label: "Nutrition" },
+  { href: "/poids", emoji: "⚖️", label: "Poids" },
   { href: "/historique", emoji: "📊", label: "Historique" },
 ];
 
