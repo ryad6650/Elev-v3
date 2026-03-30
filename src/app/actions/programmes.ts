@@ -7,7 +7,7 @@ interface CreateProgrammeInput {
   nom: string;
   description?: string;
   difficulte: string;
-  duree_semaines: number;
+  duree_semaines: number | null;
   jours: number[];
   routinesParJour: Record<number, string>; // jour → routine_id
 }

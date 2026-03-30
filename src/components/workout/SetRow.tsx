@@ -1,6 +1,6 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 import type { WorkoutSet } from '@/store/workoutStore';
 
 interface Props {
@@ -8,12 +8,15 @@ interface Props {
   isActive: boolean;
   onUpdate: (field: 'reps' | 'poids', value: number | null) => void;
   onToggle: () => void;
+  onRemove: () => void;
 }
 
-export default function SetRow({ set, isActive, onUpdate, onToggle }: Props) {
+export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
   const repsPlaceholder = set.repsCible > 0
     ? (set.repsCibleMax ? `${set.repsCible}-${set.repsCibleMax}` : `${set.repsCible}`)
     : '—';
+
+  const numLabel = set.isWarmup ? `W${set.numSerie}` : `${set.numSerie}`;
 
   const precStr = set.poidsRef != null
     ? (set.repsRef != null ? `${set.poidsRef}×${set.repsRef}` : `${set.poidsRef}kg`)
@@ -26,7 +29,10 @@ export default function SetRow({ set, isActive, onUpdate, onToggle }: Props) {
   return (
     <div
       className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
-      style={{ background: set.completed ? 'rgba(34,197,94,0.06)' : 'transparent' }}
+      style={{
+        background: set.completed ? 'rgba(34,197,94,0.06)' : 'transparent',
+        opacity: set.isWarmup ? 0.55 : 1,
+      }}
     >
       {/* Numéro ou ✓ gauche */}
       <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -38,8 +44,11 @@ export default function SetRow({ set, isActive, onUpdate, onToggle }: Props) {
             <Check size={11} strokeWidth={3} color="white" />
           </div>
         ) : (
-          <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>
-            {set.numSerie}
+          <span
+            className="text-xs font-bold"
+            style={{ color: set.isWarmup ? 'var(--accent-text)' : 'var(--text-muted)' }}
+          >
+            {numLabel}
           </span>
         )}
       </div>
@@ -98,6 +107,15 @@ export default function SetRow({ set, isActive, onUpdate, onToggle }: Props) {
         }}
       >
         <Check size={13} strokeWidth={2.5} />
+      </button>
+
+      {/* Bouton supprimer */}
+      <button
+        onClick={onRemove}
+        className="w-7 h-7 flex items-center justify-center shrink-0 rounded-lg transition-opacity active:opacity-50"
+        style={{ color: 'var(--text-muted)' }}
+      >
+        <Trash2 size={13} />
       </button>
     </div>
   );

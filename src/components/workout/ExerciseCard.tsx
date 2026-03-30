@@ -1,9 +1,18 @@
 'use client';
 
-import { Plus, ChevronRight, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, ChevronRight, Check, Timer, ChevronDown, Flame } from 'lucide-react';
 import { useWorkoutStore } from '@/store/workoutStore';
 import type { WorkoutExercise, WorkoutSet } from '@/store/workoutStore';
 import SetRow from './SetRow';
+import RestDurationPicker from './RestDurationPicker';
+
+function formatRest(s: number): string {
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return r === 0 ? `${m} min` : `${m} min ${r}s`;
+}
 
 interface Props {
   exercise: WorkoutExercise;
@@ -13,29 +22,20 @@ interface Props {
   onPR?: (exerciseName: string, poids: number, reps: number) => void;
 }
 
-/** Calcule 3 séries d'échauffement : 50%×12, 70%×6, 85%×3 (arrondi au 0.5 kg) */
-function calcWarmup(poids: number) {
-  return [
-    { pct: 0.5, reps: 12 },
-    { pct: 0.7, reps: 6 },
-    { pct: 0.85, reps: 3 },
-  ].map(({ pct, reps }) => ({
-    poids: Math.round(poids * pct * 2) / 2,
-    reps,
-  }));
-}
 
 export default function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) {
   const addSet = useWorkoutStore((s) => s.addSet);
+  const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
+  const removeSet = useWorkoutStore((s) => s.removeSet);
   const updateSet = useWorkoutStore((s) => s.updateSet);
   const toggleComplete = useWorkoutStore((s) => s.toggleComplete);
+  const setExerciseRestDuration = useWorkoutStore((s) => s.setExerciseRestDuration);
+  const [showPicker, setShowPicker] = useState(false);
 
   const completedCount = exercise.sets.filter((s) => s.completed).length;
   const allDone = exercise.sets.length > 0 && completedCount === exercise.sets.length;
   const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
-
-  const workingWeight = exercise.sets[0]?.poids ?? exercise.sets[0]?.poidsRef;
-  const warmup = workingWeight && workingWeight >= 20 ? calcWarmup(workingWeight) : null;
+  const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
   const handleToggle = (set: WorkoutSet) => {
     if (!set.completed && set.poids && set.reps && set.poidsRef && set.poids > set.poidsRef) {
@@ -119,18 +119,28 @@ export default function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, 
         </span>
       </div>
 
-      {/* Barre échauffement */}
-      {warmup && (
-        <div
-          className="mx-4 mb-2 px-3 py-2 rounded-xl text-xs font-medium"
-          style={{ background: 'rgba(232,134,12,0.18)', color: '#FDBA74' }}
+      {/* Bouton minuteur repos */}
+      <div className="px-4 pb-2">
+        <button
+          onClick={() => setShowPicker(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-opacity active:opacity-70"
+          style={{
+            background: 'var(--bg-elevated)',
+            color: exercise.restDuration != null ? 'var(--accent)' : 'var(--text-muted)',
+            border: '1px solid var(--border)',
+          }}
         >
-          🔥 Échauffement : {warmup.map((w) => `${w.poids}kg×${w.reps}`).join(' · ')}
-        </div>
-      )}
+          <Timer size={12} />
+          {exercise.restDuration != null ? formatRest(exercise.restDuration) : 'Aucun minuteur'}
+          <ChevronDown size={11} />
+        </button>
+      </div>
 
       {/* En-têtes colonnes */}
-      <div className="flex items-center gap-2 px-3 pb-1">
+      <div
+        className="flex items-center gap-2 px-3 pb-2"
+        style={{ borderBottom: '1px solid var(--border)' }}
+      >
         <span className="w-6 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>#</span>
         <div className="flex flex-1 gap-2">
           <span className="flex-1 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>POIDS</span>
@@ -138,30 +148,92 @@ export default function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, 
         </div>
         <span className="w-11 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>PRÉC.</span>
         <span className="w-8" />
+        <span className="w-7" />
       </div>
 
       {/* Lignes séries */}
-      <div className="px-1 pb-1 space-y-0.5">
-        {exercise.sets.map((set, idx) => (
-          <SetRow
-            key={set.id}
-            set={set}
-            isActive={idx === firstIncompleteIdx}
-            onUpdate={(field, value) => updateSet(exercise.uid, set.id, field, value)}
-            onToggle={() => handleToggle(set)}
-          />
-        ))}
+      <div className="px-1 pt-1 pb-1 space-y-0.5">
+        {(() => {
+          const warmupSets = exercise.sets.filter((s) => s.isWarmup);
+          const workingSets = exercise.sets.filter((s) => !s.isWarmup);
+          const allWarmupDone = warmupSets.length > 0 && warmupSets.every((s) => s.completed);
+
+          return (
+            <>
+              {allWarmupDone ? (
+                <div
+                  className="flex items-center gap-2 px-3 py-2 mx-1 rounded-xl text-xs font-medium"
+                  style={{ background: 'rgba(232,134,12,0.12)', color: 'var(--accent)' }}
+                >
+                  <Flame size={13} />
+                  <span>
+                    Échauffement :{' '}
+                    {warmupSets.map((s, i) => (
+                      <span key={s.id}>
+                        {i > 0 && <span style={{ color: 'var(--text-muted)' }}> · </span>}
+                        {s.poids != null ? `${s.poids}kg` : '—'}×{s.reps ?? '—'}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              ) : (
+                warmupSets.map((set, idx) => (
+                  <SetRow
+                    key={set.id}
+                    set={set}
+                    isActive={idx === firstIncompleteIdx}
+                    onUpdate={(field, value) => updateSet(exercise.uid, set.id, field, value)}
+                    onToggle={() => handleToggle(set)}
+                    onRemove={() => removeSet(exercise.uid, set.id)}
+                  />
+                ))
+              )}
+              {workingSets.map((set) => {
+                const globalIdx = exercise.sets.indexOf(set);
+                return (
+                  <SetRow
+                    key={set.id}
+                    set={set}
+                    isActive={globalIdx === firstIncompleteIdx}
+                    onUpdate={(field, value) => updateSet(exercise.uid, set.id, field, value)}
+                    onToggle={() => handleToggle(set)}
+                    onRemove={() => removeSet(exercise.uid, set.id)}
+                  />
+                );
+              })}
+            </>
+          );
+        })()}
       </div>
 
-      {/* Ajouter une série */}
-      <button
-        onClick={() => addSet(exercise.uid)}
-        className="w-full flex items-center justify-center gap-1.5 py-3 text-sm border-t transition-opacity hover:opacity-70"
-        style={{ color: 'var(--accent)', borderColor: 'var(--border)' }}
-      >
-        <Plus size={15} />
-        Ajouter une série
-      </button>
+      {/* Ajouter une série + Échauffement */}
+      <div className="flex border-t" style={{ borderColor: 'var(--border)' }}>
+        <button
+          onClick={() => addSet(exercise.uid)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
+          style={{ color: 'var(--accent)' }}
+        >
+          <Plus size={15} />
+          Ajouter une série
+        </button>
+        <div style={{ width: '1px', background: 'var(--border)' }} />
+        <button
+          onClick={() => addWarmupSets(exercise.uid)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
+          style={{ color: hasWarmup ? 'var(--accent)' : 'var(--text-muted)' }}
+        >
+          <Flame size={15} />
+          Échauffement
+        </button>
+      </div>
+
+      {showPicker && (
+        <RestDurationPicker
+          current={exercise.restDuration}
+          onSelect={(d) => setExerciseRestDuration(exercise.uid, d)}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
     </div>
   );
 }

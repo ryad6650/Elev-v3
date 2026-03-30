@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Trophy, Clock, Zap, Check } from 'lucide-react';
+import { Trophy, Clock, Zap, Check, Star } from 'lucide-react';
 import { useWorkoutStore } from '@/store/workoutStore';
 import type { ActiveWorkout } from '@/store/workoutStore';
 import { saveWorkout } from '@/app/actions/workout';
@@ -22,11 +22,25 @@ export default function WorkoutSummary({ workout }: Props) {
   const clearWorkout = useWorkoutStore((s) => s.clearWorkout);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
 
   const duration = Date.now() - workout.debutAt;
   const completedSets = workout.exercises.flatMap((e) => e.sets.filter((s) => s.completed));
   const volume = completedSets.reduce((acc, s) => acc + (s.poids ?? 0) * (s.reps ?? 0), 0);
   const exercicesRealises = workout.exercises.filter((e) => e.sets.some((s) => s.completed));
+
+  // PRs : série complétée avec poids > poidsRef (même logique que ExerciseCard)
+  const prs = exercicesRealises
+    .map((ex) => {
+      const prSet = ex.sets
+        .filter((s) => s.completed && s.poids != null && s.poidsRef != null && s.poids > s.poidsRef)
+        .reduce<{ poids: number; reps: number } | null>((best, s) => {
+          const val = (s.poids ?? 0) * (s.reps ?? 0);
+          return val > (best ? best.poids * best.reps : 0) ? { poids: s.poids!, reps: s.reps ?? 0 } : best;
+        }, null);
+      return prSet ? { nom: ex.nom, ...prSet } : null;
+    })
+    .filter((p): p is { nom: string; poids: number; reps: number } => p !== null);
 
   const handleSave = async () => {
     setSaving(true);
@@ -42,10 +56,10 @@ export default function WorkoutSummary({ workout }: Props) {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col items-center justify-center px-4 overflow-y-auto"
+      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col px-4 overflow-y-auto"
       style={{ background: 'var(--bg-primary)' }}
     >
-      <div className="w-full max-w-sm space-y-5 py-8">
+      <div className="w-full max-w-sm mx-auto space-y-5 py-10">
         {/* Titre */}
         <div className="text-center">
           <div
@@ -61,57 +75,82 @@ export default function WorkoutSummary({ workout }: Props) {
             Séance terminée !
           </h2>
           {workout.routineName && (
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {workout.routineName}
-            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>{workout.routineName}</p>
           )}
         </div>
 
         {/* Stats durée + volume */}
         <div className="grid grid-cols-2 gap-3">
-          <div
-            className="p-4 rounded-2xl border text-center"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-          >
+          <div className="p-4 rounded-2xl border text-center" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <Clock size={20} className="mx-auto mb-1" style={{ color: 'var(--accent)' }} />
-            <p className="text-xl font-bold" style={{ color: 'var(--accent-text)' }}>
-              {formatDuration(duration)}
-            </p>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent-text)' }}>{formatDuration(duration)}</p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Durée</p>
           </div>
-          <div
-            className="p-4 rounded-2xl border text-center"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-          >
+          <div className="p-4 rounded-2xl border text-center" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <Zap size={20} className="mx-auto mb-1" style={{ color: 'var(--accent)' }} />
             <p className="text-xl font-bold" style={{ color: 'var(--accent-text)' }}>
               {volume > 0 ? `${Math.round(volume)} kg` : '—'}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Volume</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Volume total</p>
           </div>
         </div>
+
+        {/* Records battus */}
+        {prs.length > 0 && (
+          <div
+            className="p-4 rounded-2xl border"
+            style={{ background: 'rgba(234,179,8,0.06)', borderColor: 'rgba(234,179,8,0.25)' }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Star size={14} fill="currentColor" style={{ color: '#EAB308' }} />
+              <p className="text-sm font-semibold" style={{ color: '#EAB308' }}>
+                {prs.length} record{prs.length > 1 ? 's' : ''} battu{prs.length > 1 ? 's' : ''} 🎉
+              </p>
+            </div>
+            <div className="space-y-2">
+              {prs.map((pr, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{pr.nom}</p>
+                  <span className="text-xs font-semibold" style={{ color: '#CA8A04' }}>
+                    {pr.poids} kg × {pr.reps} reps
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Exercices réalisés */}
         {exercicesRealises.length > 0 && (
           <div className="space-y-2">
             {exercicesRealises.map((ex) => {
-              const done = ex.sets.filter((s) => s.completed).length;
+              const doneSets = ex.sets.filter((s) => s.completed);
+              const maxPoids = Math.max(0, ...doneSets.map((s) => s.poids ?? 0));
+              const exVolume = doneSets.reduce((acc, s) => acc + (s.poids ?? 0) * (s.reps ?? 0), 0);
+              const isPR = prs.some((pr) => pr.nom === ex.nom);
               return (
                 <div
                   key={ex.uid}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border"
-                  style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    borderColor: isPR ? 'rgba(234,179,8,0.35)' : 'var(--border)',
+                  }}
                 >
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {ex.nom}
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {ex.groupeMusculaire}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                        {ex.nom}
+                      </p>
+                      {isPR && <Star size={11} fill="currentColor" style={{ color: '#EAB308', flexShrink: 0 }} />}
+                    </div>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      {maxPoids > 0 ? `Max ${maxPoids} kg` : ex.groupeMusculaire}
+                      {exVolume > 0 ? ` · ${Math.round(exVolume)} kg vol.` : ''}
                     </p>
                   </div>
-                  <span className="text-sm font-bold" style={{ color: 'var(--success)' }}>
-                    {done} série{done > 1 ? 's' : ''}
+                  <span className="text-sm font-bold ml-3 shrink-0" style={{ color: 'var(--success)' }}>
+                    {doneSets.length} série{doneSets.length > 1 ? 's' : ''}
                   </span>
                 </div>
               );
@@ -125,23 +164,55 @@ export default function WorkoutSummary({ workout }: Props) {
             onClick={handleSave}
             disabled={saving || saved}
             className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all"
-            style={{
-              background: saved ? 'var(--success)' : 'var(--accent)',
-              color: 'white',
-              opacity: saving ? 0.7 : 1,
-            }}
+            style={{ background: saved ? 'var(--success)' : 'var(--accent)', color: 'white', opacity: saving ? 0.7 : 1 }}
           >
             {saved ? <><Check size={18} /> Enregistré !</> : saving ? 'Sauvegarde...' : 'Enregistrer la séance'}
           </button>
           <button
-            onClick={clearWorkout}
+            onClick={() => setShowCancel(true)}
             className="w-full py-3 rounded-2xl text-sm font-medium"
             style={{ color: 'var(--text-muted)' }}
           >
-            Ignorer
+            Annuler la séance
           </button>
         </div>
       </div>
+
+      {/* Confirmation annulation */}
+      {showCancel && (
+        <div
+          className="fixed inset-0 z-10 flex items-center justify-center px-4"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+          onClick={() => setShowCancel(false)}
+        >
+          <div
+            className="w-full max-w-sm p-6 rounded-2xl space-y-4"
+            style={{ background: 'var(--bg-card)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>Annuler la séance ?</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              La séance ne sera pas enregistrée et les données seront perdues.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancel(false)}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold border"
+                style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
+              >
+                Retour
+              </button>
+              <button
+                onClick={() => { clearWorkout(); setShowCancel(false); }}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold"
+                style={{ background: 'var(--danger)', color: 'white' }}
+              >
+                Annuler quand même
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

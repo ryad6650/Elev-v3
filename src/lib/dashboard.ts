@@ -5,6 +5,8 @@ export interface ProchaineRoutine {
   nom: string;
   nbExercices: number;
   jours: string[];
+  dureeEstimee: number | null;
+  groupesMusculaires: string[];
 }
 
 export interface DashboardData {
@@ -111,7 +113,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       supabase.from("workouts").select("date").eq("user_id", user.id).gte("date", sevenWeeksAgo),
       supabase
         .from("routines")
-        .select("id, nom, jours, routine_exercises(count)")
+        .select("id, nom, jours, routine_exercises(series_cible, exercises(groupe_musculaire))")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -166,15 +168,27 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ).size;
 
   // Prochaine routine
-  const routineData = routinesRes.data as { id: string; nom: string; jours: string[]; routine_exercises: { count: number }[] } | null;
-  const prochaineRoutine: ProchaineRoutine | null = routineData
-    ? {
-        id: routineData.id,
-        nom: routineData.nom,
-        jours: routineData.jours ?? [],
-        nbExercices: routineData.routine_exercises?.[0]?.count ?? 0,
-      }
-    : null;
+  type RoutineExerciseRow = { series_cible: number; exercises: { groupe_musculaire: string } | null };
+  const routineData = routinesRes.data as { id: string; nom: string; jours: string[]; routine_exercises: RoutineExerciseRow[] } | null;
+
+  let prochaineRoutine: ProchaineRoutine | null = null;
+  if (routineData) {
+    const exos = routineData.routine_exercises ?? [];
+    const nbExercices = exos.length;
+    const totalSets = exos.reduce((sum, e) => sum + (e.series_cible ?? 3), 0);
+    const dureeEstimee = totalSets > 0 ? Math.round(totalSets * 2.5) : null;
+    const groupesRaw = exos.map((e) => e.exercises?.groupe_musculaire).filter(Boolean) as string[];
+    const groupesMusculaires = [...new Set(groupesRaw)].slice(0, 3);
+
+    prochaineRoutine = {
+      id: routineData.id,
+      nom: routineData.nom,
+      jours: routineData.jours ?? [],
+      nbExercices,
+      dureeEstimee,
+      groupesMusculaires,
+    };
+  }
 
   return {
     prenom: profil?.prenom ?? null,

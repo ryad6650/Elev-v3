@@ -159,6 +159,20 @@ Décisions techniques :
 - Le min ne peut pas dépasser le max (auto-ajustement si nécessaire)
 - Stepper max a `min = repsCible + 1` pour garantir fourchette valide
 
+### Timer repos configurable par exercice (fait le 2026-03-30)
+
+Fichiers modifiés :
+- `src/store/workoutStore.ts` — `restDuration?: number | null` sur `WorkoutExercise` ; `toggleComplete` ne déclenche le timer que si `exercise.restDuration != null` ; ajout `setExerciseRestDuration`
+- `src/components/workout/ExerciseCard.tsx` — bouton "Aucun minuteur / Xmin Xs" entre le nom et les headers ; ouvre `RestDurationPicker`
+
+Fichiers créés :
+- `src/components/workout/RestDurationPicker.tsx` — bottom sheet avec 8 options (Aucun, 30s, 45s, 1min, 1min30, 2min, 3min, 5min)
+
+Décisions techniques :
+- Défaut = `undefined` (pas de minuteur) — plus d'auto-démarrage au premier usage
+- Personnalisable par exercice, persisté dans le store Zustand (localStorage)
+- Bouton orange si timer actif, gris sinon
+
 Bugs connus / Limitations MVP :
 - Pas de pré-remplissage "valeurs dernière séance" (poidsRef = null)
 - Pas de détection PR automatique

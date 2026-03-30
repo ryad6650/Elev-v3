@@ -23,7 +23,7 @@ export default function CreateProgrammeModal({ routinesDisponibles, onClose }: P
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [nom, setNom] = useState('');
   const [difficulte, setDifficulte] = useState<'debutant' | 'intermediaire' | 'avance'>('intermediaire');
-  const [durée, setDuree] = useState(8);
+  const [durée, setDuree] = useState<number | null>(null);
   const [jours, setJours] = useState<number[]>([0, 2, 4]);
   const [routinesParJour, setRoutinesParJour] = useState<Record<number, string>>({});
 
@@ -103,15 +103,48 @@ export default function CreateProgrammeModal({ routinesDisponibles, onClose }: P
                 <label className="text-[10px] font-semibold uppercase tracking-widest block mb-1.5" style={{ color: 'var(--text-muted)' }}>
                   Durée (semaines)
                 </label>
-                <input
-                  type="number"
-                  value={durée}
-                  min={1}
-                  max={52}
-                  onChange={(e) => setDuree(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-                />
+                <div className="flex gap-2 items-center">
+                  <div
+                    className="flex-1 px-4 py-3 rounded-xl text-sm"
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      color: durée === null ? 'var(--text-primary)' : 'var(--text-muted)',
+                      border: durée === null ? '1.5px solid var(--accent)' : '1px solid var(--border)',
+                    }}
+                  >
+                    {durée === null ? 'Sans limite' : `${durée} semaine${durée > 1 ? 's' : ''}`}
+                  </div>
+                  {durée === null ? (
+                    <button
+                      type="button"
+                      onClick={() => setDuree(8)}
+                      className="px-3 py-3 rounded-xl text-xs font-medium whitespace-nowrap"
+                      style={{ background: 'var(--bg-elevated)', color: 'var(--accent-text)', border: '1px solid var(--border)' }}
+                    >
+                      + Ajouter une durée
+                    </button>
+                  ) : (
+                    <>
+                      <input
+                        type="number"
+                        value={durée}
+                        min={1}
+                        max={52}
+                        onChange={(e) => setDuree(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-16 px-3 py-3 rounded-xl text-sm outline-none text-center"
+                        style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--accent)' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setDuree(null)}
+                        className="px-3 py-3 rounded-xl text-xs font-medium whitespace-nowrap"
+                        style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+                      >
+                        Retirer
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => setStep(2)}

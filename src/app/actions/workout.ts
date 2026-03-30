@@ -168,6 +168,7 @@ export async function saveWorkout(
       poids: s.poids,
       reps: s.reps,
       completed: s.completed,
+      is_warmup: s.isWarmup,
     }))
   );
 

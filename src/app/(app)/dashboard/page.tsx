@@ -71,9 +71,6 @@ export default async function DashboardPage() {
         className="p-5 rounded-2xl border"
         style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
       >
-        <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
-          Calories aujourd'hui
-        </p>
         <CaloriesRing consumed={data.caloriesConsommees} objective={data.objectifCalories} />
       </div>
 
@@ -94,10 +91,10 @@ export default async function DashboardPage() {
 
       {/* Prochain entraînement */}
       {data.prochaineRoutine && (
-        <Link href="/workout">
+        <Link href="/workout" className="block">
           <div
             className="p-5 rounded-2xl flex items-center justify-between"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "#C8622E" }}
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-80" style={{ color: "#fff" }}>
@@ -111,7 +108,8 @@ export default async function DashboardPage() {
               </h2>
               <p className="text-sm opacity-80" style={{ color: "#fff" }}>
                 {data.prochaineRoutine.nbExercices} exercice{data.prochaineRoutine.nbExercices !== 1 ? "s" : ""}
-                {data.prochaineRoutine.jours.length > 0 && ` · ${data.prochaineRoutine.jours.join(", ")}`}
+                {data.prochaineRoutine.dureeEstimee != null && ` · ~${data.prochaineRoutine.dureeEstimee} min`}
+                {data.prochaineRoutine.groupesMusculaires.length > 0 && ` · ${data.prochaineRoutine.groupesMusculaires.join(" + ")}`}
               </p>
             </div>
             <div
