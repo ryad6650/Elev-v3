@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* ===== DESIGN SYSTEM — ÉLEV V3 ===== */
+
+/* Dark mode (default) */
+:root {
+  --bg-primary: #0C0A09;
+  --bg-secondary: #1C1917;
+  --bg-card: #292524;
+  --bg-elevated: #44403C;
+  --text-primary: #FAFAF9;
+  --text-secondary: #A8A29E;
+  --text-muted: #78716C;
+  --border: rgba(255, 255, 255, 0.08);
+
+  --accent: #E8860C;
+  --accent-hover: #CA6F08;
+  --accent-bg: rgba(232, 134, 12, 0.15);
+  --accent-text: #FDBA74;
+
+  --color-protein: #3B82F6;
+  --color-carbs: #EAB308;
+  --color-fat: #EF4444;
+  --success: #22C55E;
+  --danger: #EF4444;
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --bg-primary: #FAF9F7;
+  --bg-secondary: #F0EEEB;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #E7E5E4;
+  --text-primary: #1C1917;
+  --text-secondary: #78716C;
+  --text-muted: #A8A29E;
+  --border: #E7E5E4;
+
+  --accent-text: #C2410C;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-protein: var(--color-protein);
+  --color-carbs: var(--color-carbs);
+  --color-fat: var(--color-fat);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-dm-serif);
+}
+
+html {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page transition animation */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 300ms ease-out;
+}
+
+/* Smooth theme transitions */
+* {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 2px;
+}

@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp:*)",
+      "Bash(npx:*)",
+      "Bash(printf \"n\\\\nn\\\\n\")",
+      "Bash(printf \"n\\\\rn\\\\r\")",
+      "Bash(NEXT_TELEMETRY_DISABLED=1 npx --yes create-next-app@latest temp-init --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --no-react-compiler --no-agents-md 2>&1)",
+      "Bash(cp:*)",
+      "Bash(cp -r /c/Users/louis/elev-v3/temp-init/* /c/Users/louis/elev-v3/)",
+      "Bash(cp -r /c/Users/louis/elev-v3/temp-init/.* /c/Users/louis/elev-v3/)",
+      "Bash(npm install:*)",
+      "Bash(BASE=/c/Users/louis/elev-v3/src)",
+      "Bash(mkdir -p \"$BASE/app/\\(auth\\)/login\")",
+      "Bash(mkdir -p \"$BASE/app/\\(auth\\)/register\")",
+      "Bash(mkdir -p \"$BASE/app/\\(auth\\)/forgot-password\")",
+      "Bash(mkdir -p \"$BASE/app/\\(app\\)/dashboard\")",
+      "Read(//c/Users/louis/.claude/**)",
+      "Bash(find node_modules/@supabase/supabase-js -name *.d.ts)",
+      "Bash(find node_modules/@supabase -name *.d.ts)",
+      "Bash(find node_modules/@supabase/postgrest-js -name *.d.ts)",
+      "Bash(xargs ls:*)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)",
+      "Bash(cat -n \"C:\\\\Users\\\\louis\\\\elev-v3\\\\src\\\\app\\\\\\(app\\)\\\\nutrition\\\\page.tsx\")",
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

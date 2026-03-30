@@ -1,0 +1,39 @@
+{
+  "name": "Élev — Fitness Tracker",
+  "short_name": "Élev",
+  "description": "Suivi entraînements, nutrition et poids",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C0A09",
+  "theme_color": "#0C0A09",
+  "lang": "fr",
+  "categories": ["fitness", "health"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Nouvelle séance",
+      "url": "/workout",
+      "description": "Démarrer une séance d'entraînement"
+    },
+    {
+      "name": "Saisir poids",
+      "url": "/poids",
+      "description": "Enregistrer mon poids du jour"
+    }
+  ]
+}
