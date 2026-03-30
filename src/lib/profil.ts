@@ -36,7 +36,9 @@ export async function fetchProfilData(): Promise<ProfilPageData> {
   const debutMois = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
   const [profileRes, totalRes, moisRes, recentRes] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("profiles")
+      .select("prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, created_at")
+      .eq("id", user.id).single(),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })

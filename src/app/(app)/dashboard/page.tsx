@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
@@ -53,8 +54,7 @@ export default async function DashboardPage() {
               }}
             >
               {data.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={data.photoUrl} alt="Profil" className="w-full h-full object-cover" />
+                <Image src={data.photoUrl} alt="Profil" width={40} height={40} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-sm font-bold" style={{ color: "var(--accent)" }}>
                   {data.prenom ? data.prenom[0].toUpperCase() : "?"}

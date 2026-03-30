@@ -19,19 +19,18 @@ function formatDuration(ms: number): string {
 }
 
 export default function WorkoutTimer({ startedAt, pausedAt = null, totalPausedMs = 0, large = false }: Props) {
-  const calcElapsed = () => {
-    const pauseOffset = pausedAt ? Date.now() - pausedAt : 0;
-    return Date.now() - startedAt - totalPausedMs - pauseOffset;
-  };
-
-  const [elapsed, setElapsed] = useState(calcElapsed);
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    setElapsed(calcElapsed());
+    // Calcul défini à l'intérieur de l'effet — pas de stale closure possible
+    const calc = () => {
+      const pauseOffset = pausedAt ? Date.now() - pausedAt : 0;
+      return Date.now() - startedAt - totalPausedMs - pauseOffset;
+    };
+    setElapsed(calc());
     if (pausedAt !== null) return;
-    const id = setInterval(() => setElapsed(calcElapsed()), 1000);
+    const id = setInterval(() => setElapsed(calc()), 1000);
     return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startedAt, pausedAt, totalPausedMs]);
 
   const text = formatDuration(elapsed);

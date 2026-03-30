@@ -36,18 +36,24 @@ const DB_NAME = 'elev-offline';
 const DB_VERSION = 2;
 const STORE = 'operations';
 
+// Singleton — évite de réouvrir IndexedDB à chaque opération
+let dbSingleton: Promise<IDBDatabase> | null = null;
+
 function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = (e) => {
-      const db = (e.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: 'id' });
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  if (!dbSingleton) {
+    dbSingleton = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = (e.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains(STORE)) {
+          db.createObjectStore(STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => { dbSingleton = null; reject(req.error); };
+    });
+  }
+  return dbSingleton;
 }
 
 export async function enqueueOperation(operation: OfflineOperation): Promise<string> {

@@ -122,26 +122,33 @@ export async function createCustomAliment(
   return { id: data.id };
 }
 
+type EntryWithAliment = {
+  aliment_id: string;
+  aliments: {
+    id: string; nom: string; marque: string | null; calories: number;
+    proteines: number | null; glucides: number | null; lipides: number | null;
+    fibres: number | null; sucres: number | null; sel: number | null; code_barres: string | null;
+  } | null;
+};
+
 export async function getRecentAliments() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
+  // Limite à 20 — suffisant pour extraire 6 aliments distincts sans sur-fetch
   const { data } = await supabase
     .from("nutrition_entries")
     .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres)")
     .eq("user_id", user.id)
     .order("date", { ascending: false })
-    .limit(50);
+    .limit(20);
 
   if (!data) return [];
 
   const seen = new Set<string>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recents: any[] = [];
-  for (const e of data as any[]) {
+  const recents: EntryWithAliment["aliments"][] = [];
+  for (const e of data as EntryWithAliment[]) {
     if (!seen.has(e.aliment_id) && e.aliments) {
       seen.add(e.aliment_id);
       recents.push(e.aliments);

@@ -24,8 +24,11 @@ export async function fetchNutritionData(date: string): Promise<NutritionPageDat
       .single(),
   ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const entries: NutritionEntry[] = (entriesRes.data ?? []).map((e: any) => ({
+  type RawEntry = {
+    id: string; repas: string; quantite_g: number;
+    aliments: { id: string; nom: string; calories: number; proteines: number | null; glucides: number | null; lipides: number | null } | null;
+  };
+  const entries: NutritionEntry[] = (entriesRes.data ?? [] as RawEntry[]).map((e: RawEntry) => ({
     id: e.id,
     repas: e.repas as NutritionEntry["repas"],
     quantite_g: e.quantite_g,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Plus, ChevronRight, Check, Timer, ChevronDown, Flame } from 'lucide-react';
 import { useWorkoutStore } from '@/store/workoutStore';
 import type { WorkoutExercise, WorkoutSet } from '@/store/workoutStore';
@@ -23,7 +23,7 @@ interface Props {
 }
 
 
-export default function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) {
+function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) {
   const addSet = useWorkoutStore((s) => s.addSet);
   const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const removeSet = useWorkoutStore((s) => s.removeSet);
@@ -237,3 +237,5 @@ export default function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, 
     </div>
   );
 }
+
+export default memo(ExerciseCard);

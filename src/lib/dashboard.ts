@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getTodayString, getWeekStart, getNDaysAgo, computeStreak } from "@/lib/date-utils";
 
 export interface ProchaineRoutine {
   id: string;
@@ -32,49 +33,7 @@ export interface DashboardData {
   sommeilMinutes: number | null;
 }
 
-function getTodayString(): string {
-  return new Date().toISOString().split("T")[0];
-}
-
-function getWeekStart(): string {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(now.setDate(diff)).toISOString().split("T")[0];
-}
-
-function getNDaysAgo(n: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return d.toISOString().split("T")[0];
-}
-
-function computeStreak(activityDates: string[]): number {
-  const dateSet = new Set(activityDates);
-  const cursor = new Date();
-  let streak = 0;
-
-  // Si pas d'activité aujourd'hui, commencer à hier
-  if (!dateSet.has(getTodayString())) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  while (true) {
-    const dateStr = cursor.toISOString().split("T")[0];
-    if (!dateSet.has(dateStr)) break;
-    streak++;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
-}
-
-type AlimentJoin = {
-  calories: number;
-  proteines: number | null;
-  glucides: number | null;
-  lipides: number | null;
-} | null;
+type AlimentJoin = { calories: number; proteines: number | null; glucides: number | null; lipides: number | null } | null;
 
 export async function fetchDashboardData(): Promise<DashboardData> {
   const supabase = await createClient();
@@ -86,54 +45,33 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const thirtyDaysAgo = getNDaysAgo(30);
   const sevenWeeksAgo = getNDaysAgo(49);
 
-  const [profileRes, nutritionRes, workoutsWeekRes, poidsRes, weightHistoryRes, nutritionDatesRes, workoutDatesRes, routinesRes, sommeilRes] =
+  const [profileRes, nutritionRes, poidsRes, workoutDatesRes, nutritionDatesRes, routinesRes, sommeilRes] =
     await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).single(),
-      supabase
-        .from("nutrition_entries")
+      supabase.from("profiles")
+        .select("prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides")
+        .eq("id", user.id).single(),
+      supabase.from("nutrition_entries")
         .select("quantite_g, aliments(calories, proteines, glucides, lipides)")
-        .eq("user_id", user.id)
-        .eq("date", today),
-      supabase.from("workouts").select("date").eq("user_id", user.id).gte("date", weekStart),
-      supabase
-        .from("poids_history")
-        .select("poids, date")
-        .eq("user_id", user.id)
-        .order("date", { ascending: false })
-        .limit(14),
-      supabase
-        .from("poids_history")
-        .select("date, poids")
-        .eq("user_id", user.id)
-        .gte("date", thirtyDaysAgo)
-        .order("date", { ascending: true }),
-      supabase
-        .from("nutrition_entries")
-        .select("date")
-        .eq("user_id", user.id)
-        .gte("date", sevenWeeksAgo),
-      supabase.from("workouts").select("date").eq("user_id", user.id).gte("date", sevenWeeksAgo),
-      supabase
-        .from("routines")
+        .eq("user_id", user.id).eq("date", today),
+      // Une seule requête poids — couvre poids actuel, delta J-7, graphique 30j et stats semaine
+      supabase.from("poids_history").select("poids, date")
+        .eq("user_id", user.id).gte("date", thirtyDaysAgo)
+        .order("date", { ascending: false }),
+      // Une seule requête workouts — couvre séances semaine, aujourd'hui et streak
+      supabase.from("workouts").select("date")
+        .eq("user_id", user.id).gte("date", sevenWeeksAgo),
+      supabase.from("nutrition_entries").select("date")
+        .eq("user_id", user.id).gte("date", sevenWeeksAgo),
+      supabase.from("routines")
         .select("id, nom, jours, routine_exercises(series_cible, exercises(groupe_musculaire))")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single(),
-      supabase
-        .from("sommeil")
-        .select("duree_minutes")
-        .eq("user_id", user.id)
-        .eq("date", today)
-        .maybeSingle(),
+        .eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single(),
+      supabase.from("sommeil").select("duree_minutes")
+        .eq("user_id", user.id).eq("date", today).maybeSingle(),
     ]);
 
-  const profil = profileRes.data;
-
-  // Calcul calories/macros du jour
+  // Calories / macros du jour
   let caloriesConsommees = 0, proteinesConsommees = 0, glucidesConsommees = 0, lipidesConsommees = 0;
-  const entries = nutritionRes.data as Array<{ quantite_g: number; aliments: AlimentJoin }> ?? [];
-  for (const entry of entries) {
+  for (const entry of (nutritionRes.data ?? []) as Array<{ quantite_g: number; aliments: AlimentJoin }>) {
     const a = entry.aliments;
     if (!a) continue;
     const r = entry.quantite_g / 100;
@@ -143,27 +81,26 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     lipidesConsommees += (a.lipides ?? 0) * r;
   }
 
-  // Poids actuel + delta vs semaine précédente
+  // Poids (desc → index 0 = plus récent)
   const poidsData = poidsRes.data ?? [];
   const poidsActuel = poidsData[0]?.poids ?? null;
   const poidsIlYA7Jours = poidsData.find((p) => {
     const diff = Math.abs(new Date(today).getTime() - new Date(p.date).getTime());
     return diff >= 5 * 86400000 && diff <= 9 * 86400000;
   });
-  const poidsDelta =
-    poidsActuel != null && poidsIlYA7Jours
-      ? +(poidsActuel - poidsIlYA7Jours.poids).toFixed(1)
-      : null;
+  const poidsDelta = poidsActuel != null && poidsIlYA7Jours
+    ? +(poidsActuel - poidsIlYA7Jours.poids).toFixed(1) : null;
+  const weightHistory = [...poidsData].reverse(); // ascending pour le graphique
 
-  // Séances
-  const workouts = workoutsWeekRes.data ?? [];
-  const seancesAujourdhui = workouts.some((w) => w.date === today);
-  const seancesCetteSemaine = workouts.length;
+  // Workouts
+  const workoutDates = workoutDatesRes.data ?? [];
+  const seancesAujourdhui = workoutDates.some((w) => w.date === today);
+  const seancesCetteSemaine = workoutDates.filter((w) => w.date >= weekStart).length;
 
-  // Streak
+  // Streak (workouts + nutrition)
   const allDates = [
+    ...workoutDates.map((d) => d.date),
     ...(nutritionDatesRes.data ?? []).map((d) => d.date),
-    ...(workoutDatesRes.data ?? []).map((d) => d.date),
   ];
   const streakJours = computeStreak(allDates);
 
@@ -172,32 +109,26 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     (nutritionDatesRes.data ?? []).filter((d) => d.date >= weekStart).map((d) => d.date)
   ).size;
   const poidsJoursCetteSemaine = new Set(
-    (poidsData ?? []).filter((d) => d.date >= weekStart).map((d) => d.date)
+    poidsData.filter((d) => d.date >= weekStart).map((d) => d.date)
   ).size;
 
   // Prochaine routine
-  type RoutineExerciseRow = { series_cible: number; exercises: { groupe_musculaire: string } | null };
-  const routineData = routinesRes.data as { id: string; nom: string; jours: string[]; routine_exercises: RoutineExerciseRow[] } | null;
-
+  type RoutineExRow = { series_cible: number; exercises: { groupe_musculaire: string } | null };
+  const routineData = routinesRes.data as { id: string; nom: string; jours: string[]; routine_exercises: RoutineExRow[] } | null;
   let prochaineRoutine: ProchaineRoutine | null = null;
   if (routineData) {
     const exos = routineData.routine_exercises ?? [];
-    const nbExercices = exos.length;
     const totalSets = exos.reduce((sum, e) => sum + (e.series_cible ?? 3), 0);
-    const dureeEstimee = totalSets > 0 ? Math.round(totalSets * 3.5) : null;
     const groupesRaw = exos.map((e) => e.exercises?.groupe_musculaire).filter(Boolean) as string[];
-    const groupesMusculaires = [...new Set(groupesRaw)].slice(0, 3);
-
     prochaineRoutine = {
-      id: routineData.id,
-      nom: routineData.nom,
-      jours: routineData.jours ?? [],
-      nbExercices,
-      dureeEstimee,
-      groupesMusculaires,
+      id: routineData.id, nom: routineData.nom, jours: routineData.jours ?? [],
+      nbExercices: exos.length,
+      dureeEstimee: totalSets > 0 ? Math.round(totalSets * 3.5) : null,
+      groupesMusculaires: [...new Set(groupesRaw)].slice(0, 3),
     };
   }
 
+  const profil = profileRes.data;
   return {
     prenom: profil?.prenom ?? null,
     photoUrl: profil?.photo_url ?? null,
@@ -209,15 +140,9 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     proteinesConsommees: Math.round(proteinesConsommees),
     glucidesConsommees: Math.round(glucidesConsommees),
     lipidesConsommees: Math.round(lipidesConsommees),
-    poidsActuel,
-    poidsDelta,
-    seancesAujourdhui,
-    seancesCetteSemaine,
-    streakJours,
-    nutritionJoursCetteSemaine,
-    poidsJoursCetteSemaine,
-    weightHistory: weightHistoryRes.data ?? [],
-    prochaineRoutine,
+    poidsActuel, poidsDelta, seancesAujourdhui, seancesCetteSemaine, streakJours,
+    nutritionJoursCetteSemaine, poidsJoursCetteSemaine,
+    weightHistory, prochaineRoutine,
     sommeilMinutes: sommeilRes.data?.duree_minutes ?? null,
   };
 }
