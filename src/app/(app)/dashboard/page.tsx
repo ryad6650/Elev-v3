@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
@@ -43,16 +43,22 @@ export default async function DashboardPage() {
             </button>
             <Link
               href="/profil"
-              className="flex items-center justify-center rounded-full transition-all"
+              className="flex items-center justify-center rounded-full overflow-hidden transition-all shrink-0"
               style={{
-                width: 30,
-                height: 30,
-                background: "var(--bg-card)",
+                width: 40,
+                height: 40,
+                background: data.photoUrl ? "transparent" : "var(--bg-card)",
                 border: "1px solid var(--border)",
-                color: "var(--text-secondary)",
               }}
             >
-              <User size={16} />
+              {data.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={data.photoUrl} alt="Profil" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-sm font-bold" style={{ color: "var(--accent)" }}>
+                  {data.prenom ? data.prenom[0].toUpperCase() : "?"}
+                </span>
+              )}
             </Link>
           </div>
           {data.streakJours > 0 && (
@@ -94,7 +100,7 @@ export default async function DashboardPage() {
         <Link href="/workout" className="block">
           <div
             className="p-5 rounded-2xl flex items-center justify-between"
-            style={{ background: "#C8622E" }}
+            style={{ background: "linear-gradient(to right, #C8622E, #E8860C)" }}
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-80" style={{ color: "#fff" }}>

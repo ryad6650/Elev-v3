@@ -11,6 +11,7 @@ export interface ProchaineRoutine {
 
 export interface DashboardData {
   prenom: string | null;
+  photoUrl: string | null;
   objectifCalories: number;
   objectifProteines: number;
   objectifGlucides: number;
@@ -192,6 +193,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   return {
     prenom: profil?.prenom ?? null,
+    photoUrl: profil?.photo_url ?? null,
     objectifCalories: profil?.objectif_calories ?? 2000,
     objectifProteines: profil?.objectif_proteines ?? 150,
     objectifGlucides: profil?.objectif_glucides ?? 200,

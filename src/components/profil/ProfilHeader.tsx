@@ -1,3 +1,8 @@
+"use client";
+
+import { useRef, useState, useTransition } from "react";
+import { Camera, Loader2 } from "lucide-react";
+import { uploadPhotoProfil } from "@/app/actions/profil";
 import type { ProfilData } from "@/lib/profil";
 
 interface Props {
@@ -11,29 +16,96 @@ function formatMemberSince(dateStr: string): string {
 }
 
 export default function ProfilHeader({ profil }: Props) {
+  const [photoUrl, setPhotoUrl] = useState<string | null>(profil.photo_url);
+  const [isPending, startTransition] = useTransition();
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const initiale = profil.prenom
     ? profil.prenom[0].toUpperCase()
-    : profil.email
-    ? profil.email[0].toUpperCase()
     : "?";
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Prévisualisation immédiate
+    const objectUrl = URL.createObjectURL(file);
+    setPhotoUrl(objectUrl);
+    setUploadError(null);
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    startTransition(async () => {
+      try {
+        const url = await uploadPhotoProfil(formData);
+        setPhotoUrl(url);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : "Erreur upload");
+        setPhotoUrl(profil.photo_url); // rollback
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+        // Reset input pour permettre de re-sélectionner le même fichier
+        if (inputRef.current) inputRef.current.value = "";
+      }
+    });
+  }
 
   return (
     <div className="flex items-center gap-4 mb-6">
-      {profil.photo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={profil.photo_url}
-          alt="Avatar"
-          className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-        />
-      ) : (
+      {/* Avatar cliquable */}
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="relative shrink-0 group"
+        aria-label="Modifier la photo de profil"
+      >
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoUrl}
+            alt="Avatar"
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
+            style={{ background: "var(--accent)" }}
+          >
+            {initiale}
+          </div>
+        )}
+
+        {/* Overlay upload */}
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-2xl font-bold text-white"
-          style={{ background: "var(--accent)" }}
+          className="absolute inset-0 rounded-full flex items-center justify-center transition-opacity"
+          style={{ background: "rgba(0,0,0,0.45)", opacity: isPending ? 1 : 0 }}
+          aria-hidden
         >
-          {initiale}
+          {isPending
+            ? <Loader2 size={20} color="#fff" className="animate-spin" />
+            : <Camera size={18} color="#fff" />
+          }
         </div>
-      )}
+
+        {/* Indicateur hover */}
+        <div
+          className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+          aria-hidden
+        >
+          <Camera size={18} color="#fff" />
+        </div>
+      </button>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       <div className="min-w-0">
         <h1
@@ -46,15 +118,13 @@ export default function ProfilHeader({ profil }: Props) {
         >
           {profil.prenom || "Mon profil"}
         </h1>
-        {profil.email && (
-          <p className="text-sm mt-0.5 truncate" style={{ color: "var(--text-muted)" }}>
-            {profil.email}
-          </p>
-        )}
         {profil.created_at && (
           <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
             Membre depuis {formatMemberSince(profil.created_at)}
           </p>
+        )}
+        {uploadError && (
+          <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>{uploadError}</p>
         )}
       </div>
     </div>

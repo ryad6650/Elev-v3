@@ -18,16 +18,14 @@ export default function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none">
       <nav
-        className="pointer-events-auto flex items-center justify-around px-3 py-2 gap-1"
+        className="pointer-events-auto flex items-center px-2 py-2 gap-0.5"
         style={{
           background: "color-mix(in srgb, var(--bg-secondary) 90%, transparent)",
           backdropFilter: "blur(16px)",
           border: "1px solid var(--border)",
           borderRadius: "32px",
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-          width: "fit-content",
-          minWidth: "320px",
-          maxWidth: "420px",
+          width: "min(96vw, 460px)",
         }}
       >
         {navItems.map(({ href, emoji, label }) => {
@@ -36,14 +34,13 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-[22px] transition-all"
+              className="flex flex-1 items-center justify-center py-3 rounded-[22px] transition-all"
               style={{
                 background: active ? "var(--accent)" : "transparent",
                 color: active ? "#fff" : "var(--text-muted)",
               }}
             >
-              <span className="text-[20px] leading-none">{emoji}</span>
-              <span className="text-[10px] font-semibold">{label}</span>
+              <span className="text-[22px] leading-none">{emoji}</span>
             </Link>
           );
         })}

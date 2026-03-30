@@ -62,6 +62,40 @@ export async function updateTheme(theme: "dark" | "light"): Promise<void> {
   revalidatePath("/profil");
 }
 
+export async function uploadPhotoProfil(formData: FormData): Promise<string> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const file = formData.get("photo") as File;
+  if (!file || file.size === 0) throw new Error("Fichier manquant");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Fichier trop lourd (max 5 Mo)");
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+  const path = `${user.id}/avatar.${ext}`;
+  const arrayBuffer = await file.arrayBuffer();
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(path, arrayBuffer, { contentType: file.type, upsert: true });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ photo_url: publicUrl, updated_at: new Date().toISOString() })
+    .eq("id", user.id);
+
+  if (updateError) throw new Error(updateError.message);
+  revalidatePath("/profil");
+  revalidatePath("/dashboard");
+  return publicUrl;
+}
+
 export async function updatePassword(
   currentPassword: string,
   newPassword: string

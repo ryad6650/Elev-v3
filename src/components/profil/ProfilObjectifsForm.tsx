@@ -1,12 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Check } from "lucide-react";
 import { updateObjectifsNutrition } from "@/app/actions/profil";
 import type { ProfilData } from "@/lib/profil";
 
 interface Props {
   profil: ProfilData;
+}
+
+function calcGlucides(cal: string, prot: string, lip: string): string {
+  const kcal = parseFloat(cal);
+  const g_prot = parseFloat(prot);
+  const g_lip = parseFloat(lip);
+  if (!kcal) return "";
+  const remaining = kcal - (isNaN(g_prot) ? 0 : g_prot * 4) - (isNaN(g_lip) ? 0 : g_lip * 9);
+  if (remaining < 0) return "0";
+  return Math.round(remaining / 4).toString();
 }
 
 export default function ProfilObjectifsForm({ profil }: Props) {
@@ -17,6 +27,11 @@ export default function ProfilObjectifsForm({ profil }: Props) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Recalcule les glucides automatiquement
+  useEffect(() => {
+    setGlucides(calcGlucides(calories, proteines, lipides));
+  }, [calories, proteines, lipides]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,11 +66,17 @@ export default function ProfilObjectifsForm({ profil }: Props) {
     outline: "none",
   };
 
-  const fields = [
-    { label: "Calories (kcal)", value: calories, setter: setCalories, unit: "kcal" },
-    { label: "Protéines (g)", value: proteines, setter: setProteines, unit: "g" },
-    { label: "Glucides (g)", value: glucides, setter: setGlucides, unit: "g" },
-    { label: "Lipides (g)", value: lipides, setter: setLipides, unit: "g" },
+  const inputStyleReadonly = {
+    ...inputStyle,
+    background: "var(--bg-card)",
+    color: "var(--text-muted)",
+    cursor: "default",
+  };
+
+  const editableFields = [
+    { label: "Calories (kcal)", value: calories, setter: setCalories },
+    { label: "Protéines (g)", value: proteines, setter: setProteines },
+    { label: "Lipides (g)", value: lipides, setter: setLipides },
   ];
 
   return (
@@ -65,7 +86,7 @@ export default function ProfilObjectifsForm({ profil }: Props) {
       </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
-          {fields.map(({ label, value, setter }) => (
+          {editableFields.map(({ label, value, setter }) => (
             <div key={label}>
               <label className="block text-xs mb-1.5 font-medium" style={{ color: "var(--text-secondary)" }}>
                 {label}
@@ -80,6 +101,21 @@ export default function ProfilObjectifsForm({ profil }: Props) {
               />
             </div>
           ))}
+          {/* Glucides — calculé automatiquement */}
+          <div>
+            <label className="block text-xs mb-1.5 font-medium" style={{ color: "var(--text-secondary)" }}>
+              Glucides (g)
+              <span className="ml-1 opacity-50 font-normal">auto</span>
+            </label>
+            <input
+              type="number"
+              value={glucides}
+              readOnly
+              tabIndex={-1}
+              placeholder="—"
+              style={inputStyleReadonly}
+            />
+          </div>
         </div>
         {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
         <button
