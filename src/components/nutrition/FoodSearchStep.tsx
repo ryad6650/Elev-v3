@@ -23,7 +23,9 @@ interface Props {
   setQuery: (q: string) => void;
   results: NutritionAliment[];
   recents: NutritionAliment[];
+  populaires: NutritionAliment[];
   loading: boolean;
+  loadingInitial: boolean;
   onSelect: (a: NutritionAliment) => void;
   onScan: () => void;
   onCustom: () => void;
@@ -37,7 +39,7 @@ function filterByCat(items: NutritionAliment[], catId: CatId): NutritionAliment[
 }
 
 export default function FoodSearchStep({
-  query, setQuery, results, recents, loading, onSelect, onScan, onCustom,
+  query, setQuery, results, recents, populaires, loading, loadingInitial, onSelect, onScan, onCustom,
 }: Props) {
   const [tab, setTab] = useState<TabId>(query ? 'resultats' : 'recents');
   const [cat, setCat] = useState<CatId>('all');
@@ -45,13 +47,18 @@ export default function FoodSearchStep({
   function handleQueryChange(val: string) {
     setQuery(val);
     if (val.trim()) setTab('resultats');
+    else setTab('recents');
   }
 
-  const baseList = tab === 'resultats' ? results : tab === 'recents' ? recents : [];
+  // Quand pas de récents, afficher les populaires dans l'onglet Récents
+  const recentsOrPopulaires = recents.length > 0 ? recents : populaires;
+  const recentsLabel = recents.length > 0 ? 'Récents' : 'Populaires';
+
+  const baseList = tab === 'resultats' ? results : tab === 'recents' ? recentsOrPopulaires : [];
   const displayList = filterByCat(baseList, cat);
   const emptyMsg = tab === 'favoris'
     ? 'Aucun favori pour l\'instant'
-    : tab === 'recents' ? 'Aucun aliment récent' : 'Aucun résultat';
+    : tab === 'recents' ? (loadingInitial ? 'Chargement...' : 'Aucun aliment récent') : 'Aucun résultat';
 
   return (
     <div className="flex flex-col gap-3 px-4 pb-6 overflow-y-auto">
@@ -68,7 +75,6 @@ export default function FoodSearchStep({
         >
           <Search size={15} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
           <input
-            autoFocus
             value={query}
             onChange={e => handleQueryChange(e.target.value)}
             placeholder="Rechercher un aliment..."
@@ -107,7 +113,7 @@ export default function FoodSearchStep({
               border: tab === t ? 'none' : '1px solid var(--border)',
             }}
           >
-            {t === 'resultats' ? 'Résultats' : t === 'recents' ? 'Récents' : 'Favoris'}
+            {t === 'resultats' ? 'Résultats' : t === 'recents' ? recentsLabel : 'Favoris'}
           </button>
         ))}
       </div>

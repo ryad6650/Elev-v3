@@ -34,17 +34,25 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   const [recents, setRecents] = useState<NutritionAliment[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<NutritionAliment | null>(null);
+  const [populaires, setPopulaires] = useState<NutritionAliment[]>([]);
+  const [loadingInitial, setLoadingInitial] = useState(true);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    getRecentAliments().then(r => setRecents(r as NutritionAliment[])).catch(() => {});
+    let done = 0;
+    const finish = () => { done++; if (done >= 2) setLoadingInitial(false); };
+    getRecentAliments().then(r => setRecents(r as NutritionAliment[])).catch(() => {}).finally(finish);
+    fetch('/api/aliments?q=').then(r => r.json()).then(d => setPopulaires(Array.isArray(d) ? d : [])).catch(() => {}).finally(finish);
   }, []);
 
   const search = useCallback(async (q: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/aliments?q=${encodeURIComponent(q)}`);
-      setResults(await res.json());
+      const data = await res.json();
+      setResults(Array.isArray(data) ? data : []);
+    } catch {
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -115,7 +123,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
       style={{ background: 'rgba(0,0,0,0.65)' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-[430px] px-3 mb-20 flex flex-col">
+      <div className="w-full max-w-[430px] px-3 mb-28 flex flex-col">
         <div
           className="rounded-3xl flex flex-col w-full"
           style={{
@@ -154,7 +162,9 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
               setQuery={setQuery}
               results={results}
               recents={recents}
+              populaires={populaires}
               loading={loading}
+              loadingInitial={loadingInitial}
               onSelect={handleSelect}
               onScan={() => setStep('scan')}
               onCustom={() => setStep('custom')}
