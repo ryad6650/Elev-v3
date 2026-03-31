@@ -67,6 +67,14 @@ html {
   color-scheme: light;
 }
 
+/* Card "Prochain entraînement" — gradient adapté au fond crème en light mode */
+.workout-next-card {
+  background: linear-gradient(135deg, #1a0e07 0%, #2d1506 40%, #C8622E 100%);
+}
+[data-theme="light"] .workout-next-card {
+  background: linear-gradient(135deg, #7c3d08 0%, #a8520f 40%, #E8860C 100%);
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -90,9 +98,9 @@ body {
   animation: page-enter 300ms ease-out;
 }
 
-/* Smooth theme transitions */
-* {
-  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+/* Smooth theme transitions — uniquement pendant le basculement de thème */
+.theme-transitioning * {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease !important;
 }
 
 /* Scrollbar */

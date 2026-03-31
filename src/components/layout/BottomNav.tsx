@@ -34,7 +34,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex flex-1 items-center justify-center py-3 rounded-[22px] transition-all"
+              className="flex flex-1 items-center justify-center py-3 rounded-[22px] transition-colors"
               style={{
                 background: active ? "var(--accent)" : "transparent",
                 color: active ? "#fff" : "var(--text-muted)",
