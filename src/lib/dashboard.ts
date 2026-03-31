@@ -32,6 +32,7 @@ export interface DashboardData {
   weightHistory: { date: string; poids: number }[];
   prochaineRoutine: ProchaineRoutine | null;
   sommeilMinutes: number | null;
+  theme: "dark" | "light";
 }
 
 type AlimentJoin = { calories: number; proteines: number | null; glucides: number | null; lipides: number | null } | null;
@@ -49,7 +50,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const [profileRes, nutritionRes, poidsRes, workoutDatesRes, nutritionDatesRes, routinesRes, sommeilRes] =
     await Promise.all([
       supabase.from("profiles")
-        .select("prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion")
+        .select("prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion, theme")
         .eq("id", user.id).single(),
       supabase.from("nutrition_entries")
         .select("quantite_g, aliments(calories, proteines, glucides, lipides)")
@@ -167,5 +168,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     weightHistory, prochaineRoutine,
     streakConnexions,
     sommeilMinutes: sommeilRes.data?.duree_minutes ?? null,
+    theme: (profil?.theme ?? "dark") as "dark" | "light",
   };
 }
