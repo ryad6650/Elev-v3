@@ -1,80 +1,144 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
-import ProgrammeActifCard from '@/components/programmes/ProgrammeActifCard';
-import ProgrammeCard from '@/components/programmes/ProgrammeCard';
+import { ChevronRight } from 'lucide-react';
 import ProgrammeDetail from '@/components/programmes/ProgrammeDetail';
 import CreateProgrammeModal from '@/components/programmes/CreateProgrammeModal';
+import { getRoutineExercises } from '@/app/actions/workout';
+import { useWorkoutStore } from '@/store/workoutStore';
 import type { ProgrammesPageData, Programme } from '@/lib/programmes';
 
-interface Props {
-  data: ProgrammesPageData;
+const LETTRES = ['A', 'B', 'C', 'D', 'E'];
+
+function getEmoji(nom: string, i: number): string {
+  const n = nom.toLowerCase();
+  if (n.includes('push') || n.includes('ppl')) return '💪';
+  if (n.includes('full') || n.includes('corps')) return '🏋️';
+  if (n.includes('upper') || n.includes('lower')) return '🎯';
+  if (n.includes('force') || n.includes('5x5')) return '⚡';
+  return (['💪', '🎯', '🔥', '⚡', '🏆'] as const)[i % 5];
 }
 
-export default function WorkoutProgrammesSection({ data }: Props) {
+export default function WorkoutProgrammesSection({ data }: { data: ProgrammesPageData }) {
   const [selection, setSelection] = useState<Programme | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const startWorkout = useWorkoutStore((s) => s.startWorkout);
+
+  const handleDemarrer = async (routineId: string, routineNom: string) => {
+    try {
+      const exercises = await getRoutineExercises(routineId);
+      startWorkout({ routineId, routineName: routineNom, exercises });
+    } catch {
+      startWorkout({ routineId, routineName: routineNom });
+    }
+  };
 
   return (
-    <div className="mb-2">
+    <div>
+      {/* Programme actif */}
       {data.programmeActif && (
-        <ProgrammeActifCard
-          programme={data.programmeActif}
-          onClick={() => setSelection(data.programmeActif)}
-        />
-      )}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+              Programme actif
+            </p>
+            <button onClick={() => setSelection(data.programmeActif)} className="text-xs font-semibold" style={{ color: 'var(--accent-text)' }}>
+              Tout voir
+            </button>
+          </div>
 
-      <div className="flex items-center justify-between mb-3">
-        <p
-          className="text-[10px] font-semibold uppercase tracking-widest"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          Mes programmes
-        </p>
-        <button
-          onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-1 text-xs font-semibold transition-opacity active:opacity-70"
-          style={{ color: 'var(--accent-text)' }}
-        >
-          <Plus size={14} />
-          Créer
-        </button>
-      </div>
+          <div className="rounded-2xl p-4" style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(232,134,12,0.35)' }}>
+            <div className="flex items-start justify-between mb-1">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                {data.programmeActif.nom}
+              </h3>
+              <span className="text-[11px] font-bold px-3 py-1 rounded-full shrink-0 ml-3" style={{ background: 'var(--accent)', color: 'white' }}>
+                Actif
+              </span>
+            </div>
+            {data.programmeActif.progres && (
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                Semaine {data.programmeActif.progres.semaine_actuelle} de {data.programmeActif.progres.total_semaines} · {data.programmeActif.routines.length} séances/sem
+              </p>
+            )}
 
-      {data.programmes.length > 0 ? (
-        data.programmes.map((p) => (
-          <ProgrammeCard
-            key={p.id}
-            programme={p}
-            estActif={p.id === data.programmeActif?.id}
-            onClick={() => setSelection(p)}
-          />
-        ))
-      ) : (
-        <div
-          className="text-center py-8 rounded-2xl mb-4"
-          style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
-        >
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            Aucun programme — crée ton premier plan structuré.
-          </p>
+            <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              {data.programmeActif.routines.map((r, i) => (
+                <div
+                  key={r.routine_id}
+                  className="shrink-0 rounded-xl p-3 flex flex-col"
+                  style={{
+                    minWidth: 148,
+                    background: i === 0 ? 'rgba(232,134,12,0.12)' : 'var(--bg-card)',
+                    border: `1px solid ${i === 0 ? 'rgba(232,134,12,0.4)' : 'var(--border)'}`,
+                  }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: i === 0 ? 'var(--accent-text)' : 'var(--text-muted)' }}>
+                    {i === 0 ? '✦ SUIVANTE' : `SÉANCE ${LETTRES[i]}`}
+                  </p>
+                  <p className="text-sm font-bold mb-0.5" style={{ color: 'var(--text-primary)' }}>{r.nom}</p>
+                  <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>{r.nbExercices} exercices</p>
+                  {i === 0 && (
+                    <button
+                      onClick={() => handleDemarrer(r.routine_id, r.nom)}
+                      className="mt-auto w-full py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
+                      style={{ background: 'linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)' }}
+                    >
+                      Démarrer →
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
-      {selection && (
-        <ProgrammeDetail
-          programme={selection}
-          estActif={selection.id === data.programmeActif?.id}
-          onClose={() => setSelection(null)}
-        />
-      )}
+      {/* Mes programmes */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            Mes programmes
+          </p>
+          <button onClick={() => setCreateOpen(true)} className="text-xs font-semibold" style={{ color: 'var(--accent-text)' }}>
+            + Créer
+          </button>
+        </div>
 
+        {data.programmes.map((p, i) => (
+          <button
+            key={p.id}
+            onClick={() => setSelection(p)}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl mb-2 text-left transition-all active:scale-[0.99]"
+            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+          >
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-xl" style={{ background: 'var(--bg-elevated)' }}>
+              {getEmoji(p.nom, i)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{p.nom}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                {p.routines.length} séances · {p.id === data.programmeActif?.id ? 'En cours' : (p.description ?? 'Inactif')}
+              </p>
+            </div>
+            <ChevronRight size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="w-full py-4 rounded-2xl text-sm font-medium transition-all active:opacity-70"
+          style={{ background: 'transparent', border: '1.5px dashed rgba(255,255,255,0.12)', color: 'var(--text-muted)' }}
+        >
+          + Créer un nouveau programme
+        </button>
+      </div>
+
+      {selection && (
+        <ProgrammeDetail programme={selection} estActif={selection.id === data.programmeActif?.id} onClose={() => setSelection(null)} />
+      )}
       {createOpen && (
-        <CreateProgrammeModal
-          routinesDisponibles={data.routinesDisponibles}
-          onClose={() => setCreateOpen(false)}
-        />
+        <CreateProgrammeModal routinesDisponibles={data.routinesDisponibles} onClose={() => setCreateOpen(false)} />
       )}
     </div>
   );

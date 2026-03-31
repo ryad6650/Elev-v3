@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Dumbbell, ListPlus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useWorkoutStore } from '@/store/workoutStore';
 import WorkoutHub from './WorkoutHub';
 import ActiveWorkout from './ActiveWorkout';
@@ -15,6 +15,19 @@ interface Props {
   programmesData: ProgrammesPageData;
 }
 
+function getDateFr(): string {
+  return new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+function getLastSessionLabel(historique: WorkoutPageData['historique']): string {
+  if (!historique.length) return 'aucune séance récente';
+  const diffDays = Math.floor((Date.now() - new Date(historique[0].date).getTime()) / 86400000);
+  if (diffDays === 0) return 'dernière séance aujourd\'hui';
+  if (diffDays === 1) return 'dernière séance hier';
+  return `dernière séance il y a ${diffDays} jours`;
+}
+
 function HubLayout({ workoutData, programmesData }: Props) {
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const [showCreate, setShowCreate] = useState(false);
@@ -23,63 +36,53 @@ function HubLayout({ workoutData, programmesData }: Props) {
     <main className="px-4 pt-6 pb-28 page-enter" style={{ maxWidth: 520, margin: '0 auto' }}>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <h1
-          className="text-3xl leading-tight"
-          style={{ fontFamily: 'var(--font-dm-serif)', fontStyle: 'italic', color: 'var(--text-primary)' }}
-        >
-          Séances
-        </h1>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)', color: '#fff' }}
-        >
-          <Plus size={22} strokeWidth={2.5} />
-        </button>
+      <div className="flex items-end justify-between mb-5">
+        <div>
+          <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+            {getDateFr()} · {getLastSessionLabel(workoutData.historique)}
+          </p>
+          <h1
+            className="text-3xl leading-tight"
+            style={{ fontFamily: 'var(--font-dm-serif)', fontStyle: 'italic', color: 'var(--text-primary)' }}
+          >
+            Séances
+          </h1>
+        </div>
+        <div className="flex gap-2">
+          <button
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+          >
+            <Search size={17} style={{ color: 'var(--text-secondary)' }} />
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+          >
+            <Plus size={20} strokeWidth={2.5} style={{ color: 'var(--text-primary)' }} />
+          </button>
+        </div>
       </div>
 
       {/* CTAs */}
       <div className="flex gap-3 mb-6">
         <button
           onClick={() => startWorkout({ routineId: null, routineName: null })}
-          className="flex-1 flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
-          style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,134,12,0.35)' }}
+          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
+          style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,134,12,0.35)', color: 'var(--accent-text)' }}
         >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(232,134,12,0.12)' }}
-          >
-            <Dumbbell size={18} style={{ color: 'var(--accent-text)' }} />
-          </div>
-          <div className="text-left">
-            <p className="font-semibold text-sm" style={{ color: 'var(--accent-text)' }}>Séance libre</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Exercices libres</p>
-          </div>
+          ⚡ Séance libre
         </button>
-
         <button
-          onClick={() => setShowCreate(true)}
-          className="flex-1 flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)' }}
+          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
+          style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,134,12,0.35)', color: 'var(--accent-text)' }}
         >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(255,255,255,0.2)' }}
-          >
-            <ListPlus size={18} style={{ color: 'white' }} />
-          </div>
-          <div className="text-left">
-            <p className="font-semibold text-sm" style={{ color: 'white' }}>Nouvelle routine</p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Plan structuré</p>
-          </div>
+          📋 Programme
         </button>
       </div>
 
-      {/* Programmes */}
       <WorkoutProgrammesSection data={programmesData} />
-
-      {/* Routines */}
       <WorkoutHub data={workoutData} />
 
       {showCreate && <CreateRoutineModal onClose={() => setShowCreate(false)} />}
