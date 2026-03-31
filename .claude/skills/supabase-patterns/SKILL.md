@@ -154,3 +154,17 @@ CREATE TRIGGER on_auth_user_created
 - Jointures via `.select('*, exercise:exercises(*)')` — pas de requêtes multiples
 - Filtrer par date : `.eq('date', dateString)` au format 'YYYY-MM-DD'
 - Trier l'historique : `.order('date', { ascending: false })`
+
+## Évolution du skill
+
+**Ce skill doit évoluer au fil des conversations.** Mets à jour `## Apprentissages` quand :
+
+- Une nouvelle table ou migration est ajoutée au projet
+- Un pattern de requête récurrent émerge
+- L'utilisateur corrige une approche RLS ou un schéma SQL
+
+Pour mettre à jour : utilise Edit sur `C:/Users/louis/elev-v3/.claude/skills/supabase-patterns/SKILL.md`. Format : `- [date courte] [observation]`.
+
+## Apprentissages
+
+_(vide pour l'instant — se remplit au fil des sessions)_

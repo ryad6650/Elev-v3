@@ -119,3 +119,17 @@ Toujours utiliser des multiples de 4px : 4, 8, 12, 16, 20, 24, 32, 48, 64
 - Hover boutons : scale(1.02), 200ms
 - Toggle dark/light : transition colors 300ms
 - Pas d'animations lourdes ou excessives
+
+## Évolution du skill
+
+**Ce skill doit évoluer au fil des conversations.** Mets à jour `## Apprentissages` quand :
+
+- L'utilisateur ajuste une couleur, espacement, ou composant et exprime une préférence claire
+- Un nouveau pattern UI récurrent émerge dans le projet
+- L'utilisateur dit "utilise toujours X pour Y" ou corrige un choix visuel
+
+Pour mettre à jour : utilise Edit sur `C:/Users/louis/elev-v3/.claude/skills/design-system/SKILL.md`. Format : `- [date courte] [observation]`.
+
+## Apprentissages
+
+_(vide pour l'instant — se remplit au fil des sessions)_

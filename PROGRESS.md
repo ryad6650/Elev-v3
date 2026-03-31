@@ -190,8 +190,9 @@ Fichiers créés :
 - `src/components/nutrition/NutritionHeader.tsx` — navigation date (← Aujourd'hui →) + CaloriesRing + barres macros
 - `src/components/nutrition/MealSection.tsx` — section repas (petit-déj / déjeuner / dîner / collations)
 - `src/components/nutrition/FoodItem.tsx` — ligne aliment avec calories calculées + delete
-- `src/components/nutrition/FoodSearchResults.tsx` — liste de résultats de recherche cliquables
-- `src/components/nutrition/AddFoodModal.tsx` — bottom sheet 3 étapes (recherche → quantité → ou aliment custom)
+- `src/components/nutrition/FoodSearchResults.tsx` — liste résultats (cards avec avatar monogramme, pills macros colorées P/G/L, bouton +)
+- `src/components/nutrition/FoodSearchStep.tsx` — étape recherche V3 (barre search + scan orange, tabs Résultats/Récents/Favoris, chips catégories filtrantes)
+- `src/components/nutrition/AddFoodModal.tsx` — bottom sheet (utilise FoodSearchStep + FoodDetailSheet + CustomFoodForm), header avec sous-titre repas/date
 - `src/components/nutrition/NutritionPageClient.tsx` — hub client
 - `src/app/(app)/nutrition/page.tsx` — page RSC (lit `?date=`)
 
@@ -202,10 +203,49 @@ Décisions techniques :
 - RLS Supabase protège `nutrition_entries` et `aliments` user custom
 - Pas d'API OpenFoodFacts (MVP) — DB locale uniquement
 
+### Fiche produit V2 + refactor modale recherche (fait le 2026-03-31)
+
+Fichiers créés :
+- `src/components/nutrition/FoodDetailSheet.tsx` — fiche produit plein écran (anneau calories SVG, breakdown P/G/L/Fibres, barre macros proportionnelle, 3 cards macros, tableau nutritionnel détaillé, stepper quantité +/- 10g avec preview macros en temps réel, bouton favori local)
+- `src/components/nutrition/CustomFoodForm.tsx` — formulaire création aliment personnalisé (extrait de AddFoodModal pour respecter limite 200 lignes)
+- `mockups/recherche-v1.html` / `recherche-v2.html` / `recherche-v3.html` — maquettes HTML de la recherche
+- `mockups/produit-v1.html` / `produit-v2.html` — maquettes HTML de la fiche produit
+
+Fichiers modifiés :
+- `src/components/nutrition/AddFoodModal.tsx` — step 'quantity' remplacé par `<FoodDetailSheet>`, formulaire custom extrait dans `CustomFoodForm`, `handleConfirm` accepte qty en paramètre
+
+Décisions techniques :
+- FoodDetailSheet intégré dans le même bottom sheet (pas de navigation, juste swap de contenu)
+- Bouton favori = état local uniquement (pas de table DB favoris au MVP)
+- Anneau SVG purement décoratif (toujours plein) — affiche les kcal/100g au centre
+- Barre macros proportionnelle aux calories (P×4, G×4, L×9)
+- Stepper par paliers de 10g (min 1g)
+
+### Portions + Édition aliments (fait le 2026-03-31)
+
+Fichiers créés :
+- `supabase/migrations/008_portion.sql` — colonnes `portion_nom` + `taille_portion_g` sur la table aliments
+
+Fichiers modifiés :
+- `src/types/database.ts` — colonnes portion dans aliments Row/Insert
+- `src/lib/nutrition-utils.ts` — champs `is_global`, `portion_nom`, `taille_portion_g` dans NutritionAliment
+- `src/app/api/aliments/route.ts` — SELECT_COLS inclut is_global + colonnes portion
+- `src/app/actions/nutrition.ts` — createCustomAliment accepte portion, ajout updateCustomAliment, getRecentAliments inclut colonnes portion
+- `src/components/nutrition/CustomFoodForm.tsx` — champs portion (toggle affichage) + mode édition (editAliment prop + onEdited callback)
+- `src/components/nutrition/FoodDetailSheet.tsx` — bouton Modifier (crayon, si is_global===false), toggle Grammes/Portion en bas, quantité par défaut = portion si définie
+- `src/components/nutrition/AddFoodModal.tsx` — step 'edit' → CustomFoodForm en mode édition, handleEdited met à jour selected et retourne à la fiche
+
+Décisions techniques :
+- is_global===false = aliment custom éditable (global et OFT = lecture seule)
+- Mode portion par défaut si taille_portion_g défini, grammes sinon — toggle pill pour switcher
+- Stepper en mode portion = pas de taille_portion_g (min = 1 portion)
+- Après édition : setSelected(updated) + retour step 'quantity' + router.refresh()
+
 Bugs connus / Limitations MVP :
 - Aliment custom ajouté avec 100g par défaut (pas de step quantité dans le flow custom)
 - Pas d'édition d'une entrée (delete + re-add)
 - Pas de duplication de repas d'un jour à l'autre
+- Favoris non persistés (état local, pas de table DB)
 
 ---
 

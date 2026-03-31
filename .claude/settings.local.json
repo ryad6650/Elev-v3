@@ -1,4 +1,18 @@
 {
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e 'let d=\"\";process.stdin.on(\"data\",c=>d+=c);process.stdin.on(\"end\",()=>{const cmd=(JSON.parse(d).tool_input||{}).command||\"\";if(cmd.includes(\"git push\")){const {execSync}=require(\"child_process\");try{const s=execSync(\"git -C C:/Users/louis/elev-v3 status --short\",{encoding:\"utf8\"});const dirty=s.split(\"\\n\").filter(l=>l.trim()&&l.indexOf(\"supabase/.temp\")<0);if(dirty.length)process.stdout.write(JSON.stringify({continue:false,stopReason:dirty.length+\" fichier(s) non commite(s) detectes - fais git add + git commit avant de pusher.\"}))}catch(e){}}});'",
+            "statusMessage": "Vérification fichiers non commités..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(claude mcp:*)",
@@ -56,7 +70,14 @@
       "Bash(powershell -Command \"cd 'C:\\\\Users\\\\louis'; C:\\\\Users\\\\louis\\\\supabase.exe db push --workdir 'C:\\\\Users\\\\louis\\\\elev-v3' 2>&1\")",
       "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\louis\\\\supabase\\\\.temp\\\\project-ref'\" 2>&1)",
       "Bash(powershell -Command \"Copy-Item 'C:\\\\Users\\\\louis\\\\supabase\\\\.temp\\\\*' 'C:\\\\Users\\\\louis\\\\elev-v3\\\\supabase\\\\.temp\\\\' -Force; ls 'C:\\\\Users\\\\louis\\\\elev-v3\\\\supabase\\\\.temp'\" 2>&1)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(node scripts/seed-aliments-off.mjs)",
+      "Bash(node -e \":*)",
+      "Bash(cd:*)",
+      "Skill(update-config)",
+      "Bash(node:*)",
+      "Bash(gh run:*)",
+      "Bash(where jq:*)"
     ]
   }
 }
