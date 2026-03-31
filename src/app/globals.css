@@ -98,6 +98,11 @@ body {
   animation: page-enter 300ms ease-out;
 }
 
+/* Supprime le délai 300ms sur tap mobile (iOS/Android) */
+a, button, [role="button"], input, select, textarea, label {
+  touch-action: manipulation;
+}
+
 /* Smooth theme transitions — uniquement pendant le basculement de thème */
 .theme-transitioning * {
   transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease !important;
