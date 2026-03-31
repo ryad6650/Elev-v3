@@ -9,6 +9,7 @@ interface Exercise {
   nom: string;
   groupe_musculaire: string;
   equipement: string | null;
+  gif_url: string | null;
 }
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
 
 const GROUPES = [
   'Pectoraux', 'Dos', 'Épaules', 'Biceps', 'Triceps',
-  'Abdominaux', 'Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets',
+  'Abdominaux', 'Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets', 'Avant-bras',
 ];
 
 const EQUIPEMENTS = [

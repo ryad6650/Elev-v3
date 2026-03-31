@@ -1,18 +1,4 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e 'let d=\"\";process.stdin.on(\"data\",c=>d+=c);process.stdin.on(\"end\",()=>{const cmd=(JSON.parse(d).tool_input||{}).command||\"\";if(cmd.includes(\"git push\")){const {execSync}=require(\"child_process\");try{const s=execSync(\"git -C C:/Users/louis/elev-v3 status --short\",{encoding:\"utf8\"});const dirty=s.split(\"\\n\").filter(l=>l.trim()&&l.indexOf(\"supabase/.temp\")<0);if(dirty.length)process.stdout.write(JSON.stringify({continue:false,stopReason:dirty.length+\" fichier(s) non commite(s) detectes - fais git add + git commit avant de pusher.\"}))}catch(e){}}});'",
-            "statusMessage": "Vérification fichiers non commités..."
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(claude mcp:*)",
@@ -77,7 +63,34 @@
       "Skill(update-config)",
       "Bash(node:*)",
       "Bash(gh run:*)",
-      "Bash(where jq:*)"
+      "Bash(where jq:*)",
+      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.exercisedb.dev)",
+      "Read(//tmp/exercisedb-temp/**)",
+      "Read(//tmp/**)",
+      "Bash(curl -sI \"https://static.exercisedb.dev/media/27NNGFr.gif\")",
+      "mcp__plugin_supabase_supabase__list_projects",
+      "mcp__plugin_supabase_supabase__apply_migration",
+      "Bash(grep -v \"^$\")",
+      "mcp__plugin_supabase_supabase__execute_sql"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e 'let d=\"\";process.stdin.on(\"data\",c=>d+=c);process.stdin.on(\"end\",()=>{const cmd=(JSON.parse(d).tool_input||{}).command||\"\";if(cmd.includes(\"git push\")){const {execSync}=require(\"child_process\");try{const s=execSync(\"git -C C:/Users/louis/elev-v3 status --short\",{encoding:\"utf8\"});const dirty=s.split(\"\\n\").filter(l=>l.trim()&&l.indexOf(\"supabase/.temp\")<0);if(dirty.length)process.stdout.write(JSON.stringify({continue:false,stopReason:dirty.length+\" fichier(s) non commite(s) detectes - fais git add + git commit avant de pusher.\"}))}catch(e){}}});'",
+            "statusMessage": "Vérification fichiers non commités..."
+          }
+        ]
+      }
     ]
   }
 }

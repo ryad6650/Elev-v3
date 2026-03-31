@@ -8,7 +8,7 @@ export async function createExercise(data: {
   nom: string;
   groupe_musculaire: string;
   equipement: string | null;
-}): Promise<{ id: string; nom: string; groupe_musculaire: string; equipement: string | null }> {
+}): Promise<{ id: string; nom: string; groupe_musculaire: string; equipement: string | null; gif_url: string | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Non authentifié');
@@ -16,7 +16,7 @@ export async function createExercise(data: {
   const { data: ex, error } = await supabase
     .from('exercises')
     .insert({ user_id: user.id, is_global: false, ...data })
-    .select('id, nom, groupe_musculaire, equipement')
+    .select('id, nom, groupe_musculaire, equipement, gif_url')
     .single();
 
   if (error || !ex) throw new Error(error?.message ?? 'Erreur création exercice');
@@ -27,6 +27,7 @@ export interface RoutineExerciseData {
   exerciseId: string;
   nom: string;
   groupeMusculaire: string;
+  gifUrl: string | null;
   seriesCible: number;
   repsCible: number;
   repsCibleMax: number | null;
@@ -38,7 +39,7 @@ type RoutineExRow = {
   series_cible: number | null;
   reps_cible: number | null;
   reps_cible_max: number | null;
-  exercises: { id: string; nom: string; groupe_musculaire: string } | null;
+  exercises: { id: string; nom: string; groupe_musculaire: string; gif_url: string | null } | null;
 };
 
 export async function getRoutineExercises(routineId: string): Promise<RoutineExerciseData[]> {
@@ -48,7 +49,7 @@ export async function getRoutineExercises(routineId: string): Promise<RoutineExe
 
   const { data, error } = await supabase
     .from('routine_exercises')
-    .select('ordre, series_cible, reps_cible, reps_cible_max, exercises(id, nom, groupe_musculaire)')
+    .select('ordre, series_cible, reps_cible, reps_cible_max, exercises(id, nom, groupe_musculaire, gif_url)')
     .eq('routine_id', routineId)
     .order('ordre');
 
@@ -60,6 +61,7 @@ export async function getRoutineExercises(routineId: string): Promise<RoutineExe
       exerciseId: re.exercises!.id,
       nom: re.exercises!.nom,
       groupeMusculaire: re.exercises!.groupe_musculaire,
+      gifUrl: re.exercises!.gif_url ?? null,
       seriesCible: re.series_cible ?? 3,
       repsCible: re.reps_cible ?? 10,
       repsCibleMax: re.reps_cible_max ?? null,

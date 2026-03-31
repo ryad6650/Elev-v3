@@ -439,6 +439,32 @@ Décisions techniques :
 
 ---
 
+### GIFs animés exercices — ExerciseDB (fait le 2026-03-31)
+
+Fichiers créés :
+- `supabase/migrations/010_exercise_gif_urls.sql` — ALTER TABLE gif_url + UPDATE 110 exercices existants + INSERT 84 nouveaux exercices avec GIFs
+- `src/components/workout/ExerciseGif.tsx` — Composant GIF animé (3 tailles sm/md/lg, fallback icône Dumbbell)
+
+Fichiers modifiés :
+- `src/types/database.ts` — ajout `gif_url: string | null` dans exercises Row/Insert
+- `src/store/workoutStore.ts` — ajout `gifUrl?: string | null` dans WorkoutExercise
+- `src/app/api/exercises/route.ts` — SELECT inclut gif_url
+- `src/app/actions/workout.ts` — RoutineExerciseData inclut gifUrl, createExercise retourne gif_url, getRoutineExercises sélectionne gif_url
+- `src/components/workout/ExerciseSearch.tsx` — GIF dans chaque résultat de recherche + groupe "Avant-bras" ajouté
+- `src/components/workout/ExerciseCard.tsx` — GIF dans vue condensée et vue ouverte (remplace badge numéro)
+- `src/components/workout/RoutineCard.tsx` — GIF dans liste dépliante des exercices + couleurs ischio-jambiers/avant-bras
+- `src/components/workout/CreateExerciseModal.tsx` — gif_url dans interface Exercise + groupe "Avant-bras"
+
+Décisions techniques :
+- Source : ExerciseDB open source (AGPL-3.0), 1500 exercices avec GIFs anatomiques animés
+- GIFs hébergés sur CDN ExerciseDB (static.exercisedb.dev/media/{id}.gif) — pas d'auto-hébergement
+- `<img>` natif (pas next/image) — next/image ne gère pas bien les GIFs animés
+- Fallback = icône Dumbbell si gif_url null ou erreur de chargement
+- 84 nouveaux exercices ajoutés (total ~194) + nouveau groupe "Avant-bras" (7 exercices)
+- Mapping français→anglais fait manuellement pour les 110 exercices existants
+
+---
+
 ## Phase 3 — Fonctionnalités avancées
 
 - [x] Offline / Service Worker / sync optimiste

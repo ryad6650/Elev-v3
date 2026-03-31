@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from("exercises")
-    .select("id, nom, groupe_musculaire, equipement")
+    .select("id, nom, groupe_musculaire, equipement, gif_url")
     .or(`is_global.eq.true,user_id.eq.${user.id}`)
     .order("nom")
     .limit(100);

@@ -97,6 +97,7 @@ export interface Database {
           groupe_musculaire: string;
           equipement: string | null;
           is_global: boolean;
+          gif_url: string | null;
         };
         Insert: {
           id?: string;
@@ -105,6 +106,7 @@ export interface Database {
           groupe_musculaire: string;
           equipement?: string | null;
           is_global?: boolean;
+          gif_url?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["exercises"]["Insert"]>;
         Relationships: [];

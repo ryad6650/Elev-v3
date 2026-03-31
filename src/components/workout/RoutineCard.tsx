@@ -3,6 +3,7 @@
 import { MoreVertical, ChevronDown, Play } from 'lucide-react';
 import type { Routine } from '@/lib/workout';
 import type { RoutineExerciseData } from '@/app/actions/workout';
+import ExerciseGif from './ExerciseGif';
 
 interface Props {
   routine: Routine;
@@ -38,6 +39,8 @@ const GROUPE_COLORS: Record<string, { bg: string; text: string }> = {
   mollets: { bg: 'rgba(34,197,94,0.2)', text: '#4ADE80' },
   abdominaux: { bg: 'rgba(249,115,22,0.2)', text: '#FB923C' },
   lombaires: { bg: 'rgba(168,85,247,0.2)', text: '#C084FC' },
+  'ischio-jambiers': { bg: 'rgba(59,130,246,0.2)', text: '#93C5FD' },
+  'avant-bras': { bg: 'rgba(251,146,60,0.2)', text: '#FB923C' },
 };
 
 const DEFAULT_GROUPE_COLOR = { bg: 'rgba(168,162,158,0.2)', text: '#A8A29E' };
@@ -129,9 +132,10 @@ export default function RoutineCard({ routine, index, onToggle, onOptions, onSta
             ) : (
               <div className="space-y-2">
                 {exercises.map((ex, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{ex.nom}</span>
-                    <span className="text-xs font-semibold tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                  <div key={i} className="flex items-center gap-2.5">
+                    <ExerciseGif gifUrl={ex.gifUrl} nom={ex.nom} size="sm" />
+                    <span className="flex-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{ex.nom}</span>
+                    <span className="text-xs font-semibold tabular-nums shrink-0" style={{ color: 'var(--text-muted)' }}>
                       {ex.seriesCible}×{ex.repsCibleMax ? `${ex.repsCible}-${ex.repsCibleMax}` : ex.repsCible}
                     </span>
                   </div>

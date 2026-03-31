@@ -55,42 +55,79 @@ description: Design system complet d'Élev v3. Utiliser ce skill CHAQUE FOIS qu'
 
 ### Cards
 - Background : --bg-secondary
-- Border-radius : 16-20px
+- Border-radius : rounded-2xl (16px)
 - Border : 1px solid --border
-- Padding : 20-24px
+- Padding : p-4 (16px) ou p-5 (20px)
 - Pas de box-shadow en dark, ombre douce en light
 
 ### Card CTA (Prochain entraînement)
-- Background : --accent (orange plein)
+- Background : gradient via classe `.workout-next-card`
+  - Dark : `linear-gradient(135deg, #1a0e07 0%, #2d1506 40%, #C8622E 100%)`
+  - Light : `linear-gradient(135deg, #7c3d08 0%, #a8520f 40%, #E8860C 100%)`
 - Texte : blanc
 - Icône flèche à droite
-- Border-radius : 16px
+- Border-radius : rounded-2xl
 
 ### Boutons
-- Primaire : bg --accent, texte blanc, border-radius 12px, padding 12px 24px
-- Secondaire : bg transparent, border 1px --border, texte --text-primary
-- Hover : scale(1.02) + --accent-hover
-- Transition : 200ms ease
+- **Primaire** : bg --accent, texte blanc, rounded-xl (12px), py-3.5 px-4, text-sm font-semibold
+- **Primaire full-width** : w-full, rounded-2xl (16px), py-4
+- **Secondaire** : bg transparent, border 1px --border, texte --text-primary, rounded-xl
+- **Pill** : rounded-full, px-3.5 py-1.5, text-xs font-semibold (tabs, filtres)
+- **Icône** : p-1.5 à p-2, rounded-xl
+- **Tap feedback** : active:scale-95 ou active:scale-[0.98] (pas de hover — mobile-first)
+- **Disabled** : opacity-40 ou opacity-60, bg --bg-elevated, text --text-muted
+- Transition : transition-all 200ms
 
 ### Inputs
 - Background : --bg-elevated
 - Border : 1px solid --border
-- Border-radius : 10px
-- Padding : 12px 16px
-- Focus : border --accent
+- Border-radius : rounded-xl (12px)
+- Padding : px-4 py-3
+- Font-size : 16px (obligatoire — empêche le zoom iOS)
+- Focus : border 1.5px solid --accent, box-shadow 0 0 0 3px var(--accent-bg)
+- Outline : none
 
 ### Bottom Navigation
-- 5 onglets : Séance, Poids, Accueil, Nutrition, Historique
-- Onglet actif : fond --accent arrondi (pill 25px), texte blanc
-- Onglets inactifs : icône + label en --text-muted
-- Icônes : Lucide React
-- Position : fixed bottom, background blur --bg-primary
+- 5 onglets avec emojis : 💪 Séances, ⚖️ Poids, 🏠 Accueil, 🥗 Nutrition, 📊 Historique
+- **Container** : rounded-[32px], backdrop-blur(16px), bg color-mix(--bg-secondary 90%, transparent), border 1px --border, box-shadow 0 8px 32px rgba(0,0,0,0.4)
+- **Onglet actif** : bg --accent, rounded-[22px], texte blanc
+- **Onglets inactifs** : emoji + label en --text-muted
+- Position : fixed bottom, z-index élevé
 
-### Mini-stats (dashboard)
-- 3 cards en row, taille égale
-- Emoji en haut (💪⚖️📈), chiffre en gros, label en petit
-- Background : --bg-secondary
-- Border-radius : 16px
+### Bottom Sheet Modals
+- Position : fixed bottom 0
+- Border-radius : rounded-t-3xl (haut) ou rounded-3xl (flottant)
+- Background : --bg-secondary ou --bg-card
+- Max-height : calc(100dvh - padding)
+- Overlay : rgba(0,0,0,0.45) à rgba(0,0,0,0.65)
+- Handle bar en haut (indicateur de drag)
+
+### Tabs / Pill Buttons
+- rounded-full
+- Actif : bg --accent, texte blanc
+- Inactif : bg --bg-elevated, texte --text-secondary
+- px-3.5 py-1.5, text-xs font-semibold
+
+### Badges / Chips
+- Petit : px-2 py-0.5, rounded-md, text-[11px] font-semibold
+- Couleur de fond contextuelle (difficulté, groupe musculaire)
+
+### Sélection radio-like
+- Border inactive : 1px solid --border
+- Border active : 1.5px solid --accent
+- Background active : --accent-bg
+
+### Toggle Switch
+- rounded-full
+- Indicateur translate(30px) ou translate(4px)
+- Background actif : --accent
+
+### Barres de macros
+- Height : 6px
+- Border-radius : rounded-full
+- Background track : --bg-elevated
+- Couleurs fill : --color-protein / --color-carbs / --color-fat
+- Animation : width transition 700ms ease
 
 ### Anneaux de progression (calories)
 - SVG circle, stroke --accent pour la progression
@@ -98,26 +135,48 @@ description: Design system complet d'Élev v3. Utiliser ce skill CHAQUE FOIS qu'
 - Animation au chargement (dash-offset transition 1s ease)
 - Chiffre centré à l'intérieur (gros, --text-primary)
 
-### Barres de macros
-- Height : 6px
-- Border-radius : 3px (full rounded)
-- Background track : --bg-elevated
-- Couleurs fill : --color-protein / --color-carbs / --color-fat
-- Animation : width transition 0.5s ease
+### Mini-stats (dashboard)
+- 3 cards en row, taille égale
+- Emoji en haut (💪⚖️📈), chiffre en gros, label en petit
+- Background : --bg-secondary
+- Border-radius : rounded-2xl
+
+### Expandable Cards
+- ChevronDown rotate 180° quand expanded
+- Section expanded séparée par border-top
+- Transition : rotate 200ms
+
+### Banners
+- ActiveWorkoutBanner : fixed au-dessus de la bottom nav
+- backdrop-blur, border --accent
+- box-shadow : 0 4px 24px rgba(232,134,12,0.15)
+
+## Shadows
+| Contexte | Valeur |
+|----------|--------|
+| Bottom nav | 0 8px 32px rgba(0,0,0,0.4) |
+| Modal | 0 16px 48px rgba(0,0,0,0.5) |
+| Banner accent | 0 4px 24px rgba(232,134,12,0.15) |
+| Bouton accent | 0 4px 20px rgba(232,134,12,0.3) |
+| Petit élément | 0 1px 3px rgba(0,0,0,0.3) |
 
 ## Espacement
 Toujours utiliser des multiples de 4px : 4, 8, 12, 16, 20, 24, 32, 48, 64
 
 ## Responsive
-- Mobile first : 375px par défaut
+- Mobile first : 375px par défaut, max-w-[430px] centré
 - Breakpoints Tailwind : sm (640px), md (768px), lg (1024px)
 - La bottom nav n'apparaît que sur mobile (< md)
 - Sur desktop : sidebar navigation à gauche
+- Padding bottom : pb-20 pour compenser la bottom nav
+- Safe area : env(safe-area-inset-top, 20px)
 
 ## Animations
-- Entrée de page : fade-in + translateY(10px), durée 300ms, ease-out
-- Hover boutons : scale(1.02), 200ms
-- Toggle dark/light : transition colors 300ms
+- Entrée de page : fade-in + translateY(10px), durée 300ms, ease-out (classe `.page-enter`)
+- Tap boutons : active:scale-95 ou active:scale-[0.98]
+- Toggle dark/light : transition colors 300ms (via `.theme-transitioning`)
+- Barres de progression : width transition 700ms ease
+- Scan barcode : animation 2s ease-in-out infinite
 - Pas d'animations lourdes ou excessives
 
 ## Évolution du skill
@@ -132,4 +191,4 @@ Pour mettre à jour : utilise Edit sur `C:/Users/louis/elev-v3/.claude/skills/de
 
 ## Apprentissages
 
-_(vide pour l'instant — se remplit au fil des sessions)_
+- [2026-03-31] Mise à jour complète : aligné le skill avec le code réel (bottom nav emojis, boutons active:scale, card CTA gradient, inputs focus, bottom sheets, tabs, badges, shadows, banners)

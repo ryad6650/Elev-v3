@@ -19,6 +19,7 @@ export interface WorkoutExercise {
   exerciseId: string;
   nom: string;
   groupeMusculaire: string;
+  gifUrl?: string | null;
   ordre: number;
   seriesCible: number;
   repsCible: number;

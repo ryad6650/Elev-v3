@@ -6,6 +6,7 @@ import { useWorkoutStore } from '@/store/workoutStore';
 import type { WorkoutExercise, WorkoutSet } from '@/store/workoutStore';
 import SetRow from './SetRow';
 import RestDurationPicker from './RestDurationPicker';
+import ExerciseGif from './ExerciseGif';
 
 function formatRest(s: number): string {
   if (s < 60) return `${s}s`;
@@ -49,25 +50,10 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
     return (
       <button
         onClick={onOpen}
-        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-opacity active:opacity-70"
+        className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-opacity active:opacity-70"
         style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
       >
-        {/* Badge numéro ou ✓ */}
-        {allDone ? (
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-            style={{ background: 'var(--success)' }}
-          >
-            <Check size={13} strokeWidth={3} color="white" />
-          </div>
-        ) : (
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-            style={{ background: 'var(--bg-card)', color: 'var(--text-muted)' }}
-          >
-            {exerciseIndex + 1}
-          </div>
-        )}
+        <ExerciseGif gifUrl={exercise.gifUrl ?? null} nom={exercise.nom} size="sm" />
 
         <span className="flex-1 font-semibold text-sm" style={{ color: allDone ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
           {exercise.nom}
@@ -102,12 +88,7 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
     >
       {/* En-tête exercice */}
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <div
-          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-          style={{ background: 'var(--accent)', color: 'white' }}
-        >
-          {exerciseIndex + 1}
-        </div>
+        <ExerciseGif gifUrl={exercise.gifUrl ?? null} nom={exercise.nom} size="md" />
         <span className="flex-1 font-semibold text-base" style={{ color: 'var(--text-primary)' }}>
           {exercise.nom}
         </span>

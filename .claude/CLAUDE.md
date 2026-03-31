@@ -98,9 +98,15 @@ Les spécifications sont découpées en petits fichiers par domaine dans `specs/
 
 
 
+\## Mode Autonome (par défaut)
+
+Claude agit directement sans demander confirmation. Pas de "tu veux que je continue ?", pas de "je peux faire X ?". Juste faire.
+
+Exceptions (demander avant) : suppression de fichiers métier, migrations SQL destructives (DROP/DELETE/TRUNCATE), modification auth/RLS critique, config déploiement (next.config, vercel.json, env).
+
 \## Règles Strictes
 
-\- JAMAIS supprimer de code/fichiers sans demander
+\- Demander avant de supprimer des fichiers métier (les fichiers temporaires/variantes peuvent être supprimés librement)
 
 \- TOUJOURS vérifier le rendu mobile après chaque modif UI
 

@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, X, Plus, ChevronDown, PenLine } from 'lucide-react';
 import { useWorkoutStore } from '@/store/workoutStore';
 import CreateExerciseModal from './CreateExerciseModal';
+import ExerciseGif from './ExerciseGif';
 
 interface Exercise {
   id: string;
   nom: string;
   groupe_musculaire: string;
   equipement: string | null;
+  gif_url: string | null;
 }
 
 interface Props {
@@ -19,7 +21,7 @@ interface Props {
 
 const GROUPES = [
   'Pectoraux', 'Dos', 'Épaules', 'Biceps', 'Triceps',
-  'Abdominaux', 'Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets',
+  'Abdominaux', 'Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets', 'Avant-bras',
 ];
 
 const EQUIPEMENTS = [
@@ -81,6 +83,7 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
         exerciseId: ex.id,
         nom: ex.nom,
         groupeMusculaire: ex.groupe_musculaire,
+        gifUrl: ex.gif_url,
         ordre: 0,
         seriesCible: 3,
         repsCible: 10,
@@ -260,9 +263,10 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
             <button
               key={ex.id}
               onClick={() => handleAdd(ex)}
-              className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-opacity active:opacity-70"
+              className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-opacity active:opacity-70"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
             >
+              <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="sm" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                   {ex.nom}
