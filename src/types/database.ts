@@ -23,6 +23,8 @@ export interface Database {
           theme: "dark" | "light";
           programme_actif_id: string | null;
           programme_actif_debut: string | null;
+          streak_connexions: number;
+          derniere_connexion: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -39,6 +41,8 @@ export interface Database {
           theme?: "dark" | "light";
           programme_actif_id?: string | null;
           programme_actif_debut?: string | null;
+          streak_connexions?: number;
+          derniere_connexion?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -62,8 +66,8 @@ export interface Database {
           nom: string;
           description?: string | null;
           difficulte?: string;
-          duree_semaines?: number;
-          jours?: number[];
+          duree_semaines?: number | null;
+          jours?: number[] | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["programmes"]["Insert"]>;
@@ -259,6 +263,8 @@ export interface Database {
           sucres: number | null;
           sel: number | null;
           is_global: boolean;
+          portion_nom: string | null;
+          taille_portion_g: number | null;
         };
         Insert: {
           id?: string;
@@ -274,6 +280,8 @@ export interface Database {
           sucres?: number | null;
           sel?: number | null;
           is_global?: boolean;
+          portion_nom?: string | null;
+          taille_portion_g?: number | null;
         };
         Update: Partial<Database["public"]["Tables"]["aliments"]["Insert"]>;
         Relationships: [];
@@ -322,6 +330,32 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["poids_history"]["Insert"]>;
         Relationships: [];
       };
+      mensurations: {
+        Row: {
+          user_id: string;
+          cou: number | null;
+          tour_taille: number | null;
+          poitrine: number | null;
+          hanches: number | null;
+          bras: number | null;
+          cuisse: number | null;
+          mollet: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          cou?: number | null;
+          tour_taille?: number | null;
+          poitrine?: number | null;
+          hanches?: number | null;
+          bras?: number | null;
+          cuisse?: number | null;
+          mollet?: number | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["mensurations"]["Insert"]>;
+        Relationships: [];
+      };
       sommeil: {
         Row: {
           id: string;
@@ -344,5 +378,6 @@ export interface Database {
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
