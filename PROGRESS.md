@@ -241,6 +241,20 @@ Décisions techniques :
 - Stepper en mode portion = pas de taille_portion_g (min = 1 portion)
 - Après édition : setSelected(updated) + retour step 'quantity' + router.refresh()
 
+### Scroll picker quantité + édition universelle (fait le 2026-03-31)
+
+Fichiers créés :
+- `src/components/nutrition/QuantityScrollPicker.tsx` — drum roller iOS-style (scroll 1 par 1, tap pour saisie directe, gradients masques, highlight orange central)
+
+Fichiers modifiés :
+- `src/components/nutrition/FoodDetailSheet.tsx` — stepper +/- remplacé par QuantityScrollPicker, mode portion dans le picker (step 0.5, max 20), crayon toujours visible
+- `src/components/nutrition/AddFoodModal.tsx` — crayon visible pour TOUS les aliments ; aliments globaux → fork silencieux (id='' → CustomFoodForm crée une copie custom préremplie)
+
+Décisions techniques :
+- QuantityScrollPicker : touch events avec e.preventDefault() pour bloquer le scroll page, dragOffset visuel + discrete value update, input natif au tap du centre
+- Fork global : `{ ...aliment, id: '' }` → isEdit=false dans CustomFoodForm → createCustomAliment, l'utilisateur corrige les données et crée sa version
+- Mode portion picker : step=0.5, max=20, suffix = nom de la portion
+
 Bugs connus / Limitations MVP :
 - Aliment custom ajouté avec 100g par défaut (pas de step quantité dans le flow custom)
 - Pas d'édition d'une entrée (delete + re-add)

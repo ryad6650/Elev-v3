@@ -102,7 +102,9 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
     router.refresh();
   }
 
-  const canEdit = selected?.is_global === false;
+  // Aliment custom (is_global===false) = édition directe
+  // Aliment global ou externe = fork silencieux (nouvelle copie custom préremplie)
+  const isCustom = selected?.is_global === false && !!selected?.id;
 
   const today = new Date().toISOString().split('T')[0];
   const dateLabel = date === today ? "Aujourd'hui" : new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -126,7 +128,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
               <div className="w-7" />
               <div className="text-center">
                 <p className="font-semibold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>
-                  {step === 'custom' ? 'Aliment personnalisé' : step === 'edit' ? 'Modifier l\'aliment' : 'Ajouter'}
+                  {step === 'custom' ? 'Aliment personnalisé' : step === 'edit' ? (isCustom ? 'Modifier l\'aliment' : 'Corriger l\'aliment') : 'Ajouter'}
                 </p>
                 {step === 'search' && (
                   <p className="text-[11px] mt-0.5" style={{ color: 'var(--accent-text)' }}>
@@ -165,7 +167,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
               repas={repas}
               onBack={() => setStep('search')}
               onConfirm={handleConfirm}
-              onEdit={canEdit ? () => setStep('edit') : undefined}
+              onEdit={() => setStep('edit')}
               pending={pending}
             />
           )}
@@ -178,8 +180,9 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
             <CustomFoodForm
               repas={repas}
               date={date}
-              editAliment={selected}
+              editAliment={isCustom ? selected : { ...selected, id: '' }}
               onEdited={handleEdited}
+              onCreated={handleCustomCreated}
             />
           )}
         </div>
