@@ -98,9 +98,25 @@ body {
   animation: page-enter 300ms ease-out;
 }
 
+/* Ligne de scan barcode */
+@keyframes scan-line {
+  0%   { top: 8px; }
+  50%  { top: calc(100% - 8px); }
+  100% { top: 8px; }
+}
+
+.animate-scan-line {
+  animation: scan-line 2s ease-in-out infinite;
+}
+
 /* Supprime le délai 300ms sur tap mobile (iOS/Android) */
 a, button, [role="button"], input, select, textarea, label {
   touch-action: manipulation;
+}
+
+/* Empêche le zoom iOS Safari au focus sur un input (font-size < 16px déclenche le zoom) */
+input, select, textarea {
+  font-size: 16px;
 }
 
 /* Smooth theme transitions — uniquement pendant le basculement de thème */
