@@ -4,11 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/programmes", emoji: "📋", label: "Programmes" },
-  { href: "/workout", emoji: "💪", label: "Séance" },
+  { href: "/workout", emoji: "💪", label: "Séances" },
+  { href: "/poids", emoji: "⚖️", label: "Poids" },
   { href: "/dashboard", emoji: "🏠", label: "Accueil" },
   { href: "/nutrition", emoji: "🥗", label: "Nutrition" },
-  { href: "/poids", emoji: "⚖️", label: "Poids" },
   { href: "/historique", emoji: "📊", label: "Historique" },
 ];
 

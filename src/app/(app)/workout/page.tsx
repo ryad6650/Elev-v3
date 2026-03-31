@@ -1,13 +1,14 @@
-import { fetchWorkoutPageData } from '@/lib/workout';
+import { fetchWorkoutPageData, type WorkoutPageData } from '@/lib/workout';
+import { fetchProgrammesData, type ProgrammesPageData } from '@/lib/programmes';
 import WorkoutPageClient from '@/components/workout/WorkoutPageClient';
 
 export default async function WorkoutPage() {
-  let data;
-  try {
-    data = await fetchWorkoutPageData();
-  } catch {
-    data = { routines: [], historique: [] };
-  }
+  const workoutData: WorkoutPageData = await fetchWorkoutPageData().catch(
+    (): WorkoutPageData => ({ routines: [], historique: [] })
+  );
+  const programmesData: ProgrammesPageData = await fetchProgrammesData().catch(
+    (): ProgrammesPageData => ({ programmes: [], programmeActif: null, routinesDisponibles: [] })
+  );
 
-  return <WorkoutPageClient data={data} />;
+  return <WorkoutPageClient workoutData={workoutData} programmesData={programmesData} />;
 }

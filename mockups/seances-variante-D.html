@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séances — Variante D (Contextuelle)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0C0A09;
+    --bg-secondary: #1C1917;
+    --bg-card: #292524;
+    --bg-elevated: #44403C;
+    --text-primary: #FAFAF9;
+    --text-secondary: #A8A29E;
+    --text-muted: #78716C;
+    --border: rgba(255,255,255,0.08);
+    --accent: #E8860C;
+    --accent-hover: #CA6F08;
+    --accent-bg: rgba(232,134,12,0.15);
+    --accent-text: #FDBA74;
+    --success: #22C55E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+  .phone {
+    width: 390px;
+    min-height: 844px;
+    background: var(--bg-primary);
+    position: relative;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  }
+
+  /* HEADER COMPACT */
+  .header {
+    padding: 56px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--text-primary);
+  }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--bg-card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* CARD PROCHAINE SÉANCE — HERO CONTEXTUELLE */
+  .next-card {
+    margin: 0 20px 24px;
+    background: var(--accent);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .next-card::after {
+    content: '🏋️';
+    position: absolute;
+    right: 16px; bottom: -8px;
+    font-size: 72px;
+    opacity: 0.18;
+    transform: rotate(-15deg);
+  }
+  .next-card-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+  }
+  .next-card-name {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: white;
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .next-card-prog {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 18px;
+  }
+  .next-card-exos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .exo-pill {
+    background: rgba(255,255,255,0.18);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+  }
+  .next-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .next-card-meta {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+  .start-btn {
+    background: white;
+    color: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* SCROLL */
+  .content {
+    padding: 0 20px;
+    padding-bottom: 120px;
+  }
+
+  /* SECTION TITRE */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-text);
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: pointer;
+  }
+
+  /* GRID ACTIONS RAPIDES */
+  .quick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .quick-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .quick-card-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .quick-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .quick-card-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* PROGRAMME CARD AVEC PROGRESS */
+  .prog-card {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(232,134,12,0.25);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .prog-card-top {
+    padding: 18px 20px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+  }
+  .prog-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .prog-card-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  /* BARRE DE PROGRESSION DU PROGRAMME */
+  .prog-progress-wrap {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prog-progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .prog-progress-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .prog-progress-pct {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    width: 45%;
+  }
+
+  /* SÉANCES DU PROGRAMME */
+  .prog-seances { padding: 8px 0; }
+  .prog-seance {
+    padding: 13px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 150ms;
+  }
+  .prog-seance:last-child { border-bottom: none; }
+  .prog-seance.current {
+    background: rgba(232,134,12,0.08);
+  }
+  .seance-letter {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+  }
+  .prog-seance.current .seance-letter {
+    background: var(--accent);
+    color: white;
+  }
+  .seance-done .seance-letter {
+    background: rgba(34,197,94,0.15);
+    color: #22C55E;
+  }
+  .prog-seance-info { flex: 1; }
+  .prog-seance-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .prog-seance.current .prog-seance-name {
+    color: var(--accent-text);
+  }
+  .prog-seance-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .prog-seance-action {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-text);
+    cursor: pointer;
+  }
+  .done-check {
+    font-size: 16px;
+    color: #22C55E;
+  }
+
+  /* SECTION "GÉRER PROGRAMME" */
+  .manage-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .manage-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(12,10,9,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px 28px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+  .nav-icon-wrap { width: 44px; height: 32px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .nav-item.active .nav-icon-wrap { background: var(--accent); }
+  .nav-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+  .nav-item.active .nav-label { color: var(--accent-text); }
+
+  .variante-badge {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 11px; padding: 4px 10px;
+    border-radius: 8px; z-index: 10;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="variante-badge">Variante D — Contextuelle</div>
+
+  <div class="header">
+    <h1>Séances</h1>
+    <div class="header-actions">
+      <div class="icon-btn">⏱</div>
+      <div class="icon-btn">＋</div>
+    </div>
+  </div>
+
+  <!-- NEXT SESSION HERO -->
+  <div class="next-card">
+    <div class="next-card-eyebrow">✦ Prochaine séance suggérée</div>
+    <div class="next-card-name">Push — Poitrine<br>& Triceps</div>
+    <div class="next-card-prog">Push / Pull / Legs · Séance A</div>
+    <div class="next-card-exos">
+      <div class="exo-pill">Développé couché</div>
+      <div class="exo-pill">OHP</div>
+      <div class="exo-pill">Dips</div>
+      <div class="exo-pill">+3 exos</div>
+    </div>
+    <div class="next-card-footer">
+      <div class="next-card-meta">6 exos · ~60 min</div>
+      <button class="start-btn">Démarrer →</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ACTIONS RAPIDES -->
+    <div class="section-title" style="margin-top: 0; margin-bottom: 12px;">
+      Démarrer autre chose
+    </div>
+    <div class="quick-grid">
+      <div class="quick-card">
+        <div class="quick-card-icon">⚡</div>
+        <div>
+          <div class="quick-card-name">Libre</div>
+          <div class="quick-card-sub">Exercices libres</div>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">📋</div>
+        <div>
+          <div class="quick-card-name">Programmes</div>
+          <div class="quick-card-sub">Mes plans</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAMME EN COURS -->
+    <div class="section-title">
+      Programme en cours
+      <span class="section-link">Modifier</span>
+    </div>
+
+    <div class="prog-card">
+      <div class="prog-card-top">
+        <div>
+          <div class="prog-card-name">Push / Pull / Legs</div>
+          <div class="prog-card-meta">Semaine 4 de 8 · 3 séances/sem</div>
+        </div>
+      </div>
+      <div class="prog-progress-wrap">
+        <div class="prog-progress-header">
+          <span class="prog-progress-label">Progression du programme</span>
+          <span class="prog-progress-pct">Semaine 4/8</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+      <div class="prog-seances">
+        <div class="prog-seance current">
+          <div class="seance-letter">A</div>
+          <div class="prog-seance-info">
+            <div class="prog-seance-name">Push</div>
+            <div class="prog-seance-detail">6 exos · dernière fois mar 27</div>
+          </div>
+          <div class="prog-seance-action">Lancer →</div>
+        </div>
+        <div class="prog-seance seance-done">
+          <div class="seance-letter">✓</div>
+          <div class="prog-seance-info">
+            <div class="prog-seance-name">Pull</div>
+            <div class="prog-seance-detail">5 exos · fait jeu 29</div>
+          </div>
+          <div class="done-check">✓</div>
+        </div>
+        <div class="prog-seance">
+          <div class="seance-letter">C</div>
+          <div class="prog-seance-info">
+            <div class="prog-seance-name">Legs</div>
+            <div class="prog-seance-detail">5 exos · il y a 5 jours</div>
+          </div>
+          <div class="prog-seance-action">Lancer →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="manage-row">
+      <button class="manage-btn">📊 Mes stats</button>
+      <button class="manage-btn">📋 Gérer les programmes</button>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon-wrap">🏋️</div>
+      <span class="nav-label">Séances</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">⚖️</div>
+      <span class="nav-label">Poids</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">🏠</div>
+      <span class="nav-label">Accueil</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">🥗</div>
+      <span class="nav-label">Nutrition</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">👤</div>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

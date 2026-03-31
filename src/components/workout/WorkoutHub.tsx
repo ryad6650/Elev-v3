@@ -148,7 +148,7 @@ export default function WorkoutHub({ data }: Props) {
               <button
                 onClick={() => handleStartRoutine(menuRoutine)}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
-                style={{ background: 'var(--accent)', color: 'white' }}
+                style={{ background: 'linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)', color: 'white' }}
               >
                 <Play size={16} fill="white" />Lancer cette routine
               </button>

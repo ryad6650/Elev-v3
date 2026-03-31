@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séances — Variante B (Programme Hero)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0C0A09;
+    --bg-secondary: #1C1917;
+    --bg-card: #292524;
+    --bg-elevated: #44403C;
+    --text-primary: #FAFAF9;
+    --text-secondary: #A8A29E;
+    --text-muted: #78716C;
+    --border: rgba(255,255,255,0.08);
+    --accent: #E8860C;
+    --accent-hover: #CA6F08;
+    --accent-bg: rgba(232,134,12,0.15);
+    --accent-text: #FDBA74;
+    --success: #22C55E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  .phone {
+    width: 390px;
+    min-height: 844px;
+    background: var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HEADER COMPACT */
+  .header {
+    padding: 56px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-left {}
+  .header-date {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .icon-btn {
+    width: 38px; height: 38px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  /* BOUTONS CTA */
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    padding: 20px 20px 0;
+  }
+  .btn-primary {
+    flex: 1;
+    background: var(--bg-card);
+    color: var(--accent-text);
+    border: 1px solid rgba(232,134,12,0.35);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-secondary {
+    flex: 1;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* CONTENU SCROLL */
+  .content {
+    padding: 0 20px;
+    padding-bottom: 120px;
+  }
+
+  /* SECTION TITRE */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    margin-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-title a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-text);
+    text-decoration: none;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* PROGRAMME CARD LARGE */
+  .prog-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .prog-card.active-prog {
+    border-color: rgba(232,134,12,0.35);
+  }
+  .prog-card.active-prog::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 20px 20px 0 0;
+  }
+  .prog-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .prog-card-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .prog-card-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-actif {
+    background: var(--accent-bg);
+    border: 1px solid rgba(232,134,12,0.3);
+    color: var(--accent-text);
+  }
+
+  /* SÉANCES HORIZONTALES SCROLL */
+  .seances-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .seances-scroll::-webkit-scrollbar { display: none; }
+  .seance-chip {
+    flex-shrink: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: pointer;
+    min-width: 140px;
+  }
+  .seance-chip.next {
+    background: var(--accent-bg);
+    border-color: rgba(232,134,12,0.4);
+  }
+  .chip-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .seance-chip.next .chip-label { color: var(--accent-text); }
+  .chip-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .chip-exos {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .chip-start-btn {
+    margin-top: 10px;
+    background: linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* TOUS LES PROGRAMMES */
+  .prog-mini {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+  .prog-mini-icon {
+    width: 44px; height: 44px;
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .prog-mini-info { flex: 1; }
+  .prog-mini-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+  .prog-mini-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .prog-mini-arrow {
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  .create-prog {
+    background: transparent;
+    border: 1.5px dashed rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 390px;
+    background: rgba(12,10,9,0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px 28px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .nav-icon-wrap {
+    width: 44px; height: 32px;
+    border-radius: 25px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .nav-item.active .nav-icon-wrap { background: var(--accent); }
+  .nav-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+  .nav-item.active .nav-label { color: var(--accent-text); }
+
+  .variante-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="variante-badge">Variante B — Hero</div>
+
+  <!-- HEADER COMPACT -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-date">Mardi 31 mars · dernière séance il y a 2 jours</div>
+      <h1>Séances</h1>
+    </div>
+    <div class="header-right">
+      <div class="icon-btn">🔍</div>
+      <div class="icon-btn">＋</div>
+    </div>
+  </div>
+
+  <!-- CTA BUTTONS -->
+  <div class="hero-actions">
+    <button class="btn-primary">⚡ Séance libre</button>
+    <button class="btn-secondary">📋 Programme</button>
+  </div>
+
+  <div class="content">
+
+    <!-- PROGRAMME ACTIF + SES SÉANCES -->
+    <div class="section-title">
+      Programme actif
+      <a href="#">Tout voir</a>
+    </div>
+
+    <div class="prog-card active-prog">
+      <div class="prog-card-header">
+        <div>
+          <div class="prog-card-name">Push / Pull / Legs</div>
+          <div class="prog-card-meta">Semaine 4 de 8 · 3 séances/sem</div>
+        </div>
+        <div class="badge badge-actif">Actif</div>
+      </div>
+
+      <!-- SÉANCES SCROLL -->
+      <div class="seances-scroll">
+        <div class="seance-chip next">
+          <div class="chip-label">✦ Suivante</div>
+          <div class="chip-name">Push</div>
+          <div class="chip-exos">6 exercices</div>
+          <button class="chip-start-btn">Démarrer →</button>
+        </div>
+        <div class="seance-chip">
+          <div class="chip-label">Séance B</div>
+          <div class="chip-name">Pull</div>
+          <div class="chip-exos">5 exercices</div>
+        </div>
+        <div class="seance-chip">
+          <div class="chip-label">Séance C</div>
+          <div class="chip-name">Legs</div>
+          <div class="chip-exos">5 exercices</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTRES PROGRAMMES -->
+    <div class="section-title">
+      Mes programmes
+      <a href="#">+ Créer</a>
+    </div>
+
+    <div class="prog-mini">
+      <div class="prog-mini-icon">💪</div>
+      <div class="prog-mini-info">
+        <div class="prog-mini-name">Full Body 3×/sem</div>
+        <div class="prog-mini-meta">3 séances · Dernière fois : 15 mar</div>
+      </div>
+      <div class="prog-mini-arrow">›</div>
+    </div>
+
+    <div class="prog-mini">
+      <div class="prog-mini-icon">🎯</div>
+      <div class="prog-mini-info">
+        <div class="prog-mini-name">Upper / Lower</div>
+        <div class="prog-mini-meta">4 séances · Archivé</div>
+      </div>
+      <div class="prog-mini-arrow">›</div>
+    </div>
+
+    <div class="create-prog">
+      ＋ Créer un nouveau programme
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon-wrap">🏋️</div>
+      <span class="nav-label">Séances</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">⚖️</div>
+      <span class="nav-label">Poids</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">🏠</div>
+      <span class="nav-label">Accueil</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">🥗</div>
+      <span class="nav-label">Nutrition</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon-wrap">👤</div>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
