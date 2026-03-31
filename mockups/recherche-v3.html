@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recherche Aliment — V3 Mix</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg-primary: #0C0A09;
+    --bg-secondary: #1C1917;
+    --bg-card: #292524;
+    --bg-elevated: #44403C;
+    --text-primary: #FAFAF9;
+    --text-secondary: #A8A29E;
+    --text-muted: #78716C;
+    --border: rgba(255, 255, 255, 0.08);
+    --accent: #E8860C;
+    --accent-bg: rgba(232, 134, 12, 0.15);
+    --accent-text: #FDBA74;
+    --color-protein: #3B82F6;
+    --color-carbs: #EAB308;
+    --color-fat: #EF4444;
+  }
+  body {
+    background: #000;
+    color: var(--text-primary);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  /* ——— FOND PAGE ——— */
+  .page-bg {
+    width: 390px;
+    min-height: 100vh;
+    background: var(--bg-primary);
+    display: flex;
+    align-items: flex-end;
+  }
+
+  /* ——— BOTTOM SHEET ——— */
+  .sheet {
+    width: 390px;
+    height: calc(100vh - 56px); /* laisse voir le contenu derrière */
+    background: var(--bg-secondary);
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .handle {
+    width: 36px; height: 4px; background: var(--bg-elevated);
+    border-radius: 2px; margin: 10px auto 0; flex-shrink: 0;
+  }
+
+  /* ——— HEADER ——— */
+  .sheet-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px 12px; flex-shrink: 0;
+  }
+  .back-btn {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-primary); cursor: pointer; flex-shrink: 0;
+  }
+  .header-text { flex: 1; }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 20px; color: var(--text-primary);
+    line-height: 1;
+  }
+  .header-sub {
+    font-size: 11px; color: var(--accent-text); font-weight: 500; margin-top: 2px;
+  }
+  .close-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ——— SEARCH BAR ——— */
+  .search-area {
+    padding: 0 18px 12px; flex-shrink: 0;
+  }
+  .search-row {
+    display: flex; gap: 8px;
+  }
+  .search-bar {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px;
+    background: var(--bg-card); border-radius: 14px;
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+  .search-icon { color: var(--text-muted); flex-shrink: 0; }
+  .search-input {
+    background: none; border: none; outline: none; flex: 1;
+    font-size: 14px; color: var(--text-primary); font-family: inherit;
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .clear-btn {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--bg-elevated); border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .scan-btn {
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: white; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(232, 134, 12, 0.35);
+  }
+
+  /* ——— TABS (Résultats / Récents / Favoris) ——— */
+  .tabs {
+    display: flex; gap: 6px; padding: 0 18px 12px; flex-shrink: 0;
+  }
+  .tab {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: var(--accent); color: white; border-color: var(--accent);
+  }
+
+  /* ——— CATEGORIES CHIPS ——— */
+  .cats {
+    display: flex; gap: 6px; padding: 0 18px 14px; flex-shrink: 0;
+    overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 10px; white-space: nowrap;
+    border: 1px solid var(--border); background: var(--bg-card);
+    cursor: pointer; font-family: inherit;
+    font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .cat.active {
+    background: var(--accent-bg); border-color: var(--accent);
+    color: var(--accent-text);
+  }
+  .cat-emoji { font-size: 13px; }
+
+  /* ——— RESULTS LIST ——— */
+  .results {
+    flex: 1; overflow-y: auto; padding: 0 18px;
+  }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .section-count {
+    font-size: 11px; color: var(--text-muted);
+  }
+
+  /* Food item — hybrid card */
+  .food-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin-bottom: 6px;
+    background: var(--bg-card); border-radius: 16px;
+    border: 1px solid var(--border); cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .food-item:active { border-color: rgba(232,134,12,0.4); background: #302C29; }
+  .food-emoji {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .food-body { flex: 1; min-width: 0; }
+  .food-name-row {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 3px;
+  }
+  .food-name {
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .badge-oft {
+    font-size: 8px; font-weight: 700; padding: 2px 5px; border-radius: 4px;
+    background: var(--bg-elevated); color: var(--text-muted);
+    text-transform: uppercase; flex-shrink: 0;
+  }
+  .food-meta {
+    font-size: 11px; color: var(--text-muted); margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* mini macro pills */
+  .macro-pills {
+    display: flex; gap: 4px;
+  }
+  .mp {
+    font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 5px;
+  }
+  .mp-p { background: rgba(59,130,246,0.15); color: #93C5FD; }
+  .mp-g { background: rgba(234,179,8,0.15); color: #FDE047; }
+  .mp-l { background: rgba(239,68,68,0.12); color: #FCA5A5; }
+  .food-right {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 6px; flex-shrink: 0;
+  }
+  .food-kcal {
+    font-size: 19px; font-weight: 800; color: var(--accent-text);
+    line-height: 1;
+  }
+  .food-kcal-label {
+    font-size: 9px; color: var(--text-muted); text-align: right;
+  }
+  .add-btn {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent-bg); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+  }
+
+  /* ——— EMPTY / RECENTS ——— */
+  .recents-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  /* ——— CREATE CUSTOM ——— */
+  .create-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px; margin-top: 6px; margin-bottom: 28px;
+    border: 1.5px dashed rgba(232,134,12,0.3); border-radius: 14px;
+    background: transparent; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--accent-text);
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .create-btn:hover {
+    background: var(--accent-bg); border-color: var(--accent);
+  }
+
+  .label-v {
+    position: fixed; top: 16px; right: 16px;
+    background: var(--accent); color: white; font-size: 11px;
+    font-weight: 700; padding: 4px 10px; border-radius: 8px;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="label-v">MAQUETTE RECHERCHE V3 — Mix</div>
+
+<div class="page-bg">
+  <div class="sheet">
+    <div class="handle"></div>
+
+    <!-- Header -->
+    <div class="sheet-header">
+      <button class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="header-text">
+        <div class="header-title">Ajouter</div>
+        <div class="header-sub">Déjeuner · Aujourd'hui</div>
+      </div>
+      <button class="close-btn">&times;</button>
+    </div>
+
+    <!-- Search bar + scan btn -->
+    <div class="search-area">
+      <div class="search-row">
+        <div class="search-bar">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="search-input" value="poulet" />
+          <button class="clear-btn">&times;</button>
+        </div>
+        <button class="scan-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <line x1="7" y1="12" x2="17" y2="12"/>
+            <line x1="7" y1="8" x2="13" y2="8"/>
+            <line x1="7" y1="16" x2="15" y2="16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active">Résultats</button>
+      <button class="tab">Récents</button>
+      <button class="tab">Favoris</button>
+    </div>
+
+    <!-- Categories -->
+    <div class="cats">
+      <button class="cat active"><span class="cat-emoji">🔍</span>Tous</button>
+      <button class="cat"><span class="cat-emoji">🥦</span>Légumes</button>
+      <button class="cat"><span class="cat-emoji">🍎</span>Fruits</button>
+      <button class="cat"><span class="cat-emoji">🥩</span>Viandes</button>
+      <button class="cat"><span class="cat-emoji">🐟</span>Poissons</button>
+      <button class="cat"><span class="cat-emoji">🧀</span>Laitiers</button>
+      <button class="cat"><span class="cat-emoji">🌾</span>Féculents</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results">
+      <div class="section-header">
+        <span class="section-label">Résultats</span>
+        <span class="section-count">12 aliments</span>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🍗</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Blanc de poulet grillé</span>
+          </div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 31g</span>
+            <span class="mp mp-g">G 0g</span>
+            <span class="mp mp-l">L 3.6g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">165</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🥩</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Cuisse de poulet rôtie</span>
+          </div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 26g</span>
+            <span class="mp mp-g">G 0g</span>
+            <span class="mp mp-l">L 10.9g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">209</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🍖</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Poulet entier rôti</span>
+            <span class="badge-oft">OFT</span>
+          </div>
+          <div class="food-meta">Maître Coq</div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 25g</span>
+            <span class="mp mp-g">G 0.5g</span>
+            <span class="mp mp-l">L 8.2g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">180</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🥗</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Salade Caesar au poulet</span>
+            <span class="badge-oft">OFT</span>
+          </div>
+          <div class="food-meta">Sodebo</div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 9g</span>
+            <span class="mp mp-g">G 8g</span>
+            <span class="mp mp-l">L 7.5g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">138</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🍛</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Curry de poulet</span>
+            <span class="badge-oft">OFT</span>
+          </div>
+          <div class="food-meta">Fleury Michon</div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 11g</span>
+            <span class="mp mp-g">G 14g</span>
+            <span class="mp mp-l">L 5g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">152</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="food-item">
+        <div class="food-emoji">🌯</div>
+        <div class="food-body">
+          <div class="food-name-row">
+            <span class="food-name">Wrap poulet crudités</span>
+            <span class="badge-oft">OFT</span>
+          </div>
+          <div class="food-meta">Daunat</div>
+          <div class="macro-pills">
+            <span class="mp mp-p">P 10g</span>
+            <span class="mp mp-g">G 22g</span>
+            <span class="mp mp-l">L 8g</span>
+          </div>
+        </div>
+        <div class="food-right">
+          <div>
+            <div class="food-kcal">201</div>
+            <div class="food-kcal-label">kcal/100g</div>
+          </div>
+          <button class="add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="create-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Créer un aliment personnalisé
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Concept D — Anneau Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0A09;--bg2:#1C1917;--bg3:#292524;--bg4:#44403C;
+  --txt:#FAFAF9;--txt2:#A8A29E;--muted:#78716C;
+  --border:rgba(255,255,255,0.07);
+  --acc:#E8860C;--acc2:#C8622E;--acct:#FDBA74;
+}
+body{background:#060504;font-family:'DM Sans',sans-serif;color:var(--txt);
+  display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px;gap:16px}
+.label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-align:center}
+.phone{width:375px;background:var(--bg);border-radius:44px;
+  border:1.5px solid rgba(255,255,255,0.09);overflow:hidden;
+  box-shadow:0 48px 120px rgba(0,0,0,0.8)}
+.status{padding:16px 28px 0;display:flex;justify-content:space-between;align-items:center}
+.status .t{font-size:14px;font-weight:600}
+.sicons{display:flex;gap:4px;align-items:center}
+.sicons span{display:block;border-radius:2px;background:var(--txt);opacity:.5}
+.sicons .bat{width:22px;height:10px;border-radius:3px;background:var(--acc);opacity:1}
+
+.body{padding:0 0 100px}
+
+/* ── HEADER avec avatar + name côte à côte ── */
+.header{padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,var(--bg3),var(--bg));
+  border:2px solid var(--acc);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:17px;color:var(--acc);
+  box-shadow:0 0 0 4px rgba(232,134,12,0.1)}
+.hdr-txt .greet{font-size:11px;color:var(--muted)}
+.hdr-txt .nm{font-family:'DM Serif Display',serif;font-style:italic;font-size:22px;line-height:1.1;color:var(--txt)}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:600}
+.pill-a{border:1.5px solid var(--acc);color:var(--acc)}
+.pill-d{background:var(--bg3);color:var(--txt)}
+
+/* ── HERO RING — grand anneau centré ── */
+.ring-hero{padding:24px 20px 0;display:flex;flex-direction:column;align-items:center}
+.ring-outer{position:relative;width:200px;height:200px}
+/* Halo ambient */
+.ring-outer::before{content:'';position:absolute;inset:-20px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,134,12,0.1) 0%,transparent 65%);pointer-events:none}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px}
+.rc-val{font-family:'DM Serif Display',serif;font-style:italic;font-size:48px;
+  line-height:1;color:var(--acct);letter-spacing:-.02em}
+.rc-unit{font-size:12px;color:var(--muted);font-weight:500}
+.rc-sub{font-size:11px;color:var(--txt2);margin-top:4px}
+/* 3 mini arcs autour — protéines, glucides, lipides */
+
+/* Légende sous l'anneau */
+.ring-legend{display:flex;gap:16px;margin-top:14px}
+.rl-item{display:flex;align-items:center;gap:5px}
+.rl-dot{width:7px;height:7px;border-radius:50%}
+.rl-txt{font-size:10px;color:var(--muted)}
+
+/* ── BARRE stats sous l'anneau ── */
+.under-ring{padding:16px 20px 0;display:flex;justify-content:space-around;
+  border-top:1px solid var(--border);margin:16px 20px 0}
+.ur-item{text-align:center}
+.ur-v{font-size:18px;font-weight:700;color:var(--txt);line-height:1}
+.ur-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.ur-sep{width:1px;background:var(--border)}
+
+/* ── MACROS section ── */
+.section-head{padding:16px 20px 0;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-txt{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.macros{padding:10px 20px 0;display:flex;flex-direction:column;gap:9px}
+.macro{display:flex;align-items:center;gap:10px}
+.mc-name{font-size:12px;font-weight:600;width:68px;flex-shrink:0}
+.mc-track{flex:1;height:5px;border-radius:999px;background:var(--bg4);overflow:hidden}
+.mc-fill{height:100%;border-radius:999px}
+.mc-val{font-size:11px;color:var(--txt2);width:60px;text-align:right;flex-shrink:0}
+
+/* ── WORKOUT CARD ── */
+.wk{margin:16px 20px 0;border-radius:16px;overflow:hidden;position:relative}
+.wk-bg{position:absolute;inset:0;
+  background:linear-gradient(120deg,#1a0d04 0%,#361507 45%,#a34a1a 100%)}
+/* Motif géométrique subtil */
+.wk-bg::after{content:'';position:absolute;inset:0;opacity:.06;
+  background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,255,255,.5) 20px,rgba(255,255,255,.5) 21px)}
+.wk-inner{position:relative;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+.wk-s{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px}
+.wk-n{font-family:'DM Serif Display',serif;font-style:italic;font-size:22px;color:#fff;line-height:1.1;margin-bottom:3px}
+.wk-m{font-size:11px;color:rgba(255,255,255,.65)}
+.wk-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:10px;
+  border:1px solid rgba(255,255,255,.2)}
+
+/* ── MINI STATS (bas) ── */
+.mini-row{padding:12px 20px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mini{background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.mi-ic{font-size:20px}
+.mi-v{font-size:15px;font-weight:700;color:var(--txt)}
+.mi-l{font-size:9px;color:var(--muted);text-align:center}
+
+/* ── NAV ── */
+.nav{padding:12px 24px 20px;background:rgba(12,10,9,.92);backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ni-ic{font-size:20px;opacity:.35}
+.ni-lbl{font-size:9px;color:var(--muted);font-weight:500}
+.pill-nav{background:var(--acc);border-radius:12px;padding:5px 14px 3px;
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+</style>
+</head>
+<body>
+
+<p class="label">D — Grand Anneau Central</p>
+
+<div class="phone">
+  <div class="status"><span class="t">9:41</span><div class="sicons"><span style="width:14px;height:8px"></span><span style="width:12px;height:8px;opacity:.35"></span><span class="bat"></span></div></div>
+  <div class="body">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="hdr-left">
+        <div class="av">L</div>
+        <div class="hdr-txt">
+          <p class="greet">Bonjour,</p>
+          <p class="nm">Louis</p>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <span class="pill pill-a">✦ PREMIUM</span>
+        <span class="pill pill-d">🔥 12 jours</span>
+      </div>
+    </div>
+
+    <!-- GRAND ANNEAU -->
+    <div class="ring-hero">
+      <div class="ring-outer">
+        <svg width="200" height="200" style="transform:rotate(-90deg)">
+          <!-- Track principal -->
+          <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(232,134,12,0.12)" stroke-width="10"/>
+          <!-- Arc calories -->
+          <circle cx="100" cy="100" r="82" fill="none" stroke="url(#gd)" stroke-width="10"
+            stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="134"/>
+          <!-- Arc glucides — anneau intérieur -->
+          <circle cx="100" cy="100" r="66" fill="none" stroke="rgba(234,179,8,0.2)" stroke-width="6"/>
+          <circle cx="100" cy="100" r="66" fill="none" stroke="#EAB308" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="415" stroke-dashoffset="149"
+            style="opacity:.8"/>
+          <!-- Arc protéines -->
+          <circle cx="100" cy="100" r="54" fill="none" stroke="rgba(59,130,246,0.2)" stroke-width="5"/>
+          <circle cx="100" cy="100" r="54" fill="none" stroke="#3B82F6" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="64"
+            style="opacity:.8"/>
+          <defs>
+            <linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#C8622E"/><stop offset="100%" stop-color="#E8860C"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ring-center">
+          <span class="rc-val">1 840</span>
+          <span class="rc-unit">kcal</span>
+          <span class="rc-sub">660 restants</span>
+        </div>
+      </div>
+      <div class="ring-legend">
+        <div class="rl-item"><div class="rl-dot" style="background:var(--acc)"></div><span class="rl-txt">Calories</span></div>
+        <div class="rl-item"><div class="rl-dot" style="background:#EAB308"></div><span class="rl-txt">Glucides</span></div>
+        <div class="rl-item"><div class="rl-dot" style="background:#3B82F6"></div><span class="rl-txt">Protéines</span></div>
+      </div>
+    </div>
+
+    <!-- STATS SOUS ANNEAU -->
+    <div class="under-ring">
+      <div class="ur-item"><div class="ur-v">2 500</div><div class="ur-l">Objectif</div></div>
+      <div class="ur-sep"></div>
+      <div class="ur-item"><div class="ur-v">74%</div><div class="ur-l">Atteint</div></div>
+      <div class="ur-sep"></div>
+      <div class="ur-item"><div class="ur-v">3</div><div class="ur-l">Séances</div></div>
+    </div>
+
+    <!-- MACROS -->
+    <div class="section-head"><div class="sh-line"></div><span class="sh-txt">Macros</span><div class="sh-line"></div></div>
+    <div class="macros">
+      <div class="macro">
+        <span class="mc-name" style="color:#EAB308">Glucides</span>
+        <div class="mc-track"><div class="mc-fill" style="width:64%;background:#EAB308"></div></div>
+        <span class="mc-val">180 / 280g</span>
+      </div>
+      <div class="macro">
+        <span class="mc-name" style="color:#3B82F6">Protéines</span>
+        <div class="mc-track"><div class="mc-fill" style="width:81%;background:#3B82F6"></div></div>
+        <span class="mc-val">142 / 175g</span>
+      </div>
+      <div class="macro">
+        <span class="mc-name" style="color:#A78BFA">Lipides</span>
+        <div class="mc-track"><div class="mc-fill" style="width:69%;background:#A78BFA"></div></div>
+        <span class="mc-val">55 / 80g</span>
+      </div>
+    </div>
+
+    <!-- WORKOUT -->
+    <div class="wk">
+      <div class="wk-bg"></div>
+      <div class="wk-inner">
+        <div>
+          <p class="wk-s">Prochain entraînement</p>
+          <p class="wk-n">Push A — Pecto</p>
+          <p class="wk-m">6 exercices · ~55 min · Épaules</p>
+        </div>
+        <div class="wk-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+    </div>
+
+    <!-- MINI STATS -->
+    <div class="mini-row">
+      <div class="mini"><span class="mi-ic">💧</span><span class="mi-v">—</span><span class="mi-l">Hydratation</span></div>
+      <div class="mini"><span class="mi-ic">🌙</span><span class="mi-v">7h20</span><span class="mi-l">Sommeil</span></div>
+      <div class="mini"><span class="mi-ic">⚖️</span><span class="mi-v">74.2</span><span class="mi-l">kg actuel</span></div>
+    </div>
+
+  </div>
+
+  <div class="nav">
+    <div class="ni"><span class="ni-ic">🏋️</span><span class="ni-lbl">Séance</span></div>
+    <div class="ni"><span class="ni-ic">⚖️</span><span class="ni-lbl">Poids</span></div>
+    <div class="ni"><div class="pill-nav"><span class="ni-ic" style="opacity:1">🏠</span><span class="ni-lbl" style="color:#fff">Accueil</span></div></div>
+    <div class="ni"><span class="ni-ic">🥗</span><span class="ni-lbl">Nutrition</span></div>
+    <div class="ni"><span class="ni-ic">📋</span><span class="ni-lbl">Historique</span></div>
+  </div>
+</div>
+
+</body>
+</html>

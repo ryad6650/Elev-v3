@@ -26,6 +26,7 @@ export interface DashboardData {
   seancesAujourdhui: boolean;
   seancesCetteSemaine: number;
   streakJours: number;
+  streakConnexions: number;
   nutritionJoursCetteSemaine: number;
   poidsJoursCetteSemaine: number;
   weightHistory: { date: string; poids: number }[];
@@ -48,7 +49,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const [profileRes, nutritionRes, poidsRes, workoutDatesRes, nutritionDatesRes, routinesRes, sommeilRes] =
     await Promise.all([
       supabase.from("profiles")
-        .select("prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides")
+        .select("prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion")
         .eq("id", user.id).single(),
       supabase.from("nutrition_entries")
         .select("quantite_g, aliments(calories, proteines, glucides, lipides)")
@@ -128,7 +129,28 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     };
   }
 
+  // ── Streak de connexions ──────────────────────────────────────
   const profil = profileRes.data;
+  const hier = getNDaysAgo(1);
+  const derniereConnexion = profil?.derniere_connexion ?? null;
+
+  let streakConnexions = profil?.streak_connexions ?? 1;
+  if (derniereConnexion === null || derniereConnexion < hier) {
+    // Première connexion ou jour(s) manqué(s) → reset
+    streakConnexions = 1;
+  } else if (derniereConnexion === hier) {
+    // Connexion hier → on incrémente
+    streakConnexions = streakConnexions + 1;
+  }
+  // Si derniereConnexion === today → déjà connecté aujourd'hui, on conserve
+
+  if (derniereConnexion !== today) {
+    await supabase.from("profiles")
+      .update({ streak_connexions: streakConnexions, derniere_connexion: today })
+      .eq("id", user.id);
+  }
+  // ─────────────────────────────────────────────────────────────
+
   return {
     prenom: profil?.prenom ?? null,
     photoUrl: profil?.photo_url ?? null,
@@ -143,6 +165,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     poidsActuel, poidsDelta, seancesAujourdhui, seancesCetteSemaine, streakJours,
     nutritionJoursCetteSemaine, poidsJoursCetteSemaine,
     weightHistory, prochaineRoutine,
+    streakConnexions,
     sommeilMinutes: sommeilRes.data?.duree_minutes ?? null,
   };
 }

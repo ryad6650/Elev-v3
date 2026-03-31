@@ -11,12 +11,12 @@ function MacroBar({ label, consumed, objective, color }: MacroBarProps) {
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-sm font-medium" style={{ color }}>{label}</span>
-        <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+        <span className="text-xs font-semibold" style={{ color }}>{label}</span>
+        <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
           {consumed} / {objective}g
         </span>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--bg-elevated)" }}>
+      <div className="rounded-full overflow-hidden" style={{ height: 6, background: "var(--bg-elevated)" }}>
         <div
           className="h-full rounded-full"
           style={{ width: `${percent}%`, background: color, transition: "width 0.6s ease" }}
@@ -34,7 +34,7 @@ interface Props {
 
 export default function MacrosBars({ proteines, glucides, lipides }: Props) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-3.5">
       <MacroBar label="Glucides" consumed={glucides.consumed} objective={glucides.objective} color="#EAB308" />
       <MacroBar label="Protéines" consumed={proteines.consumed} objective={proteines.objective} color="#3B82F6" />
       <MacroBar label="Lipides" consumed={lipides.consumed} objective={lipides.objective} color="#A78BFA" />

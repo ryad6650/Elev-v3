@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Concept A — Editorial Dark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0A09;
+  --bg2:#1C1917;
+  --bg3:#292524;
+  --bg4:#44403C;
+  --txt:#FAFAF9;
+  --txt2:#A8A29E;
+  --muted:#78716C;
+  --border:rgba(255,255,255,0.07);
+  --acc:#E8860C;
+  --acc2:#C8622E;
+  --acct:#FDBA74;
+  --acc-bg:rgba(232,134,12,0.12);
+}
+
+body{
+  background:#060504;
+  font-family:'DM Sans',sans-serif;
+  color:var(--txt);
+  display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px;gap:16px
+}
+
+.page-label{
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;text-align:center
+}
+
+.phone{
+  width:375px;background:var(--bg);border-radius:44px;
+  border:1.5px solid rgba(255,255,255,0.09);overflow:hidden;
+  box-shadow:0 48px 120px rgba(0,0,0,0.8),0 0 0 1px rgba(232,134,12,0.05)
+}
+
+/* ── STATUS BAR ── */
+.status{
+  padding:16px 28px 0;display:flex;justify-content:space-between;align-items:center
+}
+.status .t{font-size:14px;font-weight:600;color:var(--txt)}
+.sicons{display:flex;gap:4px;align-items:center}
+.sicons span{display:block;border-radius:2px;background:var(--txt);opacity:.4}
+.sicons .bat{width:22px;height:10px;border-radius:3px;background:var(--acc);opacity:1}
+
+.body{padding:0 0 100px}
+
+/* ══════════════════════
+   HERO
+══════════════════════ */
+.hero{padding:16px 20px 0}
+
+.hero-date{
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px
+}
+
+.hero-line{
+  display:flex;align-items:flex-end;justify-content:space-between
+}
+
+.hero-pre{font-size:12px;color:var(--txt2);letter-spacing:.02em;margin-bottom:1px}
+.hero-name{
+  font-family:'DM Serif Display',serif;font-style:italic;
+  font-size:38px;line-height:.95;color:var(--txt);letter-spacing:-.02em
+}
+
+.hero-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:2px
+}
+.hero-avatar{
+  width:46px;height:46px;border-radius:13px;background:var(--bg3);
+  border:1px solid rgba(232,134,12,0.28);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:17px;color:var(--acc)
+}
+
+/* ── Chips résumé ── */
+.quick-row{
+  display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap
+}
+.qchip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:600;
+  background:var(--bg3);border:1px solid var(--border);color:var(--txt2)
+}
+.qchip-acc{
+  background:var(--acc-bg);
+  border-color:rgba(232,134,12,0.25);
+  color:var(--acct)
+}
+
+/* Bande orange */
+.hero-stripe{
+  height:2.5px;
+  background:linear-gradient(to right,var(--acc2),var(--acc),transparent);
+  margin:14px 20px 0;border-radius:999px
+}
+
+/* ══════════════════════
+   CALORIES
+══════════════════════ */
+.cal-section{
+  padding:18px 20px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.cal-big{flex:1}
+.cal-sup{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:4px
+}
+.cal-num{
+  font-family:'DM Serif Display',serif;font-style:italic;
+  font-size:58px;line-height:1;color:var(--acct);letter-spacing:-.03em
+}
+.cal-unit{font-size:12px;color:var(--muted);font-weight:500;margin-left:3px}
+
+.cal-right{
+  display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0
+}
+.ring-wrap{position:relative;width:76px;height:76px}
+.ring-center{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center
+}
+.ring-pct{font-size:14px;font-weight:700;color:var(--txt)}
+
+.cal-meta{display:flex;gap:16px}
+.cal-m-item .v{font-size:16px;font-weight:700;text-align:center}
+.cal-m-item .lbl{
+  font-size:9px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;text-align:center;margin-top:1px
+}
+.v-obj{color:var(--txt2)}
+.v-rest{color:var(--acc)}
+
+/* ══════════════════════
+   SÉPARATEURS + MACROS
+══════════════════════ */
+.section-divider{
+  display:flex;align-items:center;gap:10px;padding:16px 20px 0
+}
+.section-divider .line{flex:1;height:1px;background:var(--border)}
+.section-divider .txt{
+  font-size:9px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted)
+}
+
+.macros{padding:10px 20px 0;display:flex;flex-direction:column;gap:10px}
+.macro{display:flex;flex-direction:column;gap:5px}
+.macro-header{display:flex;justify-content:space-between;align-items:baseline}
+.macro-name{font-size:12px;font-weight:600}
+.macro-val{font-size:11px;font-weight:500;color:var(--txt2)}
+.macro-track{height:6px;border-radius:999px;background:var(--bg4);overflow:hidden}
+.macro-fill{height:100%;border-radius:999px}
+
+/* ══════════════════════
+   WORKOUT
+══════════════════════ */
+.workout{margin:16px 20px 0;position:relative;border-radius:18px;overflow:hidden}
+.workout-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,#1a0e07 0%,#2d1506 40%,var(--acc2) 100%)
+}
+.workout-inner{
+  position:relative;padding:17px 18px;
+  display:flex;align-items:center;justify-content:space-between
+}
+.workout-label{
+  font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:4px
+}
+.workout-name{
+  font-family:'DM Serif Display',serif;font-style:italic;
+  font-size:22px;color:#fff;line-height:1.1;margin-bottom:3px
+}
+.workout-sub{font-size:11px;color:rgba(255,255,255,.65)}
+.workout-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:10px
+}
+
+/* ══════════════════════
+   MINI STATS
+══════════════════════ */
+.mini-grid{
+  padding:10px 20px 0;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px
+}
+.mini{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:3px
+}
+.mini-ic{font-size:20px}
+.mini-v{font-size:15px;font-weight:700;color:var(--txt)}
+.mini-l{font-size:9px;color:var(--muted);text-align:center;line-height:1.3}
+
+/* ══════════════════════
+   BOTTOM NAV
+══════════════════════ */
+.nav{
+  padding:12px 24px 20px;
+  background:rgba(12,10,9,0.94);
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center
+}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ni-ic{font-size:20px;opacity:.35}
+.ni-lbl{font-size:9px;color:var(--muted);font-weight:500}
+.pill-nav{
+  background:var(--acc);border-radius:12px;padding:5px 14px 3px;
+  display:flex;flex-direction:column;align-items:center;gap:2px
+}
+</style>
+</head>
+<body>
+
+<p class="page-label">A — Editorial · Dark Mode</p>
+
+<div class="phone">
+  <div class="status">
+    <span class="t">9:41</span>
+    <div class="sicons">
+      <span style="width:14px;height:8px;border-radius:2px"></span>
+      <span style="width:12px;height:8px;border-radius:2px;opacity:.2"></span>
+      <span class="bat"></span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-date">Mardi — 31 mars 2026</div>
+
+      <div class="hero-line">
+        <div>
+          <p class="hero-pre">Bonjour,</p>
+          <h1 class="hero-name">Louis</h1>
+        </div>
+        <div class="hero-right">
+          <div class="hero-avatar">L</div>
+        </div>
+      </div>
+
+      <!-- Chips résumé -->
+      <div class="quick-row">
+        <span class="qchip qchip-acc">⚡ Jour 42</span>
+        <span class="qchip">⚖️ 74.2 kg</span>
+        <span class="qchip">💪 3 séances sem.</span>
+      </div>
+    </div>
+
+    <div class="hero-stripe"></div>
+
+    <!-- ── CALORIES ── -->
+    <div class="cal-section">
+      <div class="cal-big">
+        <p class="cal-sup">Calories aujourd'hui</p>
+        <div style="display:flex;align-items:baseline">
+          <span class="cal-num">1 840</span>
+          <span class="cal-unit">kcal</span>
+        </div>
+      </div>
+
+      <div class="cal-right">
+        <div class="ring-wrap">
+          <svg width="76" height="76" style="transform:rotate(-90deg)">
+            <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(232,134,12,0.15)" stroke-width="6"/>
+            <circle cx="38" cy="38" r="30" fill="none" stroke="url(#gd)" stroke-width="6"
+              stroke-linecap="round" stroke-dasharray="188" stroke-dashoffset="49"/>
+            <defs>
+              <linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#C8622E"/>
+                <stop offset="100%" stop-color="#E8860C"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="ring-center">
+            <span class="ring-pct">74%</span>
+          </div>
+        </div>
+        <div class="cal-meta">
+          <div class="cal-m-item">
+            <div class="v v-obj">2 500</div>
+            <div class="lbl">Objectif</div>
+          </div>
+          <div class="cal-m-item">
+            <div class="v v-rest">660</div>
+            <div class="lbl">Restant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MACROS ── -->
+    <div class="section-divider">
+      <div class="line"></div>
+      <span class="txt">Macros</span>
+      <div class="line"></div>
+    </div>
+    <div class="macros">
+      <div class="macro">
+        <div class="macro-header">
+          <span class="macro-name" style="color:#EAB308">Glucides</span>
+          <span class="macro-val">180 / 280g</span>
+        </div>
+        <div class="macro-track"><div class="macro-fill" style="width:64%;background:#EAB308"></div></div>
+      </div>
+      <div class="macro">
+        <div class="macro-header">
+          <span class="macro-name" style="color:#3B82F6">Protéines</span>
+          <span class="macro-val">142 / 175g</span>
+        </div>
+        <div class="macro-track"><div class="macro-fill" style="width:81%;background:#3B82F6"></div></div>
+      </div>
+      <div class="macro">
+        <div class="macro-header">
+          <span class="macro-name" style="color:#A78BFA">Lipides</span>
+          <span class="macro-val">55 / 80g</span>
+        </div>
+        <div class="macro-track"><div class="macro-fill" style="width:69%;background:#A78BFA"></div></div>
+      </div>
+    </div>
+
+    <!-- ── WORKOUT ── -->
+    <div class="section-divider">
+      <div class="line"></div>
+      <span class="txt">Entraînement</span>
+      <div class="line"></div>
+    </div>
+    <div class="workout">
+      <div class="workout-bg"></div>
+      <div class="workout-inner">
+        <div>
+          <p class="workout-label">Prochain entraînement</p>
+          <p class="workout-name">Push A — Pecto</p>
+          <p class="workout-sub">6 exercices · ~55 min · Épaules</p>
+        </div>
+        <div class="workout-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MINI STATS ── -->
+    <div class="mini-grid">
+      <div class="mini">
+        <span class="mini-ic">💧</span>
+        <span class="mini-v">—</span>
+        <span class="mini-l">Hydratation</span>
+      </div>
+      <div class="mini">
+        <span class="mini-ic">💪</span>
+        <span class="mini-v">3</span>
+        <span class="mini-l">Séances sem.</span>
+      </div>
+      <div class="mini">
+        <span class="mini-ic">🌙</span>
+        <span class="mini-v">7h20</span>
+        <span class="mini-l">Sommeil</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── NAV ── -->
+  <div class="nav">
+    <div class="ni"><span class="ni-ic">🏋️</span><span class="ni-lbl">Séance</span></div>
+    <div class="ni"><span class="ni-ic">⚖️</span><span class="ni-lbl">Poids</span></div>
+    <div class="ni">
+      <div class="pill-nav">
+        <span class="ni-ic" style="opacity:1">🏠</span>
+        <span class="ni-lbl" style="color:#fff">Accueil</span>
+      </div>
+    </div>
+    <div class="ni"><span class="ni-ic">🥗</span><span class="ni-lbl">Nutrition</span></div>
+    <div class="ni"><span class="ni-ic">📋</span><span class="ni-lbl">Historique</span></div>
+  </div>
+</div>
+
+</body>
+</html>

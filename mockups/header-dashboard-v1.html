@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Header — Maquettes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0C0A09;
+      --bg-secondary: #1C1917;
+      --bg-card: #292524;
+      --bg-elevated: #44403C;
+      --text-primary: #FAFAF9;
+      --text-secondary: #A8A29E;
+      --text-muted: #78716C;
+      --border: rgba(255,255,255,0.08);
+      --accent: #E8860C;
+      --accent-bg: rgba(232,134,12,0.15);
+      --accent-text: #FDBA74;
+    }
+
+    body {
+      background: #080706;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    /* ── Téléphone simulé ── */
+    .phone {
+      width: 375px;
+      background: var(--bg-primary);
+      border-radius: 36px;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    }
+    .phone-inner {
+      padding: 20px 20px 24px;
+    }
+
+    /* ── Avatar ── */
+    .avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: var(--accent);
+      overflow: hidden; flex-shrink: 0;
+    }
+    .avatar-lg {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 20px; color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Badge pill ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-accent { border: 1.5px solid var(--accent); color: var(--accent); }
+    .badge-card { background: var(--bg-card); color: var(--text-primary); }
+    .badge-success { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+    /* ══════════════════════════════
+       VARIANTE A — Actuel (référence)
+    ══════════════════════════════ */
+    .var-a .header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .var-a .greeting { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
+    .var-a .name {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 36px;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .var-a .right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px; }
+
+    /* ══════════════════════════════
+       VARIANTE B — Date + Citation
+    ══════════════════════════════ */
+    .var-b .header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .var-b .date-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px; color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .var-b .date-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .var-b .greeting { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
+    .var-b .name {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 36px;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .var-b .tagline {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .var-b .tagline span { color: var(--accent-text); font-style: normal; font-weight: 600; }
+    .var-b .right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px; }
+
+    /* ══════════════════════════════
+       VARIANTE C — Hero Banner
+    ══════════════════════════════ */
+    .var-c .hero {
+      border-radius: 20px;
+      background: linear-gradient(135deg, #1C1917 0%, #292524 60%, rgba(232,134,12,0.18) 100%);
+      border: 1px solid rgba(232,134,12,0.2);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .var-c .hero::before {
+      content: '';
+      position: absolute; top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,134,12,0.18) 0%, transparent 70%);
+    }
+    .var-c .hero-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .var-c .hero-left { display: flex; align-items: center; gap: 12px; }
+    .var-c .hero-info .greeting { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+    .var-c .hero-info .name {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .var-c .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .var-c .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+      margin-bottom: 14px;
+    }
+    .var-c .hero-stats { display: flex; gap: 0; }
+    .var-c .hero-stat { flex: 1; text-align: center; }
+    .var-c .hero-stat:not(:last-child) { border-right: 1px solid var(--border); }
+    .var-c .hero-stat-val { font-size: 18px; font-weight: 700; color: var(--accent-text); display: block; }
+    .var-c .hero-stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ══════════════════════════════
+       VARIANTE D — Avatar centré + objectif du jour
+    ══════════════════════════════ */
+    .var-d .header {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .var-d .top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 16px; }
+    .var-d .date-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .var-d .center { display: flex; flex-direction: column; align-items: center; }
+    .var-d .avatar-wrap { position: relative; margin-bottom: 10px; }
+    .var-d .avatar-ring {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; color: var(--accent);
+    }
+    .var-d .streak-dot {
+      position: absolute; bottom: 0; right: 0;
+      background: var(--accent);
+      color: #fff; font-size: 10px; font-weight: 700;
+      border-radius: 999px; padding: 2px 6px;
+      border: 2px solid var(--bg-primary);
+      white-space: nowrap;
+    }
+    .var-d .greeting { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
+    .var-d .name {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 32px; line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .var-d .progress-row { width: 100%; margin-top: 6px; }
+    .var-d .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text-muted); margin-bottom: 5px;
+    }
+    .var-d .progress-label span { color: var(--accent-text); font-weight: 600; }
+    .var-d .progress-track {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--bg-elevated);
+    }
+    .var-d .progress-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(to right, #C8622E, #E8860C);
+      width: 62%;
+    }
+    .var-d .badges-row { display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+
+    /* ── Fake card preview ── */
+    .preview-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      opacity: 0.5;
+    }
+    .preview-card-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; }
+    .preview-placeholder { height: 60px; border-radius: 8px; background: var(--bg-card); }
+
+    /* ── Labels section ── */
+    .variant-block { display: flex; flex-direction: column; align-items: center; }
+    .variant-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 4px 14px; border-radius: 999px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .tag-b { border-color: rgba(232,134,12,0.4); color: var(--accent-text); }
+    .tag-c { border-color: rgba(232,134,12,0.4); color: var(--accent-text); }
+    .tag-d { border-color: rgba(34,197,94,0.4); color: #4ade80; }
+
+    h1 { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 28px; color: var(--text-primary); text-align: center; }
+    .subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <div>
+    <h1>Dashboard Header</h1>
+    <p class="subtitle">4 variantes de header — fond noir chaud #0C0A09</p>
+  </div>
+
+  <!-- ────────────────────────────
+       VARIANTE A — Actuel (référence)
+  ──────────────────────────────── -->
+  <div class="variant-block">
+    <div class="variant-tag">A — Actuel (référence)</div>
+    <div class="phone">
+      <div class="phone-inner var-a">
+        <div class="header">
+          <div>
+            <p class="greeting">Bonjour,</p>
+            <h2 class="name">Louis</h2>
+          </div>
+          <div class="right">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="badge badge-accent">✦ PREMIUM</span>
+              <div class="avatar">L</div>
+            </div>
+            <span class="badge badge-card">🔥 12 jours</span>
+          </div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-card-title">Calories</div>
+          <div class="preview-placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────
+       VARIANTE B — Date + Citation motivante
+  ──────────────────────────────── -->
+  <div class="variant-block">
+    <div class="variant-tag tag-b">B — Date + Accroche ✦</div>
+    <div class="phone">
+      <div class="phone-inner var-b">
+        <div class="date-chip">
+          <span class="date-dot"></span>
+          Mardi 31 mars 2026
+        </div>
+        <div class="header">
+          <div>
+            <p class="greeting">Bonjour,</p>
+            <h2 class="name">Louis</h2>
+            <p class="tagline">Jour <span>42</span> — tu es en feu 🔥</p>
+          </div>
+          <div class="right">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="badge badge-accent">✦ PREMIUM</span>
+              <div class="avatar">L</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-card-title">Calories</div>
+          <div class="preview-placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────
+       VARIANTE C — Hero Card avec stats inline
+  ──────────────────────────────── -->
+  <div class="variant-block">
+    <div class="variant-tag tag-c">C — Hero card avec stats ✦</div>
+    <div class="phone">
+      <div class="phone-inner var-c">
+        <div class="hero">
+          <div class="hero-top">
+            <div class="hero-left">
+              <div class="avatar-lg">L</div>
+              <div class="hero-info">
+                <p class="greeting">Bonjour,</p>
+                <h2 class="name">Louis</h2>
+              </div>
+            </div>
+            <div class="hero-right">
+              <span class="badge badge-accent">✦ PREMIUM</span>
+              <span class="badge badge-card">🔥 12 jours</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-val">1 840</span>
+              <span class="hero-stat-label">kcal / obj</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-val">3</span>
+              <span class="hero-stat-label">séances sem.</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-val">74.2</span>
+              <span class="hero-stat-label">kg actuel</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-card-title">Calories du jour</div>
+          <div class="preview-placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────
+       VARIANTE D — Avatar centré + objectif jour
+  ──────────────────────────────── -->
+  <div class="variant-block">
+    <div class="variant-tag tag-d">D — Avatar centré + progression</div>
+    <div class="phone">
+      <div class="phone-inner var-d">
+        <div class="header">
+          <div class="top-row">
+            <span class="date-label">Mardi 31 mars</span>
+            <span class="badge badge-accent">✦ PREMIUM</span>
+          </div>
+          <div class="center">
+            <div class="avatar-wrap">
+              <div class="avatar-ring">L</div>
+              <span class="streak-dot">🔥 12</span>
+            </div>
+            <p class="greeting">Bonjour,</p>
+            <h2 class="name">Louis</h2>
+            <div class="progress-row">
+              <div class="progress-label">
+                <span>Objectif calories</span>
+                <span>1 840 / 2 500 kcal</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill"></div>
+              </div>
+            </div>
+            <div class="badges-row">
+              <span class="badge" style="background:rgba(59,130,246,0.15);color:#93c5fd;font-size:10px;">💪 3 séances</span>
+              <span class="badge" style="background:rgba(234,179,8,0.15);color:#fde047;font-size:10px;">⚡ 74.2 kg</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-card" style="margin-top:16px;">
+          <div class="preview-card-title">Macronutriments</div>
+          <div class="preview-placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
