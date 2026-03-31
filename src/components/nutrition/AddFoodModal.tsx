@@ -59,8 +59,8 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    if (query.trim().length < 3) { setResults([]); return; }
-    const t = setTimeout(() => search(query), 300);
+    if (query.trim().length < 2) { setResults([]); return; }
+    const t = setTimeout(() => search(query), 250);
     return () => clearTimeout(t);
   }, [query, search]);
 

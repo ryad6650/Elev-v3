@@ -46,7 +46,7 @@ export default function FoodSearchStep({
 
   function handleQueryChange(val: string) {
     setQuery(val);
-    if (val.trim().length >= 3) setTab('resultats');
+    if (val.trim().length >= 1) setTab('resultats');
     else setTab('recents');
   }
 
@@ -54,18 +54,18 @@ export default function FoodSearchStep({
   const recentsOrPopulaires = recents.length > 0 ? recents : populaires;
   const recentsLabel = recents.length > 0 ? 'Récents' : 'Populaires';
 
-  // Résultats instantanés : recents + populaires filtrés côté client (avant réponse API)
+  // Résultats instantanés : recents + populaires filtrés côté client dès 1 char
   const q = query.trim().toLowerCase();
-  const instantResults: NutritionAliment[] = q.length >= 3
+  const instantResults: NutritionAliment[] = q.length >= 1
     ? [...recents, ...populaires]
         .filter((a, i, arr) => arr.findIndex(x => x.id === a.id && x.id !== '') === i)
         .filter(a => a.nom.toLowerCase().includes(q))
         .slice(0, 8)
     : [];
 
-  // Pendant le chargement, affiche les instantanés si disponibles (évite l'écran vide)
+  // Toujours afficher les instantanés disponibles ; les résultats API enrichissent quand ils arrivent
   const resultsList = tab === 'resultats'
-    ? (loading && instantResults.length > 0 ? instantResults : results)
+    ? (results.length > 0 ? results : instantResults)
     : tab === 'recents' ? recentsOrPopulaires : [];
   const displayList = filterByCat(resultsList, cat);
   const emptyMsg = tab === 'favoris'
@@ -161,7 +161,7 @@ export default function FoodSearchStep({
       <FoodSearchResults
         results={displayList}
         onSelect={onSelect}
-        loading={loading && tab === 'resultats' && instantResults.length === 0}
+        loading={loading && tab === 'resultats' && instantResults.length === 0 && results.length === 0}
         emptyMessage={emptyMsg}
       />
 
