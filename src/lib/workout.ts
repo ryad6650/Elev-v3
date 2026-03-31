@@ -25,6 +25,7 @@ export interface WorkoutPageData {
 
 type RoutineExerciseWithEx = {
   id: string;
+  series_cible: number | null;
   exercises: { groupe_musculaire: string } | null;
 };
 

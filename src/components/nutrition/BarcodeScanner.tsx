@@ -1,74 +1,79 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, ZapOff } from 'lucide-react';
-
-// BarcodeDetector n'est pas encore dans les types TS standard
-declare class BarcodeDetector {
-  constructor(options?: { formats?: string[] });
-  detect(image: HTMLVideoElement): Promise<Array<{ rawValue: string }>>;
-  static getSupportedFormats(): Promise<string[]>;
-}
+import { X, ZapOff, Loader2 } from 'lucide-react';
+import {
+  BrowserMultiFormatReader,
+  DecodeHintType,
+  BarcodeFormat,
+  NotFoundException,
+} from '@zxing/library';
 
 interface Props {
   onDetected: (barcode: string) => void;
   onClose: () => void;
 }
 
-const PERM_KEY = 'elev_camera_granted';
+const HINTS = new Map();
+HINTS.set(DecodeHintType.POSSIBLE_FORMATS, [
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.UPC_A,
+  BarcodeFormat.UPC_E,
+]);
+HINTS.set(DecodeHintType.TRY_HARDER, true);
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!('BarcodeDetector' in window)) {
-      setError('Scanner non supporté. Essayez Chrome ou Safari 17+.');
-      return;
-    }
-
-    let stream: MediaStream | null = null;
-    let frameId: number;
+    const reader = new BrowserMultiFormatReader(HINTS);
     let stopped = false;
 
     async function start() {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1280 } },
-        });
-        if (stopped || !videoRef.current) { stream.getTracks().forEach(t => t.stop()); return; }
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        localStorage.setItem(PERM_KEY, '1');
-        setActive(true);
+        // Sélectionne la caméra arrière
+        const devices = await reader.listVideoInputDevices();
+        const backCam = devices.find(d =>
+          /back|rear|environment/i.test(d.label)
+        ) ?? devices[devices.length - 1];
 
-        const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+        if (stopped || !videoRef.current) return;
 
-        async function tick() {
-          if (stopped || !videoRef.current) return;
-          try {
-            const codes = await detector.detect(videoRef.current);
-            if (codes.length > 0) { onDetected(codes[0].rawValue); return; }
-          } catch { /* frame invalide */ }
-          frameId = requestAnimationFrame(tick);
-        }
-        tick();
+        await reader.decodeFromVideoDevice(
+          backCam?.deviceId ?? undefined,
+          videoRef.current,
+          (result, err) => {
+            if (result) {
+              onDetected(result.getText());
+              return;
+            }
+            // NotFoundException = frame sans code-barres, normal
+            if (err && !(err instanceof NotFoundException)) {
+              console.warn('Scanner:', err);
+            }
+          }
+        );
+
+        if (!stopped) setLoading(false);
       } catch (err) {
+        if (stopped) return;
         if (err instanceof Error && err.name === 'NotAllowedError') {
-          localStorage.removeItem(PERM_KEY);
-          setError('Accès caméra refusé. Autorisez-le dans les réglages de votre navigateur.');
+          setError('Accès caméra refusé. Allez dans Réglages → Safari → Caméra.');
         } else {
           setError('Impossible d\'accéder à la caméra.');
         }
+        setLoading(false);
       }
     }
 
     start();
+
     return () => {
       stopped = true;
-      cancelAnimationFrame(frameId);
-      stream?.getTracks().forEach(t => t.stop());
+      reader.reset();
     };
   }, [onDetected]);
 
@@ -76,14 +81,24 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     <div className="relative w-full rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: '4/3' }}>
       <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
 
+      {/* Chargement */}
+      {loading && !error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70">
+          <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Activation de la caméra…</p>
+        </div>
+      )}
+
       {/* Viseur */}
-      {active && (
+      {!loading && !error && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="relative w-60 h-36">
+          <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.35)' }} />
+          <div className="relative z-10 w-64 h-40">
             <span className="absolute top-0 left-0 w-7 h-7 border-t-2 border-l-2" style={{ borderColor: 'var(--accent)', borderRadius: '4px 0 0 0' }} />
             <span className="absolute top-0 right-0 w-7 h-7 border-t-2 border-r-2" style={{ borderColor: 'var(--accent)', borderRadius: '0 4px 0 0' }} />
             <span className="absolute bottom-0 left-0 w-7 h-7 border-b-2 border-l-2" style={{ borderColor: 'var(--accent)', borderRadius: '0 0 0 4px' }} />
             <span className="absolute bottom-0 right-0 w-7 h-7 border-b-2 border-r-2" style={{ borderColor: 'var(--accent)', borderRadius: '0 0 4px 0' }} />
+            <div className="absolute left-2 right-2 h-px animate-scan-line" style={{ background: 'var(--accent)', boxShadow: '0 0 6px var(--accent)' }} />
             <p className="absolute -bottom-7 left-0 right-0 text-center text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
               Centrez le code-barres
             </p>
@@ -101,7 +116,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 p-1.5 rounded-full"
+        className="absolute top-2 right-2 p-1.5 rounded-full z-20"
         style={{ background: 'rgba(0,0,0,0.55)' }}
       >
         <X size={15} className="text-white" />

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import { X, Search, Plus, ChevronLeft, ScanBarcode } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { addNutritionEntry, createCustomAliment, getRecentAliments, upsertExternalAliment } from '@/app/actions/nutrition';
-import FoodSearchResults from './FoodSearchResults';
+import { addNutritionEntry, getRecentAliments, upsertExternalAliment } from '@/app/actions/nutrition';
+import FoodSearchStep from './FoodSearchStep';
+import FoodDetailSheet from './FoodDetailSheet';
+import CustomFoodForm from './CustomFoodForm';
 import BarcodeScanner from './BarcodeScanner';
 import type { NutritionAliment } from '@/lib/nutrition-utils';
 
@@ -15,7 +17,7 @@ const REPAS_LABELS: Record<string, string> = {
   'snacks': 'Collations',
 };
 
-type Step = 'search' | 'scan' | 'quantity' | 'custom';
+type Step = 'search' | 'scan' | 'quantity' | 'custom' | 'edit';
 type Repas = 'petit-dejeuner' | 'dejeuner' | 'diner' | 'snacks';
 
 interface Props {
@@ -32,16 +34,10 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   const [recents, setRecents] = useState<NutritionAliment[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<NutritionAliment | null>(null);
-  const [quantite, setQuantite] = useState('100');
   const [pending, startTransition] = useTransition();
-  const [customNom, setCustomNom] = useState('');
-  const [customCal, setCustomCal] = useState('');
-  const [customProt, setCustomProt] = useState('');
-  const [customGluc, setCustomGluc] = useState('');
-  const [customLip, setCustomLip] = useState('');
 
   useEffect(() => {
-    getRecentAliments().then((r) => setRecents(r as NutritionAliment[])).catch(() => {});
+    getRecentAliments().then(r => setRecents(r as NutritionAliment[])).catch(() => {});
   }, []);
 
   const search = useCallback(async (q: string) => {
@@ -55,7 +51,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!query.trim()) return;
+    if (!query.trim()) { setResults([]); return; }
     const t = setTimeout(() => search(query), 300);
     return () => clearTimeout(t);
   }, [query, search]);
@@ -66,11 +62,8 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
     try {
       const res = await fetch(`/api/aliments?barcode=${encodeURIComponent(code)}`);
       const data: NutritionAliment[] = await res.json();
-      if (data.length > 0) {
-        handleSelect(data[0]);
-      } else {
-        setQuery(code);
-      }
+      if (data.length > 0) handleSelect(data[0]);
+      else setQuery(code);
     } finally {
       setLoading(false);
     }
@@ -81,199 +74,115 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
     setStep('quantity');
   }
 
-  function handleConfirm() {
+  function handleConfirm(quantite: number) {
     if (!selected) return;
-    const qty = parseFloat(quantite);
-    if (isNaN(qty) || qty <= 0) return;
     startTransition(async () => {
       let alimentId = selected.id;
-      // Résultat OFT pas encore en DB — sauvegarder d'abord
       if (!alimentId && selected.source === 'openfoodfacts') {
         const { id } = await upsertExternalAliment(selected);
         alimentId = id;
       }
-      await addNutritionEntry(repas, alimentId, qty, date);
+      await addNutritionEntry(repas, alimentId, quantite, date);
       router.refresh();
       onClose();
     });
   }
 
-  function handleCustomSubmit() {
-    const cal = parseFloat(customCal);
-    if (!customNom || isNaN(cal)) return;
+  function handleCustomCreated(id: string) {
     startTransition(async () => {
-      const { id } = await createCustomAliment(
-        customNom, cal,
-        customProt ? parseFloat(customProt) : null,
-        customGluc ? parseFloat(customGluc) : null,
-        customLip ? parseFloat(customLip) : null,
-      );
       await addNutritionEntry(repas, id, 100, date);
       router.refresh();
       onClose();
     });
   }
 
-  const displayList = query.trim() ? results : recents;
-  const previewCal = selected && quantite
-    ? Math.round(selected.calories * (parseFloat(quantite) || 0) / 100)
-    : null;
+  function handleEdited(updated: NutritionAliment) {
+    setSelected(updated);
+    setStep('quantity');
+    router.refresh();
+  }
+
+  const canEdit = selected?.is_global === false;
+
+  const today = new Date().toISOString().split('T')[0];
+  const dateLabel = date === today ? "Aujourd'hui" : new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-end"
       style={{ background: 'rgba(0,0,0,0.65)' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div
-        className="w-full max-w-[430px] px-3 mb-20 flex flex-col"
-      >
-      <div
-        className="rounded-3xl flex flex-col w-full"
-        style={{
-          background: 'var(--bg-secondary)',
-          maxHeight: 'calc(100dvh - 100px - env(safe-area-inset-top, 20px))',
-        }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
-          {step !== 'search' && step !== 'scan' ? (
-            <button onClick={() => setStep('search')} className="p-1">
-              <ChevronLeft size={20} style={{ color: 'var(--text-primary)' }} />
-            </button>
-          ) : <div className="w-6" />}
-          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-            {step === 'custom' ? 'Aliment personnalisé' : `Ajouter — ${REPAS_LABELS[repas]}`}
-          </p>
-          <button onClick={onClose} className="p-1">
-            <X size={20} style={{ color: 'var(--text-muted)' }} />
-          </button>
-        </div>
-
-        {/* Étape scan */}
-        {step === 'scan' && (
-          <div className="px-4 pb-6">
-            <BarcodeScanner
-              onDetected={handleBarcode}
-              onClose={() => setStep('search')}
-            />
-          </div>
-        )}
-
-        {/* Étape recherche */}
-        {step === 'search' && (
-          <div className="flex flex-col gap-3 px-4 pb-6 overflow-y-auto">
-            <div
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
-              style={{ background: 'var(--bg-elevated)' }}
-            >
-              <Search size={16} style={{ color: 'var(--text-muted)' }} />
-              <input
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rechercher un aliment..."
-                className="bg-transparent flex-1 text-sm outline-none"
-                style={{ color: 'var(--text-primary)' }}
-              />
-              <button onClick={() => setStep('scan')} className="p-1">
-                <ScanBarcode size={18} style={{ color: 'var(--accent)' }} />
+      <div className="w-full max-w-[430px] px-3 mb-20 flex flex-col">
+        <div
+          className="rounded-3xl flex flex-col w-full"
+          style={{
+            background: 'var(--bg-secondary)',
+            maxHeight: 'calc(100dvh - 100px - env(safe-area-inset-top, 20px))',
+          }}
+        >
+          {step !== 'quantity' && (
+            <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
+              <div className="w-7" />
+              <div className="text-center">
+                <p className="font-semibold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>
+                  {step === 'custom' ? 'Aliment personnalisé' : step === 'edit' ? 'Modifier l\'aliment' : 'Ajouter'}
+                </p>
+                {step === 'search' && (
+                  <p className="text-[11px] mt-0.5" style={{ color: 'var(--accent-text)' }}>
+                    {REPAS_LABELS[repas]} · {dateLabel}
+                  </p>
+                )}
+              </div>
+              <button onClick={onClose} className="p-1">
+                <X size={20} style={{ color: 'var(--text-muted)' }} />
               </button>
             </div>
-            {!query.trim() && recents.length > 0 && (
-              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-                Récents
-              </p>
-            )}
-            <FoodSearchResults
-              results={displayList}
-              onSelect={handleSelect}
+          )}
+
+          {step === 'scan' && (
+            <div className="px-4 pb-6">
+              <BarcodeScanner onDetected={handleBarcode} onClose={() => setStep('search')} />
+            </div>
+          )}
+
+          {step === 'search' && (
+            <FoodSearchStep
+              query={query}
+              setQuery={setQuery}
+              results={results}
+              recents={recents}
               loading={loading}
-              emptyMessage={query.trim() ? 'Aucun résultat' : 'Aucun aliment récent'}
+              onSelect={handleSelect}
+              onScan={() => setStep('scan')}
+              onCustom={() => setStep('custom')}
             />
-            <button
-              onClick={() => setStep('custom')}
-              className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium"
-              style={{ border: '1px dashed var(--border)', color: 'var(--text-secondary)' }}
-            >
-              <Plus size={15} /> Créer un aliment personnalisé
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* Étape quantité */}
-        {step === 'quantity' && selected && (
-          <div className="px-4 pb-8 flex flex-col gap-4">
-            <div className="rounded-xl p-3" style={{ background: 'var(--bg-card)' }}>
-              <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{selected.nom}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                {selected.calories} kcal · P {selected.proteines ?? 0}g · G {selected.glucides ?? 0}g · L {selected.lipides ?? 0}g
-                &nbsp;/ 100g
-              </p>
-            </div>
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-                Quantité (g)
-              </label>
-              <input
-                type="number"
-                value={quantite}
-                onChange={(e) => setQuantite(e.target.value)}
-                autoFocus
-                className="mt-2 w-full px-4 py-3 rounded-xl text-xl font-bold outline-none"
-                style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-              />
-              {previewCal !== null && (
-                <p className="text-center mt-2 text-sm font-semibold" style={{ color: 'var(--accent-text)' }}>
-                  ≈ {previewCal} kcal
-                </p>
-              )}
-            </div>
-            <button
-              onClick={handleConfirm}
-              disabled={pending}
-              className="w-full py-3 rounded-xl font-semibold text-white transition-opacity"
-              style={{ background: 'var(--accent)', opacity: pending ? 0.6 : 1 }}
-            >
-              {pending ? 'Ajout...' : 'Confirmer'}
-            </button>
-          </div>
-        )}
+          {step === 'quantity' && selected && (
+            <FoodDetailSheet
+              aliment={selected}
+              repas={repas}
+              onBack={() => setStep('search')}
+              onConfirm={handleConfirm}
+              onEdit={canEdit ? () => setStep('edit') : undefined}
+              pending={pending}
+            />
+          )}
 
-        {/* Étape aliment custom */}
-        {step === 'custom' && (
-          <div className="px-4 pb-8 flex flex-col gap-3 overflow-y-auto">
-            {[
-              { label: 'Nom *', value: customNom, setter: setCustomNom, type: 'text' },
-              { label: 'Calories (kcal / 100g) *', value: customCal, setter: setCustomCal, type: 'number' },
-              { label: 'Protéines (g)', value: customProt, setter: setCustomProt, type: 'number' },
-              { label: 'Glucides (g)', value: customGluc, setter: setCustomGluc, type: 'number' },
-              { label: 'Lipides (g)', value: customLip, setter: setCustomLip, type: 'number' },
-            ].map(({ label, value, setter, type }) => (
-              <div key={label}>
-                <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-                  {label}
-                </label>
-                <input
-                  type={type}
-                  value={value}
-                  onChange={(e) => setter(e.target.value)}
-                  className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-                />
-              </div>
-            ))}
-            <button
-              onClick={handleCustomSubmit}
-              disabled={pending || !customNom || !customCal}
-              className="w-full py-3 rounded-xl font-semibold text-white mt-2 transition-opacity"
-              style={{ background: 'var(--accent)', opacity: pending || !customNom || !customCal ? 0.5 : 1 }}
-            >
-              {pending ? 'Création...' : 'Créer et ajouter (100g)'}
-            </button>
-          </div>
-        )}
-      </div>
+          {step === 'custom' && (
+            <CustomFoodForm repas={repas} date={date} onCreated={handleCustomCreated} />
+          )}
+
+          {step === 'edit' && selected && (
+            <CustomFoodForm
+              repas={repas}
+              date={date}
+              editAliment={selected}
+              onEdited={handleEdited}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

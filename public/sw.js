@@ -1,22 +1,14 @@
 // Service Worker — Élev v3
 // Stratégies : cache-first (assets statiques), stale-while-revalidate (pages)
 
-const CACHE_NAME = 'elev-v1';
+const CACHE_NAME = 'elev-v2';
 const SYNC_TAG = 'elev-sync';
 
 // Assets statiques Next.js → permanents (hash dans le nom)
 const STATIC_PATTERN = /\/_next\/static\//;
-// Pages de l'app → stale-while-revalidate
-const APP_ROUTES = ['/', '/dashboard', '/workout', '/nutrition', '/poids', '/profil'];
-
 // ─── Install ─────────────────────────────────────────────────────────────────
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // Pré-cache les routes principales en best-effort
-      return Promise.allSettled(APP_ROUTES.map((url) => cache.add(url)));
-    })
-  );
+  // Pas de pré-cache des routes protégées par auth (risque de cacher la page login)
   self.skipWaiting();
 });
 
@@ -50,9 +42,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Requêtes de navigation (pages HTML) → stale-while-revalidate
+  // Requêtes de navigation (pages HTML) → toujours réseau (auth-aware, RSC)
   if (request.mode === 'navigate') {
-    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 

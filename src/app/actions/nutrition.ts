@@ -104,21 +104,47 @@ export async function createCustomAliment(
   calories: number,
   proteines: number | null,
   glucides: number | null,
-  lipides: number | null
+  lipides: number | null,
+  portion_nom?: string | null,
+  taille_portion_g?: number | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
   const { data, error } = await supabase
     .from("aliments")
-    .insert({ user_id: user.id, nom, calories, proteines, glucides, lipides, is_global: false })
+    .insert({ user_id: user.id, nom, calories, proteines, glucides, lipides, is_global: false, portion_nom: portion_nom ?? null, taille_portion_g: taille_portion_g ?? null })
     .select("id")
     .single();
 
   if (error || !data) throw new Error(error?.message ?? "Erreur création aliment");
+  return { id: data.id };
+}
+
+export async function updateCustomAliment(
+  id: string,
+  nom: string,
+  calories: number,
+  proteines: number | null,
+  glucides: number | null,
+  lipides: number | null,
+  portion_nom: string | null,
+  taille_portion_g: number | null,
+): Promise<{ id: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const { data, error } = await supabase
+    .from("aliments")
+    .update({ nom, calories, proteines, glucides, lipides, portion_nom, taille_portion_g })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select("id")
+    .single();
+
+  if (error || !data) throw new Error(error?.message ?? "Erreur modification aliment");
   return { id: data.id };
 }
 
@@ -128,6 +154,7 @@ type EntryWithAliment = {
     id: string; nom: string; marque: string | null; calories: number;
     proteines: number | null; glucides: number | null; lipides: number | null;
     fibres: number | null; sucres: number | null; sel: number | null; code_barres: string | null;
+    is_global: boolean; portion_nom: string | null; taille_portion_g: number | null;
   } | null;
 };
 
@@ -136,10 +163,9 @@ export async function getRecentAliments() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  // Limite à 20 — suffisant pour extraire 6 aliments distincts sans sur-fetch
   const { data } = await supabase
     .from("nutrition_entries")
-    .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres)")
+    .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)")
     .eq("user_id", user.id)
     .order("date", { ascending: false })
     .limit(20);

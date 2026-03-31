@@ -13,6 +13,9 @@ export interface NutritionAliment {
   sel?: number | null;
   code_barres?: string | null;
   source?: 'local' | 'openfoodfacts';
+  is_global?: boolean;
+  portion_nom?: string | null;
+  taille_portion_g?: number | null;
 }
 
 export interface NutritionEntry {

@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react';
 import type { NutritionAliment } from '@/lib/nutrition-utils';
 
 interface Props {
@@ -33,22 +34,31 @@ export default function FoodSearchResults({
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       {results.map((a, i) => (
         <button
           key={a.id || `off-${i}`}
           onClick={() => onSelect(a)}
-          className="flex items-center justify-between w-full px-3 py-3 rounded-xl text-left"
-          style={{ background: 'var(--bg-card)' }}
+          className="flex items-center gap-3 w-full px-3 py-3 rounded-2xl text-left transition-colors"
+          style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
         >
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+          {/* Avatar monogramme */}
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-extrabold shrink-0"
+            style={{ background: 'var(--accent-bg)', color: 'var(--accent-text)' }}
+          >
+            {a.nom.charAt(0).toUpperCase()}
+          </div>
+
+          {/* Infos */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                 {a.nom}
-              </p>
+              </span>
               {a.source === 'openfoodfacts' && (
                 <span
-                  className="shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium"
+                  className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded"
                   style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}
                 >
                   OFT
@@ -56,21 +66,41 @@ export default function FoodSearchResults({
               )}
             </div>
             {a.marque && (
-              <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
+              <p className="text-[11px] truncate mb-1.5" style={{ color: 'var(--text-muted)' }}>
                 {a.marque}
               </p>
             )}
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              P&nbsp;{a.proteines ?? 0}g · G&nbsp;{a.glucides ?? 0}g · L&nbsp;{a.lipides ?? 0}g
-              &nbsp;/ 100g
-            </p>
+            <div className="flex gap-1.5">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                style={{ background: 'rgba(59,130,246,0.15)', color: '#93C5FD' }}>
+                P&nbsp;{a.proteines ?? 0}g
+              </span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                style={{ background: 'rgba(234,179,8,0.15)', color: '#FDE047' }}>
+                G&nbsp;{a.glucides ?? 0}g
+              </span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                style={{ background: 'rgba(239,68,68,0.12)', color: '#FCA5A5' }}>
+                L&nbsp;{a.lipides ?? 0}g
+              </span>
+            </div>
           </div>
-          <span
-            className="text-sm font-semibold ml-3 shrink-0"
-            style={{ color: 'var(--accent-text)' }}
-          >
-            {a.calories} kcal
-          </span>
+
+          {/* Calories + bouton + */}
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <div className="text-right">
+              <span className="text-[19px] font-extrabold leading-none" style={{ color: 'var(--accent-text)' }}>
+                {a.calories}
+              </span>
+              <span className="block text-[9px]" style={{ color: 'var(--text-muted)' }}>kcal/100g</span>
+            </div>
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--accent-bg)' }}
+            >
+              <Plus size={13} style={{ color: 'var(--accent)' }} />
+            </div>
+          </div>
         </button>
       ))}
     </div>

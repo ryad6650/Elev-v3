@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
-const SELECT_COLS = "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres";
+const SELECT_COLS = "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g";
 
 /** Normalise un produit OpenFoodFacts en NutritionAliment */
 function normalizeOFF(p: Record<string, unknown>): NutritionAliment | null {
