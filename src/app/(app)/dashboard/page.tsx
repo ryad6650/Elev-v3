@@ -5,6 +5,7 @@ import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
 import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
+import ThemeToggleButton from "@/components/dashboard/ThemeToggleButton";
 
 function formatDateFr(): string {
   return new Date().toLocaleDateString("fr-FR", {
@@ -49,9 +50,11 @@ export default async function DashboardPage() {
               {prenom}
             </h1>
           </div>
+          <div className="flex items-center gap-2 mt-1">
+          <ThemeToggleButton initialTheme={data.theme} />
           <Link
             href="/profil"
-            className="flex items-center justify-center rounded-[13px] overflow-hidden shrink-0 mt-1"
+            className="flex items-center justify-center rounded-[13px] overflow-hidden shrink-0"
             style={{
               width: 46, height: 46,
               background: data.photoUrl ? "transparent" : "var(--bg-card)",
@@ -66,6 +69,7 @@ export default async function DashboardPage() {
               </span>
             )}
           </Link>
+          </div>
         </div>
 
         {/* Chips résumé rapide */}
@@ -99,22 +103,23 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Carte Calories */}
+      <SectionDivider label="Calories" />
+
+      {/* Calories */}
       <div
-        className="px-5 py-4 rounded-2xl border"
+        className="p-5 rounded-2xl border"
         style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
       >
         <CaloriesRing consumed={data.caloriesConsommees} objective={data.objectifCalories} />
       </div>
 
-      {/* Carte Macronutriments */}
+      <SectionDivider label="Macronutriments" />
+
+      {/* Macronutriments */}
       <div
         className="p-5 rounded-2xl border"
         style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
       >
-        <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>
-          Macronutriments
-        </p>
         <MacrosBars
           proteines={{ consumed: data.proteinesConsommees, objective: data.objectifProteines }}
           glucides={{ consumed: data.glucidesConsommees, objective: data.objectifGlucides }}
@@ -122,12 +127,13 @@ export default async function DashboardPage() {
         />
       </div>
 
+      <SectionDivider label="Entraînement" />
+
       {/* Prochain entraînement */}
       {data.prochaineRoutine && (
         <Link href="/workout" className="block">
           <div
-            className="p-5 rounded-2xl flex items-center justify-between"
-            style={{ background: "linear-gradient(135deg, #1a0e07 0%, #2d1506 40%, #C8622E 100%)" }}
+            className="workout-next-card p-5 rounded-2xl flex items-center justify-between"
           >
             <div>
               <p className="text-[9px] font-bold uppercase tracking-widest mb-1 opacity-60" style={{ color: "#fff" }}>
@@ -163,6 +169,18 @@ export default async function DashboardPage() {
       </div>
 
     </main>
+  );
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+      <span className="text-[10px] font-semibold uppercase tracking-widest shrink-0" style={{ color: "var(--text-muted)" }}>
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+    </div>
   );
 }
 

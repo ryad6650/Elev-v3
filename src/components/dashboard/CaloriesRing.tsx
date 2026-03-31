@@ -26,12 +26,6 @@ export default function CaloriesRing({ consumed, objective }: Props) {
     <div className="flex items-center justify-between gap-3">
       {/* Grand chiffre à gauche */}
       <div className="flex-1">
-        <p
-          className="text-[10px] font-semibold uppercase tracking-widest mb-1"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Calories aujourd'hui
-        </p>
         <div className="flex items-baseline gap-1">
           <span
             className="leading-none"
@@ -47,6 +41,12 @@ export default function CaloriesRing({ consumed, objective }: Props) {
           </span>
           <span className="text-sm" style={{ color: "var(--text-muted)" }}>kcal</span>
         </div>
+        <p
+          className="text-[10px] font-semibold uppercase tracking-widest mt-1"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Kcal consommées
+        </p>
       </div>
 
       {/* Mini anneau + meta à droite */}
