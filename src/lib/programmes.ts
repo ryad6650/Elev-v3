@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 export interface ProgrammeRoutine {
   jour: number;
@@ -59,8 +60,7 @@ function parseProgramme(p: ProgrammeRaw): Programme {
   };
 }
 
-export async function fetchProgrammesData(): Promise<ProgrammesPageData> {
-  const supabase = await createClient();
+export async function fetchProgrammesData(supabase: SupabaseClient<Database>): Promise<ProgrammesPageData> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Non authentifié');
 

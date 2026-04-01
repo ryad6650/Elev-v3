@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import type { MensurationsData } from "@/components/poids/MensurationsCard";
 
 export interface PoidsEntry {
@@ -13,8 +14,7 @@ export interface PoidsPageData {
   mensurations: MensurationsData | null;
 }
 
-export async function fetchPoidsData(): Promise<PoidsPageData> {
-  const supabase = await createClient();
+export async function fetchPoidsData(supabase: SupabaseClient<Database>): Promise<PoidsPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

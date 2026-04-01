@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 export interface Routine {
   id: string;
@@ -51,8 +52,7 @@ type WorkoutJoin = {
   workout_sets: SetJoin[];
 };
 
-export async function fetchWorkoutPageData(): Promise<WorkoutPageData> {
-  const supabase = await createClient();
+export async function fetchWorkoutPageData(supabase: SupabaseClient<Database>): Promise<WorkoutPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

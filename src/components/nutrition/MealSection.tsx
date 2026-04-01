@@ -17,9 +17,10 @@ interface Props {
   repas: 'petit-dejeuner' | 'dejeuner' | 'diner' | 'snacks';
   entries: NutritionEntry[];
   onAdd: () => void;
+  onEntryDeleted?: (id: string) => void;
 }
 
-export default function MealSection({ repas, entries, onAdd }: Props) {
+export default function MealSection({ repas, entries, onAdd, onEntryDeleted }: Props) {
   const config = REPAS_CONFIG[repas];
   const [expanded, setExpanded] = useState(repas === 'petit-dejeuner');
   const total = sumEntries(entries);
@@ -34,7 +35,7 @@ export default function MealSection({ repas, entries, onAdd }: Props) {
         <div className="w-1 shrink-0" style={{ background: 'var(--accent)' }} />
 
         {/* Contenu */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 min-w-0 p-4">
           {/* En-tête cliquable */}
           <button
             className="w-full flex items-center gap-3 text-left"
@@ -61,8 +62,10 @@ export default function MealSection({ repas, entries, onAdd }: Props) {
           {/* Liste aliments + bouton ajouter (déplié) */}
           {expanded && (
             <div className="mt-3">
-              {entries.map((e) => (
-                <FoodItem key={e.id} entry={e} />
+              {entries.map((e, i) => (
+                <div key={e.id} style={i === 0 ? { borderTop: '1px solid var(--border)' } : undefined}>
+                  <FoodItem entry={e} onDeleted={(id) => onEntryDeleted?.(id)} />
+                </div>
               ))}
               <button
                 onClick={onAdd}

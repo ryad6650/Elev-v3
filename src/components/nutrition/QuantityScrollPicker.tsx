@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 interface Props {
   value: number;
@@ -10,26 +10,33 @@ interface Props {
   step?: number;
   suffix?: string;
   compact?: boolean;
+  onCenterTap?: () => void;
 }
 
 export default function QuantityScrollPicker({
-  value, onChange, min = 1, max = 2000, step = 1, suffix, compact,
+  value, onChange, min = 1, max = 2000, step = 1, suffix, compact, onCenterTap,
 }: Props) {
   const ITEM_H = compact ? 46 : 52;
   const VISIBLE = compact ? 3 : 5;
   const half = Math.floor(VISIBLE / 2);
 
-  const touchRef = useRef<{ startY: number; startVal: number; moved: boolean } | null>(null);
+  const touchRef = useRef<{ startY: number; startVal: number; moved: boolean; startTime: number } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const clamp = (v: number) => {
+  const clamp = useCallback((v: number) => {
     const rounded = Math.round(v / step) * step;
     const fixed = Math.round(rounded * 10) / 10;
     return Math.min(max, Math.max(min, fixed));
-  };
+  }, [step, min, max]);
 
   function onTouchStart(e: React.TouchEvent) {
-    touchRef.current = { startY: e.touches[0].clientY, startVal: value, moved: false };
+    touchRef.current = {
+      startY: e.touches[0].clientY,
+      startVal: value,
+      moved: false,
+      startTime: Date.now(),
+    };
     setDragOffset(0);
   }
 
@@ -37,7 +44,7 @@ export default function QuantityScrollPicker({
     if (!touchRef.current) return;
     e.preventDefault();
     const dy = e.touches[0].clientY - touchRef.current.startY;
-    if (Math.abs(dy) > 4) touchRef.current.moved = true;
+    if (Math.abs(dy) > 8) touchRef.current.moved = true;
     setDragOffset(((dy % ITEM_H) + ITEM_H) % ITEM_H > ITEM_H / 2
       ? (dy % ITEM_H) - ITEM_H
       : dy % ITEM_H);
@@ -47,8 +54,15 @@ export default function QuantityScrollPicker({
   }
 
   function onTouchEnd() {
+    if (!touchRef.current) return;
+    const wasDrag = touchRef.current.moved;
+    const elapsed = Date.now() - touchRef.current.startTime;
     touchRef.current = null;
     setDragOffset(0);
+    // Tap court sans mouvement → édition clavier
+    if (!wasDrag && elapsed < 300 && onCenterTap) {
+      onCenterTap();
+    }
   }
 
   useEffect(() => { setDragOffset(0); }, [value]);
@@ -57,6 +71,7 @@ export default function QuantityScrollPicker({
 
   return (
     <div
+      ref={containerRef}
       style={{ height: ITEM_H * VISIBLE, overflow: 'hidden', position: 'relative', touchAction: 'none', userSelect: 'none' }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}

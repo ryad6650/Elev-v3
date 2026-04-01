@@ -38,10 +38,16 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [pending, startTransition] = useTransition();
 
+  // Bloquer le scroll de la page derrière le modal
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   useEffect(() => {
     let done = 0;
     const finish = () => { done++; if (done >= 2) setLoadingInitial(false); };
-    getRecentAliments().then(r => setRecents(r as NutritionAliment[])).catch(() => {}).finally(finish);
+    getRecentAliments(repas).then(r => setRecents(r as NutritionAliment[])).catch(() => {}).finally(finish);
     fetch('/api/aliments?q=').then(r => r.json()).then(d => setPopulaires(Array.isArray(d) ? d : [])).catch(() => {}).finally(finish);
   }, []);
 
@@ -59,8 +65,8 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    if (query.trim().length < 2) { setResults([]); return; }
-    const t = setTimeout(() => search(query), 250);
+    if (query.trim().length < 1) { setResults([]); return; }
+    const t = setTimeout(() => search(query), 200);
     return () => clearTimeout(t);
   }, [query, search]);
 
@@ -123,12 +129,12 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
       style={{ background: 'rgba(0,0,0,0.65)' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-[430px] px-3 mb-28 flex flex-col">
+      <div className="w-full max-w-[430px] px-3 mb-24 flex flex-col">
         <div
-          className="rounded-3xl flex flex-col w-full"
+          className="rounded-3xl flex flex-col w-full pt-2"
           style={{
             background: 'var(--bg-secondary)',
-            maxHeight: 'calc(100dvh - 100px - env(safe-area-inset-top, 20px))',
+            maxHeight: 'calc(100dvh - 165px - env(safe-area-inset-top, 20px))',
           }}
         >
           {step !== 'quantity' && (
@@ -191,6 +197,7 @@ export default function AddFoodModal({ repas, date, onClose }: Props) {
               repas={repas}
               date={date}
               editAliment={isCustom ? selected : { ...selected, id: '' }}
+              isForking={!isCustom}
               onEdited={handleEdited}
               onCreated={handleCustomCreated}
             />

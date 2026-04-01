@@ -49,14 +49,15 @@ export default function NutritionHeader({
 }: Props) {
   const objectif = profile.objectif_calories ?? 2000;
   const pct = objectif > 0 ? Math.round((totalCalories / objectif) * 100) : 0;
+  const restantes = Math.max(0, objectif - totalCalories);
 
   return (
     <div
       className="rounded-2xl p-4 mb-4"
       style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
     >
-      {/* Calories + badge % */}
-      <div className="flex items-start justify-between mb-4">
+      {/* Calories + restantes */}
+      <div className="flex items-start justify-between mb-2">
         <div>
           <p className="font-bold leading-none" style={{ color: 'var(--text-primary)', fontSize: 36 }}>
             {totalCalories.toLocaleString('fr-FR')}{' '}
@@ -66,12 +67,21 @@ export default function NutritionHeader({
             sur {objectif.toLocaleString('fr-FR')} kcal
           </p>
         </div>
-        <div
-          className="w-12 h-12 rounded-full flex flex-col items-center justify-center shrink-0 gap-0.5"
-          style={{ background: 'var(--accent)' }}
-        >
-          <span className="text-sm leading-none">🔥</span>
-          <span className="text-xs font-bold text-white leading-none">{pct}%</span>
+        <div className="flex flex-col items-end shrink-0">
+          <span className="font-bold" style={{ fontSize: 24, color: 'var(--accent-text)' }}>
+            {restantes.toLocaleString('fr-FR')}
+          </span>
+          <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>restantes</span>
+        </div>
+      </div>
+
+      {/* Barre de progression calories */}
+      <div className="mb-3">
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--accent-bg)' }}>
+          <div
+            className="h-2.5 rounded-full transition-all duration-700"
+            style={{ width: `${Math.max(Math.min(pct, 100), 3)}%`, background: 'var(--accent)' }}
+          />
         </div>
       </div>
 

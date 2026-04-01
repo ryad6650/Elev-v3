@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 export interface HistoriqueWorkout {
   id: string;
@@ -73,8 +74,7 @@ function computePRs(workouts: WorkoutJoin[]): PRRecord[] {
     .map((e) => ({ exerciceNom: e.nom, poidsMax: e.poids, repsAuMax: e.reps }));
 }
 
-export async function fetchHistoriqueData(): Promise<HistoriquePageData> {
-  const supabase = await createClient();
+export async function fetchHistoriqueData(supabase: SupabaseClient<Database>): Promise<HistoriquePageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

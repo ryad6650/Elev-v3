@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maquettes — Card Nutrition Header</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0C0A09;
+    font-family: 'DM Sans', sans-serif;
+    color: #FAFAF9;
+    padding: 20px 16px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: #E8860C;
+    text-align: center;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 12px;
+    color: #78716C;
+    margin-top: 4px;
+    margin-bottom: 12px;
+  }
+
+  .mockup-container {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .card {
+    background: #1C1917;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    margin: 0 auto;
+  }
+
+  /* ─── Couleurs macros ─── */
+  .color-carbs { color: #EAB308; }
+  .color-protein { color: #3B82F6; }
+  .color-fat { color: #C084FC; }
+  .bg-carbs { background: #EAB308; }
+  .bg-protein { background: #3B82F6; }
+  .bg-fat { background: #C084FC; }
+  .color-accent { color: #E8860C; }
+  .bg-accent { background: #E8860C; }
+  .color-muted { color: #78716C; }
+  .color-secondary { color: #A8A29E; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- MAQUETTE A — Anneau calories + barres macros horizontales -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="mockup-container">
+  <h2>A — Anneau + Barres</h2>
+  <p class="subtitle">Anneau de progression calories au centre, barres macros horizontales en dessous</p>
+
+  <div class="card" style="text-align: center;">
+    <!-- Anneau SVG -->
+    <div style="position: relative; width: 140px; height: 140px; margin: 0 auto 16px;">
+      <svg width="140" height="140" viewBox="0 0 140 140" style="transform: rotate(-90deg);">
+        <!-- Track -->
+        <circle cx="70" cy="70" r="58" fill="none" stroke="#292524" stroke-width="10"/>
+        <!-- Progress (68%) -->
+        <circle cx="70" cy="70" r="58" fill="none" stroke="#E8860C" stroke-width="10"
+          stroke-linecap="round"
+          stroke-dasharray="364.4"
+          stroke-dashoffset="116.6"/>
+      </svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <span style="font-size: 32px; font-weight: 700; color: #FAFAF9; line-height: 1;">1 364</span>
+        <span style="font-size: 12px; color: #78716C; margin-top: 2px;">/ 2 000 kcal</span>
+      </div>
+    </div>
+
+    <!-- Calories restantes -->
+    <p style="font-size: 14px; color: #A8A29E; margin-bottom: 16px;">
+      Il te reste <span style="font-weight: 700; color: #E8860C;">636 kcal</span>
+    </p>
+
+    <!-- Barres macros -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <!-- Glucides -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 11px; font-weight: 600; color: #78716C; width: 60px; text-align: left;">Glucides</span>
+        <div style="flex: 1; height: 8px; border-radius: 999px; background: #292524; overflow: hidden;">
+          <div style="width: 62%; height: 100%; border-radius: 999px; background: #EAB308;"></div>
+        </div>
+        <span style="font-size: 12px; font-weight: 700; color: #EAB308; width: 55px; text-align: right;">155g <span style="font-weight: 400; color: #78716C; font-size: 10px;">/ 250</span></span>
+      </div>
+      <!-- Protéines -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 11px; font-weight: 600; color: #78716C; width: 60px; text-align: left;">Protéines</span>
+        <div style="flex: 1; height: 8px; border-radius: 999px; background: #292524; overflow: hidden;">
+          <div style="width: 73%; height: 100%; border-radius: 999px; background: #3B82F6;"></div>
+        </div>
+        <span style="font-size: 12px; font-weight: 700; color: #3B82F6; width: 55px; text-align: right;">110g <span style="font-weight: 400; color: #78716C; font-size: 10px;">/ 150</span></span>
+      </div>
+      <!-- Lipides -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 11px; font-weight: 600; color: #78716C; width: 60px; text-align: left;">Lipides</span>
+        <div style="flex: 1; height: 8px; border-radius: 999px; background: #292524; overflow: hidden;">
+          <div style="width: 57%; height: 100%; border-radius: 999px; background: #C084FC;"></div>
+        </div>
+        <span style="font-size: 12px; font-weight: 700; color: #C084FC; width: 55px; text-align: right;">40g <span style="font-weight: 400; color: #78716C; font-size: 10px;">/ 70</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- MAQUETTE B — Compteur dégressif + jauges verticales -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="mockup-container">
+  <h2>B — Calories Restantes</h2>
+  <p class="subtitle">Gros compteur dégressif central avec jauges verticales macros</p>
+
+  <div class="card">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <!-- Compteur restant -->
+      <div style="flex: 1; text-align: center;">
+        <p style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #78716C; margin-bottom: 4px;">IL TE RESTE</p>
+        <p style="font-size: 48px; font-weight: 700; color: #E8860C; line-height: 1;">636</p>
+        <p style="font-size: 13px; color: #A8A29E; margin-top: 2px;">kcal</p>
+        <div style="display: flex; justify-content: center; gap: 6px; margin-top: 8px; font-size: 11px; color: #78716C;">
+          <span>🔥 1 364</span>
+          <span>sur 2 000</span>
+        </div>
+      </div>
+
+      <!-- Jauges verticales -->
+      <div style="display: flex; gap: 8px;">
+        <!-- G -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="font-size: 10px; font-weight: 700; color: #EAB308;">155</span>
+          <div style="width: 12px; height: 64px; border-radius: 999px; background: #292524; display: flex; flex-direction: column-reverse; overflow: hidden;">
+            <div style="width: 100%; height: 62%; border-radius: 999px; background: #EAB308;"></div>
+          </div>
+          <span style="font-size: 9px; font-weight: 600; color: #78716C;">G</span>
+        </div>
+        <!-- P -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="font-size: 10px; font-weight: 700; color: #3B82F6;">110</span>
+          <div style="width: 12px; height: 64px; border-radius: 999px; background: #292524; display: flex; flex-direction: column-reverse; overflow: hidden;">
+            <div style="width: 100%; height: 73%; border-radius: 999px; background: #3B82F6;"></div>
+          </div>
+          <span style="font-size: 9px; font-weight: 600; color: #78716C;">P</span>
+        </div>
+        <!-- L -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="font-size: 10px; font-weight: 700; color: #C084FC;">40</span>
+          <div style="width: 12px; height: 64px; border-radius: 999px; background: #292524; display: flex; flex-direction: column-reverse; overflow: hidden;">
+            <div style="width: 100%; height: 57%; border-radius: 999px; background: #C084FC;"></div>
+          </div>
+          <span style="font-size: 9px; font-weight: 600; color: #78716C;">L</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- MAQUETTE C — Barre segmentée + stats inline -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="mockup-container">
+  <h2>C — Barre Segmentée</h2>
+  <p class="subtitle">Barre multicolore compacte avec macros restantes en dessous</p>
+
+  <div class="card">
+    <!-- Ligne calories -->
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+      <div>
+        <span style="font-size: 34px; font-weight: 700; color: #FAFAF9;">1 364</span>
+        <span style="font-size: 16px; font-weight: 500; color: #78716C; margin-left: 4px;">kcal</span>
+      </div>
+      <div style="text-align: right;">
+        <span style="font-size: 14px; font-weight: 600; color: #E8860C;">636</span>
+        <span style="font-size: 11px; color: #78716C;"> restantes</span>
+      </div>
+    </div>
+
+    <!-- Barre segmentée (G + P + L colorés) -->
+    <div style="height: 10px; border-radius: 999px; background: #292524; overflow: hidden; display: flex; margin-bottom: 16px;">
+      <div style="width: 38%; background: #EAB308;"></div>
+      <div style="width: 22%; background: #3B82F6;"></div>
+      <div style="width: 8%; background: #C084FC;"></div>
+    </div>
+
+    <!-- 3 macros restantes -->
+    <div style="display: flex; gap: 8px;">
+      <!-- Glucides -->
+      <div style="flex: 1; background: #292524; border-radius: 12px; padding: 10px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #EAB308;"></div>
+          <span style="font-size: 10px; font-weight: 600; color: #78716C;">Glucides</span>
+        </div>
+        <p style="font-size: 18px; font-weight: 700; color: #EAB308;">155g</p>
+        <p style="font-size: 10px; color: #78716C; margin-top: 2px;">95g restants</p>
+      </div>
+      <!-- Protéines -->
+      <div style="flex: 1; background: #292524; border-radius: 12px; padding: 10px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #3B82F6;"></div>
+          <span style="font-size: 10px; font-weight: 600; color: #78716C;">Protéines</span>
+        </div>
+        <p style="font-size: 18px; font-weight: 700; color: #3B82F6;">110g</p>
+        <p style="font-size: 10px; color: #78716C; margin-top: 2px;">40g restants</p>
+      </div>
+      <!-- Lipides -->
+      <div style="flex: 1; background: #292524; border-radius: 12px; padding: 10px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #C084FC;"></div>
+          <span style="font-size: 10px; font-weight: 600; color: #78716C;">Lipides</span>
+        </div>
+        <p style="font-size: 18px; font-weight: 700; color: #C084FC;">40g</p>
+        <p style="font-size: 10px; color: #78716C; margin-top: 2px;">30g restants</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- MAQUETTE D — 3 mini-anneaux macros + calories compact -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="mockup-container">
+  <h2>D — Triple Anneaux</h2>
+  <p class="subtitle">Calories en haut, 3 mini anneaux de progression macros en dessous</p>
+
+  <div class="card">
+    <!-- Calories top row -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <div style="display: flex; align-items: baseline; gap: 6px;">
+        <span style="font-size: 32px; font-weight: 700; color: #FAFAF9;">1 364</span>
+        <span style="font-size: 14px; color: #78716C;">/ 2 000 kcal</span>
+      </div>
+      <!-- Badge restant -->
+      <div style="background: rgba(232,134,12,0.15); border-radius: 999px; padding: 4px 10px;">
+        <span style="font-size: 12px; font-weight: 700; color: #FDBA74;">-636</span>
+      </div>
+    </div>
+
+    <!-- Barre de progression calories -->
+    <div style="height: 6px; border-radius: 999px; background: #292524; overflow: hidden; margin-bottom: 20px;">
+      <div style="width: 68%; height: 100%; border-radius: 999px; background: #E8860C;"></div>
+    </div>
+
+    <!-- 3 anneaux macros -->
+    <div style="display: flex; justify-content: space-around;">
+      <!-- Glucides -->
+      <div style="text-align: center;">
+        <div style="position: relative; width: 72px; height: 72px; margin: 0 auto 6px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" style="transform: rotate(-90deg);">
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#292524" stroke-width="6"/>
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#EAB308" stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="175.9"
+              stroke-dashoffset="66.8"/>
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 16px; font-weight: 700; color: #EAB308;">155</span>
+            <span style="font-size: 8px; color: #78716C;">/ 250g</span>
+          </div>
+        </div>
+        <span style="font-size: 11px; font-weight: 600; color: #A8A29E;">Glucides</span>
+      </div>
+
+      <!-- Protéines -->
+      <div style="text-align: center;">
+        <div style="position: relative; width: 72px; height: 72px; margin: 0 auto 6px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" style="transform: rotate(-90deg);">
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#292524" stroke-width="6"/>
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#3B82F6" stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="175.9"
+              stroke-dashoffset="47.5"/>
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 16px; font-weight: 700; color: #3B82F6;">110</span>
+            <span style="font-size: 8px; color: #78716C;">/ 150g</span>
+          </div>
+        </div>
+        <span style="font-size: 11px; font-weight: 600; color: #A8A29E;">Protéines</span>
+      </div>
+
+      <!-- Lipides -->
+      <div style="text-align: center;">
+        <div style="position: relative; width: 72px; height: 72px; margin: 0 auto 6px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" style="transform: rotate(-90deg);">
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#292524" stroke-width="6"/>
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#C084FC" stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="175.9"
+              stroke-dashoffset="75.6"/>
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 16px; font-weight: 700; color: #C084FC;">40</span>
+            <span style="font-size: 8px; color: #78716C;">/ 70g</span>
+          </div>
+        </div>
+        <span style="font-size: 11px; font-weight: 600; color: #A8A29E;">Lipides</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- MAQUETTE E — Actuel amélioré (restant + barre calories) -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="mockup-container">
+  <h2>E — Actuel Amélioré</h2>
+  <p class="subtitle">Design actuel enrichi : ajout calories restantes et barre de progression</p>
+
+  <div class="card">
+    <!-- Calories + badge -->
+    <div style="display: flex; align-items: start; justify-content: space-between; margin-bottom: 8px;">
+      <div>
+        <p style="font-size: 36px; font-weight: 700; color: #FAFAF9; line-height: 1;">
+          1 364 <span style="font-size: 20px; font-weight: 600;">kcal</span>
+        </p>
+        <p style="font-size: 12px; color: #78716C; margin-top: 8px;">
+          sur 2 000 kcal
+        </p>
+      </div>
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: #E8860C; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; flex-shrink: 0;">
+        <span style="font-size: 14px; line-height: 1;">🔥</span>
+        <span style="font-size: 12px; font-weight: 700; color: white; line-height: 1;">68%</span>
+      </div>
+    </div>
+
+    <!-- Barre calories + restant -->
+    <div style="margin-bottom: 16px;">
+      <div style="height: 8px; border-radius: 999px; background: #292524; overflow: hidden; margin-bottom: 6px;">
+        <div style="width: 68%; height: 100%; border-radius: 999px; background: #E8860C;"></div>
+      </div>
+      <div style="display: flex; align-items: baseline; justify-content: flex-end; gap: 4px; margin-top: 6px;">
+        <span style="font-size: 20px; font-weight: 700; color: #FDBA74;">636</span>
+        <span style="font-size: 12px; color: #A8A29E;">kcal restantes</span>
+      </div>
+    </div>
+
+    <!-- 3 cartes macros (style actuel) -->
+    <div style="display: flex; gap: 8px;">
+      <div style="flex: 1; background: #292524; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px;">
+        <span style="font-size: 18px; font-weight: 700; color: #EAB308; line-height: 1;">155g</span>
+        <p style="font-size: 11px; color: #78716C; margin-top: 6px;">Glucides</p>
+        <div style="height: 4px; border-radius: 999px; background: #44403C; overflow: hidden; margin-top: 6px;">
+          <div style="width: 62%; height: 100%; border-radius: 999px; background: #EAB308;"></div>
+        </div>
+      </div>
+      <div style="flex: 1; background: #292524; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px;">
+        <span style="font-size: 18px; font-weight: 700; color: #3B82F6; line-height: 1;">110g</span>
+        <p style="font-size: 11px; color: #78716C; margin-top: 6px;">Protéines</p>
+        <div style="height: 4px; border-radius: 999px; background: #44403C; overflow: hidden; margin-top: 6px;">
+          <div style="width: 73%; height: 100%; border-radius: 999px; background: #3B82F6;"></div>
+        </div>
+      </div>
+      <div style="flex: 1; background: #292524; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px;">
+        <span style="font-size: 18px; font-weight: 700; color: #C084FC; line-height: 1;">40g</span>
+        <p style="font-size: 11px; color: #78716C; margin-top: 6px;">Lipides</p>
+        <div style="height: 4px; border-radius: 999px; background: #44403C; overflow: hidden; margin-top: 6px;">
+          <div style="width: 57%; height: 100%; border-radius: 999px; background: #C084FC;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

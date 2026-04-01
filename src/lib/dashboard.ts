@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import { getTodayString, getWeekStart, getNDaysAgo, computeStreak } from "@/lib/date-utils";
 
 export interface ProchaineRoutine {
@@ -37,8 +38,7 @@ export interface DashboardData {
 
 type AlimentJoin = { calories: number; proteines: number | null; glucides: number | null; lipides: number | null } | null;
 
-export async function fetchDashboardData(): Promise<DashboardData> {
-  const supabase = await createClient();
+export async function fetchDashboardData(supabase: SupabaseClient<Database>): Promise<DashboardData> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
@@ -55,11 +55,9 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       supabase.from("nutrition_entries")
         .select("quantite_g, aliments(calories, proteines, glucides, lipides)")
         .eq("user_id", user.id).eq("date", today),
-      // Une seule requête poids — couvre poids actuel, delta J-7, graphique 30j et stats semaine
       supabase.from("poids_history").select("poids, date")
         .eq("user_id", user.id).gte("date", thirtyDaysAgo)
         .order("date", { ascending: false }),
-      // Une seule requête workouts — couvre séances semaine, aujourd'hui et streak
       supabase.from("workouts").select("date")
         .eq("user_id", user.id).gte("date", sevenWeeksAgo),
       supabase.from("nutrition_entries").select("date")
@@ -83,7 +81,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     lipidesConsommees += (a.lipides ?? 0) * r;
   }
 
-  // Poids (desc → index 0 = plus récent)
+  // Poids (desc -> index 0 = plus récent)
   const poidsData = poidsRes.data ?? [];
   const poidsActuel = poidsData[0]?.poids ?? null;
   const poidsIlYA7Jours = poidsData.find((p) => {
@@ -92,7 +90,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   });
   const poidsDelta = poidsActuel != null && poidsIlYA7Jours
     ? +(poidsActuel - poidsIlYA7Jours.poids).toFixed(1) : null;
-  const weightHistory = [...poidsData].reverse(); // ascending pour le graphique
+  const weightHistory = [...poidsData].reverse();
 
   // Workouts
   const workoutDates = workoutDatesRes.data ?? [];
@@ -130,27 +128,23 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     };
   }
 
-  // ── Streak de connexions ──────────────────────────────────────
+  // Streak de connexions
   const profil = profileRes.data;
   const hier = getNDaysAgo(1);
   const derniereConnexion = profil?.derniere_connexion ?? null;
 
   let streakConnexions = profil?.streak_connexions ?? 1;
   if (derniereConnexion === null || derniereConnexion < hier) {
-    // Première connexion ou jour(s) manqué(s) → reset
     streakConnexions = 1;
   } else if (derniereConnexion === hier) {
-    // Connexion hier → on incrémente
     streakConnexions = streakConnexions + 1;
   }
-  // Si derniereConnexion === today → déjà connecté aujourd'hui, on conserve
 
   if (derniereConnexion !== today) {
     await supabase.from("profiles")
       .update({ streak_connexions: streakConnexions, derniere_connexion: today })
       .eq("id", user.id);
   }
-  // ─────────────────────────────────────────────────────────────
 
   return {
     prenom: profil?.prenom ?? null,

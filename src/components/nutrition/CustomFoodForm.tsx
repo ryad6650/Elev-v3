@@ -10,6 +10,7 @@ interface Props {
   onCreated?: (id: string) => void;
   onEdited?: (aliment: NutritionAliment) => void;
   editAliment?: NutritionAliment;
+  isForking?: boolean;
 }
 
 const BASE_FIELDS = [
@@ -20,10 +21,11 @@ const BASE_FIELDS = [
   { label: 'Lipides (g)', key: 'lip' as const, type: 'number' },
 ] as const;
 
-type ValKey = 'nom' | 'cal' | 'prot' | 'gluc' | 'lip' | 'portionNom' | 'portionG';
+type ValKey = 'nom' | 'cal' | 'prot' | 'gluc' | 'lip' | 'portionNom' | 'portionG' | 'codeBarres';
 
-export default function CustomFoodForm({ onCreated, onEdited, editAliment }: Props) {
+export default function CustomFoodForm({ onCreated, onEdited, editAliment, isForking }: Props) {
   const isEdit = !!editAliment?.id;
+  const isEditMode = isEdit || isForking;
   const [vals, setVals] = useState<Record<ValKey, string>>({
     nom: editAliment?.nom ?? '',
     cal: editAliment?.calories?.toString() ?? '',
@@ -32,8 +34,9 @@ export default function CustomFoodForm({ onCreated, onEdited, editAliment }: Pro
     lip: editAliment?.lipides?.toString() ?? '',
     portionNom: editAliment?.portion_nom ?? '',
     portionG: editAliment?.taille_portion_g?.toString() ?? '',
+    codeBarres: editAliment?.code_barres ?? '',
   });
-  const [showPortion, setShowPortion] = useState(!!(editAliment?.taille_portion_g));
+  const [showBarcode, setShowBarcode] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function set(key: ValKey, val: string) {
@@ -43,24 +46,31 @@ export default function CustomFoodForm({ onCreated, onEdited, editAliment }: Pro
   function handleSubmit() {
     const cal = parseFloat(vals.cal);
     if (!vals.nom || isNaN(cal)) return;
-    const portionNom = showPortion && vals.portionNom ? vals.portionNom : null;
-    const portionG = showPortion && vals.portionG ? parseFloat(vals.portionG) : null;
+    const portionNom = vals.portionNom ? vals.portionNom : null;
+    const portionG = vals.portionG ? parseFloat(vals.portionG) : null;
     const prot = vals.prot ? parseFloat(vals.prot) : null;
     const gluc = vals.gluc ? parseFloat(vals.gluc) : null;
     const lip = vals.lip ? parseFloat(vals.lip) : null;
+    const codeBarres = showBarcode && vals.codeBarres ? vals.codeBarres : null;
 
     startTransition(async () => {
       if (isEdit && editAliment) {
-        await updateCustomAliment(editAliment.id, vals.nom, cal, prot, gluc, lip, portionNom, portionG);
-        onEdited?.({ ...editAliment, nom: vals.nom, calories: cal, proteines: prot, glucides: gluc, lipides: lip, portion_nom: portionNom, taille_portion_g: portionG });
+        await updateCustomAliment(editAliment.id, vals.nom, cal, prot, gluc, lip, portionNom, portionG, codeBarres);
+        onEdited?.({ ...editAliment, nom: vals.nom, calories: cal, proteines: prot, glucides: gluc, lipides: lip, portion_nom: portionNom, taille_portion_g: portionG, code_barres: codeBarres });
       } else {
-        const { id } = await createCustomAliment(vals.nom, cal, prot, gluc, lip, portionNom, portionG);
+        const { id } = await createCustomAliment(vals.nom, cal, prot, gluc, lip, portionNom, portionG, codeBarres);
         onCreated?.(id);
       }
     });
   }
 
   const disabled = pending || !vals.nom || !vals.cal;
+
+  function buttonLabel() {
+    if (pending) return isEditMode ? 'Enregistrement...' : 'Création...';
+    if (isEditMode) return 'Modifier l\'aliment';
+    return 'Créer et ajouter (100g)';
+  }
 
   return (
     <div className="px-4 pb-8 flex flex-col gap-3 overflow-y-auto">
@@ -79,22 +89,12 @@ export default function CustomFoodForm({ onCreated, onEdited, editAliment }: Pro
         </div>
       ))}
 
-      {/* Section portion */}
-      <button
-        type="button"
-        onClick={() => setShowPortion(p => !p)}
-        className="flex items-center gap-2 text-xs font-semibold py-1"
-        style={{ color: showPortion ? 'var(--accent-text)' : 'var(--text-muted)' }}
-      >
-        <span>{showPortion ? '▼' : '▶'}</span>
-        Définir une portion (facultatif)
-      </button>
-
-      {showPortion && (
+      {/* Section portion — toujours visible en mode édition */}
+      {isEditMode && (
         <div className="flex gap-2">
           <div className="flex-1">
             <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
-              Nom
+              Nom de la portion
             </label>
             <input
               type="text"
@@ -121,15 +121,44 @@ export default function CustomFoodForm({ onCreated, onEdited, editAliment }: Pro
         </div>
       )}
 
+      {/* Section code-barres */}
+      <button
+        type="button"
+        onClick={() => setShowBarcode(p => !p)}
+        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-colors"
+        style={{
+          background: 'var(--bg-elevated)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border)',
+        }}
+      >
+        {editAliment?.code_barres ? 'Modifier le code-barres' : 'Ajouter un code-barres'}
+      </button>
+
+      {showBarcode && (
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            Code-barres
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="ex: 3017620422003"
+            value={vals.codeBarres}
+            onChange={e => set('codeBarres', e.target.value)}
+            className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+          />
+        </div>
+      )}
+
       <button
         onClick={handleSubmit}
         disabled={disabled}
         className="w-full py-3 rounded-xl font-semibold text-white mt-2 transition-opacity"
         style={{ background: 'var(--accent)', opacity: disabled ? 0.5 : 1 }}
       >
-        {pending
-          ? (isEdit ? 'Enregistrement...' : 'Création...')
-          : (isEdit ? 'Enregistrer les modifications' : 'Créer et ajouter (100g)')}
+        {buttonLabel()}
       </button>
     </div>
   );

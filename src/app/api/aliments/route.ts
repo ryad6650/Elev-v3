@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
-const SELECT_COLS = "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g";
+const SELECT_COLS = "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global";
 
 function normalizeOFF(p: Record<string, unknown>): NutritionAliment | null {
   const nom = ((p.product_name_fr as string) || (p.product_name as string) || "").trim();
@@ -61,7 +61,7 @@ async function searchByBarcode(
       const aliment = normalizeOFF({ ...json.product, code: barcode });
       if (aliment) return [aliment];
     }
-  } catch { /* OFT indisponible */ }
+  } catch { /* OFF indisponible */ }
   return [];
 }
 
@@ -75,26 +75,47 @@ export async function GET(request: NextRequest) {
 
   const q = request.nextUrl.searchParams.get("q") ?? "";
 
-  // Pas de requête → aliments globaux populaires (pour l'état initial)
+  // Pas de requête → aliments globaux populaires (état initial)
   if (!q.trim()) {
     const { data } = await supabase.from("aliments").select(SELECT_COLS)
       .eq("is_global", true).limit(24);
     return NextResponse.json((data ?? []).map(r => ({ ...r, source: "local" as const })));
   }
 
-  // 1. Recherche locale d'abord (rapide ~50ms)
-  const { data: localData } = await supabase.from("aliments").select(SELECT_COLS)
-    .or(`is_global.eq.true,user_id.eq.${user.id}`)
-    .ilike("nom", `%${q}%`)
-    .order("nom")
-    .limit(25);
+  // Recherche via RPC (trigram + ILIKE, priorité aliments utilisés)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: rpcData } = await (supabase.rpc as any)("search_aliments", {
+    search_query: q,
+    user_uuid: user.id,
+    max_results: 25,
+  }) as { data: Array<{
+    id: string; nom: string; marque: string | null;
+    calories: number; proteines: number | null; glucides: number | null;
+    lipides: number | null; fibres: number | null; sucres: number | null;
+    sel: number | null; code_barres: string | null; is_global: boolean;
+    usage_count: number; match_rank: number;
+  }> | null };
 
-  const local: NutritionAliment[] = (localData ?? []).map(r => ({ ...r, source: "local" as const }));
+  const local: NutritionAliment[] = (rpcData ?? []).map(r => ({
+    id: r.id,
+    nom: r.nom,
+    marque: r.marque,
+    calories: r.calories,
+    proteines: r.proteines,
+    glucides: r.glucides,
+    lipides: r.lipides,
+    fibres: r.fibres,
+    sucres: r.sucres,
+    sel: r.sel,
+    code_barres: r.code_barres,
+    is_global: r.is_global,
+    source: "local" as const,
+  }));
 
-  // 2. Si suffisamment de résultats locaux, pas besoin d'OFT
-  if (local.length >= 5) return NextResponse.json(local);
+  // Si assez de résultats locaux, pas besoin d'OFF
+  if (local.length >= 8) return NextResponse.json(local);
 
-  // 3. Compléter avec OFT seulement si peu de résultats locaux (timeout court)
+  // Compléter avec OFF en parallèle (timeout court)
   const offResults = await searchOFF(q, 1500);
   const localCodes = new Set(local.map(a => a.code_barres).filter(Boolean));
   const localNoms = new Set(local.map(a => a.nom.toLowerCase()));

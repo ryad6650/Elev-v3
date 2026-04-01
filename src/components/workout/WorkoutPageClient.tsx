@@ -7,10 +7,14 @@ import WorkoutHub from './WorkoutHub';
 import ActiveWorkout from './ActiveWorkout';
 import CreateRoutineModal from './CreateRoutineModal';
 import WorkoutProgrammesSection from './WorkoutProgrammesSection';
-import type { WorkoutPageData } from '@/lib/workout';
-import type { ProgrammesPageData } from '@/lib/programmes';
+import { fetchWorkoutPageData, type WorkoutPageData } from '@/lib/workout';
+import { fetchProgrammesData, type ProgrammesPageData } from '@/lib/programmes';
+import { createClient } from '@/lib/supabase/client';
+import { getCached, setCache } from '@/lib/pageCache';
 
-interface Props {
+const CACHE_KEY = 'workout';
+
+interface PageData {
   workoutData: WorkoutPageData;
   programmesData: ProgrammesPageData;
 }
@@ -28,7 +32,7 @@ function getLastSessionLabel(historique: WorkoutPageData['historique']): string 
   return `dernière séance il y a ${diffDays} jours`;
 }
 
-function HubLayout({ workoutData, programmesData }: Props) {
+function HubLayout({ workoutData, programmesData }: PageData) {
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -90,14 +94,33 @@ function HubLayout({ workoutData, programmesData }: Props) {
   );
 }
 
-export default function WorkoutPageClient({ workoutData, programmesData }: Props) {
+const EMPTY_WORKOUT: WorkoutPageData = { routines: [], historique: [] };
+const EMPTY_PROGRAMMES: ProgrammesPageData = { programmes: [], programmeActif: null, routinesDisponibles: [] };
+
+export default function WorkoutPageClient() {
+  const cached = getCached<PageData>(CACHE_KEY);
+  const [pageData, setPageData] = useState<PageData | null>(cached);
   const [hydrated, setHydrated] = useState(false);
   const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
 
-  useEffect(() => setHydrated(true), []);
+  useEffect(() => { setHydrated(true); }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    Promise.all([fetchWorkoutPageData(supabase), fetchProgrammesData(supabase)])
+      .then(([workoutData, programmesData]) => {
+        const data = { workoutData, programmesData };
+        setPageData(data);
+        setCache(CACHE_KEY, data);
+      })
+      .catch(console.error);
+  }, []);
 
   if (!hydrated || !activeWorkout) {
-    return <HubLayout workoutData={workoutData} programmesData={programmesData} />;
+    return <HubLayout
+      workoutData={pageData?.workoutData ?? EMPTY_WORKOUT}
+      programmesData={pageData?.programmesData ?? EMPTY_PROGRAMMES}
+    />;
   }
   return <ActiveWorkout />;
 }

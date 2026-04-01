@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import type { NutritionAliment, NutritionEntry, NutritionPageData } from "@/lib/nutrition-utils";
 
 export type { NutritionAliment, NutritionEntry, NutritionProfile, NutritionPageData } from "@/lib/nutrition-utils";
 export { calcNutrients, sumEntries } from "@/lib/nutrition-utils";
 
-export async function fetchNutritionData(date: string): Promise<NutritionPageData> {
-  const supabase = await createClient();
+export async function fetchNutritionData(supabase: SupabaseClient<Database>, date: string): Promise<NutritionPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

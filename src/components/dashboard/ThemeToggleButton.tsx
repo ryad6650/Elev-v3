@@ -45,9 +45,9 @@ export default function ThemeToggleButton({ initialTheme }: Props) {
       }}
     >
       {theme === "dark" ? (
-        <Sun size={18} style={{ color: "var(--text-secondary)" }} />
-      ) : (
         <Moon size={18} style={{ color: "var(--text-secondary)" }} />
+      ) : (
+        <Sun size={18} style={{ color: "var(--text-secondary)" }} />
       )}
     </button>
   );

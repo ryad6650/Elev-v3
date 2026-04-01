@@ -107,6 +107,7 @@ export async function createCustomAliment(
   lipides: number | null,
   portion_nom?: string | null,
   taille_portion_g?: number | null,
+  code_barres?: string | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -114,7 +115,7 @@ export async function createCustomAliment(
 
   const { data, error } = await supabase
     .from("aliments")
-    .insert({ user_id: user.id, nom, calories, proteines, glucides, lipides, is_global: false, portion_nom: portion_nom ?? null, taille_portion_g: taille_portion_g ?? null })
+    .insert({ user_id: user.id, nom, calories, proteines, glucides, lipides, is_global: false, portion_nom: portion_nom ?? null, taille_portion_g: taille_portion_g ?? null, code_barres: code_barres ?? null })
     .select("id")
     .single();
 
@@ -131,6 +132,7 @@ export async function updateCustomAliment(
   lipides: number | null,
   portion_nom: string | null,
   taille_portion_g: number | null,
+  code_barres?: string | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -138,7 +140,7 @@ export async function updateCustomAliment(
 
   const { data, error } = await supabase
     .from("aliments")
-    .update({ nom, calories, proteines, glucides, lipides, portion_nom, taille_portion_g })
+    .update({ nom, calories, proteines, glucides, lipides, portion_nom, taille_portion_g, code_barres: code_barres ?? null })
     .eq("id", id)
     .eq("user_id", user.id)
     .select("id")
@@ -158,17 +160,19 @@ type EntryWithAliment = {
   } | null;
 };
 
-export async function getRecentAliments() {
+export async function getRecentAliments(repas?: "petit-dejeuner" | "dejeuner" | "diner" | "snacks") {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const { data } = await supabase
+  let query = supabase
     .from("nutrition_entries")
-    .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)")
+    .select("aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global)")
     .eq("user_id", user.id)
-    .order("date", { ascending: false })
-    .limit(20);
+    .order("date", { ascending: false });
+
+  if (repas) query = query.eq("repas", repas);
+  const { data } = await query.limit(30);
 
   if (!data) return [];
 
@@ -178,7 +182,7 @@ export async function getRecentAliments() {
     if (!seen.has(e.aliment_id) && e.aliments) {
       seen.add(e.aliment_id);
       recents.push(e.aliments);
-      if (recents.length >= 6) break;
+      if (recents.length >= 8) break;
     }
   }
   return recents;

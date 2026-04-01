@@ -73,7 +73,7 @@ export default function FoodSearchStep({
     : tab === 'recents' ? (loadingInitial ? 'Chargement...' : 'Aucun aliment récent') : 'Aucun résultat';
 
   return (
-    <div className="flex flex-col gap-3 px-4 pb-6 overflow-y-auto">
+    <div className="flex flex-col gap-3 px-4 pb-6 overflow-y-auto" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
       {/* Barre de recherche + scan */}
       <div className="flex gap-2">
         <div

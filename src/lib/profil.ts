@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 export interface ProfilData {
   id: string;
@@ -25,8 +26,7 @@ export interface ProfilPageData {
   stats: ProfilStats;
 }
 
-export async function fetchProfilData(): Promise<ProfilPageData> {
-  const supabase = await createClient();
+export async function fetchProfilData(supabase: SupabaseClient<Database>): Promise<ProfilPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

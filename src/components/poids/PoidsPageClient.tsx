@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PoidsHero from "./PoidsHero";
 import PoidsChart from "./PoidsChart";
 import PoidsComposition from "./PoidsComposition";
 import PoidsHistorique from "./PoidsHistorique";
 import MensurationsCard from "./MensurationsCard";
 import AddPoidsModal from "./AddPoidsModal";
+import { createClient } from "@/lib/supabase/client";
+import { fetchPoidsData } from "@/lib/poids";
 import type { PoidsPageData, PoidsEntry } from "@/lib/poids";
+import { getCached, setCache } from "@/lib/pageCache";
+
+const CACHE_KEY = "poids";
 
 const EMPTY_MENSURATIONS = {
   cou: null,
@@ -19,14 +24,27 @@ const EMPTY_MENSURATIONS = {
   mollet: null,
 };
 
-interface Props {
-  data: PoidsPageData;
-}
-
-export default function PoidsPageClient({ data }: Props) {
+export default function PoidsPageClient() {
+  const [data, setData] = useState<PoidsPageData | null>(getCached<PoidsPageData>(CACHE_KEY));
   const [modal, setModal] = useState<{ open: boolean; entry?: PoidsEntry }>({
     open: false,
   });
+
+  useEffect(() => {
+    const supabase = createClient();
+    fetchPoidsData(supabase).then((d) => {
+      setData(d);
+      setCache(CACHE_KEY, d);
+    }).catch(console.error);
+  }, []);
+
+  if (!data) return (
+    <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
+      <div className="flex items-center justify-center" style={{ height: "50vh" }}>
+        <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
+      </div>
+    </main>
+  );
 
   const entries = data.entries;
   const current = entries.length > 0 ? entries[entries.length - 1] : null;

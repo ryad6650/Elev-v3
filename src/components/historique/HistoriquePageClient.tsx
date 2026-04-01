@@ -1,16 +1,36 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { HistoriquePageData } from "@/lib/historique";
+import { fetchHistoriqueData } from "@/lib/historique";
+import { createClient } from "@/lib/supabase/client";
+import { getCached, setCache } from "@/lib/pageCache";
 import HistoriqueStatsCards from "./HistoriqueStatsCards";
 import HistoriqueCalendar from "./HistoriqueCalendar";
 import PRSection from "./PRSection";
 import HistoriqueList from "./HistoriqueList";
 
-interface Props {
-  data: HistoriquePageData;
-}
+const CACHE_KEY = "historique";
 
-export default function HistoriquePageClient({ data }: Props) {
+export default function HistoriquePageClient() {
+  const [data, setData] = useState<HistoriquePageData | null>(getCached<HistoriquePageData>(CACHE_KEY));
+
+  useEffect(() => {
+    const supabase = createClient();
+    fetchHistoriqueData(supabase).then((d) => {
+      setData(d);
+      setCache(CACHE_KEY, d);
+    }).catch(console.error);
+  }, []);
+
+  if (!data) return (
+    <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
+      <div className="flex items-center justify-center" style={{ height: "50vh" }}>
+        <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
+      </div>
+    </main>
+  );
+
   return (
     <main
       className="px-4 pt-6 pb-28 page-enter"
