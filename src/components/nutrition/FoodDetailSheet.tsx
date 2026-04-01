@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, Heart, Pencil } from 'lucide-react';
 import type { NutritionAliment } from '@/lib/nutrition-utils';
 import QuantityScrollPicker from './QuantityScrollPicker';
@@ -26,6 +26,9 @@ export default function FoodDetailSheet({ aliment, repas, onBack, onConfirm, onE
   // In 'g' mode: pickerVal = grams. In 'portion' mode: pickerVal = nb portions
   const [pickerVal, setPickerVal] = useState(hasPortion ? 1 : 100);
   const [fav, setFav] = useState(false);
+  const [editingQty, setEditingQty] = useState(false);
+  const [qtyInput, setQtyInput] = useState('');
+  const qtyInputRef = useRef<HTMLInputElement>(null);
 
   const qty = mode === 'portion' ? pickerVal * portionG : pickerVal;
   const scale = qty / 100;
@@ -45,6 +48,21 @@ export default function FoodDetailSheet({ aliment, repas, onBack, onConfirm, onE
   function switchMode(m: 'g' | 'portion') {
     setMode(m);
     setPickerVal(m === 'portion' ? 1 : 100);
+    setEditingQty(false);
+  }
+
+  function startEdit() {
+    setEditingQty(true);
+    setQtyInput(String(pickerVal));
+    setTimeout(() => { qtyInputRef.current?.focus(); qtyInputRef.current?.select(); }, 50);
+  }
+
+  function confirmEdit() {
+    const n = parseFloat(qtyInput.replace(',', '.'));
+    if (!isNaN(n) && n > 0) {
+      setPickerVal(Math.min(pickerMax, Math.max(pickerStep, Math.round(n / pickerStep) * pickerStep)));
+    }
+    setEditingQty(false);
   }
 
   const pickerSuffix = mode === 'portion' ? (aliment.portion_nom ?? 'portion') : 'g';
@@ -180,44 +198,71 @@ export default function FoodDetailSheet({ aliment, repas, onBack, onConfirm, onE
         </div>
       </div>
 
-      {/* Bottom — quantity picker + CTA */}
+      {/* Bottom — picker + CTA */}
       <div className="shrink-0 px-4 pb-6 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-        {/* Mode toggle Grammes / Portion */}
-        {hasPortion && (
-          <div className="flex justify-center mb-3">
-            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-              {(['g', 'portion'] as const).map(m => (
-                <button key={m} onClick={() => switchMode(m)}
-                  className="px-4 py-1.5 text-xs font-semibold transition-colors"
-                  style={{ background: mode === m ? 'var(--accent)' : 'var(--bg-card)', color: mode === m ? 'white' : 'var(--text-muted)' }}>
-                  {m === 'g' ? 'Grammes' : (aliment.portion_nom ?? 'Portion')}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Scroll picker */}
-        <QuantityScrollPicker
-          value={pickerVal}
-          onChange={setPickerVal}
-          min={pickerStep}
-          max={pickerMax}
-          step={pickerStep}
-          suffix={pickerSuffix}
-        />
-
-        {/* Mode portion: show equivalent grams */}
-        {mode === 'portion' && (
-          <p className="text-center text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-            = {qty}g
-          </p>
-        )}
-
         {/* Macros preview */}
-        <p className="text-center text-sm font-semibold mt-2 mb-3" style={{ color: 'var(--accent-text)' }}>
+        <p className="text-center text-xs font-semibold mb-3" style={{ color: 'var(--accent-text)' }}>
           ≈ {cal} kcal · P {prot}g · G {gluc}g · L {lip}g
         </p>
+
+        {/* Deux colonnes : picker gauche + card droite */}
+        <div className="flex gap-3 mb-4">
+          {/* Gauche : scroll picker compact */}
+          <div className="shrink-0" style={{ width: '42%' }}>
+            <QuantityScrollPicker
+              value={pickerVal}
+              onChange={setPickerVal}
+              min={pickerStep}
+              max={pickerMax}
+              step={pickerStep}
+              suffix={pickerSuffix}
+              compact
+            />
+          </div>
+
+          {/* Droite : card valeur + toggle */}
+          <div
+            className="flex-1 rounded-2xl flex flex-col justify-center items-center gap-3 px-3 py-4"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+          >
+            {/* Valeur éditable au tap */}
+            <button className="flex flex-col items-center" onClick={startEdit}>
+              {editingQty ? (
+                <input
+                  ref={qtyInputRef}
+                  type="number"
+                  inputMode="decimal"
+                  value={qtyInput}
+                  onChange={e => setQtyInput(e.target.value)}
+                  onBlur={confirmEdit}
+                  onKeyDown={e => e.key === 'Enter' && confirmEdit()}
+                  className="bg-transparent text-center outline-none"
+                  style={{ fontSize: 38, fontWeight: 800, color: 'var(--accent-text)', fontFamily: 'inherit', width: 110 }}
+                />
+              ) : (
+                <span style={{ fontSize: 38, fontWeight: 800, color: 'var(--accent-text)', lineHeight: 1 }}>
+                  {pickerVal}
+                </span>
+              )}
+              <span className="text-sm font-medium mt-1" style={{ color: 'var(--text-muted)' }}>
+                {pickerSuffix}{mode === 'portion' ? ` = ${qty}g` : ''}
+              </span>
+            </button>
+
+            {/* Toggle grammes / portion */}
+            {hasPortion && (
+              <div className="flex w-full rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+                {(['g', 'portion'] as const).map(m => (
+                  <button key={m} onClick={() => switchMode(m)}
+                    className="flex-1 py-1.5 text-[11px] font-semibold transition-colors"
+                    style={{ background: mode === m ? 'var(--accent)' : 'transparent', color: mode === m ? 'white' : 'var(--text-muted)' }}>
+                    {m === 'g' ? 'Grammes' : (aliment.portion_nom ?? 'Portion')}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <button
           onClick={() => onConfirm(qty)}
