@@ -104,6 +104,10 @@ export default function NutritionPageClient() {
           </div>
         </div>
 
+        <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+          KCALORIES
+        </p>
+
         <NutritionHeader
           totalCalories={total.calories}
           totalProteines={total.proteines}
