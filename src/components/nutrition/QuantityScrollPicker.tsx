@@ -11,10 +11,16 @@ interface Props {
   suffix?: string;
   compact?: boolean;
   onCenterTap?: () => void;
+  editing?: boolean;
+  editValue?: string;
+  onEditChange?: (v: string) => void;
+  onEditConfirm?: () => void;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export default function QuantityScrollPicker({
   value, onChange, min = 1, max = 2000, step = 1, suffix, compact, onCenterTap,
+  editing, editValue, onEditChange, onEditConfirm, inputRef,
 }: Props) {
   const ITEM_H = compact ? 46 : 52;
   const VISIBLE = compact ? 3 : 5;
@@ -110,20 +116,54 @@ export default function QuantityScrollPicker({
           return (
             <div key={i} style={{ height: ITEM_H, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                <span style={{
-                  fontSize: isCenter ? (compact ? 26 : 30) : dist === 1 ? (compact ? 19 : 22) : (compact ? 13 : 15),
-                  fontWeight: isCenter ? 800 : dist === 1 ? 600 : 400,
-                  color: isCenter ? 'var(--accent-text)' : 'var(--text-secondary)',
-                  opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
-                  transition: 'font-size 0.1s, opacity 0.1s',
-                  lineHeight: 1,
-                }}>
-                  {v}
-                </span>
-                {isCenter && suffix && (
-                  <span style={{ fontSize: compact ? 11 : 14, fontWeight: 500, color: 'var(--text-muted)', opacity: 0.8 }}>
-                    {suffix}
-                  </span>
+                {isCenter && editing ? (
+                  <>
+                    <input
+                      ref={inputRef}
+                      type="number"
+                      inputMode="decimal"
+                      value={editValue ?? ''}
+                      onChange={e => onEditChange?.(e.target.value)}
+                      onBlur={() => onEditConfirm?.()}
+                      onKeyDown={e => e.key === 'Enter' && onEditConfirm?.()}
+                      style={{
+                        fontSize: compact ? 26 : 30,
+                        fontWeight: 800,
+                        color: 'var(--accent-text)',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        textAlign: 'center',
+                        width: '4ch',
+                        lineHeight: 1,
+                        fontFamily: 'inherit',
+                        caretColor: 'var(--accent)',
+                      }}
+                    />
+                    {suffix && (
+                      <span style={{ fontSize: compact ? 11 : 14, fontWeight: 500, color: 'var(--text-muted)', opacity: 0.8 }}>
+                        {suffix}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <span style={{
+                      fontSize: isCenter ? (compact ? 26 : 30) : dist === 1 ? (compact ? 19 : 22) : (compact ? 13 : 15),
+                      fontWeight: isCenter ? 800 : dist === 1 ? 600 : 400,
+                      color: isCenter ? 'var(--accent-text)' : 'var(--text-secondary)',
+                      opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
+                      transition: 'font-size 0.1s, opacity 0.1s',
+                      lineHeight: 1,
+                    }}>
+                      {v}
+                    </span>
+                    {isCenter && suffix && (
+                      <span style={{ fontSize: compact ? 11 : 14, fontWeight: 500, color: 'var(--text-muted)', opacity: 0.8 }}>
+                        {suffix}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
             </div>

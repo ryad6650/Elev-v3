@@ -58,6 +58,10 @@ export default function FoodDetailSheet({ aliment, repas, onBack, onConfirm, onE
     setTimeout(() => {
       qtyInputRef.current?.focus();
       qtyInputRef.current?.select();
+      // Scroll le picker dans la vue quand le clavier apparaît
+      setTimeout(() => {
+        qtyInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
     }, 100);
   }
 
@@ -238,38 +242,21 @@ export default function FoodDetailSheet({ aliment, repas, onBack, onConfirm, onE
         <div className="flex gap-3 mb-4">
           {/* Gauche : scroll picker (tap = saisie clavier) */}
           <div className="shrink-0 relative" style={{ width: '55%' }}>
-            {editingQty ? (
-              <div
-                className="flex flex-col items-center justify-center rounded-2xl"
-                style={{ height: 46 * 3, background: 'var(--bg-card)', border: '1.5px solid var(--accent)' }}
-              >
-                <input
-                  ref={qtyInputRef}
-                  type="number"
-                  inputMode="decimal"
-                  value={qtyInput}
-                  onChange={e => setQtyInput(e.target.value)}
-                  onBlur={confirmEdit}
-                  onKeyDown={e => e.key === 'Enter' && confirmEdit()}
-                  className="bg-transparent text-center outline-none w-full"
-                  style={{ fontSize: 32, fontWeight: 800, color: 'var(--accent-text)', fontFamily: 'inherit' }}
-                />
-                <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-                  {pickerSuffix}
-                </span>
-              </div>
-            ) : (
-              <QuantityScrollPicker
-                value={pickerVal}
-                onChange={setPickerVal}
-                min={pickerStep}
-                max={pickerMax}
-                step={pickerStep}
-                suffix={pickerSuffix}
-                compact
-                onCenterTap={startEdit}
-              />
-            )}
+            <QuantityScrollPicker
+              value={pickerVal}
+              onChange={setPickerVal}
+              min={pickerStep}
+              max={pickerMax}
+              step={pickerStep}
+              suffix={pickerSuffix}
+              compact
+              onCenterTap={startEdit}
+              editing={editingQty}
+              editValue={qtyInput}
+              onEditChange={setQtyInput}
+              onEditConfirm={confirmEdit}
+              inputRef={qtyInputRef}
+            />
           </div>
 
           {/* Droite : toggle grammage / portion */}
