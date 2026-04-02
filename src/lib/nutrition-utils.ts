@@ -12,7 +12,7 @@ export interface NutritionAliment {
   sucres?: number | null;
   sel?: number | null;
   code_barres?: string | null;
-  source?: 'local' | 'openfoodfacts';
+  source?: "local" | "openfoodfacts";
   is_global?: boolean;
   portion_nom?: string | null;
   taille_portion_g?: number | null;
@@ -20,9 +20,17 @@ export interface NutritionAliment {
 
 export interface NutritionEntry {
   id: string;
-  repas: "petit-dejeuner" | "dejeuner" | "diner" | "snacks";
+  meal_number: number;
+  meal_time: string; // ISO timestamp
   quantite_g: number;
   aliment: NutritionAliment;
+}
+
+/** Un repas regroupé (toutes les entries d'un même meal_number) */
+export interface Meal {
+  meal_number: number;
+  meal_time: string; // heure du premier aliment ajouté
+  entries: NutritionEntry[];
 }
 
 export interface NutritionProfile {
@@ -59,6 +67,29 @@ export function sumEntries(entries: NutritionEntry[]) {
         lipides: Math.round((acc.lipides + n.lipides) * 10) / 10,
       };
     },
-    { calories: 0, proteines: 0, glucides: 0, lipides: 0 }
+    { calories: 0, proteines: 0, glucides: 0, lipides: 0 },
   );
+}
+
+/** Regroupe les entries par meal_number → liste de Meal triés par heure */
+export function groupByMeal(entries: NutritionEntry[]): Meal[] {
+  const map = new Map<number, NutritionEntry[]>();
+  for (const e of entries) {
+    const arr = map.get(e.meal_number) ?? [];
+    arr.push(e);
+    map.set(e.meal_number, arr);
+  }
+  return Array.from(map.entries())
+    .map(([meal_number, entries]) => ({
+      meal_number,
+      meal_time: entries[0].meal_time,
+      entries,
+    }))
+    .sort((a, b) => a.meal_number - b.meal_number);
+}
+
+/** Prochain meal_number disponible */
+export function nextMealNumber(entries: NutritionEntry[]): number {
+  if (entries.length === 0) return 1;
+  return Math.max(...entries.map((e) => e.meal_number)) + 1;
 }

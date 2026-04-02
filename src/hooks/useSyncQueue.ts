@@ -1,50 +1,55 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useCallback } from 'react';
-import { getQueuedOperations, removeOperation, type OfflineOperation } from '@/lib/offlineQueue';
-import { useOnlineStatus } from './useOnlineStatus';
+import { useEffect, useRef, useCallback } from "react";
+import {
+  getQueuedOperations,
+  removeOperation,
+  type OfflineOperation,
+} from "@/lib/offlineQueue";
+import { useOnlineStatus } from "./useOnlineStatus";
 
 // Rejoue une opération en appelant la Server Action correspondante
 async function replayOperation(op: OfflineOperation): Promise<void> {
   switch (op.type) {
-    case 'UPSERT_POIDS': {
-      const { upsertPoids } = await import('@/app/actions/poids');
+    case "UPSERT_POIDS": {
+      const { upsertPoids } = await import("@/app/actions/poids");
       await upsertPoids(op.payload.date, op.payload.poids);
       break;
     }
-    case 'DELETE_POIDS': {
-      const { deletePoids } = await import('@/app/actions/poids');
+    case "DELETE_POIDS": {
+      const { deletePoids } = await import("@/app/actions/poids");
       await deletePoids(op.payload.id);
       break;
     }
-    case 'ADD_NUTRITION': {
-      const { addNutritionEntry } = await import('@/app/actions/nutrition');
+    case "ADD_NUTRITION": {
+      const { addNutritionEntry } = await import("@/app/actions/nutrition");
       await addNutritionEntry(
-        op.payload.repas,
+        op.payload.mealNumber,
         op.payload.alimentId,
         op.payload.quantiteG,
-        op.payload.date
+        op.payload.date,
+        op.payload.mealTime,
       );
       break;
     }
-    case 'DELETE_NUTRITION': {
-      const { deleteNutritionEntry } = await import('@/app/actions/nutrition');
+    case "DELETE_NUTRITION": {
+      const { deleteNutritionEntry } = await import("@/app/actions/nutrition");
       await deleteNutritionEntry(op.payload.id);
       break;
     }
-    case 'UPDATE_PROFIL': {
-      const { updateInfosProfil } = await import('@/app/actions/profil');
+    case "UPDATE_PROFIL": {
+      const { updateInfosProfil } = await import("@/app/actions/profil");
       await updateInfosProfil(op.payload);
       break;
     }
-    case 'UPDATE_OBJECTIFS': {
-      const { updateObjectifsNutrition } = await import('@/app/actions/profil');
+    case "UPDATE_OBJECTIFS": {
+      const { updateObjectifsNutrition } = await import("@/app/actions/profil");
       await updateObjectifsNutrition(op.payload);
       break;
     }
     default: {
       const exhaustive: never = op;
-      console.warn('Type opération offline inconnu:', exhaustive);
+      console.warn("Type opération offline inconnu:", exhaustive);
     }
   }
 }
@@ -65,7 +70,9 @@ export function useSyncQueue(): void {
       const ops = await getQueuedOperations();
       if (ops.length === 0) return;
 
-      console.info(`[Élev] Synchronisation : ${ops.length} opération(s) en attente`);
+      console.info(
+        `[Élev] Synchronisation : ${ops.length} opération(s) en attente`,
+      );
 
       for (const item of ops) {
         try {
@@ -73,7 +80,11 @@ export function useSyncQueue(): void {
           await removeOperation(item.id);
         } catch (err) {
           // Laisser dans la queue pour la prochaine tentative
-          console.warn('[Élev] Échec replay opération offline:', item.operation.type, err);
+          console.warn(
+            "[Élev] Échec replay opération offline:",
+            item.operation.type,
+            err,
+          );
           break; // Arrêter si réseau encore instable
         }
       }
@@ -91,15 +102,16 @@ export function useSyncQueue(): void {
 
   // Écouter les messages du Service Worker (Background Sync)
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!("serviceWorker" in navigator)) return;
 
     const handler = (event: MessageEvent) => {
-      if (event.data?.type === 'PROCESS_SYNC_QUEUE') {
+      if (event.data?.type === "PROCESS_SYNC_QUEUE") {
         processQueue();
       }
     };
 
-    navigator.serviceWorker.addEventListener('message', handler);
-    return () => navigator.serviceWorker.removeEventListener('message', handler);
+    navigator.serviceWorker.addEventListener("message", handler);
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", handler);
   }, [processQueue]);
 }

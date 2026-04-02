@@ -27,10 +27,12 @@ export async function fetchNutritionData(
     supabase
       .from("nutrition_entries")
       .select(
-        "id, repas, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides)",
+        "id, meal_number, meal_time, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
       )
       .eq("user_id", user.id)
-      .eq("date", date),
+      .eq("date", date)
+      .order("meal_number")
+      .order("meal_time"),
     supabase
       .from("profiles")
       .select(
@@ -42,7 +44,8 @@ export async function fetchNutritionData(
 
   type RawEntry = {
     id: string;
-    repas: string;
+    meal_number: number;
+    meal_time: string;
     quantite_g: number;
     aliments: {
       id: string;
@@ -51,12 +54,20 @@ export async function fetchNutritionData(
       proteines: number | null;
       glucides: number | null;
       lipides: number | null;
+      fibres: number | null;
+      sucres: number | null;
+      sel: number | null;
+      code_barres: string | null;
+      is_global: boolean | null;
+      portion_nom: string | null;
+      taille_portion_g: number | null;
     } | null;
   };
   const entries: NutritionEntry[] = (entriesRes.data ?? ([] as RawEntry[])).map(
     (e: RawEntry) => ({
       id: e.id,
-      repas: e.repas as NutritionEntry["repas"],
+      meal_number: e.meal_number,
+      meal_time: e.meal_time,
       quantite_g: e.quantite_g,
       aliment: e.aliments as NutritionAliment,
     }),

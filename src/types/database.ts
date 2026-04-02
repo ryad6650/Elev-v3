@@ -150,24 +150,27 @@ export type Database = {
           aliment_id: string;
           date: string | null;
           id: string;
+          meal_number: number;
+          meal_time: string;
           quantite_g: number;
-          repas: string;
           user_id: string;
         };
         Insert: {
           aliment_id: string;
           date?: string | null;
           id?: string;
+          meal_number: number;
+          meal_time: string;
           quantite_g: number;
-          repas: string;
           user_id: string;
         };
         Update: {
           aliment_id?: string;
           date?: string | null;
           id?: string;
+          meal_number?: number;
+          meal_time?: string;
           quantite_g?: number;
-          repas?: string;
           user_id?: string;
         };
         Relationships: [

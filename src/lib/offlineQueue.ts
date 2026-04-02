@@ -2,21 +2,25 @@
 // Stocke les mutations en attente et les rejoue à la reconnexion
 
 export type OfflineOperation =
-  | { type: 'UPSERT_POIDS'; payload: { date: string; poids: number } }
-  | { type: 'DELETE_POIDS'; payload: { id: string } }
+  | { type: "UPSERT_POIDS"; payload: { date: string; poids: number } }
+  | { type: "DELETE_POIDS"; payload: { id: string } }
   | {
-      type: 'ADD_NUTRITION';
+      type: "ADD_NUTRITION";
       payload: {
-        repas: 'petit-dejeuner' | 'dejeuner' | 'diner' | 'snacks';
+        mealNumber: number;
+        mealTime: string;
         alimentId: string;
         quantiteG: number;
         date: string;
       };
     }
-  | { type: 'DELETE_NUTRITION'; payload: { id: string } }
-  | { type: 'UPDATE_PROFIL'; payload: { prenom: string; taille: number | null } }
+  | { type: "DELETE_NUTRITION"; payload: { id: string } }
   | {
-      type: 'UPDATE_OBJECTIFS';
+      type: "UPDATE_PROFIL";
+      payload: { prenom: string; taille: number | null };
+    }
+  | {
+      type: "UPDATE_OBJECTIFS";
       payload: {
         objectif_calories: number;
         objectif_proteines: number | null;
@@ -32,9 +36,9 @@ export interface QueuedOperation {
   retries: number;
 }
 
-const DB_NAME = 'elev-offline';
+const DB_NAME = "elev-offline";
 const DB_VERSION = 2;
-const STORE = 'operations';
+const STORE = "operations";
 
 // Singleton — évite de réouvrir IndexedDB à chaque opération
 let dbSingleton: Promise<IDBDatabase> | null = null;
@@ -46,23 +50,33 @@ function openDB(): Promise<IDBDatabase> {
       req.onupgradeneeded = (e) => {
         const db = (e.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(STORE)) {
-          db.createObjectStore(STORE, { keyPath: 'id' });
+          db.createObjectStore(STORE, { keyPath: "id" });
         }
       };
       req.onsuccess = () => resolve(req.result);
-      req.onerror = () => { dbSingleton = null; reject(req.error); };
+      req.onerror = () => {
+        dbSingleton = null;
+        reject(req.error);
+      };
     });
   }
   return dbSingleton;
 }
 
-export async function enqueueOperation(operation: OfflineOperation): Promise<string> {
+export async function enqueueOperation(
+  operation: OfflineOperation,
+): Promise<string> {
   const db = await openDB();
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const item: QueuedOperation = { id, operation, createdAt: Date.now(), retries: 0 };
+  const item: QueuedOperation = {
+    id,
+    operation,
+    createdAt: Date.now(),
+    retries: 0,
+  };
 
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
+    const tx = db.transaction(STORE, "readwrite");
     const store = tx.objectStore(STORE);
     const req = store.add(item);
     req.onsuccess = () => resolve(id);
@@ -73,7 +87,7 @@ export async function enqueueOperation(operation: OfflineOperation): Promise<str
 export async function getQueuedOperations(): Promise<QueuedOperation[]> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly');
+    const tx = db.transaction(STORE, "readonly");
     const store = tx.objectStore(STORE);
     const req = store.getAll();
     req.onsuccess = () => resolve((req.result as QueuedOperation[]) ?? []);
@@ -84,7 +98,7 @@ export async function getQueuedOperations(): Promise<QueuedOperation[]> {
 export async function removeOperation(id: string): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
+    const tx = db.transaction(STORE, "readwrite");
     const store = tx.objectStore(STORE);
     const req = store.delete(id);
     req.onsuccess = () => resolve();
@@ -93,11 +107,11 @@ export async function removeOperation(id: string): Promise<void> {
 }
 
 export async function getQueueCount(): Promise<number> {
-  if (typeof indexedDB === 'undefined') return 0;
+  if (typeof indexedDB === "undefined") return 0;
   try {
     const db = await openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readonly');
+      const tx = db.transaction(STORE, "readonly");
       const store = tx.objectStore(STORE);
       const req = store.count();
       req.onsuccess = () => resolve(req.result);
