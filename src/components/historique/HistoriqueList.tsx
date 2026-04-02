@@ -3,6 +3,7 @@ import type { HistoriqueWorkout } from "@/lib/historique";
 
 interface Props {
   workouts: HistoriqueWorkout[];
+  onSelect?: (id: string) => void;
 }
 
 function formatDate(dateStr: string): string {
@@ -44,7 +45,7 @@ function getGroupLabel(dateStr: string): string {
   }).format(date);
 }
 
-export default function HistoriqueList({ workouts }: Props) {
+export default function HistoriqueList({ workouts, onSelect }: Props) {
   const groups = useMemo(() => {
     const g: { label: string; items: HistoriqueWorkout[] }[] = [];
     for (const w of workouts) {
@@ -92,11 +93,12 @@ export default function HistoriqueList({ workouts }: Props) {
             {items.map((w) => (
               <div
                 key={w.id}
-                className="relative overflow-hidden rounded-[18px] p-3.5 flex items-center gap-3"
+                className="relative overflow-hidden rounded-[18px] p-3.5 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
                 style={{
                   background: "var(--bg-secondary)",
                   border: "1px solid var(--border)",
                 }}
+                onClick={() => onSelect?.(w.id)}
               >
                 {/* Barre accent gauche */}
                 <div

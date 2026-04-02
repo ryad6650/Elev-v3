@@ -14,7 +14,9 @@ export interface PoidsPageData {
   mensurations: MensurationsData | null;
 }
 
-export async function fetchPoidsData(supabase: SupabaseClient<Database>): Promise<PoidsPageData> {
+export async function fetchPoidsData(
+  supabase: SupabaseClient<Database>,
+): Promise<PoidsPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,11 +28,7 @@ export async function fetchPoidsData(supabase: SupabaseClient<Database>): Promis
       .select("id, date, poids")
       .eq("user_id", user.id)
       .order("date", { ascending: true }),
-    supabase
-      .from("profiles")
-      .select("taille")
-      .eq("id", user.id)
-      .single(),
+    supabase.from("profiles").select("taille").eq("id", user.id).single(),
     supabase
       .from("mensurations")
       .select("cou, tour_taille, poitrine, hanches, bras, cuisse, mollet")
@@ -40,7 +38,7 @@ export async function fetchPoidsData(supabase: SupabaseClient<Database>): Promis
 
   const entries: PoidsEntry[] = (poidsRes.data ?? []).map((e) => ({
     id: e.id,
-    date: e.date,
+    date: e.date ?? "",
     poids: e.poids,
   }));
 

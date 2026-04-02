@@ -52,7 +52,9 @@ type WorkoutJoin = {
   workout_sets: SetJoin[];
 };
 
-export async function fetchWorkoutPageData(supabase: SupabaseClient<Database>): Promise<WorkoutPageData> {
+export async function fetchWorkoutPageData(
+  supabase: SupabaseClient<Database>,
+): Promise<WorkoutPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -69,7 +71,7 @@ export async function fetchWorkoutPageData(supabase: SupabaseClient<Database>): 
       .select(
         `id, date, duree_minutes,
         routines(nom),
-        workout_sets(exercise_id, poids, reps, completed, exercises(nom))`
+        workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
       )
       .eq("user_id", user.id)
       .order("date", { ascending: false })
@@ -85,7 +87,7 @@ export async function fetchWorkoutPageData(supabase: SupabaseClient<Database>): 
   const lastWorkoutMap = new Map<string, string>();
   for (const w of lastWorkoutsRes.data ?? []) {
     if (w.routine_id && !lastWorkoutMap.has(w.routine_id)) {
-      lastWorkoutMap.set(w.routine_id, w.date);
+      lastWorkoutMap.set(w.routine_id, w.date!);
     }
   }
 
@@ -99,7 +101,10 @@ export async function fetchWorkoutPageData(supabase: SupabaseClient<Database>): 
       }
     }
     const exercisesCount = r.routine_exercises.length;
-    const totalSets = r.routine_exercises.reduce((sum, e) => sum + (e.series_cible ?? 3), 0);
+    const totalSets = r.routine_exercises.reduce(
+      (sum, e) => sum + (e.series_cible ?? 3),
+      0,
+    );
     return {
       id: r.id,
       nom: r.nom,

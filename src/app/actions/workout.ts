@@ -89,6 +89,7 @@ export interface RoutineExerciseData {
   repsCible: number;
   repsCibleMax: number | null;
   ordre: number;
+  restDuration?: number | null;
 }
 
 type RoutineExRow = {
@@ -123,18 +124,25 @@ export async function getRoutineExercises(
 
   if (error) throw new Error(error.message);
 
-  return ((data ?? []) as unknown as RoutineExRow[])
-    .filter((re) => re.exercises !== null)
-    .map((re) => ({
-      exerciseId: re.exercises!.id,
-      nom: re.exercises!.nom,
-      groupeMusculaire: re.exercises!.groupe_musculaire,
-      gifUrl: re.exercises!.gif_url ?? null,
-      seriesCible: re.series_cible ?? 3,
-      repsCible: re.reps_cible ?? 10,
-      repsCibleMax: re.reps_cible_max ?? null,
-      ordre: re.ordre,
-    }));
+  const rows = ((data ?? []) as unknown as RoutineExRow[]).filter(
+    (re) => re.exercises !== null,
+  );
+
+  // Charger les temps de repos sauvegardés pour ces exercices
+  const exerciseIds = rows.map((re) => re.exercises!.id);
+  const restMap = await getUserExerciseRests(exerciseIds);
+
+  return rows.map((re) => ({
+    exerciseId: re.exercises!.id,
+    nom: re.exercises!.nom,
+    groupeMusculaire: re.exercises!.groupe_musculaire,
+    gifUrl: re.exercises!.gif_url ?? null,
+    seriesCible: re.series_cible ?? 3,
+    repsCible: re.reps_cible ?? 10,
+    repsCibleMax: re.reps_cible_max ?? null,
+    ordre: re.ordre,
+    restDuration: restMap[re.exercises!.id] ?? null,
+  }));
 }
 
 export async function createRoutine(
@@ -234,16 +242,69 @@ export async function deleteRoutine(routineId: string): Promise<void> {
   revalidatePath("/workout");
 }
 
-export async function saveWorkout(
-  exercises: WorkoutExercise[],
-  debutAt: number,
-  routineId: string | null,
-): Promise<{ id: string }> {
+// ---------- Temps de repos par exercice ----------
+
+export async function getUserExerciseRests(
+  exerciseIds: string[],
+): Promise<Record<string, number>> {
+  if (exerciseIds.length === 0) return {};
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return {};
+
+  const { data } = await supabase
+    .from("user_exercise_rest")
+    .select("exercise_id, rest_duration")
+    .eq("user_id", user.id)
+    .in("exercise_id", exerciseIds);
+
+  const map: Record<string, number> = {};
+  for (const row of data ?? []) {
+    map[row.exercise_id] = row.rest_duration;
+  }
+  return map;
+}
+
+export async function saveExerciseRest(
+  exerciseId: string,
+  restDuration: number | null,
+): Promise<void> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
+
+  if (restDuration == null || restDuration <= 0) {
+    await supabase
+      .from("user_exercise_rest")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("exercise_id", exerciseId);
+  } else {
+    await supabase.from("user_exercise_rest").upsert(
+      {
+        user_id: user.id,
+        exercise_id: exerciseId,
+        rest_duration: restDuration,
+      },
+      { onConflict: "user_id,exercise_id" },
+    );
+  }
+}
+
+export async function saveWorkout(
+  exercises: WorkoutExercise[],
+  debutAt: number,
+  routineId: string | null,
+): Promise<{ success: boolean; id?: string; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Non authentifié" };
 
   const dureeMinutes = Math.round((Date.now() - debutAt) / 60000);
   const date = new Date(debutAt).toISOString().split("T")[0];
@@ -252,7 +313,7 @@ export async function saveWorkout(
     .from("workouts")
     .insert({
       user_id: user.id,
-      routine_id: routineId,
+      routine_id: routineId || null,
       date,
       duree_minutes: dureeMinutes,
     })
@@ -260,7 +321,10 @@ export async function saveWorkout(
     .single();
 
   if (wError || !workout)
-    throw new Error(wError?.message ?? "Erreur lors de la sauvegarde");
+    return {
+      success: false,
+      error: wError?.message ?? "Erreur création séance",
+    };
 
   const sets = exercises.flatMap((ex) =>
     ex.sets.map((s) => ({
@@ -271,14 +335,17 @@ export async function saveWorkout(
       poids: s.poids,
       reps: s.reps,
       completed: s.completed,
-      is_warmup: s.isWarmup,
     })),
   );
 
   if (sets.length > 0) {
     const { error: sError } = await supabase.from("workout_sets").insert(sets);
-    if (sError) throw new Error(sError.message);
+    if (sError) {
+      // Supprimer le workout orphelin si les sets échouent
+      await supabase.from("workouts").delete().eq("id", workout.id);
+      return { success: false, error: sError.message };
+    }
   }
 
-  return { id: workout.id };
+  return { success: true, id: workout.id };
 }

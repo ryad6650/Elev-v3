@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
+import { getUserExerciseRests } from "@/app/actions/workout";
 import CreateExerciseModal from "./CreateExerciseModal";
 import ExerciseGif from "./ExerciseGif";
 
@@ -110,10 +111,11 @@ export default function ExerciseSearch({
     fetchExercises(debouncedQ, groupe, equipement);
   }, [debouncedQ, groupe, equipement, fetchExercises]);
 
-  const handleAdd = (ex: Exercise) => {
+  const handleAdd = async (ex: Exercise) => {
     if (onSelect) {
       onSelect(ex);
     } else {
+      const restMap = await getUserExerciseRests([ex.id]);
       addExercise({
         exerciseId: ex.id,
         nom: ex.nom,
@@ -123,6 +125,7 @@ export default function ExerciseSearch({
         seriesCible: 3,
         repsCible: 10,
         repsCibleMax: null,
+        restDuration: restMap[ex.id] ?? null,
       });
       onClose();
     }

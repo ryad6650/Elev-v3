@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { memo, useState } from 'react';
-import { Plus, ChevronRight, Check, Timer, ChevronDown, Flame } from 'lucide-react';
-import { useWorkoutStore } from '@/store/workoutStore';
-import type { WorkoutExercise, WorkoutSet } from '@/store/workoutStore';
-import SetRow from './SetRow';
-import RestDurationPicker from './RestDurationPicker';
-import ExerciseGif from './ExerciseGif';
+import { memo, useState } from "react";
+import { Plus, ChevronRight, Timer, ChevronDown, Flame } from "lucide-react";
+import { useWorkoutStore } from "@/store/workoutStore";
+import type { WorkoutExercise, WorkoutSet } from "@/store/workoutStore";
+import { saveExerciseRest } from "@/app/actions/workout";
+import SetRow from "./SetRow";
+import RestDurationPicker from "./RestDurationPicker";
+import ExerciseGif from "./ExerciseGif";
 
 function formatRest(s: number): string {
   if (s < 60) return `${s}s`;
@@ -17,29 +18,36 @@ function formatRest(s: number): string {
 
 interface Props {
   exercise: WorkoutExercise;
-  exerciseIndex: number;
   isOpen: boolean;
   onOpen: () => void;
   onPR?: (exerciseName: string, poids: number, reps: number) => void;
 }
 
-
-function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) {
+function ExerciseCard({ exercise, isOpen, onOpen, onPR }: Props) {
   const addSet = useWorkoutStore((s) => s.addSet);
   const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const removeSet = useWorkoutStore((s) => s.removeSet);
   const updateSet = useWorkoutStore((s) => s.updateSet);
   const toggleComplete = useWorkoutStore((s) => s.toggleComplete);
-  const setExerciseRestDuration = useWorkoutStore((s) => s.setExerciseRestDuration);
+  const setExerciseRestDuration = useWorkoutStore(
+    (s) => s.setExerciseRestDuration,
+  );
   const [showPicker, setShowPicker] = useState(false);
 
   const completedCount = exercise.sets.filter((s) => s.completed).length;
-  const allDone = exercise.sets.length > 0 && completedCount === exercise.sets.length;
+  const allDone =
+    exercise.sets.length > 0 && completedCount === exercise.sets.length;
   const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
   const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
   const handleToggle = (set: WorkoutSet) => {
-    if (!set.completed && set.poids && set.reps && set.poidsRef && set.poids > set.poidsRef) {
+    if (
+      !set.completed &&
+      set.poids &&
+      set.reps &&
+      set.poidsRef &&
+      set.poids > set.poidsRef
+    ) {
       onPR?.(exercise.nom, set.poids, set.reps);
     }
     toggleComplete(exercise.uid, set.id);
@@ -51,28 +59,50 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
       <button
         onClick={onOpen}
         className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-opacity active:opacity-70"
-        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+        style={{
+          background: "var(--bg-secondary)",
+          border: "1px solid var(--border)",
+        }}
       >
-        <ExerciseGif gifUrl={exercise.gifUrl ?? null} nom={exercise.nom} size="sm" />
+        <ExerciseGif
+          gifUrl={exercise.gifUrl ?? null}
+          nom={exercise.nom}
+          size="sm"
+        />
 
-        <span className="flex-1 font-semibold text-sm" style={{ color: allDone ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
+        <span
+          className="flex-1 font-semibold text-sm"
+          style={{
+            color: allDone ? "var(--text-secondary)" : "var(--text-primary)",
+          }}
+        >
           {exercise.nom}
         </span>
 
         {allDone ? (
           <span
             className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
-            style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)' }}
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              color: "var(--success)",
+            }}
           >
             Terminé
           </span>
         ) : (
-          <span className="text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>
+          <span
+            className="text-xs shrink-0"
+            style={{ color: "var(--text-muted)" }}
+          >
             {completedCount}/{exercise.sets.length} séries
           </span>
         )}
 
-        <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} className="shrink-0" />
+        <ChevronRight
+          size={16}
+          style={{ color: "var(--text-muted)" }}
+          className="shrink-0"
+        />
       </button>
     );
   }
@@ -82,19 +112,26 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: 'var(--bg-secondary)',
-        border: '1.5px solid var(--accent)',
+        background: "var(--bg-secondary)",
+        border: "1.5px solid var(--accent)",
       }}
     >
       {/* En-tête exercice */}
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <ExerciseGif gifUrl={exercise.gifUrl ?? null} nom={exercise.nom} size="md" />
-        <span className="flex-1 font-semibold text-base" style={{ color: 'var(--text-primary)' }}>
+        <ExerciseGif
+          gifUrl={exercise.gifUrl ?? null}
+          nom={exercise.nom}
+          size="md"
+        />
+        <span
+          className="flex-1 font-semibold text-base"
+          style={{ color: "var(--text-primary)" }}
+        >
           {exercise.nom}
         </span>
         <span
           className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
-          style={{ background: 'rgba(59,130,246,0.15)', color: '#93C5FD' }}
+          style={{ background: "rgba(59,130,246,0.15)", color: "#93C5FD" }}
         >
           {exercise.groupeMusculaire}
         </span>
@@ -106,13 +143,18 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
           onClick={() => setShowPicker(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-opacity active:opacity-70"
           style={{
-            background: 'var(--bg-elevated)',
-            color: exercise.restDuration != null ? 'var(--accent)' : 'var(--text-muted)',
-            border: '1px solid var(--border)',
+            background: "var(--bg-elevated)",
+            color:
+              exercise.restDuration != null
+                ? "var(--accent)"
+                : "var(--text-muted)",
+            border: "1px solid var(--border)",
           }}
         >
           <Timer size={12} />
-          {exercise.restDuration != null ? formatRest(exercise.restDuration) : 'Aucun minuteur'}
+          {exercise.restDuration != null
+            ? formatRest(exercise.restDuration)
+            : "Aucun minuteur"}
           <ChevronDown size={11} />
         </button>
       </div>
@@ -120,14 +162,54 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
       {/* En-têtes colonnes */}
       <div
         className="flex items-center gap-2 px-3 pb-2"
-        style={{ borderBottom: '1px solid var(--border)' }}
+        style={{ borderBottom: "1px solid var(--border)" }}
       >
-        <span className="w-6 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>#</span>
+        <span
+          className="w-6 text-center"
+          style={{
+            color: "var(--text-muted)",
+            fontSize: "10px",
+            fontWeight: 600,
+            letterSpacing: "0.06em",
+          }}
+        >
+          #
+        </span>
         <div className="flex flex-1 gap-2">
-          <span className="flex-1 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>POIDS</span>
-          <span className="flex-1 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>REPS</span>
+          <span
+            className="flex-1 text-center"
+            style={{
+              color: "var(--text-muted)",
+              fontSize: "10px",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+            }}
+          >
+            POIDS
+          </span>
+          <span
+            className="flex-1 text-center"
+            style={{
+              color: "var(--text-muted)",
+              fontSize: "10px",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+            }}
+          >
+            REPS
+          </span>
         </div>
-        <span className="w-11 text-center" style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em' }}>PRÉC.</span>
+        <span
+          className="w-11 text-center"
+          style={{
+            color: "var(--text-muted)",
+            fontSize: "10px",
+            fontWeight: 600,
+            letterSpacing: "0.06em",
+          }}
+        >
+          PRÉC.
+        </span>
         <span className="w-8" />
         <span className="w-7" />
       </div>
@@ -137,22 +219,31 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
         {(() => {
           const warmupSets = exercise.sets.filter((s) => s.isWarmup);
           const workingSets = exercise.sets.filter((s) => !s.isWarmup);
-          const allWarmupDone = warmupSets.length > 0 && warmupSets.every((s) => s.completed);
+          const allWarmupDone =
+            warmupSets.length > 0 && warmupSets.every((s) => s.completed);
 
           return (
             <>
               {allWarmupDone ? (
                 <div
                   className="flex items-center gap-2 px-3 py-2 mx-1 rounded-xl text-xs font-medium"
-                  style={{ background: 'rgba(232,134,12,0.12)', color: 'var(--accent)' }}
+                  style={{
+                    background: "rgba(232,134,12,0.12)",
+                    color: "var(--accent)",
+                  }}
                 >
                   <Flame size={13} />
                   <span>
-                    Échauffement :{' '}
+                    Échauffement :{" "}
                     {warmupSets.map((s, i) => (
                       <span key={s.id}>
-                        {i > 0 && <span style={{ color: 'var(--text-muted)' }}> · </span>}
-                        {s.poids != null ? `${s.poids}kg` : '—'}×{s.reps ?? '—'}
+                        {i > 0 && (
+                          <span style={{ color: "var(--text-muted)" }}>
+                            {" "}
+                            ·{" "}
+                          </span>
+                        )}
+                        {s.poids != null ? `${s.poids}kg` : "—"}×{s.reps ?? "—"}
                       </span>
                     ))}
                   </span>
@@ -163,7 +254,9 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
                     key={set.id}
                     set={set}
                     isActive={idx === firstIncompleteIdx}
-                    onUpdate={(field, value) => updateSet(exercise.uid, set.id, field, value)}
+                    onUpdate={(field, value) =>
+                      updateSet(exercise.uid, set.id, field, value)
+                    }
                     onToggle={() => handleToggle(set)}
                     onRemove={() => removeSet(exercise.uid, set.id)}
                   />
@@ -176,7 +269,9 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
                     key={set.id}
                     set={set}
                     isActive={globalIdx === firstIncompleteIdx}
-                    onUpdate={(field, value) => updateSet(exercise.uid, set.id, field, value)}
+                    onUpdate={(field, value) =>
+                      updateSet(exercise.uid, set.id, field, value)
+                    }
                     onToggle={() => handleToggle(set)}
                     onRemove={() => removeSet(exercise.uid, set.id)}
                   />
@@ -188,20 +283,20 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
       </div>
 
       {/* Ajouter une série + Échauffement */}
-      <div className="flex border-t" style={{ borderColor: 'var(--border)' }}>
+      <div className="flex border-t" style={{ borderColor: "var(--border)" }}>
         <button
           onClick={() => addSet(exercise.uid)}
           className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
-          style={{ color: 'var(--accent)' }}
+          style={{ color: "var(--accent)" }}
         >
           <Plus size={15} />
           Ajouter une série
         </button>
-        <div style={{ width: '1px', background: 'var(--border)' }} />
+        <div style={{ width: "1px", background: "var(--border)" }} />
         <button
           onClick={() => addWarmupSets(exercise.uid)}
           className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
-          style={{ color: hasWarmup ? 'var(--accent)' : 'var(--text-muted)' }}
+          style={{ color: hasWarmup ? "var(--accent)" : "var(--text-muted)" }}
         >
           <Flame size={15} />
           Échauffement
@@ -211,7 +306,10 @@ function ExerciseCard({ exercise, exerciseIndex, isOpen, onOpen, onPR }: Props) 
       {showPicker && (
         <RestDurationPicker
           current={exercise.restDuration}
-          onSelect={(d) => setExerciseRestDuration(exercise.uid, d)}
+          onSelect={(d) => {
+            setExerciseRestDuration(exercise.uid, d);
+            saveExerciseRest(exercise.exerciseId, d);
+          }}
           onClose={() => setShowPicker(false)}
         />
       )}

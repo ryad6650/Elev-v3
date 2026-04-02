@@ -26,7 +26,9 @@ export interface ProfilPageData {
   stats: ProfilStats;
 }
 
-export async function fetchProfilData(supabase: SupabaseClient<Database>): Promise<ProfilPageData> {
+export async function fetchProfilData(
+  supabase: SupabaseClient<Database>,
+): Promise<ProfilPageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -36,9 +38,13 @@ export async function fetchProfilData(supabase: SupabaseClient<Database>): Promi
   const debutMois = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
   const [profileRes, totalRes, moisRes, recentRes] = await Promise.all([
-    supabase.from("profiles")
-      .select("prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, created_at")
-      .eq("id", user.id).single(),
+    supabase
+      .from("profiles")
+      .select(
+        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, created_at",
+      )
+      .eq("id", user.id)
+      .single(),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })
@@ -59,7 +65,9 @@ export async function fetchProfilData(supabase: SupabaseClient<Database>): Promi
   // Calcul streak actuel
   let streak = 0;
   if (recentRes.data && recentRes.data.length > 0) {
-    const dates = [...new Set(recentRes.data.map((w) => w.date))].sort().reverse();
+    const dates = [...new Set(recentRes.data.map((w) => w.date))]
+      .sort()
+      .reverse();
     const cursor = new Date();
     cursor.setHours(0, 0, 0, 0);
     let prev = cursor;
@@ -83,7 +91,7 @@ export async function fetchProfilData(supabase: SupabaseClient<Database>): Promi
       objectif_glucides: profileRes.data?.objectif_glucides ?? null,
       objectif_lipides: profileRes.data?.objectif_lipides ?? null,
       photo_url: profileRes.data?.photo_url ?? null,
-      theme: profileRes.data?.theme ?? "dark",
+      theme: (profileRes.data?.theme ?? "dark") as "dark" | "light",
       created_at: profileRes.data?.created_at ?? user.created_at ?? "",
       email: user.email ?? null,
     },
