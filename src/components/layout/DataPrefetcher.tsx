@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/client";
 import { getCached, setCache } from "@/lib/pageCache";
 import { getTodayString } from "@/lib/date-utils";
 import { fetchDashboardData } from "@/lib/dashboard";
-import { fetchWorkoutPageData } from "@/lib/workout";
-import { fetchProgrammesData } from "@/lib/programmes";
 import { fetchNutritionData } from "@/lib/nutrition";
 import { fetchPoidsData } from "@/lib/poids";
 import { fetchHistoriqueData } from "@/lib/historique";
@@ -26,16 +24,6 @@ export default function DataPrefetcher() {
     if (!getCached("dashboard")) {
       fetchDashboardData(supabase)
         .then((d) => setCache("dashboard", d))
-        .catch(() => {});
-    }
-    if (!getCached("workout")) {
-      Promise.all([
-        fetchWorkoutPageData(supabase),
-        fetchProgrammesData(supabase),
-      ])
-        .then(([workoutData, programmesData]) =>
-          setCache("workout", { workoutData, programmesData }),
-        )
         .catch(() => {});
     }
     if (!getCached(`nutrition:${today}`)) {

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUiStore } from "@/store/uiStore";
 
 const navItems = [
   { href: "/workout", emoji: "💪", label: "Séances" },
@@ -13,6 +14,9 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const hidden = useUiStore((s) => s.fullscreenModal);
+
+  if (hidden) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none">
@@ -28,7 +32,7 @@ export default function BottomNav() {
           width: "min(96vw, 460px)",
         }}
       >
-        {navItems.map(({ href, emoji, label }) => {
+        {navItems.map(({ href, emoji }) => {
           const active = pathname.startsWith(href);
           return (
             <Link

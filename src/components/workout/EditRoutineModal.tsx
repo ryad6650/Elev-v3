@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Dumbbell } from "lucide-react";
+import { ChevronLeft, Plus, Dumbbell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { updateRoutine, getRoutineExercises } from "@/app/actions/workout";
 import ExerciseSearch from "./ExerciseSearch";
@@ -10,6 +10,7 @@ import ExerciseEditMenu from "./ExerciseEditMenu";
 import RoutineExerciseCard from "./RoutineExerciseCard";
 import type { RoutineExercise } from "./RoutineExerciseCard";
 import { getGroupeColor } from "./exerciseColors";
+import { useUiStore } from "@/store/uiStore";
 import type { Routine } from "@/lib/workout";
 
 interface RawExercise {
@@ -34,6 +35,12 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [erreur, setErreur] = useState("");
+
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+  useEffect(() => {
+    setFullscreenModal(true);
+    return () => setFullscreenModal(false);
+  }, [setFullscreenModal]);
 
   useEffect(() => {
     getRoutineExercises(routine.id)
@@ -216,36 +223,38 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 flex flex-col overflow-hidden"
+      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col overflow-hidden"
       style={{ background: "var(--bg-primary)", height: "100dvh" }}
     >
       {/* Header */}
       <div
-        className="px-4 pb-5 border-b"
+        className="px-4 pb-4 border-b"
         style={{
           borderColor: "var(--border)",
-          paddingTop: "max(1.5rem, env(safe-area-inset-top))",
-          background:
-            "linear-gradient(180deg, rgba(232,134,12,0.06) 0%, transparent 100%)",
+          paddingTop: "max(1.25rem, env(safe-area-inset-top))",
         }}
       >
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2 mb-4">
           <button
             onClick={onClose}
-            className="p-2 rounded-xl"
-            style={{ background: "var(--bg-elevated)" }}
+            className="p-1.5 -ml-1.5 rounded-lg active:scale-95"
           >
-            <X size={18} style={{ color: "var(--text-primary)" }} />
+            <ChevronLeft size={22} style={{ color: "var(--text-primary)" }} />
           </button>
+          <span
+            className="text-[11px] font-semibold uppercase tracking-wider"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Modifier la routine
+          </span>
           <div className="flex-1" />
           <button
             onClick={handleSave}
             disabled={saving || !nom.trim()}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
+            className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
             style={{
               background: "var(--accent)",
               color: "white",
-              boxShadow: "0 4px 20px rgba(232,134,12,0.3)",
             }}
           >
             {saving ? "Sauvegarde..." : "Sauvegarder"}
@@ -259,27 +268,22 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
             setErreur("");
           }}
           placeholder="Nom de la routine"
-          className="w-full text-3xl font-bold bg-transparent outline-none mb-1"
+          className="w-full bg-transparent outline-none mb-3"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
             color: "var(--text-primary)",
-            fontSize: "16px",
+            fontSize: "24px",
+            lineHeight: "1.2",
           }}
         />
-        <h2
-          className="text-[11px] uppercase tracking-wider font-semibold"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Modifier la séance
-        </h2>
         {erreur && (
-          <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
+          <p className="text-xs mt-1 mb-2" style={{ color: "var(--danger)" }}>
             {erreur}
           </p>
         )}
         {exercices.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap mt-3">
+          <div className="flex items-center gap-2 flex-wrap">
             {groupes.map((g) => {
               const c = getGroupeColor(g);
               return (

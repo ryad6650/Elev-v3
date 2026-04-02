@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { X, Plus, Dumbbell } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { ChevronLeft, Plus, Dumbbell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createRoutine } from "@/app/actions/workout";
 import ExerciseSearch from "./ExerciseSearch";
 import RoutineExerciseCard from "./RoutineExerciseCard";
 import type { RoutineExercise } from "./RoutineExerciseCard";
 import { getGroupeColor } from "./exerciseColors";
+import { useUiStore } from "@/store/uiStore";
 
 interface RawExercise {
   id: string;
@@ -16,17 +17,69 @@ interface RawExercise {
   gif_url: string | null;
 }
 
+const STORAGE_KEY = "elev-draft-routine";
+const DRAFT_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface DraftRoutine {
+  nom: string;
+  exercices: RoutineExercise[];
+  savedAt: number;
+}
+
+function loadDraft(): DraftRoutine | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const draft: DraftRoutine = JSON.parse(raw);
+    if (Date.now() - draft.savedAt > DRAFT_TTL) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return draft;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(nom: string, exercices: RoutineExercise[]) {
+  if (!nom && exercices.length === 0) {
+    localStorage.removeItem(STORAGE_KEY);
+    return;
+  }
+  const draft: DraftRoutine = { nom, exercices, savedAt: Date.now() };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+}
+
+function clearDraft() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
 interface Props {
   onClose: () => void;
 }
 
 export default function CreateRoutineModal({ onClose }: Props) {
   const router = useRouter();
-  const [nom, setNom] = useState("");
-  const [exercices, setExercices] = useState<RoutineExercise[]>([]);
+  const [draft] = useState(loadDraft);
+  const [nom, setNom] = useState(draft?.nom ?? "");
+  const [exercices, setExercices] = useState<RoutineExercise[]>(
+    draft?.exercices ?? [],
+  );
   const [showSearch, setShowSearch] = useState(false);
   const [saving, setSaving] = useState(false);
   const [erreur, setErreur] = useState("");
+
+  // Masquer la bottom nav
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+  useEffect(() => {
+    setFullscreenModal(true);
+    return () => setFullscreenModal(false);
+  }, [setFullscreenModal]);
+
+  // Sauvegarder le brouillon à chaque changement
+  useEffect(() => {
+    saveDraft(nom, exercices);
+  }, [nom, exercices]);
 
   const handleSelect = useCallback((ex: RawExercise) => {
     setExercices((prev) => [
@@ -112,6 +165,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
           ordre: i,
         })),
       );
+      clearDraft();
       router.refresh();
       onClose();
     } catch (err) {
@@ -133,36 +187,38 @@ export default function CreateRoutineModal({ onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 flex flex-col overflow-hidden"
+      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col overflow-hidden"
       style={{ background: "var(--bg-primary)", height: "100dvh" }}
     >
       {/* Header */}
       <div
-        className="px-4 pb-5 border-b"
+        className="px-4 pb-4 border-b"
         style={{
           borderColor: "var(--border)",
-          paddingTop: "max(1.5rem, env(safe-area-inset-top))",
-          background:
-            "linear-gradient(180deg, rgba(232,134,12,0.06) 0%, transparent 100%)",
+          paddingTop: "max(1.25rem, env(safe-area-inset-top))",
         }}
       >
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2 mb-4">
           <button
             onClick={onClose}
-            className="p-2 rounded-xl"
-            style={{ background: "var(--bg-elevated)" }}
+            className="p-1.5 -ml-1.5 rounded-lg active:scale-95"
           >
-            <X size={18} style={{ color: "var(--text-primary)" }} />
+            <ChevronLeft size={22} style={{ color: "var(--text-primary)" }} />
           </button>
+          <span
+            className="text-[11px] font-semibold uppercase tracking-wider"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Créer une routine
+          </span>
           <div className="flex-1" />
           <button
             onClick={handleSave}
             disabled={saving || !nom.trim()}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
+            className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
             style={{
               background: "var(--accent)",
               color: "white",
-              boxShadow: "0 4px 20px rgba(232,134,12,0.3)",
             }}
           >
             {saving ? "Création..." : "Créer"}
@@ -177,21 +233,22 @@ export default function CreateRoutineModal({ onClose }: Props) {
             setErreur("");
           }}
           placeholder="Nom de la routine"
-          className="w-full text-3xl font-bold bg-transparent outline-none mb-1"
+          className="w-full bg-transparent outline-none mb-3"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
             color: "var(--text-primary)",
-            fontSize: "16px",
+            fontSize: "24px",
+            lineHeight: "1.2",
           }}
         />
         {erreur && (
-          <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
+          <p className="text-xs mt-1 mb-2" style={{ color: "var(--danger)" }}>
             {erreur}
           </p>
         )}
         {exercices.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap mt-3">
+          <div className="flex items-center gap-2 flex-wrap">
             {groupes.map((g) => {
               const c = getGroupeColor(g);
               return (
