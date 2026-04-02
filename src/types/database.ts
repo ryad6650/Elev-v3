@@ -221,6 +221,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          accent_color: string | null;
           created_at: string | null;
           derniere_connexion: string | null;
           id: string;
@@ -239,6 +240,7 @@ export type Database = {
           updated_at: string | null;
         };
         Insert: {
+          accent_color?: string | null;
           created_at?: string | null;
           derniere_connexion?: string | null;
           id: string;
@@ -257,6 +259,7 @@ export type Database = {
           updated_at?: string | null;
         };
         Update: {
+          accent_color?: string | null;
           created_at?: string | null;
           derniere_connexion?: string | null;
           id?: string;

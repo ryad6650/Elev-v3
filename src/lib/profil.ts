@@ -1,6 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
+export type AccentColor =
+  | "orange"
+  | "green"
+  | "blue"
+  | "purple"
+  | "red"
+  | "cyan"
+  | "silver";
+
 export interface ProfilData {
   id: string;
   prenom: string | null;
@@ -11,6 +20,7 @@ export interface ProfilData {
   objectif_lipides: number | null;
   photo_url: string | null;
   theme: "dark" | "light";
+  accent_color: AccentColor;
   created_at: string;
   email: string | null;
 }
@@ -41,7 +51,7 @@ export async function fetchProfilData(
     supabase
       .from("profiles")
       .select(
-        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, created_at",
+        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, created_at",
       )
       .eq("id", user.id)
       .single(),
@@ -92,6 +102,7 @@ export async function fetchProfilData(
       objectif_lipides: profileRes.data?.objectif_lipides ?? null,
       photo_url: profileRes.data?.photo_url ?? null,
       theme: (profileRes.data?.theme ?? "dark") as "dark" | "light",
+      accent_color: (profileRes.data?.accent_color ?? "orange") as AccentColor,
       created_at: profileRes.data?.created_at ?? user.created_at ?? "",
       email: user.email ?? null,
     },

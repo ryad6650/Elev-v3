@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import type { AccentColor } from "@/lib/profil";
 import {
   getTodayString,
   getWeekStart,
@@ -39,6 +40,7 @@ export interface DashboardData {
   prochaineRoutine: ProchaineRoutine | null;
   sommeilMinutes: number | null;
   theme: "dark" | "light";
+  accentColor: AccentColor;
 }
 
 type AlimentJoin = {
@@ -73,7 +75,7 @@ export async function fetchDashboardData(
     supabase
       .from("profiles")
       .select(
-        "prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion, theme",
+        "prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion, theme, accent_color",
       )
       .eq("id", user.id)
       .single(),
@@ -250,5 +252,6 @@ export async function fetchDashboardData(
     streakConnexions,
     sommeilMinutes: sommeilRes.data?.duree_minutes ?? null,
     theme: (profil?.theme ?? "dark") as "dark" | "light",
+    accentColor: (profil?.accent_color ?? "orange") as AccentColor,
   };
 }

@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
 import { getCached, setCache } from "@/lib/pageCache";
+import { applyAccent } from "@/lib/apply-accent";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
 import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
@@ -77,6 +78,10 @@ function MiniStat({
 function DashboardContent({ data }: { data: DashboardData }) {
   const prenom = data.prenom ?? "toi";
 
+  useEffect(() => {
+    applyAccent(data.accentColor);
+  }, [data.accentColor]);
+
   return (
     <main
       className="px-4 pt-5 pb-4 space-y-4 page-enter"
@@ -120,7 +125,8 @@ function DashboardContent({ data }: { data: DashboardData }) {
                 width: 46,
                 height: 46,
                 background: data.photoUrl ? "transparent" : "var(--bg-card)",
-                border: "1px solid rgba(232,134,12,0.28)",
+                border:
+                  "1px solid color-mix(in srgb, var(--accent) 28%, transparent)",
               }}
             >
               {data.photoUrl ? (
@@ -147,8 +153,9 @@ function DashboardContent({ data }: { data: DashboardData }) {
           <span
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold"
             style={{
-              background: "rgba(232,134,12,0.12)",
-              border: "1px solid rgba(232,134,12,0.25)",
+              background: "var(--accent-bg)",
+              border:
+                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
               color: "var(--accent-text)",
             }}
           >
@@ -184,7 +191,7 @@ function DashboardContent({ data }: { data: DashboardData }) {
           style={{
             height: 2.5,
             background:
-              "linear-gradient(to right, #C8622E, #E8860C, transparent)",
+              "linear-gradient(to right, var(--accent-hover), var(--accent), transparent)",
           }}
         />
       </div>

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { AccentColor } from "@/lib/profil";
 
 export async function updateInfosProfil(data: {
   prenom: string;
@@ -15,7 +16,11 @@ export async function updateInfosProfil(data: {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ prenom: data.prenom || null, taille: data.taille, updated_at: new Date().toISOString() })
+    .update({
+      prenom: data.prenom || null,
+      taille: data.taille,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);
@@ -62,6 +67,25 @@ export async function updateTheme(theme: "dark" | "light"): Promise<void> {
   revalidatePath("/profil");
 }
 
+export async function updateAccentColor(
+  accent_color: AccentColor,
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ accent_color, updated_at: new Date().toISOString() })
+    .eq("id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/profil");
+  revalidatePath("/dashboard");
+}
+
 export async function uploadPhotoProfil(formData: FormData): Promise<string> {
   const supabase = await createClient();
   const {
@@ -71,7 +95,8 @@ export async function uploadPhotoProfil(formData: FormData): Promise<string> {
 
   const file = formData.get("photo") as File;
   if (!file || file.size === 0) throw new Error("Fichier manquant");
-  if (file.size > 5 * 1024 * 1024) throw new Error("Fichier trop lourd (max 5 Mo)");
+  if (file.size > 5 * 1024 * 1024)
+    throw new Error("Fichier trop lourd (max 5 Mo)");
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${user.id}/avatar.${ext}`;
@@ -83,7 +108,9 @@ export async function uploadPhotoProfil(formData: FormData): Promise<string> {
 
   if (uploadError) throw new Error(uploadError.message);
 
-  const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(path);
 
   const { error: updateError } = await supabase
     .from("profiles")
@@ -98,7 +125,7 @@ export async function uploadPhotoProfil(formData: FormData): Promise<string> {
 
 export async function updatePassword(
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
   const {

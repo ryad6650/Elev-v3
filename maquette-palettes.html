@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Élev v3 — Maquettes Palettes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #111;
+    color: #fafaf9;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== SELECTOR BAR ===== */
+  .selector-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(17,17,17,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+    overflow-x: auto;
+  }
+  .selector-bar h2 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+  .pill {
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: #a8a29e;
+    transition: all 200ms;
+  }
+  .pill:hover { border-color: rgba(255,255,255,0.25); color: #fafaf9; }
+  .pill.active { color: #fff; }
+
+  /* ===== LAYOUT ===== */
+  .phones-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 90px 24px 48px;
+    flex-wrap: wrap;
+  }
+
+  .phone-frame {
+    width: 390px;
+    min-height: 780px;
+    border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    transition: transform 300ms ease, box-shadow 300ms ease;
+  }
+  .phone-frame:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 32px 90px rgba(0,0,0,0.6);
+  }
+  .phone-label {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; z-index: 10;
+    padding: 5px 14px; border-radius: 999px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* ===== DASHBOARD CONTENT ===== */
+  .dash {
+    padding: 52px 20px 100px;
+    min-height: 780px;
+  }
+  .dash .date {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; margin-bottom: 12px;
+  }
+  .dash .greeting { font-size: 13px; margin-bottom: 2px; }
+  .dash .name {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 38px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .dash .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .dash .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 10px; border-radius: 999px;
+    font-size: 10px; font-weight: 600;
+  }
+  .dash .divider-line {
+    height: 2.5px; border-radius: 2px; margin-top: 16px;
+  }
+
+  .section-divider {
+    display: flex; align-items: center; gap: 12px; margin: 16px 0;
+  }
+  .section-divider .line { flex: 1; height: 1px; }
+  .section-divider span {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .card {
+    padding: 20px; border-radius: 16px; border-width: 1px; border-style: solid;
+  }
+
+  /* Calories */
+  .cal-row { display: flex; align-items: center; justify-content: space-between; }
+  .cal-number {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 50px;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .cal-unit { font-size: 14px; margin-left: 4px; }
+  .cal-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-top: 6px;
+  }
+  .ring-wrap { position: relative; width: 76px; height: 76px; }
+  .ring-center {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .ring-meta { display: flex; gap: 14px; margin-top: 10px; text-align: center; }
+  .ring-meta .val { font-size: 15px; font-weight: 700; line-height: 1; }
+  .ring-meta .lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+
+  /* Macros */
+  .macro-row { margin-bottom: 14px; }
+  .macro-row:last-child { margin-bottom: 0; }
+  .macro-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .macro-header .label { font-size: 12px; font-weight: 600; }
+  .macro-header .vals { font-size: 12px; font-weight: 500; }
+  .macro-track { height: 6px; border-radius: 999px; overflow: hidden; }
+  .macro-fill { height: 100%; border-radius: 999px; }
+
+  /* Workout CTA */
+  .workout-cta {
+    padding: 20px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #fff;
+  }
+  .workout-cta .label-top {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; opacity: 0.6; margin-bottom: 4px;
+  }
+  .workout-cta .title {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 22px; line-height: 1.15;
+    margin-bottom: 4px;
+  }
+  .workout-cta .sub { font-size: 12px; opacity: 0.7; }
+  .workout-cta .arrow {
+    width: 38px; height: 38px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    flex-shrink: 0; margin-left: 16px;
+  }
+
+  /* Mini stats */
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .mini-stat {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 16px; border-radius: 16px; gap: 4px;
+    border-width: 1px; border-style: solid;
+  }
+  .mini-stat .emoji { font-size: 24px; }
+  .mini-stat .value { font-size: 18px; font-weight: 700; }
+  .mini-stat .label { font-size: 10px; text-align: center; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: absolute; bottom: 12px; left: 12px; right: 12px;
+    border-radius: 32px;
+    backdrop-filter: blur(16px);
+    border-width: 1px; border-style: solid;
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 6px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 8px 12px; border-radius: 22px; font-size: 10px; font-weight: 600;
+  }
+  .nav-item .nav-emoji { font-size: 18px; }
+
+  /* ===== PALETTE A — Actuelle (Orange Doré / Noir Charbon) ===== */
+  .palette-a { background: #0d0808; }
+  .palette-a .phone-label { background: rgba(232,134,12,0.25); color: #fdba74; border: 1px solid rgba(232,134,12,0.4); }
+  .palette-a .date { color: #78716c; }
+  .palette-a .greeting { color: #a8a29e; }
+  .palette-a .name { color: #fafaf9; }
+  .palette-a .badge-accent { background: rgba(232,134,12,0.12); border: 1px solid rgba(232,134,12,0.25); color: #fdba74; }
+  .palette-a .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-a .divider-line { background: linear-gradient(to right, #C8622E, #E8860C, transparent); }
+  .palette-a .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-a .section-divider span { color: #78716c; }
+  .palette-a .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-a .cal-number { color: #fdba74; }
+  .palette-a .cal-unit { color: #78716c; }
+  .palette-a .cal-label { color: #78716c; }
+  .palette-a .ring-center { color: #fafaf9; }
+  .palette-a .ring-meta .val { color: #a8a29e; }
+  .palette-a .ring-meta .val.accent { color: #e8860c; }
+  .palette-a .ring-meta .lbl { color: #78716c; }
+  .palette-a .macro-header .vals { color: #a8a29e; }
+  .palette-a .macro-track { background: #3a2020; }
+  .palette-a .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #2d1506 40%, #c8622e 100%); }
+  .palette-a .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-a .mini-stat .value { color: #fafaf9; }
+  .palette-a .mini-stat .label { color: #78716c; }
+  .palette-a .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-a .nav-item { color: #78716c; }
+  .palette-a .nav-item.active { background: #e8860c; color: #fff; }
+
+  /* ===== PALETTE B — Vert Forêt / Noir Charbon ===== */
+  .palette-b { background: #0d0808; }
+  .palette-b .phone-label { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.35); }
+  .palette-b .date { color: #78716c; }
+  .palette-b .greeting { color: #a8a29e; }
+  .palette-b .name { color: #fafaf9; }
+  .palette-b .badge-accent { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); color: #86efac; }
+  .palette-b .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-b .divider-line { background: linear-gradient(to right, #166534, #22c55e, transparent); }
+  .palette-b .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-b .section-divider span { color: #78716c; }
+  .palette-b .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-b .cal-number { color: #86efac; }
+  .palette-b .cal-unit { color: #78716c; }
+  .palette-b .cal-label { color: #78716c; }
+  .palette-b .ring-center { color: #fafaf9; }
+  .palette-b .ring-meta .val { color: #a8a29e; }
+  .palette-b .ring-meta .val.accent { color: #22c55e; }
+  .palette-b .ring-meta .lbl { color: #78716c; }
+  .palette-b .macro-header .vals { color: #a8a29e; }
+  .palette-b .macro-track { background: #3a2020; }
+  .palette-b .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #0d2b0d 40%, #166534 100%); }
+  .palette-b .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-b .mini-stat .value { color: #fafaf9; }
+  .palette-b .mini-stat .label { color: #78716c; }
+  .palette-b .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-b .nav-item { color: #78716c; }
+  .palette-b .nav-item.active { background: #22c55e; color: #fff; }
+
+  /* ===== PALETTE C — Bleu Nuit / Noir Charbon ===== */
+  .palette-c { background: #0d0808; }
+  .palette-c .phone-label { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.35); }
+  .palette-c .date { color: #78716c; }
+  .palette-c .greeting { color: #a8a29e; }
+  .palette-c .name { color: #fafaf9; }
+  .palette-c .badge-accent { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; }
+  .palette-c .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-c .divider-line { background: linear-gradient(to right, #1d4ed8, #3b82f6, transparent); }
+  .palette-c .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-c .section-divider span { color: #78716c; }
+  .palette-c .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-c .cal-number { color: #93c5fd; }
+  .palette-c .cal-unit { color: #78716c; }
+  .palette-c .cal-label { color: #78716c; }
+  .palette-c .ring-center { color: #fafaf9; }
+  .palette-c .ring-meta .val { color: #a8a29e; }
+  .palette-c .ring-meta .val.accent { color: #3b82f6; }
+  .palette-c .ring-meta .lbl { color: #78716c; }
+  .palette-c .macro-header .vals { color: #a8a29e; }
+  .palette-c .macro-track { background: #3a2020; }
+  .palette-c .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #152040 40%, #1d4ed8 100%); }
+  .palette-c .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-c .mini-stat .value { color: #fafaf9; }
+  .palette-c .mini-stat .label { color: #78716c; }
+  .palette-c .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-c .nav-item { color: #78716c; }
+  .palette-c .nav-item.active { background: #3b82f6; color: #fff; }
+
+  /* ===== PALETTE D — Violet Luxe / Noir Charbon ===== */
+  .palette-d { background: #0d0808; }
+  .palette-d .phone-label { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.35); }
+  .palette-d .date { color: #78716c; }
+  .palette-d .greeting { color: #a8a29e; }
+  .palette-d .name { color: #fafaf9; }
+  .palette-d .badge-accent { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); color: #d8b4fe; }
+  .palette-d .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-d .divider-line { background: linear-gradient(to right, #7c3aed, #a855f7, transparent); }
+  .palette-d .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-d .section-divider span { color: #78716c; }
+  .palette-d .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-d .cal-number { color: #d8b4fe; }
+  .palette-d .cal-unit { color: #78716c; }
+  .palette-d .cal-label { color: #78716c; }
+  .palette-d .ring-center { color: #fafaf9; }
+  .palette-d .ring-meta .val { color: #a8a29e; }
+  .palette-d .ring-meta .val.accent { color: #a855f7; }
+  .palette-d .ring-meta .lbl { color: #78716c; }
+  .palette-d .macro-header .vals { color: #a8a29e; }
+  .palette-d .macro-track { background: #3a2020; }
+  .palette-d .workout-cta { background: linear-gradient(135deg, #1a0810 0%, #2d1020 40%, #7c3aed 100%); }
+  .palette-d .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-d .mini-stat .value { color: #fafaf9; }
+  .palette-d .mini-stat .label { color: #78716c; }
+  .palette-d .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-d .nav-item { color: #78716c; }
+  .palette-d .nav-item.active { background: #a855f7; color: #fff; }
+
+  /* ===== PALETTE E — Rouge Rubis / Noir Charbon ===== */
+  .palette-e { background: #0d0808; }
+  .palette-e .phone-label { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.35); }
+  .palette-e .date { color: #78716c; }
+  .palette-e .greeting { color: #a8a29e; }
+  .palette-e .name { color: #fafaf9; }
+  .palette-e .badge-accent { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+  .palette-e .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-e .divider-line { background: linear-gradient(to right, #b91c1c, #ef4444, transparent); }
+  .palette-e .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-e .section-divider span { color: #78716c; }
+  .palette-e .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-e .cal-number { color: #fca5a5; }
+  .palette-e .cal-unit { color: #78716c; }
+  .palette-e .cal-label { color: #78716c; }
+  .palette-e .ring-center { color: #fafaf9; }
+  .palette-e .ring-meta .val { color: #a8a29e; }
+  .palette-e .ring-meta .val.accent { color: #ef4444; }
+  .palette-e .ring-meta .lbl { color: #78716c; }
+  .palette-e .macro-header .vals { color: #a8a29e; }
+  .palette-e .macro-track { background: #3a2020; }
+  .palette-e .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #3b1010 40%, #b91c1c 100%); }
+  .palette-e .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-e .mini-stat .value { color: #fafaf9; }
+  .palette-e .mini-stat .label { color: #78716c; }
+  .palette-e .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-e .nav-item { color: #78716c; }
+  .palette-e .nav-item.active { background: #ef4444; color: #fff; }
+
+  /* ===== PALETTE F — Cyan Electrique / Noir Charbon ===== */
+  .palette-f { background: #0d0808; }
+  .palette-f .phone-label { background: rgba(6,182,212,0.2); color: #67e8f9; border: 1px solid rgba(6,182,212,0.35); }
+  .palette-f .date { color: #78716c; }
+  .palette-f .greeting { color: #a8a29e; }
+  .palette-f .name { color: #fafaf9; }
+  .palette-f .badge-accent { background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.25); color: #67e8f9; }
+  .palette-f .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-f .divider-line { background: linear-gradient(to right, #0e7490, #06b6d4, transparent); }
+  .palette-f .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-f .section-divider span { color: #78716c; }
+  .palette-f .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-f .cal-number { color: #67e8f9; }
+  .palette-f .cal-unit { color: #78716c; }
+  .palette-f .cal-label { color: #78716c; }
+  .palette-f .ring-center { color: #fafaf9; }
+  .palette-f .ring-meta .val { color: #a8a29e; }
+  .palette-f .ring-meta .val.accent { color: #06b6d4; }
+  .palette-f .ring-meta .lbl { color: #78716c; }
+  .palette-f .macro-header .vals { color: #a8a29e; }
+  .palette-f .macro-track { background: #3a2020; }
+  .palette-f .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #0c2535 40%, #0e7490 100%); }
+  .palette-f .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-f .mini-stat .value { color: #fafaf9; }
+  .palette-f .mini-stat .label { color: #78716c; }
+  .palette-f .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-f .nav-item { color: #78716c; }
+  .palette-f .nav-item.active { background: #06b6d4; color: #fff; }
+
+  /* ===== PALETTE G — Blanc Argenté / Noir Charbon ===== */
+  .palette-g { background: #0d0808; }
+  .palette-g .phone-label { background: rgba(255,255,255,0.12); color: #e7e5e4; border: 1px solid rgba(255,255,255,0.25); }
+  .palette-g .date { color: #78716c; }
+  .palette-g .greeting { color: #a8a29e; }
+  .palette-g .name { color: #fafaf9; }
+  .palette-g .badge-accent { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #e7e5e4; }
+  .palette-g .badge-default { background: #292524; border: 1px solid rgba(255,255,255,0.08); color: #a8a29e; }
+  .palette-g .divider-line { background: linear-gradient(to right, #78716c, #d6d3d1, transparent); }
+  .palette-g .section-divider .line { background: rgba(255,255,255,0.08); }
+  .palette-g .section-divider span { color: #78716c; }
+  .palette-g .card { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-g .cal-number { color: #e7e5e4; }
+  .palette-g .cal-unit { color: #78716c; }
+  .palette-g .cal-label { color: #78716c; }
+  .palette-g .ring-center { color: #fafaf9; }
+  .palette-g .ring-meta .val { color: #a8a29e; }
+  .palette-g .ring-meta .val.accent { color: #d6d3d1; }
+  .palette-g .ring-meta .lbl { color: #78716c; }
+  .palette-g .macro-header .vals { color: #a8a29e; }
+  .palette-g .macro-track { background: #3a2020; }
+  .palette-g .workout-cta { background: linear-gradient(135deg, #0d0808 0%, #44403c 40%, #a8a29e 100%); }
+  .palette-g .mini-stat { background: #1a1010; border-color: rgba(255,255,255,0.06); }
+  .palette-g .mini-stat .value { color: #fafaf9; }
+  .palette-g .mini-stat .label { color: #78716c; }
+  .palette-g .bottom-nav { background: rgba(26,16,16,0.9); border-color: rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .palette-g .nav-item { color: #78716c; }
+  .palette-g .nav-item.active { background: linear-gradient(135deg, #78716c, #d6d3d1); color: #1c1917; }
+
+  /* Hidden state */
+  .phone-frame { display: none; }
+  .phone-frame.visible { display: block; }
+
+  /* View modes */
+  .phones-row.grid-view { flex-wrap: wrap; }
+  .phones-row.grid-view .phone-frame {
+    display: block !important;
+    width: 340px;
+    min-height: 700px;
+  }
+  .phones-row.grid-view .phone-frame .dash { padding-top: 48px; }
+
+  @media (max-width: 768px) {
+    .phones-row { gap: 20px; padding: 80px 12px 40px; }
+    .phone-frame { width: 100%; max-width: 390px; }
+    .phones-row.grid-view .phone-frame { width: 100%; max-width: 390px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Selector Bar -->
+<div class="selector-bar" id="selectorBar">
+  <h2>Palettes</h2>
+  <button class="pill active" data-palette="all" onclick="showPalette('all')">Toutes</button>
+  <button class="pill" data-palette="a" onclick="showPalette('a')">A — Orange Doré</button>
+  <button class="pill" data-palette="b" onclick="showPalette('b')">B — Vert Forêt</button>
+  <button class="pill" data-palette="c" onclick="showPalette('c')">C — Bleu Nuit</button>
+  <button class="pill" data-palette="d" onclick="showPalette('d')">D — Violet Luxe</button>
+  <button class="pill" data-palette="e" onclick="showPalette('e')">E — Rouge Rubis</button>
+  <button class="pill" data-palette="f" onclick="showPalette('f')">F — Cyan Electrique</button>
+  <button class="pill" data-palette="g" onclick="showPalette('g')">G — Blanc Argenté</button>
+</div>
+
+<div class="phones-row" id="phonesRow">
+
+  <!-- ======== PALETTE A — Orange Doré (Actuelle) ======== -->
+  <div class="phone-frame palette-a visible" data-id="a">
+    <div class="phone-label">A — Orange Doré (actuelle)</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px">
+              <span class="cal-number">1 842</span>
+              <span class="cal-unit">kcal</span>
+            </div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(232,134,12,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#E8860C" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row">
+          <div class="macro-header"><span class="label" style="color:#EAB308">Glucides</span><span class="vals">180 / 250g</span></div>
+          <div class="macro-track"><div class="macro-fill" style="width:72%;background:#EAB308"></div></div>
+        </div>
+        <div class="macro-row">
+          <div class="macro-header"><span class="label" style="color:#3B82F6">Protéines</span><span class="vals">125 / 160g</span></div>
+          <div class="macro-track"><div class="macro-fill" style="width:78%;background:#3B82F6"></div></div>
+        </div>
+        <div class="macro-row">
+          <div class="macro-header"><span class="label" style="color:#A78BFA">Lipides</span><span class="vals">52 / 75g</span></div>
+          <div class="macro-track"><div class="macro-fill" style="width:69%;background:#A78BFA"></div></div>
+        </div>
+      </div>
+
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div>
+          <p class="label-top">Prochain entraînement</p>
+          <h2 class="title">Push (Pectoraux)</h2>
+          <p class="sub">6 exercices · ~55 min · Pecs + Épaules</p>
+        </div>
+        <div class="arrow">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE B — Vert Forêt ======== -->
+  <div class="phone-frame palette-b visible" data-id="b">
+    <div class="phone-label">B — Vert Forêt</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(34,197,94,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#EAB308">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#EAB308"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#3B82F6">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#3B82F6"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#A78BFA">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#A78BFA"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE C — Bleu Nuit ======== -->
+  <div class="phone-frame palette-c visible" data-id="c">
+    <div class="phone-label">C — Bleu Nuit</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(59,130,246,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#EAB308">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#EAB308"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#60a5fa">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#60a5fa"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#A78BFA">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#A78BFA"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE D — Violet Luxe ======== -->
+  <div class="phone-frame palette-d visible" data-id="d">
+    <div class="phone-label">D — Violet Luxe</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(168,85,247,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#a855f7" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#facc15">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#facc15"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#818cf8">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#818cf8"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#f472b6">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#f472b6"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE E — Rouge Rubis ======== -->
+  <div class="phone-frame palette-e visible" data-id="e">
+    <div class="phone-label">E — Rouge Rubis</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(239,68,68,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#fbbf24">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#fbbf24"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#38bdf8">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#38bdf8"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#fb923c">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#fb923c"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE F — Cyan Electrique ======== -->
+  <div class="phone-frame palette-f visible" data-id="f">
+    <div class="phone-label">F — Cyan Electrique</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(6,182,212,0.15)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#06b6d4" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#fbbf24">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#fbbf24"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#22d3ee">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#22d3ee"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#c084fc">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#c084fc"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+  <!-- ======== PALETTE G — Blanc Argenté ======== -->
+  <div class="phone-frame palette-g visible" data-id="g">
+    <div class="phone-label">G — Blanc Argenté (light)</div>
+    <div class="dash">
+      <p class="date">Mercredi 2 avril 2026</p>
+      <p class="greeting">Bonjour,</p>
+      <h1 class="name">Ryad</h1>
+      <div class="badges">
+        <span class="badge badge-accent">&#9889; Jour 12</span>
+        <span class="badge badge-default">&#9878;&#65039; 78.4 kg</span>
+        <span class="badge badge-default">&#128170; 3 séances cette sem.</span>
+      </div>
+      <div class="divider-line"></div>
+      <div class="section-divider"><div class="line"></div><span>Calories</span><div class="line"></div></div>
+      <div class="card">
+        <div class="cal-row">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px"><span class="cal-number">1 842</span><span class="cal-unit">kcal</span></div>
+            <p class="cal-label">Kcal consommées</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div class="ring-wrap">
+              <svg width="76" height="76" style="transform:rotate(-90deg)">
+                <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                <circle cx="38" cy="38" r="30" fill="none" stroke="#d6d3d1" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="37.7"/>
+              </svg>
+              <div class="ring-center">80%</div>
+            </div>
+            <div class="ring-meta">
+              <div><p class="val">2 300</p><p class="lbl">Objectif</p></div>
+              <div><p class="val accent">458</p><p class="lbl">Restant</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Macronutriments</span><div class="line"></div></div>
+      <div class="card">
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#EAB308">Glucides</span><span class="vals">180 / 250g</span></div><div class="macro-track"><div class="macro-fill" style="width:72%;background:#EAB308"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#3B82F6">Protéines</span><span class="vals">125 / 160g</span></div><div class="macro-track"><div class="macro-fill" style="width:78%;background:#3B82F6"></div></div></div>
+        <div class="macro-row"><div class="macro-header"><span class="label" style="color:#A78BFA">Lipides</span><span class="vals">52 / 75g</span></div><div class="macro-track"><div class="macro-fill" style="width:69%;background:#A78BFA"></div></div></div>
+      </div>
+      <div class="section-divider"><div class="line"></div><span>Entraînement</span><div class="line"></div></div>
+      <div class="workout-cta">
+        <div><p class="label-top">Prochain entraînement</p><h2 class="title">Push (Pectoraux)</h2><p class="sub">6 exercices · ~55 min · Pecs + Épaules</p></div>
+        <div class="arrow"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="mini-grid">
+        <div class="mini-stat"><span class="emoji">&#128170;</span><span class="value">3</span><span class="label">Séances / sem</span></div>
+        <div class="mini-stat"><span class="emoji">&#128564;</span><span class="value">7h30</span><span class="label">Sommeil</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"><span class="nav-emoji">&#128170;</span>Séances</div>
+      <div class="nav-item"><span class="nav-emoji">&#9878;&#65039;</span>Poids</div>
+      <div class="nav-item active"><span class="nav-emoji">&#127968;</span>Accueil</div>
+      <div class="nav-item"><span class="nav-emoji">&#129367;</span>Nutri</div>
+      <div class="nav-item"><span class="nav-emoji">&#128202;</span>Histo</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showPalette(id) {
+  const pills = document.querySelectorAll('.pill');
+  const frames = document.querySelectorAll('.phone-frame');
+  const row = document.getElementById('phonesRow');
+
+  pills.forEach(p => {
+    p.classList.toggle('active', p.dataset.palette === id);
+    if (p.dataset.palette === id) {
+      // Set pill active color based on palette
+      const colors = { all:'#e8860c', a:'#e8860c', b:'#22c55e', c:'#3b82f6', d:'#a855f7', e:'#ef4444', f:'#06b6d4', g:'#d6d3d1' };
+      p.style.background = colors[id] || '#e8860c';
+      p.style.borderColor = colors[id] || '#e8860c';
+      p.style.color = '#fff';
+    } else {
+      p.style.background = 'transparent';
+      p.style.borderColor = 'rgba(255,255,255,0.12)';
+      p.style.color = '#a8a29e';
+    }
+  });
+
+  if (id === 'all') {
+    row.classList.add('grid-view');
+    frames.forEach(f => f.classList.add('visible'));
+  } else {
+    row.classList.remove('grid-view');
+    frames.forEach(f => {
+      f.classList.toggle('visible', f.dataset.id === id);
+      f.style.display = f.dataset.id === id ? 'block' : 'none';
+    });
+  }
+}
+
+// Init: show all
+showPalette('all');
+</script>
+
+</body>
+</html>
