@@ -43,13 +43,13 @@ export default function RoutineExerciseCard({
 
   return (
     <div
-      className="rounded-2xl overflow-hidden"
+      className="rounded-2xl relative"
       style={{
         background: "var(--bg-secondary)",
         border: "1px solid var(--border)",
       }}
     >
-      <div className="h-1" style={{ background: gColor.text }} />
+      <div className="h-1 rounded-t-2xl" style={{ background: gColor.text }} />
       <div className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">

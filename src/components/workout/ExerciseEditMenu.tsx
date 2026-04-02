@@ -28,9 +28,9 @@ export default function ExerciseEditMenu({
       </button>
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={onClose} />
+          <div className="fixed inset-0 z-[70]" onClick={onClose} />
           <div
-            className="absolute right-0 bottom-8 z-20 w-56 rounded-xl py-1 shadow-lg"
+            className="absolute right-0 bottom-8 z-[70] w-56 rounded-xl py-1 shadow-lg"
             style={{
               background: "var(--bg-elevated)",
               border: "1px solid var(--border)",
