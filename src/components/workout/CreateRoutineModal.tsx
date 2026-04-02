@@ -5,11 +5,13 @@ import { X, Plus, Trash2, ChevronUp, ChevronDown, Dumbbell } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import { createRoutine } from '@/app/actions/workout';
 import ExerciseSearch from './ExerciseSearch';
+import ExerciseGif from './ExerciseGif';
 
 interface SelectedExercise {
   exerciseId: string;
   nom: string;
   groupeMusculaire: string;
+  gifUrl: string | null;
   seriesCible: number;
   repsCible: number;
   repsCibleMax: number | null;
@@ -19,6 +21,7 @@ interface RawExercise {
   id: string;
   nom: string;
   groupe_musculaire: string;
+  gif_url: string | null;
 }
 
 interface Props {
@@ -55,7 +58,6 @@ export default function CreateRoutineModal({ onClose }: Props) {
   const [showSearch, setShowSearch] = useState(false);
   const [saving, setSaving] = useState(false);
   const [erreur, setErreur] = useState('');
-  const [repsRaw, setRepsRaw] = useState<Record<number, string>>({});
 
   const handleSelectExercise = useCallback((ex: RawExercise) => {
     setExercices((prev) => [
@@ -64,6 +66,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
         exerciseId: ex.id,
         nom: ex.nom,
         groupeMusculaire: ex.groupe_musculaire,
+        gifUrl: ex.gif_url,
         seriesCible: 3,
         repsCible: 10,
         repsCibleMax: null,
@@ -78,49 +81,38 @@ export default function CreateRoutineModal({ onClose }: Props) {
     );
   };
 
-  const getRepsDisplay = (ex: SelectedExercise, i: number): string => {
-    if (repsRaw[i] !== undefined) return repsRaw[i];
-    return ex.repsCibleMax !== null ? `${ex.repsCible}-${ex.repsCibleMax}` : `${ex.repsCible}`;
+  const toggleRepsMode = (index: number) => {
+    setExercices((prev) =>
+      prev.map((e, i) => {
+        if (i !== index) return e;
+        if (e.repsCibleMax !== null) {
+          return { ...e, repsCible: e.repsCible, repsCibleMax: null };
+        }
+        return { ...e, repsCibleMax: e.repsCible + 4 };
+      })
+    );
   };
 
-  const handleRepsChange = (i: number, raw: string) => {
-    setRepsRaw((prev) => ({ ...prev, [i]: raw }));
-  };
-
-  const handleRepsBlur = (i: number) => {
-    const raw = (repsRaw[i] ?? '').trim();
-    const rangeMatch = raw.match(/^(\d+)\s*[-–]\s*(\d+)$/);
-    if (rangeMatch) {
-      const min = parseInt(rangeMatch[1]);
-      const max = parseInt(rangeMatch[2]);
-      if (min >= 1 && max > min) {
-        setExercices((prev) =>
-          prev.map((e, idx) => idx === i ? { ...e, repsCible: min, repsCibleMax: max } : e)
-        );
-      }
-    } else {
-      const num = parseInt(raw);
-      if (!isNaN(num) && num >= 1) {
-        setExercices((prev) =>
-          prev.map((e, idx) => idx === i ? { ...e, repsCible: num, repsCibleMax: null } : e)
-        );
-      }
+  const updateReps = (index: number, value: string) => {
+    const num = parseInt(value);
+    if (value === '' || (!isNaN(num) && num >= 0)) {
+      setExercices((prev) =>
+        prev.map((e, i) => i === index ? { ...e, repsCible: isNaN(num) ? 0 : num } : e)
+      );
     }
-    setRepsRaw((prev) => { const next = { ...prev }; delete next[i]; return next; });
+  };
+
+  const updateRepsMax = (index: number, value: string) => {
+    const num = parseInt(value);
+    if (value === '' || (!isNaN(num) && num >= 0)) {
+      setExercices((prev) =>
+        prev.map((e, i) => i === index ? { ...e, repsCibleMax: isNaN(num) ? 0 : num } : e)
+      );
+    }
   };
 
   const removeExercice = (index: number) => {
     setExercices((prev) => prev.filter((_, i) => i !== index));
-    // Nettoyer les repsRaw pour les index décalés
-    setRepsRaw((prev) => {
-      const next: Record<number, string> = {};
-      Object.entries(prev).forEach(([k, v]) => {
-        const key = parseInt(k);
-        if (key < index) next[key] = v;
-        else if (key > index) next[key - 1] = v;
-      });
-      return next;
-    });
   };
 
   const moveExercice = (index: number, direction: -1 | 1) => {
@@ -164,8 +156,8 @@ export default function CreateRoutineModal({ onClose }: Props) {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 flex flex-col"
-      style={{ background: 'var(--bg-primary)' }}
+      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 flex flex-col overflow-hidden"
+      style={{ background: 'var(--bg-primary)', height: '100dvh' }}
     >
       {/* Header avec gradient accent subtil */}
       <div
@@ -237,7 +229,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
       </div>
 
       {/* Liste exercices */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-24">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-3 pb-6" style={{ WebkitOverflowScrolling: 'touch' }}>
         {exercices.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <Dumbbell size={40} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
@@ -262,12 +254,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
                 {/* Header exercice */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: gColor.bg }}
-                    >
-                      <Dumbbell size={20} style={{ color: gColor.text }} />
-                    </div>
+                    <ExerciseGif gifUrl={ex.gifUrl} nom={ex.nom} size="md" />
                     <div>
                       <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                         {ex.nom}
@@ -307,8 +294,8 @@ export default function CreateRoutineModal({ onClose }: Props) {
                   </div>
                 </div>
 
-                {/* Config séries / reps — side by side */}
-                <div className="flex gap-3">
+                {/* Config séries / reps */}
+                <div className="flex gap-3 mb-2">
                   <div
                     className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl"
                     style={{ background: 'var(--bg-elevated)' }}
@@ -344,35 +331,57 @@ export default function CreateRoutineModal({ onClose }: Props) {
                     <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: 'var(--text-muted)' }}>
                       Reps
                     </span>
-                    <input
-                      type="text"
-                      value={getRepsDisplay(ex, i)}
-                      onChange={(e) => handleRepsChange(i, e.target.value)}
-                      onBlur={() => handleRepsBlur(i)}
-                      placeholder="10 ou 8-12"
-                      className="w-16 text-right text-sm font-bold tabular-nums bg-transparent outline-none"
-                      style={{ color: 'var(--accent-text)' }}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={ex.repsCible || ''}
+                        onChange={(e) => updateReps(i, e.target.value)}
+                        className="w-10 text-sm font-bold tabular-nums outline-none rounded-lg py-1 [appearance:textfield]"
+                        style={{ color: 'var(--accent-text)', background: 'var(--bg-card)', textAlign: 'center' }}
+                      />
+                      {ex.repsCibleMax !== null && (
+                        <>
+                          <span className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>–</span>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={ex.repsCibleMax || ''}
+                            onChange={(e) => updateRepsMax(i, e.target.value)}
+                            className="w-10 text-sm font-bold tabular-nums outline-none rounded-lg py-1 [appearance:textfield]"
+                            style={{ color: 'var(--accent-text)', background: 'var(--bg-card)', textAlign: 'center' }}
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Toggle rep unique / fourchette */}
+                <button
+                  onClick={() => toggleRepsMode(i)}
+                  className="w-full py-1.5 rounded-lg text-[10px] uppercase tracking-wide font-semibold transition-all active:scale-[0.98]"
+                  style={{
+                    background: ex.repsCibleMax !== null ? 'rgba(232,134,12,0.1)' : 'var(--bg-elevated)',
+                    color: ex.repsCibleMax !== null ? 'var(--accent-text)' : 'var(--text-muted)',
+                    border: ex.repsCibleMax !== null ? '1px solid rgba(232,134,12,0.2)' : '1px solid var(--border)',
+                  }}
+                >
+                  {ex.repsCibleMax !== null ? 'Fourchette de reps' : 'Rep unique'}
+                </button>
               </div>
             </div>
           );
         })}
-      </div>
 
-      {/* FAB Ajouter (floating) — bien cadré au-dessus de la bottom nav */}
-      <div
-        className="absolute bottom-0 left-0 right-0 flex justify-center pb-6 pt-4"
-        style={{ background: 'linear-gradient(transparent, var(--bg-primary) 30%)' }}
-      >
+        {/* Bouton Ajouter — inline, suit les exercices */}
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold transition-all active:scale-95"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98] border-2 border-dashed"
           style={{
-            background: 'var(--accent)',
-            color: 'white',
-            boxShadow: '0 8px 32px rgba(232,134,12,0.4)',
+            borderColor: 'rgba(232,134,12,0.3)',
+            color: 'var(--accent)',
+            background: 'rgba(232,134,12,0.06)',
           }}
         >
           <Plus size={18} strokeWidth={2.5} />

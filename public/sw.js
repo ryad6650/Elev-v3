@@ -2,6 +2,7 @@
 // Stratégies : cache-first (assets statiques), stale-while-revalidate (pages)
 
 const CACHE_NAME = 'elev-v2';
+const GIF_CACHE_NAME = 'elev-gifs';
 const SYNC_TAG = 'elev-sync';
 
 // Assets statiques Next.js → permanents (hash dans le nom)
@@ -19,7 +20,7 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+          keys.filter((k) => k !== CACHE_NAME && k !== GIF_CACHE_NAME).map((k) => caches.delete(k))
         )
       )
       .then(() => self.clients.claim())
@@ -31,9 +32,17 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignorer : méthodes non-GET, autres origines, extensions Chrome
+  // Ignorer : méthodes non-GET, extensions Chrome
   if (request.method !== 'GET') return;
   if (!url.protocol.startsWith('http')) return;
+
+  // GIFs d'exercices (origine externe) → cache-first dédié
+  if (url.hostname === 'static.exercisedb.dev' && url.pathname.endsWith('.gif')) {
+    event.respondWith(gifCacheFirst(request));
+    return;
+  }
+
+  // Ignorer les autres origines externes
   if (url.origin !== self.location.origin) return;
 
   // Assets statiques Next.js (hachés) → cache-first
@@ -129,6 +138,20 @@ function offlinePage() {
     <body><div><h1>Élev</h1><p>Vous êtes hors ligne.<br>Reconnectez-vous pour continuer.</p></div></body></html>`,
     { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
+}
+
+async function gifCacheFirst(request) {
+  const cache = await caches.open(GIF_CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    // Pas de GIF en cache + pas de réseau → réponse vide transparente
+    return new Response('', { status: 503 });
+  }
 }
 
 async function notifyClientsToSync() {
