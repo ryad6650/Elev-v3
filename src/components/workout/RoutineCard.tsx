@@ -16,15 +16,87 @@ interface Props {
   loadingExpanded: boolean;
 }
 
-const ICON_PALETTE = [
-  { bg: "rgba(244,63,94,0.15)", color: "#F43F5E", shape: "triangle" },
-  { bg: "rgba(59,130,246,0.15)", color: "#3B82F6", shape: "circle" },
-  { bg: "rgba(234,179,8,0.15)", color: "#EAB308", shape: "circle" },
-  { bg: "rgba(168,85,247,0.15)", color: "#A855F7", shape: "circle" },
-  { bg: "rgba(34,197,94,0.15)", color: "#22C55E", shape: "circle" },
-  { bg: "rgba(249,115,22,0.15)", color: "#F97316", shape: "circle" },
-  { bg: "rgba(6,182,212,0.15)", color: "#06B6D4", shape: "circle" },
-];
+/** Détecte le label + couleurs de l'icône selon le nom et groupes */
+function getRoutineIcon(
+  nom: string,
+  groupes: string[],
+): {
+  label: string;
+  color: string;
+  bg: string;
+} {
+  const n = nom.toLowerCase();
+  const g = groupes.map((x) => x.toLowerCase());
+  const upper = ["pectoraux", "épaules", "epaules", "triceps", "dos", "biceps"];
+  const lower = [
+    "quadriceps",
+    "ischios",
+    "ischio-jambiers",
+    "fessiers",
+    "mollets",
+  ];
+
+  if (n.includes("push"))
+    return {
+      label: "Ps",
+      color: "#FB923C",
+      bg: "linear-gradient(135deg, rgba(249,115,22,0.2), rgba(244,63,94,0.2))",
+    };
+  if (n.includes("pull"))
+    return {
+      label: "Pu",
+      color: "#60A5FA",
+      bg: "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(20,184,166,0.2))",
+    };
+  if (n.includes("leg") || n.includes("jambe"))
+    return {
+      label: "Lg",
+      color: "#FACC15",
+      bg: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(244,63,94,0.2))",
+    };
+  if (n.includes("full") || n.includes("complet"))
+    return {
+      label: "Fb",
+      color: "#A78BFA",
+      bg: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.2))",
+    };
+  if (n.includes("upper") || n.includes("haut"))
+    return {
+      label: "Up",
+      color: "#F472B6",
+      bg: "linear-gradient(135deg, rgba(236,72,153,0.2), rgba(249,115,22,0.2))",
+    };
+  if (n.includes("lower") || n.includes("bas"))
+    return {
+      label: "Lo",
+      color: "#34D399",
+      bg: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(234,179,8,0.2))",
+    };
+
+  // Détection par groupes musculaires
+  const hasUpper = g.some((x) => upper.includes(x));
+  const hasLower = g.some((x) => lower.includes(x));
+  if (hasUpper && hasLower)
+    return {
+      label: "Fb",
+      color: "#A78BFA",
+      bg: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.2))",
+    };
+  if (hasLower)
+    return {
+      label: "Lo",
+      color: "#34D399",
+      bg: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(234,179,8,0.2))",
+    };
+
+  // Fallback : 2 premières lettres du nom
+  const fallback = nom.slice(0, 2);
+  return {
+    label: fallback,
+    color: "#E8860C",
+    bg: "linear-gradient(135deg, rgba(232,134,12,0.2), rgba(249,115,22,0.2))",
+  };
+}
 
 const GROUPE_COLORS: Record<string, { bg: string; text: string }> = {
   pectoraux: { bg: "rgba(249,115,22,0.2)", text: "#FB923C" },
@@ -63,7 +135,7 @@ export default function RoutineCard({
   exercises,
   loadingExpanded,
 }: Props) {
-  const icone = ICON_PALETTE[index % ICON_PALETTE.length];
+  const icone = getRoutineIcon(routine.nom, routine.groupes);
 
   return (
     <div
@@ -83,21 +155,17 @@ export default function RoutineCard({
         }}
         className="flex items-center gap-3 p-4 text-left transition-all active:scale-[0.98] cursor-pointer"
       >
-        {/* Icône colorée */}
+        {/* Icône lettre colorée */}
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
           style={{ background: icone.bg }}
         >
-          {icone.shape === "triangle" ? (
-            <svg viewBox="0 0 24 24" width={20} height={20}>
-              <polygon points="12,4 22,20 2,20" fill={icone.color} />
-            </svg>
-          ) : (
-            <div
-              className="w-5 h-5 rounded-full"
-              style={{ background: icone.color }}
-            />
-          )}
+          <span
+            className="text-[18px] font-extrabold leading-none"
+            style={{ color: icone.color }}
+          >
+            {icone.label}
+          </span>
         </div>
 
         {/* Contenu */}
