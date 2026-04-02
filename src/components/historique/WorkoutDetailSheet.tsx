@@ -199,8 +199,7 @@ export default function WorkoutDetailSheet({
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
-              style={{ background: "var(--accent)", color: "#fff" }}
+              className="btn-accent flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
             >
               <Check size={16} />
               {isPending ? "Sauvegarde…" : "Enregistrer"}

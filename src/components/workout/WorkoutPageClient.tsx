@@ -42,10 +42,11 @@ export default function WorkoutPageClient({
   initialProgrammesData,
 }: Props) {
   const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
+  const isMinimized = useWorkoutStore((s) => s.isMinimized);
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const [showCreate, setShowCreate] = useState(false);
 
-  if (activeWorkout) return <ActiveWorkout />;
+  if (activeWorkout && !isMinimized) return <ActiveWorkout />;
 
   return (
     <main

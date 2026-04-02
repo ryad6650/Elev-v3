@@ -1,7 +1,16 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Plus, ChevronRight, Timer, ChevronDown, Flame } from "lucide-react";
+import {
+  Plus,
+  ChevronRight,
+  Timer,
+  ChevronDown,
+  Flame,
+  MoreVertical,
+  ArrowLeftRight,
+  Trash2,
+} from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { WorkoutExercise, WorkoutSet } from "@/store/workoutStore";
 import { saveExerciseRest } from "@/app/actions/workout";
@@ -21,18 +30,21 @@ interface Props {
   isOpen: boolean;
   onOpen: () => void;
   onPR?: (exerciseName: string, poids: number, reps: number) => void;
+  onReplace?: () => void;
 }
 
-function ExerciseCard({ exercise, isOpen, onOpen, onPR }: Props) {
+function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   const addSet = useWorkoutStore((s) => s.addSet);
   const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const removeSet = useWorkoutStore((s) => s.removeSet);
+  const removeExercise = useWorkoutStore((s) => s.removeExercise);
   const updateSet = useWorkoutStore((s) => s.updateSet);
   const toggleComplete = useWorkoutStore((s) => s.toggleComplete);
   const setExerciseRestDuration = useWorkoutStore(
     (s) => s.setExerciseRestDuration,
   );
   const [showPicker, setShowPicker] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const completedCount = exercise.sets.filter((s) => s.completed).length;
   const allDone =
@@ -135,6 +147,60 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR }: Props) {
         >
           {exercise.groupeMusculaire}
         </span>
+        <div className="relative shrink-0">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-1.5 rounded-lg transition-opacity active:opacity-70"
+            style={{ color: "var(--text-muted)" }}
+          >
+            <MoreVertical size={16} />
+          </button>
+          {showMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-[60]"
+                onClick={() => setShowMenu(false)}
+              />
+              <div
+                className="absolute right-0 top-full mt-1 z-[60] w-52 rounded-xl py-1 shadow-lg"
+                style={{
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    onReplace?.();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold transition-opacity active:opacity-70"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  <ArrowLeftRight
+                    size={14}
+                    style={{ color: "var(--accent)" }}
+                  />
+                  Remplacer l&apos;exercice
+                </button>
+                <div
+                  className="mx-3 h-px"
+                  style={{ background: "var(--border)" }}
+                />
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    removeExercise(exercise.uid);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold transition-opacity active:opacity-70"
+                  style={{ color: "var(--danger, #EF4444)" }}
+                >
+                  <Trash2 size={14} />
+                  Supprimer l&apos;exercice
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Bouton minuteur repos */}

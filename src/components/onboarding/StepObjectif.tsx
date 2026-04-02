@@ -93,7 +93,11 @@ export default function StepObjectif({ data, update, onNext, onBack }: Props) {
       <button
         onClick={onBack}
         className="text-2xl mb-8 -ml-1 self-start"
-        style={{ color: "var(--text-muted)", background: "none", border: "none" }}
+        style={{
+          color: "var(--text-muted)",
+          background: "none",
+          border: "none",
+        }}
       >
         ←
       </button>
@@ -122,7 +126,9 @@ export default function StepObjectif({ data, update, onNext, onBack }: Props) {
                 onClick={() => handleSelect(opt.value)}
                 className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all duration-200"
                 style={{
-                  background: selected ? "var(--accent-bg)" : "var(--bg-secondary)",
+                  background: selected
+                    ? "var(--accent-bg)"
+                    : "var(--bg-secondary)",
                   border: `1px solid ${selected ? "var(--accent)" : "var(--border)"}`,
                 }}
               >
@@ -134,14 +140,19 @@ export default function StepObjectif({ data, update, onNext, onBack }: Props) {
                   >
                     {opt.label}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  <p
+                    className="text-xs mt-0.5"
+                    style={{ color: "var(--text-muted)" }}
+                  >
                     {opt.desc}
                   </p>
                 </div>
                 <div
                   className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                   style={{
-                    background: selected ? "var(--accent)" : "var(--bg-elevated)",
+                    background: selected
+                      ? "var(--accent)"
+                      : "var(--bg-elevated)",
                     border: selected ? "none" : "1px solid var(--border)",
                   }}
                 >
@@ -157,8 +168,7 @@ export default function StepObjectif({ data, update, onNext, onBack }: Props) {
 
       <button
         onClick={onNext}
-        className="w-full py-4 mt-6 text-base font-semibold transition-transform active:scale-95"
-        style={{ background: "var(--accent)", color: "#fff", borderRadius: 12 }}
+        className="btn-accent w-full py-4 mt-6 text-base font-semibold rounded-xl transition-transform active:scale-95"
       >
         Continuer →
       </button>

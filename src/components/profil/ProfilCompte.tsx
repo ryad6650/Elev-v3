@@ -26,16 +26,27 @@ export default function ProfilCompte() {
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPwError(null);
-    if (newPw.length < 8) { setPwError("Minimum 8 caractères"); return; }
-    if (newPw !== confirmPw) { setPwError("Les mots de passe ne correspondent pas"); return; }
+    if (newPw.length < 8) {
+      setPwError("Minimum 8 caractères");
+      return;
+    }
+    if (newPw !== confirmPw) {
+      setPwError("Les mots de passe ne correspondent pas");
+      return;
+    }
     startTransition(async () => {
       const result = await updatePassword(currentPw, newPw);
       if (result.error) {
         setPwError(result.error);
       } else {
         setPwSuccess(true);
-        setCurrentPw(""); setNewPw(""); setConfirmPw("");
-        setTimeout(() => { setPwSuccess(false); setShowPwForm(false); }, 2000);
+        setCurrentPw("");
+        setNewPw("");
+        setConfirmPw("");
+        setTimeout(() => {
+          setPwSuccess(false);
+          setShowPwForm(false);
+        }, 2000);
       }
     });
   }
@@ -54,7 +65,10 @@ export default function ProfilCompte() {
   return (
     <section
       className="rounded-2xl mb-4 overflow-hidden"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+      }}
     >
       <h2
         className="text-xs font-semibold tracking-widest uppercase px-5 pt-5 pb-3"
@@ -71,7 +85,10 @@ export default function ProfilCompte() {
       >
         <div className="flex items-center gap-3">
           <KeyRound size={18} style={{ color: "var(--accent)" }} />
-          <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+          <span
+            className="text-sm font-medium"
+            style={{ color: "var(--text-primary)" }}
+          >
             Modifier le mot de passe
           </span>
         </div>
@@ -86,14 +103,28 @@ export default function ProfilCompte() {
       </button>
 
       {showPwForm && (
-        <form onSubmit={handlePasswordSubmit} className="px-5 pb-4 flex flex-col gap-3">
+        <form
+          onSubmit={handlePasswordSubmit}
+          className="px-5 pb-4 flex flex-col gap-3"
+        >
           {[
-            { label: "Mot de passe actuel", value: currentPw, setter: setCurrentPw },
+            {
+              label: "Mot de passe actuel",
+              value: currentPw,
+              setter: setCurrentPw,
+            },
             { label: "Nouveau mot de passe", value: newPw, setter: setNewPw },
-            { label: "Confirmer le nouveau", value: confirmPw, setter: setConfirmPw },
+            {
+              label: "Confirmer le nouveau",
+              value: confirmPw,
+              setter: setConfirmPw,
+            },
           ].map(({ label, value, setter }) => (
             <div key={label}>
-              <label className="block text-xs mb-1.5 font-medium" style={{ color: "var(--text-secondary)" }}>
+              <label
+                className="block text-xs mb-1.5 font-medium"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {label}
               </label>
               <input
@@ -105,14 +136,30 @@ export default function ProfilCompte() {
               />
             </div>
           ))}
-          {pwError && <p className="text-sm" style={{ color: "var(--danger)" }}>{pwError}</p>}
+          {pwError && (
+            <p className="text-sm" style={{ color: "var(--danger)" }}>
+              {pwError}
+            </p>
+          )}
           <button
             type="submit"
             disabled={isPending}
-            className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
-            style={{ background: pwSuccess ? "var(--success)" : "var(--accent)", color: "#fff" }}
+            className={`${pwSuccess ? "" : "btn-accent"} flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50`}
+            style={
+              pwSuccess
+                ? { background: "var(--success)", color: "#fff" }
+                : undefined
+            }
           >
-            {pwSuccess ? <><Check size={16} /> Modifié</> : isPending ? "Vérification…" : "Changer le mot de passe"}
+            {pwSuccess ? (
+              <>
+                <Check size={16} /> Modifié
+              </>
+            ) : isPending ? (
+              "Vérification…"
+            ) : (
+              "Changer le mot de passe"
+            )}
           </button>
         </form>
       )}
@@ -125,7 +172,10 @@ export default function ProfilCompte() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <LogOut size={18} style={{ color: "var(--danger)" }} />
-          <span className="text-sm font-medium" style={{ color: "var(--danger)" }}>
+          <span
+            className="text-sm font-medium"
+            style={{ color: "var(--danger)" }}
+          >
             Se déconnecter
           </span>
         </button>
@@ -141,7 +191,10 @@ export default function ProfilCompte() {
             <button
               onClick={() => setShowLogoutConfirm(false)}
               className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: "var(--bg-elevated)", color: "var(--text-primary)" }}
+              style={{
+                background: "var(--bg-elevated)",
+                color: "var(--text-primary)",
+              }}
             >
               Annuler
             </button>

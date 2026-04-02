@@ -21,7 +21,12 @@ interface ScrollPickerProps {
   label: string;
 }
 
-function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerProps) {
+function ScrollPicker({
+  items,
+  selectedIndex,
+  onChange,
+  label,
+}: ScrollPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const touchStartIndex = useRef(selectedIndex);
@@ -61,7 +66,8 @@ function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerPro
     const maxOffset = (items.length - 1) * ITEM_HEIGHT;
     let offset = rawOffset;
     if (rawOffset < 0) offset = rawOffset * 0.25;
-    if (rawOffset > maxOffset) offset = maxOffset + (rawOffset - maxOffset) * 0.25;
+    if (rawOffset > maxOffset)
+      offset = maxOffset + (rawOffset - maxOffset) * 0.25;
     const el = containerRef.current;
     if (el) el.style.transform = `translateY(${-offset}px)`;
     currentOffset.current = offset;
@@ -86,7 +92,10 @@ function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerPro
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+      <span
+        className="text-[10px] font-semibold uppercase tracking-wider"
+        style={{ color: "var(--text-muted)" }}
+      >
         {label}
       </span>
 
@@ -112,15 +121,26 @@ function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerPro
         {/* Dégradés */}
         <div
           className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-          style={{ height: topPad, background: "linear-gradient(to bottom, var(--bg-card), transparent)" }}
+          style={{
+            height: topPad,
+            background:
+              "linear-gradient(to bottom, var(--bg-card), transparent)",
+          }}
         />
         <div
           className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-          style={{ height: topPad, background: "linear-gradient(to top, var(--bg-card), transparent)" }}
+          style={{
+            height: topPad,
+            background: "linear-gradient(to top, var(--bg-card), transparent)",
+          }}
         />
 
         {/* Items */}
-        <div ref={containerRef} className="absolute inset-x-0" style={{ top: topPad }}>
+        <div
+          ref={containerRef}
+          className="absolute inset-x-0"
+          style={{ top: topPad }}
+        >
           {items.map((item, i) => {
             const isSelected = i === selectedIndex;
             return (
@@ -130,11 +150,16 @@ function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerPro
                 style={{
                   height: ITEM_HEIGHT,
                   fontSize: isSelected ? 30 : 20,
-                  color: isSelected ? "var(--accent-text)" : "var(--text-muted)",
+                  color: isSelected
+                    ? "var(--accent-text)"
+                    : "var(--text-muted)",
                   transition: "font-size 150ms, color 150ms",
                   cursor: "pointer",
                 }}
-                onClick={() => { onChange(i); scrollTo(i); }}
+                onClick={() => {
+                  onChange(i);
+                  scrollTo(i);
+                }}
               >
                 {item}
               </div>
@@ -147,9 +172,16 @@ function ScrollPicker({ items, selectedIndex, onChange, label }: ScrollPickerPro
 }
 
 const HEURES_ITEMS = Array.from({ length: 13 }, (_, i) => String(i));
-const MINUTES_ITEMS = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES_ITEMS = Array.from({ length: 60 }, (_, i) =>
+  String(i).padStart(2, "0"),
+);
 
-export default function SleepModal({ date, initialMinutes, onClose, onSaved }: Props) {
+export default function SleepModal({
+  date,
+  initialMinutes,
+  onClose,
+  onSaved,
+}: Props) {
   const initH = initialMinutes != null ? Math.floor(initialMinutes / 60) : 7;
   const initM = initialMinutes != null ? initialMinutes % 60 : 30;
 
@@ -203,7 +235,11 @@ export default function SleepModal({ date, initialMinutes, onClose, onSaved }: P
           <div className="flex items-center justify-between mb-1">
             <h2
               className="text-lg font-bold"
-              style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "var(--text-primary)" }}
+              style={{
+                fontFamily: "var(--font-dm-serif)",
+                fontStyle: "italic",
+                color: "var(--text-primary)",
+              }}
             >
               Sommeil de la nuit
             </h2>
@@ -242,17 +278,26 @@ export default function SleepModal({ date, initialMinutes, onClose, onSaved }: P
           </div>
 
           {error && (
-            <p className="text-xs mb-3 text-center" style={{ color: "var(--danger)" }}>{error}</p>
+            <p
+              className="text-xs mb-3 text-center"
+              style={{ color: "var(--danger)" }}
+            >
+              {error}
+            </p>
           )}
 
           <button
             onClick={handleSave}
             disabled={isPending || totalMinutes === 0}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95"
-            style={{
-              background: isPending || totalMinutes === 0 ? "var(--bg-elevated)" : "var(--accent)",
-              color: isPending || totalMinutes === 0 ? "var(--text-muted)" : "#fff",
-            }}
+            className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${isPending || totalMinutes === 0 ? "" : "btn-accent"}`}
+            style={
+              isPending || totalMinutes === 0
+                ? {
+                    background: "var(--bg-elevated)",
+                    color: "var(--text-muted)",
+                  }
+                : undefined
+            }
           >
             {isPending ? "Sauvegarde…" : "Enregistrer"}
           </button>

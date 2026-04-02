@@ -130,10 +130,8 @@ export default function PoidsHero({
         <button
           onClick={handleSave}
           disabled={isPending || !value}
-          className="active:scale-95 transition-transform font-bold whitespace-nowrap"
+          className="btn-accent active:scale-95 transition-transform font-bold whitespace-nowrap"
           style={{
-            background: "var(--accent)",
-            color: "#fff",
             border: "none",
             borderRadius: 10,
             padding: "10px 20px",

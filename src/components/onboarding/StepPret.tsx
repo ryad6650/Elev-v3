@@ -38,9 +38,7 @@ export default function StepPret({ data, onBack }: Props) {
       router.push("/dashboard");
     } catch (err) {
       setIsPending(false);
-      setError(
-        err instanceof Error ? err.message : "Une erreur est survenue."
-      );
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     }
   };
 
@@ -57,7 +55,11 @@ export default function StepPret({ data, onBack }: Props) {
       <button
         onClick={onBack}
         className="text-2xl mb-8 -ml-1 self-start"
-        style={{ color: "var(--text-muted)", background: "none", border: "none" }}
+        style={{
+          color: "var(--text-muted)",
+          background: "none",
+          border: "none",
+        }}
       >
         ←
       </button>
@@ -113,12 +115,15 @@ export default function StepPret({ data, onBack }: Props) {
       <button
         onClick={handleSubmit}
         disabled={isPending}
-        className="w-full py-4 mt-6 text-base font-semibold transition-all active:scale-95"
-        style={{
-          background: isPending ? "var(--bg-elevated)" : "var(--accent)",
-          color: isPending ? "var(--text-muted)" : "#fff",
-          borderRadius: 12,
-        }}
+        className={`w-full py-4 mt-6 text-base font-semibold rounded-xl transition-all active:scale-95 ${isPending ? "" : "btn-accent"}`}
+        style={
+          isPending
+            ? {
+                background: "var(--bg-elevated)",
+                color: "var(--text-muted)",
+              }
+            : undefined
+        }
       >
         {isPending ? "Enregistrement…" : "Commencer Élev →"}
       </button>

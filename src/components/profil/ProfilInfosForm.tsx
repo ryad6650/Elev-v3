@@ -46,13 +46,25 @@ export default function ProfilInfosForm({ profil }: Props) {
   };
 
   return (
-    <section className="rounded-2xl p-5 mb-4" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}>
-      <h2 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "var(--text-muted)" }}>
+    <section
+      className="rounded-2xl p-5 mb-4"
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <h2
+        className="text-xs font-semibold tracking-widest uppercase mb-4"
+        style={{ color: "var(--text-muted)" }}
+      >
         Mes informations
       </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div>
-          <label className="block text-sm mb-1.5 font-medium" style={{ color: "var(--text-secondary)" }}>
+          <label
+            className="block text-sm mb-1.5 font-medium"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Prénom
           </label>
           <input
@@ -64,7 +76,10 @@ export default function ProfilInfosForm({ profil }: Props) {
           />
         </div>
         <div>
-          <label className="block text-sm mb-1.5 font-medium" style={{ color: "var(--text-secondary)" }}>
+          <label
+            className="block text-sm mb-1.5 font-medium"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Taille (cm)
           </label>
           <input
@@ -77,14 +92,30 @@ export default function ProfilInfosForm({ profil }: Props) {
             style={inputStyle}
           />
         </div>
-        {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
+        {error && (
+          <p className="text-sm" style={{ color: "var(--danger)" }}>
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={isPending}
-          className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 mt-1"
-          style={{ background: success ? "var(--success)" : "var(--accent)", color: "#fff" }}
+          className={`${success ? "" : "btn-accent"} flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 mt-1`}
+          style={
+            success
+              ? { background: "var(--success)", color: "#fff" }
+              : undefined
+          }
         >
-          {success ? <><Check size={16} /> Enregistré</> : isPending ? "Enregistrement…" : "Enregistrer"}
+          {success ? (
+            <>
+              <Check size={16} /> Enregistré
+            </>
+          ) : isPending ? (
+            "Enregistrement…"
+          ) : (
+            "Enregistrer"
+          )}
         </button>
       </form>
     </section>

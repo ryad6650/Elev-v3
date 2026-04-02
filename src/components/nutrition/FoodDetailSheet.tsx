@@ -512,30 +512,30 @@ export default function FoodDetailSheet({
             <div className="flex flex-col w-full gap-1.5">
               <button
                 onClick={() => switchMode("g")}
-                className="w-full py-2.5 rounded-xl text-xs font-semibold transition-colors"
-                style={{
-                  background:
-                    mode === "g" ? "var(--accent)" : "var(--bg-elevated)",
-                  color: mode === "g" ? "white" : "var(--text-muted)",
-                  border: mode === "g" ? "none" : "1px solid var(--border)",
-                }}
+                className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors ${mode === "g" ? "btn-accent" : ""}`}
+                style={
+                  mode === "g"
+                    ? undefined
+                    : {
+                        background: "var(--bg-elevated)",
+                        color: "var(--text-muted)",
+                        border: "1px solid var(--border)",
+                      }
+                }
               >
                 Grammes
               </button>
               <button
                 onClick={() => hasPortion && switchMode("portion")}
-                className="w-full py-2.5 rounded-xl text-xs font-semibold transition-colors"
+                className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors ${mode === "portion" ? "btn-accent" : ""}`}
                 style={{
-                  background:
-                    mode === "portion" ? "var(--accent)" : "var(--bg-elevated)",
-                  color:
-                    mode === "portion"
-                      ? "white"
-                      : hasPortion
-                        ? "var(--text-muted)"
-                        : "var(--text-muted)",
-                  border:
-                    mode === "portion" ? "none" : "1px solid var(--border)",
+                  ...(mode === "portion"
+                    ? {}
+                    : {
+                        background: "var(--bg-elevated)",
+                        color: "var(--text-muted)",
+                        border: "1px solid var(--border)",
+                      }),
                   opacity: hasPortion ? 1 : 0.4,
                   cursor: hasPortion ? "pointer" : "default",
                 }}
@@ -551,9 +551,8 @@ export default function FoodDetailSheet({
         <button
           onClick={() => onConfirm(qty)}
           disabled={pending}
-          className="w-full py-4 rounded-2xl font-bold text-white text-sm transition-opacity"
+          className="btn-accent w-full py-4 rounded-2xl font-bold text-sm transition-opacity"
           style={{
-            background: "var(--accent)",
             opacity: pending ? 0.6 : 1,
             boxShadow: "0 4px 20px rgba(232,134,12,0.3)",
           }}

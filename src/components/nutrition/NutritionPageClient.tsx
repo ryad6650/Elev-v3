@@ -219,11 +219,8 @@ export default function NutritionPageClient() {
 
         <button
           onClick={handleCreateMeal}
-          className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-semibold text-white text-sm mt-1 transition-all active:scale-[0.97]"
-          style={{
-            background: "var(--accent)",
-            boxShadow: "0 4px 20px rgba(232,134,12,0.3)",
-          }}
+          className="btn-accent w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-semibold text-sm mt-1 transition-all active:scale-[0.97]"
+          style={{ boxShadow: "0 4px 20px rgba(232,134,12,0.3)" }}
         >
           <div
             className="w-6 h-6 rounded-full flex items-center justify-center"

@@ -228,8 +228,8 @@ export default function CustomFoodForm({
       <button
         onClick={handleSubmit}
         disabled={disabled}
-        className="w-full py-3 rounded-xl font-semibold text-white mt-2 transition-opacity"
-        style={{ background: "var(--accent)", opacity: disabled ? 0.5 : 1 }}
+        className="btn-accent w-full py-3 rounded-xl font-semibold mt-2 transition-opacity"
+        style={{ opacity: disabled ? 0.5 : 1 }}
       >
         {buttonLabel()}
       </button>

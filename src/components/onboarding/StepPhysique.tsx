@@ -65,7 +65,11 @@ export default function StepPhysique({ data, update, onNext, onBack }: Props) {
       <button
         onClick={onBack}
         className="text-2xl mb-8 -ml-1 self-start"
-        style={{ color: "var(--text-muted)", background: "none", border: "none" }}
+        style={{
+          color: "var(--text-muted)",
+          background: "none",
+          border: "none",
+        }}
       >
         ←
       </button>
@@ -107,8 +111,7 @@ export default function StepPhysique({ data, update, onNext, onBack }: Props) {
 
       <button
         onClick={onNext}
-        className="w-full py-4 text-base font-semibold transition-transform active:scale-95"
-        style={{ background: "var(--accent)", color: "#fff", borderRadius: 12 }}
+        className="btn-accent w-full py-4 text-base font-semibold rounded-xl transition-transform active:scale-95"
       >
         Continuer →
       </button>

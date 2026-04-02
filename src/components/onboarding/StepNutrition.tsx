@@ -26,7 +26,10 @@ function MacroRow({
         className="w-2.5 h-2.5 rounded-full flex-shrink-0"
         style={{ background: color }}
       />
-      <span className="flex-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+      <span
+        className="flex-1 text-sm"
+        style={{ color: "var(--text-secondary)" }}
+      >
         {label}
       </span>
       <div className="flex items-center gap-1.5">
@@ -34,7 +37,9 @@ function MacroRow({
           type="number"
           inputMode="numeric"
           value={value ?? ""}
-          onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
+          onChange={(e) =>
+            onChange(e.target.value ? Number(e.target.value) : null)
+          }
           className="w-20 text-right text-sm font-semibold outline-none rounded-lg px-2 py-2"
           style={{
             background: "var(--bg-elevated)",
@@ -56,7 +61,11 @@ export default function StepNutrition({ data, update, onNext, onBack }: Props) {
       <button
         onClick={onBack}
         className="text-2xl mb-8 -ml-1 self-start"
-        style={{ color: "var(--text-muted)", background: "none", border: "none" }}
+        style={{
+          color: "var(--text-muted)",
+          background: "none",
+          border: "none",
+        }}
       >
         ←
       </button>
@@ -148,8 +157,7 @@ export default function StepNutrition({ data, update, onNext, onBack }: Props) {
 
       <button
         onClick={onNext}
-        className="w-full py-4 mt-6 text-base font-semibold transition-transform active:scale-95"
-        style={{ background: "var(--accent)", color: "#fff", borderRadius: 12 }}
+        className="btn-accent w-full py-4 mt-6 text-base font-semibold rounded-xl transition-transform active:scale-95"
       >
         Continuer →
       </button>

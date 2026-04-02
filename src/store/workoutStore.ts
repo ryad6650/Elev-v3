@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface WorkoutSet {
   id: string;
@@ -10,7 +10,7 @@ export interface WorkoutSet {
   repsCible: number;
   repsCibleMax: number | null; // null = chiffre unique, sinon max de la fourchette
   poidsRef: number | null; // poids de la dernière séance
-  repsRef: number | null;  // reps de la dernière séance
+  repsRef: number | null; // reps de la dernière séance
   isWarmup: boolean;
 }
 
@@ -38,20 +38,32 @@ export interface ActiveWorkout {
 
 interface WorkoutStore {
   activeWorkout: ActiveWorkout | null;
+  isMinimized: boolean;
   restTimer: { active: boolean; endAt: number; duration: number } | null;
   restDuration: number; // secondes
 
   startWorkout: (params: {
     routineId?: string | null;
     routineName?: string | null;
-    exercises?: Omit<WorkoutExercise, 'uid' | 'sets'>[];
+    exercises?: Omit<WorkoutExercise, "uid" | "sets">[];
   }) => void;
-  addExercise: (exercise: Omit<WorkoutExercise, 'uid' | 'sets'>) => void;
+  minimizeWorkout: () => void;
+  maximizeWorkout: () => void;
+  addExercise: (exercise: Omit<WorkoutExercise, "uid" | "sets">) => void;
   removeExercise: (uid: string) => void;
+  replaceExercise: (
+    uid: string,
+    newExercise: Omit<WorkoutExercise, "uid" | "sets" | "ordre">,
+  ) => void;
   addSet: (uid: string) => void;
   addWarmupSets: (uid: string) => void;
   removeSet: (uid: string, setId: string) => void;
-  updateSet: (uid: string, setId: string, field: 'reps' | 'poids', value: number | null) => void;
+  updateSet: (
+    uid: string,
+    setId: string,
+    field: "reps" | "poids",
+    value: number | null,
+  ) => void;
   toggleComplete: (uid: string, setId: string) => void;
   startRestTimer: () => void;
   dismissRestTimer: () => void;
@@ -60,7 +72,11 @@ interface WorkoutStore {
   clearWorkout: () => void;
 }
 
-function buildSets(seriesCible: number, repsCible: number, repsCibleMax: number | null = null): WorkoutSet[] {
+function buildSets(
+  seriesCible: number,
+  repsCible: number,
+  repsCibleMax: number | null = null,
+): WorkoutSet[] {
   return Array.from({ length: seriesCible }, (_, i) => ({
     id: crypto.randomUUID(),
     numSerie: i + 1,
@@ -79,10 +95,18 @@ export const useWorkoutStore = create<WorkoutStore>()(
   persist(
     (set, get) => ({
       activeWorkout: null,
+      isMinimized: false,
       restTimer: null,
       restDuration: 90,
 
-      startWorkout: ({ routineId = null, routineName = null, exercises = [] }) => {
+      minimizeWorkout: () => set({ isMinimized: true }),
+      maximizeWorkout: () => set({ isMinimized: false }),
+
+      startWorkout: ({
+        routineId = null,
+        routineName = null,
+        exercises = [],
+      }) => {
         const builtExercises: WorkoutExercise[] = exercises.map((e, i) => ({
           ...e,
           uid: crypto.randomUUID(),
@@ -97,6 +121,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
             debutAt: Date.now(),
             exercises: builtExercises,
           },
+          isMinimized: false,
         });
       },
 
@@ -107,9 +132,18 @@ export const useWorkoutStore = create<WorkoutStore>()(
           ...exercise,
           uid: crypto.randomUUID(),
           ordre: activeWorkout.exercises.length,
-          sets: buildSets(exercise.seriesCible, exercise.repsCible, exercise.repsCibleMax ?? null),
+          sets: buildSets(
+            exercise.seriesCible,
+            exercise.repsCible,
+            exercise.repsCibleMax ?? null,
+          ),
         };
-        set({ activeWorkout: { ...activeWorkout, exercises: [...activeWorkout.exercises, newEx] } });
+        set({
+          activeWorkout: {
+            ...activeWorkout,
+            exercises: [...activeWorkout.exercises, newEx],
+          },
+        });
       },
 
       removeExercise: (uid) => {
@@ -119,6 +153,36 @@ export const useWorkoutStore = create<WorkoutStore>()(
           activeWorkout: {
             ...activeWorkout,
             exercises: activeWorkout.exercises.filter((e) => e.uid !== uid),
+          },
+        });
+      },
+
+      replaceExercise: (uid, newExercise) => {
+        const { activeWorkout } = get();
+        if (!activeWorkout) return;
+        set({
+          activeWorkout: {
+            ...activeWorkout,
+            exercises: activeWorkout.exercises.map((e) => {
+              if (e.uid !== uid) return e;
+              return {
+                ...e,
+                exerciseId: newExercise.exerciseId,
+                nom: newExercise.nom,
+                groupeMusculaire: newExercise.groupeMusculaire,
+                gifUrl: newExercise.gifUrl,
+                seriesCible: newExercise.seriesCible,
+                repsCible: newExercise.repsCible,
+                repsCibleMax: newExercise.repsCibleMax,
+                restDuration: newExercise.restDuration,
+                sets: e.sets.map((s) => ({
+                  ...s,
+                  completed: false,
+                  poidsRef: null,
+                  repsRef: null,
+                })),
+              };
+            }),
           },
         });
       },
@@ -163,7 +227,8 @@ export const useWorkoutStore = create<WorkoutStore>()(
               if (e.sets.some((s) => s.isWarmup)) {
                 return { ...e, sets: workingSets };
               }
-              const refPoids = workingSets[0]?.poids ?? workingSets[0]?.poidsRef ?? 0;
+              const refPoids =
+                workingSets[0]?.poids ?? workingSets[0]?.poidsRef ?? 0;
               const warmupDefs = [
                 { pct: 0.5, reps: 8 },
                 { pct: 0.75, reps: 5 },
@@ -197,7 +262,8 @@ export const useWorkoutStore = create<WorkoutStore>()(
               if (e.uid !== uid) return e;
               const filtered = e.sets.filter((s) => s.id !== setId);
               // Renuméroter warmup et working indépendamment
-              let wIdx = 0; let wkIdx = 0;
+              let wIdx = 0;
+              let wkIdx = 0;
               return {
                 ...e,
                 sets: filtered.map((s) => ({
@@ -219,10 +285,13 @@ export const useWorkoutStore = create<WorkoutStore>()(
             ...activeWorkout,
             exercises: activeWorkout.exercises.map((e) => {
               if (e.uid !== uid) return e;
-              const updatedSets = e.sets.map((s) => (s.id === setId ? { ...s, [field]: value } : s));
+              const updatedSets = e.sets.map((s) =>
+                s.id === setId ? { ...s, [field]: value } : s,
+              );
               // Recalcul réactif des poids warmup si on modifie le poids de la 1ère vraie série
               const firstWorking = updatedSets.find((s) => !s.isWarmup);
-              const isFirstWorking = firstWorking?.id === setId && field === 'poids';
+              const isFirstWorking =
+                firstWorking?.id === setId && field === "poids";
               if (isFirstWorking && updatedSets.some((s) => s.isWarmup)) {
                 const ref = (value as number | null) ?? 0;
                 let wIdx = 0;
@@ -230,8 +299,13 @@ export const useWorkoutStore = create<WorkoutStore>()(
                   ...e,
                   sets: updatedSets.map((s) =>
                     s.isWarmup
-                      ? { ...s, poids: ref ? Math.round(ref * warmupPcts[wIdx++] * 2) / 2 : s.poids }
-                      : s
+                      ? {
+                          ...s,
+                          poids: ref
+                            ? Math.round(ref * warmupPcts[wIdx++] * 2) / 2
+                            : s.poids,
+                        }
+                      : s,
                   ),
                 };
               }
@@ -260,13 +334,25 @@ export const useWorkoutStore = create<WorkoutStore>()(
         });
         set({ activeWorkout: { ...activeWorkout, exercises: updated } });
         if (justCompleted && exerciseRest != null && exerciseRest > 0) {
-          set({ restTimer: { active: true, endAt: Date.now() + exerciseRest * 1000, duration: exerciseRest } });
+          set({
+            restTimer: {
+              active: true,
+              endAt: Date.now() + exerciseRest * 1000,
+              duration: exerciseRest,
+            },
+          });
         }
       },
 
       startRestTimer: () => {
         const { restDuration } = get();
-        set({ restTimer: { active: true, endAt: Date.now() + restDuration * 1000, duration: restDuration } });
+        set({
+          restTimer: {
+            active: true,
+            endAt: Date.now() + restDuration * 1000,
+            duration: restDuration,
+          },
+        });
       },
 
       dismissRestTimer: () => set({ restTimer: null }),
@@ -278,16 +364,20 @@ export const useWorkoutStore = create<WorkoutStore>()(
           activeWorkout: {
             ...activeWorkout,
             exercises: activeWorkout.exercises.map((e) =>
-              e.uid === uid ? { ...e, restDuration: duration } : e
+              e.uid === uid ? { ...e, restDuration: duration } : e,
             ),
           },
         });
       },
-      clearWorkout: () => set({ activeWorkout: null, restTimer: null }),
+      clearWorkout: () =>
+        set({ activeWorkout: null, isMinimized: false, restTimer: null }),
     }),
     {
-      name: 'elev-workout',
-      partialize: (state) => ({ activeWorkout: state.activeWorkout, restDuration: state.restDuration }),
-    }
-  )
+      name: "elev-workout",
+      partialize: (state) => ({
+        activeWorkout: state.activeWorkout,
+        restDuration: state.restDuration,
+      }),
+    },
+  ),
 );

@@ -75,8 +75,7 @@ export default function StepBienvenue({ data, update, onNext }: Props) {
 
       <button
         onClick={handleNext}
-        className="w-full py-4 text-base font-semibold rounded-xl transition-transform active:scale-95"
-        style={{ background: "var(--accent)", color: "#fff", borderRadius: 12 }}
+        className="btn-accent w-full py-4 text-base font-semibold rounded-xl transition-transform active:scale-95"
       >
         Continuer →
       </button>

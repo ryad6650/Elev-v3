@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
+import { getUserExerciseRests } from "@/app/actions/workout";
 import ExerciseCard from "./ExerciseCard";
 import ExerciseSearch from "./ExerciseSearch";
 import WorkoutTimer from "./WorkoutTimer";
@@ -17,10 +18,11 @@ interface PRNotif {
 
 export default function ActiveWorkout() {
   const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
-  const clearWorkout = useWorkoutStore((s) => s.clearWorkout);
+  const minimizeWorkout = useWorkoutStore((s) => s.minimizeWorkout);
+  const replaceExercise = useWorkoutStore((s) => s.replaceExercise);
   const [showSearch, setShowSearch] = useState(false);
+  const [replacingUid, setReplacingUid] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-  const [showCancel, setShowCancel] = useState(false);
   const [pausedAt, setPausedAt] = useState<number | null>(null);
   const [totalPausedMs, setTotalPausedMs] = useState(0);
   const [prNotif, setPrNotif] = useState<PRNotif | null>(null);
@@ -57,7 +59,7 @@ export default function ActiveWorkout() {
           {/* Titre */}
           <div className="flex items-start gap-2 mb-3">
             <button
-              onClick={() => setShowCancel(true)}
+              onClick={minimizeWorkout}
               className="p-1 rounded-lg mt-1.5 shrink-0"
               style={{ color: "var(--text-muted)" }}
             >
@@ -142,14 +144,13 @@ export default function ActiveWorkout() {
               </p>
               <button
                 onClick={() => setShowSearch(true)}
-                className="px-6 py-3 rounded-2xl text-sm font-semibold"
-                style={{ background: "var(--accent)", color: "white" }}
+                className="btn-accent px-6 py-3 rounded-2xl text-sm font-semibold"
               >
                 Ajouter un exercice
               </button>
             </div>
           )}
-          {activeWorkout.exercises.map((ex, idx) => (
+          {activeWorkout.exercises.map((ex) => (
             <ExerciseCard
               key={ex.uid}
               exercise={ex}
@@ -158,6 +159,10 @@ export default function ActiveWorkout() {
               onPR={(name, poids, reps) =>
                 setPrNotif({ exerciseName: name, poids, reps })
               }
+              onReplace={() => {
+                setReplacingUid(ex.uid);
+                setShowSearch(true);
+              }}
             />
           ))}
         </div>
@@ -167,8 +172,7 @@ export default function ActiveWorkout() {
           <div className="fixed bottom-24 right-4 z-20">
             <button
               onClick={() => setShowSearch(true)}
-              className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl"
-              style={{ background: "var(--accent)", color: "white" }}
+              className="btn-accent w-14 h-14 rounded-full flex items-center justify-center shadow-xl"
             >
               <Plus size={24} />
             </button>
@@ -212,56 +216,35 @@ export default function ActiveWorkout() {
         )}
       </div>
 
-      {showSearch && <ExerciseSearch onClose={() => setShowSearch(false)} />}
-      <RestTimer />
-
-      {/* Confirmation abandon */}
-      {showCancel && (
-        <div
-          className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex items-end justify-center pb-8 px-4"
-          style={{ background: "rgba(0,0,0,0.7)" }}
-          onClick={() => setShowCancel(false)}
-        >
-          <div
-            className="w-full max-w-sm p-6 rounded-2xl space-y-4"
-            style={{ background: "var(--bg-card)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p
-              className="font-semibold"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Abandonner la séance ?
-            </p>
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Les données non enregistrées seront perdues.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowCancel(false)}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold border"
-                style={{
-                  background: "var(--bg-elevated)",
-                  color: "var(--text-primary)",
-                  borderColor: "var(--border)",
-                }}
-              >
-                Continuer
-              </button>
-              <button
-                onClick={() => {
-                  clearWorkout();
-                  setShowCancel(false);
-                }}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold"
-                style={{ background: "var(--danger)", color: "white" }}
-              >
-                Abandonner
-              </button>
-            </div>
-          </div>
-        </div>
+      {showSearch && (
+        <ExerciseSearch
+          onClose={() => {
+            setShowSearch(false);
+            setReplacingUid(null);
+          }}
+          title={replacingUid ? "Remplacer l'exercice" : "Ajouter un exercice"}
+          onSelect={
+            replacingUid
+              ? async (ex) => {
+                  const restMap = await getUserExerciseRests([ex.id]);
+                  replaceExercise(replacingUid, {
+                    exerciseId: ex.id,
+                    nom: ex.nom,
+                    groupeMusculaire: ex.groupe_musculaire,
+                    gifUrl: ex.gif_url,
+                    seriesCible: 3,
+                    repsCible: 10,
+                    repsCibleMax: null,
+                    restDuration: restMap[ex.id] ?? null,
+                  });
+                  setShowSearch(false);
+                  setReplacingUid(null);
+                }
+              : undefined
+          }
+        />
       )}
+      <RestTimer />
     </>
   );
 }
