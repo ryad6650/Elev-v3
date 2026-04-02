@@ -8,6 +8,7 @@ import type { PoidsEntry } from "@/lib/poids";
 interface Props {
   entries: PoidsEntry[];
   onEdit: (entry: PoidsEntry) => void;
+  onDeleted?: () => void;
 }
 
 function formatDate(dateStr: string): string {
@@ -21,9 +22,11 @@ function formatDate(dateStr: string): string {
 function HistoriqueRow({
   entry,
   onEdit,
+  onDeleted,
 }: {
   entry: PoidsEntry;
   onEdit: () => void;
+  onDeleted?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -31,6 +34,7 @@ function HistoriqueRow({
     if (!confirm("Supprimer cette entrée ?")) return;
     startTransition(async () => {
       await deletePoids(entry.id);
+      onDeleted?.();
     });
   };
 
@@ -75,7 +79,7 @@ function HistoriqueRow({
   );
 }
 
-export default function PoidsHistorique({ entries, onEdit }: Props) {
+export default function PoidsHistorique({ entries, onEdit, onDeleted }: Props) {
   const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
 
   if (sorted.length === 0) return null;
@@ -83,7 +87,10 @@ export default function PoidsHistorique({ entries, onEdit }: Props) {
   return (
     <div
       className="rounded-2xl p-5 mb-4"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+      }}
     >
       <p
         className="text-xs font-semibold uppercase tracking-wider mb-1"
@@ -96,6 +103,7 @@ export default function PoidsHistorique({ entries, onEdit }: Props) {
           key={entry.id}
           entry={entry}
           onEdit={() => onEdit(entry)}
+          onDeleted={onDeleted}
         />
       ))}
     </div>

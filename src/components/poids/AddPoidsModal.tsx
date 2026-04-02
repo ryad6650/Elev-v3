@@ -8,12 +8,14 @@ interface Props {
   defaultDate?: string;
   defaultPoids?: number;
   onClose: () => void;
+  onSaved?: () => void;
 }
 
 export default function AddPoidsModal({
   defaultDate,
   defaultPoids,
   onClose,
+  onSaved,
 }: Props) {
   const today = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(defaultDate ?? today);
@@ -31,6 +33,7 @@ export default function AddPoidsModal({
     startTransition(async () => {
       try {
         await upsertPoids(date, val);
+        onSaved?.();
         onClose();
       } catch {
         setError("Erreur lors de la sauvegarde");

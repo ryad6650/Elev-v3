@@ -6,9 +6,14 @@ import { upsertPoids } from "@/app/actions/poids";
 interface Props {
   poidsActuel: number | null;
   poidsVeille: number | null;
+  onSaved?: () => void;
 }
 
-export default function PoidsHero({ poidsActuel, poidsVeille }: Props) {
+export default function PoidsHero({
+  poidsActuel,
+  poidsVeille,
+  onSaved,
+}: Props) {
   const today = new Date().toISOString().split("T")[0];
   const [value, setValue] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -29,13 +34,17 @@ export default function PoidsHero({ poidsActuel, poidsVeille }: Props) {
     startTransition(async () => {
       await upsertPoids(today, num);
       setValue("");
+      onSaved?.();
     });
   };
 
   return (
     <div
       className="rounded-2xl p-5 mb-3"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+      }}
     >
       {/* Affichage poids actuel */}
       <div className="flex items-end gap-2 mb-3.5">
@@ -89,7 +98,10 @@ export default function PoidsHero({ poidsActuel, poidsVeille }: Props) {
             max="300"
             placeholder={poidsActuel ? String(poidsActuel) : "0.0"}
             value={value}
-            onChange={(e) => { setValue(e.target.value); setError(""); }}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setError("");
+            }}
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
             className="w-full outline-none"
             style={{

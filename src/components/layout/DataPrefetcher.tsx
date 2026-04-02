@@ -13,55 +13,50 @@ import { fetchHistoriqueData } from "@/lib/historique";
 import { fetchProfilData } from "@/lib/profil";
 
 /**
- * Prefetch toutes les données des onglets en arrière-plan au chargement de l'app.
- * Utilise requestIdleCallback pour ne pas bloquer le rendu initial.
+ * Prefetch toutes les données des onglets en parallèle dès le montage.
+ * Lancé immédiatement (pas de requestIdleCallback) pour que les données
+ * soient prêtes avant le premier clic sur un onglet.
  */
 export default function DataPrefetcher() {
   useEffect(() => {
-    const prefetch = () => {
-      const supabase = createClient();
-      const today = getTodayString();
+    const supabase = createClient();
+    const today = getTodayString();
 
-      // Prefetch seulement les onglets pas encore en cache
-      if (!getCached("dashboard")) {
-        fetchDashboardData(supabase)
-          .then((d) => setCache("dashboard", d))
-          .catch(() => {});
-      }
-      if (!getCached("workout")) {
-        Promise.all([fetchWorkoutPageData(supabase), fetchProgrammesData(supabase)])
-          .then(([workoutData, programmesData]) =>
-            setCache("workout", { workoutData, programmesData })
-          )
-          .catch(() => {});
-      }
-      if (!getCached(`nutrition:${today}`)) {
-        fetchNutritionData(supabase, today)
-          .then((d) => setCache(`nutrition:${today}`, d))
-          .catch(() => {});
-      }
-      if (!getCached("poids")) {
-        fetchPoidsData(supabase)
-          .then((d) => setCache("poids", d))
-          .catch(() => {});
-      }
-      if (!getCached("historique")) {
-        fetchHistoriqueData(supabase)
-          .then((d) => setCache("historique", d))
-          .catch(() => {});
-      }
-      if (!getCached("profil")) {
-        fetchProfilData(supabase)
-          .then((d) => setCache("profil", d))
-          .catch(() => {});
-      }
-    };
-
-    // Lancer après le rendu initial pour ne pas impacter le temps de chargement
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(prefetch);
-    } else {
-      setTimeout(prefetch, 100);
+    // Lancer tous les fetches en parallèle immédiatement
+    if (!getCached("dashboard")) {
+      fetchDashboardData(supabase)
+        .then((d) => setCache("dashboard", d))
+        .catch(() => {});
+    }
+    if (!getCached("workout")) {
+      Promise.all([
+        fetchWorkoutPageData(supabase),
+        fetchProgrammesData(supabase),
+      ])
+        .then(([workoutData, programmesData]) =>
+          setCache("workout", { workoutData, programmesData }),
+        )
+        .catch(() => {});
+    }
+    if (!getCached(`nutrition:${today}`)) {
+      fetchNutritionData(supabase, today)
+        .then((d) => setCache(`nutrition:${today}`, d))
+        .catch(() => {});
+    }
+    if (!getCached("poids")) {
+      fetchPoidsData(supabase)
+        .then((d) => setCache("poids", d))
+        .catch(() => {});
+    }
+    if (!getCached("historique")) {
+      fetchHistoriqueData(supabase)
+        .then((d) => setCache("historique", d))
+        .catch(() => {});
+    }
+    if (!getCached("profil")) {
+      fetchProfilData(supabase)
+        .then((d) => setCache("profil", d))
+        .catch(() => {});
     }
   }, []);
 

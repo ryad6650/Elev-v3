@@ -74,7 +74,9 @@ function computePRs(workouts: WorkoutJoin[]): PRRecord[] {
     .map((e) => ({ exerciceNom: e.nom, poidsMax: e.poids, repsAuMax: e.reps }));
 }
 
-export async function fetchHistoriqueData(supabase: SupabaseClient<Database>): Promise<HistoriquePageData> {
+export async function fetchHistoriqueData(
+  supabase: SupabaseClient<Database>,
+): Promise<HistoriquePageData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -86,11 +88,11 @@ export async function fetchHistoriqueData(supabase: SupabaseClient<Database>): P
       .select(
         `id, date, duree_minutes,
         routines(nom),
-        workout_sets(exercise_id, poids, reps, completed, exercises(nom))`
+        workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
       )
       .eq("user_id", user.id)
       .order("date", { ascending: false })
-      .limit(100),
+      .limit(30),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })

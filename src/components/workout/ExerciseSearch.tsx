@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Search, X, Plus, ChevronDown, PenLine } from 'lucide-react';
-import { useWorkoutStore } from '@/store/workoutStore';
-import CreateExerciseModal from './CreateExerciseModal';
-import ExerciseGif from './ExerciseGif';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
+import { useWorkoutStore } from "@/store/workoutStore";
+import CreateExerciseModal from "./CreateExerciseModal";
+import ExerciseGif from "./ExerciseGif";
 
 interface Exercise {
   id: string;
@@ -17,36 +17,57 @@ interface Exercise {
 interface Props {
   onClose: () => void;
   onSelect?: (ex: Exercise) => void;
+  title?: string;
 }
 
 const GROUPES = [
-  'Pectoraux', 'Dos', 'Épaules', 'Biceps', 'Triceps',
-  'Abdominaux', 'Quadriceps', 'Ischio-jambiers', 'Fessiers', 'Mollets', 'Avant-bras',
+  "Pectoraux",
+  "Dos",
+  "Épaules",
+  "Biceps",
+  "Triceps",
+  "Abdominaux",
+  "Quadriceps",
+  "Ischio-jambiers",
+  "Fessiers",
+  "Mollets",
+  "Avant-bras",
 ];
 
 const EQUIPEMENTS = [
-  'Barre', 'Haltères', 'Machine', 'Poulie / Câble',
-  'Poids du corps', 'Corde', 'Kettlebell', 'Smith machine', 'Bande élastique',
+  "Barre",
+  "Haltères",
+  "Machine",
+  "Poulie / Câble",
+  "Poids du corps",
+  "Corde",
+  "Kettlebell",
+  "Smith machine",
+  "Bande élastique",
 ];
 
 // Badge couleur par équipement
 const EQUIPEMENT_COLOR: Record<string, string> = {
-  'Barre': '#6366F1',
-  'Haltères': '#3B82F6',
-  'Machine': '#8B5CF6',
-  'Poulie / Câble': '#06B6D4',
-  'Poids du corps': '#22C55E',
-  'Corde': '#F59E0B',
-  'Kettlebell': '#EF4444',
-  'Smith machine': '#EC4899',
-  'Bande élastique': '#14B8A6',
+  Barre: "#6366F1",
+  Haltères: "#3B82F6",
+  Machine: "#8B5CF6",
+  "Poulie / Câble": "#06B6D4",
+  "Poids du corps": "#22C55E",
+  Corde: "#F59E0B",
+  Kettlebell: "#EF4444",
+  "Smith machine": "#EC4899",
+  "Bande élastique": "#14B8A6",
 };
 
-export default function ExerciseSearch({ onClose, onSelect }: Props) {
-  const [q, setQ] = useState('');
-  const [debouncedQ, setDebouncedQ] = useState('');
-  const [groupe, setGroupe] = useState('');
-  const [equipement, setEquipement] = useState('');
+export default function ExerciseSearch({
+  onClose,
+  onSelect,
+  title = "Ajouter un exercice",
+}: Props) {
+  const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
+  const [groupe, setGroupe] = useState("");
+  const [equipement, setEquipement] = useState("");
   const [results, setResults] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(false);
   const [showGroupe, setShowGroupe] = useState(false);
@@ -59,22 +80,35 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => setDebouncedQ(q), 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [q]);
 
   // Fetch exercices
+  const fetchExercises = useCallback(
+    async (search: string, grp: string, equip: string) => {
+      const params = new URLSearchParams();
+      if (search) params.set("q", search);
+      if (grp) params.set("groupe", grp);
+      if (equip) params.set("equipement", equip);
+      setLoading(true);
+      try {
+        const r = await fetch(`/api/exercises?${params}`);
+        const data: Exercise[] = await r.json();
+        setResults(Array.isArray(data) ? data : []);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (debouncedQ) params.set('q', debouncedQ);
-    if (groupe) params.set('groupe', groupe);
-    if (equipement) params.set('equipement', equipement);
-    setLoading(true);
-    fetch(`/api/exercises?${params}`)
-      .then((r) => r.json())
-      .then((data: Exercise[]) => setResults(Array.isArray(data) ? data : []))
-      .catch(() => setResults([]))
-      .finally(() => setLoading(false));
-  }, [debouncedQ, groupe, equipement]);
+    fetchExercises(debouncedQ, groupe, equipement);
+  }, [debouncedQ, groupe, equipement, fetchExercises]);
 
   const handleAdd = (ex: Exercise) => {
     if (onSelect) {
@@ -102,30 +136,34 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[55] flex flex-col"
-      style={{ background: 'var(--bg-primary)' }}
+      style={{ background: "var(--bg-primary)" }}
     >
       {/* Header */}
       <div
         className="px-4 pb-4 border-b"
         style={{
-          borderColor: 'var(--border)',
-          paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
-          background: 'linear-gradient(180deg, rgba(232,134,12,0.06) 0%, transparent 100%)',
+          borderColor: "var(--border)",
+          paddingTop: "max(1.5rem, env(safe-area-inset-top))",
+          background:
+            "linear-gradient(180deg, rgba(232,134,12,0.06) 0%, transparent 100%)",
         }}
       >
         <div className="flex items-center gap-3 mb-3">
           <button
             onClick={onClose}
             className="p-2 rounded-xl"
-            style={{ background: 'var(--bg-elevated)' }}
+            style={{ background: "var(--bg-elevated)" }}
           >
-            <X size={18} style={{ color: 'var(--text-primary)' }} />
+            <X size={18} style={{ color: "var(--text-primary)" }} />
           </button>
           <div className="flex-1" />
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-            style={{ background: 'var(--accent-bg)', color: 'var(--accent-text)' }}
+            style={{
+              background: "var(--accent-bg)",
+              color: "var(--accent-text)",
+            }}
           >
             <PenLine size={13} />
             Créer
@@ -134,12 +172,12 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
         <h2
           className="text-2xl mb-1"
           style={{
-            fontFamily: 'var(--font-dm-serif)',
-            fontStyle: 'italic',
-            color: 'var(--text-primary)',
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            color: "var(--text-primary)",
           }}
         >
-          Ajouter un exercice
+          {title}
         </h2>
       </div>
 
@@ -147,9 +185,12 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
         {/* Recherche texte */}
         <div
           className="flex items-center gap-2 px-4 py-3 rounded-xl"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+          style={{
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border)",
+          }}
         >
-          <Search size={16} style={{ color: 'var(--text-muted)' }} />
+          <Search size={16} style={{ color: "var(--text-muted)" }} />
           <input
             autoFocus
             type="text"
@@ -157,11 +198,11 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="flex-1 bg-transparent outline-none text-sm"
-            style={{ color: 'var(--text-primary)' }}
+            style={{ color: "var(--text-primary)" }}
           />
           {q && (
-            <button onClick={() => setQ('')}>
-              <X size={14} style={{ color: 'var(--text-muted)' }} />
+            <button onClick={() => setQ("")}>
+              <X size={14} style={{ color: "var(--text-muted)" }} />
             </button>
           )}
         </div>
@@ -170,37 +211,59 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
         <div className="flex gap-2">
           {/* Bouton Groupe musculaire */}
           <button
-            onClick={() => { setShowGroupe(!showGroupe); setShowEquipement(false); }}
+            onClick={() => {
+              setShowGroupe(!showGroupe);
+              setShowEquipement(false);
+            }}
             className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
             style={{
-              background: groupe ? 'rgba(232,134,12,0.12)' : 'var(--bg-elevated)',
-              border: groupe ? '1px solid rgba(232,134,12,0.3)' : '1px solid var(--border)',
-              color: groupe ? 'var(--accent-text)' : 'var(--text-secondary)',
+              background: groupe
+                ? "rgba(232,134,12,0.12)"
+                : "var(--bg-elevated)",
+              border: groupe
+                ? "1px solid rgba(232,134,12,0.3)"
+                : "1px solid var(--border)",
+              color: groupe ? "var(--accent-text)" : "var(--text-secondary)",
             }}
           >
-            <span className="truncate">{groupe || 'Groupe musculaire'}</span>
+            <span className="truncate">{groupe || "Groupe musculaire"}</span>
             <ChevronDown
               size={14}
               className="shrink-0 ml-1"
-              style={{ transform: showGroupe ? 'rotate(180deg)' : 'none', transition: '200ms' }}
+              style={{
+                transform: showGroupe ? "rotate(180deg)" : "none",
+                transition: "200ms",
+              }}
             />
           </button>
 
           {/* Bouton Équipement */}
           <button
-            onClick={() => { setShowEquipement(!showEquipement); setShowGroupe(false); }}
+            onClick={() => {
+              setShowEquipement(!showEquipement);
+              setShowGroupe(false);
+            }}
             className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
             style={{
-              background: equipement ? 'rgba(232,134,12,0.12)' : 'var(--bg-elevated)',
-              border: equipement ? '1px solid rgba(232,134,12,0.3)' : '1px solid var(--border)',
-              color: equipement ? 'var(--accent-text)' : 'var(--text-secondary)',
+              background: equipement
+                ? "rgba(232,134,12,0.12)"
+                : "var(--bg-elevated)",
+              border: equipement
+                ? "1px solid rgba(232,134,12,0.3)"
+                : "1px solid var(--border)",
+              color: equipement
+                ? "var(--accent-text)"
+                : "var(--text-secondary)",
             }}
           >
-            <span className="truncate">{equipement || 'Équipement'}</span>
+            <span className="truncate">{equipement || "Équipement"}</span>
             <ChevronDown
               size={14}
               className="shrink-0 ml-1"
-              style={{ transform: showEquipement ? 'rotate(180deg)' : 'none', transition: '200ms' }}
+              style={{
+                transform: showEquipement ? "rotate(180deg)" : "none",
+                transition: "200ms",
+              }}
             />
           </button>
         </div>
@@ -213,11 +276,14 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
               return (
                 <button
                   key={g}
-                  onClick={() => { setGroupe(active ? '' : g); setShowGroupe(false); }}
+                  onClick={() => {
+                    setGroupe(active ? "" : g);
+                    setShowGroupe(false);
+                  }}
                   className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
-                    background: active ? 'var(--accent)' : 'var(--bg-elevated)',
-                    color: active ? 'white' : 'var(--text-secondary)',
+                    background: active ? "var(--accent)" : "var(--bg-elevated)",
+                    color: active ? "white" : "var(--text-secondary)",
                   }}
                 >
                   {g}
@@ -232,16 +298,19 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
           <div className="flex flex-wrap gap-2 pb-1">
             {EQUIPEMENTS.map((eq) => {
               const active = equipement === eq;
-              const color = EQUIPEMENT_COLOR[eq] ?? 'var(--text-secondary)';
+              const color = EQUIPEMENT_COLOR[eq] ?? "var(--text-secondary)";
               return (
                 <button
                   key={eq}
-                  onClick={() => { setEquipement(active ? '' : eq); setShowEquipement(false); }}
+                  onClick={() => {
+                    setEquipement(active ? "" : eq);
+                    setShowEquipement(false);
+                  }}
                   className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
-                    background: active ? color : 'var(--bg-elevated)',
-                    color: active ? 'white' : 'var(--text-secondary)',
-                    border: active ? 'none' : `1px solid ${color}40`,
+                    background: active ? color : "var(--bg-elevated)",
+                    color: active ? "white" : "var(--text-secondary)",
+                    border: active ? "none" : `1px solid ${color}40`,
                   }}
                 >
                   {eq}
@@ -256,61 +325,85 @@ export default function ExerciseSearch({ onClose, onSelect }: Props) {
       <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
         {/* Compteur résultats */}
         {!loading && results.length > 0 && (
-          <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-            {results.length} exercice{results.length > 1 ? 's' : ''}
+          <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
+            {results.length} exercice{results.length > 1 ? "s" : ""}
           </p>
         )}
 
         {loading && (
-          <p className="text-sm text-center mt-8" style={{ color: 'var(--text-muted)' }}>
+          <p
+            className="text-sm text-center mt-8"
+            style={{ color: "var(--text-muted)" }}
+          >
             Chargement...
           </p>
         )}
         {!loading && results.length === 0 && (
           <div className="flex flex-col items-center gap-4 mt-12">
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
               Aucun exercice trouvé
             </p>
             <button
               onClick={() => setShowCreate(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'var(--accent-bg)', color: 'var(--accent-text)', border: '1px solid var(--accent)' }}
+              style={{
+                background: "var(--accent-bg)",
+                color: "var(--accent-text)",
+                border: "1px solid var(--accent)",
+              }}
             >
               <PenLine size={15} />
-              Créer &quot;{q || 'un exercice personnalisé'}&quot;
+              Créer &quot;{q || "un exercice personnalisé"}&quot;
             </button>
           </div>
         )}
 
         {results.map((ex) => {
-          const badgeColor = EQUIPEMENT_COLOR[ex.equipement ?? ''] ?? 'var(--text-muted)';
+          const badgeColor =
+            EQUIPEMENT_COLOR[ex.equipement ?? ""] ?? "var(--text-muted)";
           return (
             <button
               key={ex.id}
               onClick={() => handleAdd(ex)}
               className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-opacity active:opacity-70"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+              style={{
+                background: "var(--bg-secondary)",
+                border: "1px solid var(--border)",
+              }}
             >
               <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                <p
+                  className="text-sm font-semibold truncate"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {ex.nom}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  <span
+                    className="text-xs"
+                    style={{ color: "var(--text-muted)" }}
+                  >
                     {ex.groupe_musculaire}
                   </span>
                   {ex.equipement && (
                     <span
                       className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ background: `${badgeColor}20`, color: badgeColor }}
+                      style={{
+                        background: `${badgeColor}20`,
+                        color: badgeColor,
+                      }}
                     >
                       {ex.equipement}
                     </span>
                   )}
                 </div>
               </div>
-              <Plus size={18} className="shrink-0 ml-3" style={{ color: 'var(--accent)' }} />
+              <Plus
+                size={18}
+                className="shrink-0 ml-3"
+                style={{ color: "var(--accent)" }}
+              />
             </button>
           );
         })}

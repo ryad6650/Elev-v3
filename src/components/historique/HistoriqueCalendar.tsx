@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { HistoriqueWorkout } from "@/lib/historique";
 
 interface Props {
@@ -10,8 +10,18 @@ interface Props {
 
 const JOURS = ["L", "M", "M", "J", "V", "S", "D"];
 const MOIS = [
-  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
 ];
 
 export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
@@ -19,7 +29,10 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
   const [annee, setAnnee] = useState(today.getFullYear());
   const [mois, setMois] = useState(today.getMonth());
 
-  const sessionDates = new Set(workouts.map((w) => w.date));
+  const sessionDates = useMemo(
+    () => new Set(workouts.map((w) => w.date)),
+    [workouts],
+  );
   const todayStr = today.toISOString().split("T")[0];
 
   const premierJour = new Date(annee, mois, 1);
@@ -40,14 +53,21 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
   return (
     <div
       className="rounded-2xl p-4 mb-3"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+      }}
     >
       {/* Navigation mois */}
       <div className="flex items-center justify-between mb-3.5">
         <button
           onClick={() => navMois(-1)}
           className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-          style={{ background: "var(--bg-card)", color: "var(--text-secondary)", fontSize: "0.85rem" }}
+          style={{
+            background: "var(--bg-card)",
+            color: "var(--text-secondary)",
+            fontSize: "0.85rem",
+          }}
         >
           ‹
         </button>
@@ -60,7 +80,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
         <button
           onClick={() => navMois(1)}
           className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-          style={{ background: "var(--bg-card)", color: "var(--text-secondary)", fontSize: "0.85rem" }}
+          style={{
+            background: "var(--bg-card)",
+            color: "var(--text-secondary)",
+            fontSize: "0.85rem",
+          }}
         >
           ›
         </button>
@@ -111,7 +135,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
                   fontSize: "0.72rem",
                   fontWeight: isToday ? 700 : 500,
                   background: isToday ? "var(--accent)" : "transparent",
-                  color: isToday ? "#fff" : hasSession ? "var(--text-primary)" : "var(--text-secondary)",
+                  color: isToday
+                    ? "#fff"
+                    : hasSession
+                      ? "var(--text-primary)"
+                      : "var(--text-secondary)",
                 }}
               >
                 {day}
@@ -134,7 +162,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
       {/* Streak */}
       <div
         className="flex items-center gap-1.5 mt-3 pt-3"
-        style={{ borderTop: "1px solid var(--border)", fontSize: "0.75rem", color: "var(--text-secondary)" }}
+        style={{
+          borderTop: "1px solid var(--border)",
+          fontSize: "0.75rem",
+          color: "var(--text-secondary)",
+        }}
       >
         🔥 Streak actuel :&nbsp;
         <strong style={{ color: "#F5A623", fontWeight: 700 }}>

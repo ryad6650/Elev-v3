@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -8,18 +8,75 @@ export async function createExercise(data: {
   nom: string;
   groupe_musculaire: string;
   equipement: string | null;
-}): Promise<{ id: string; nom: string; groupe_musculaire: string; equipement: string | null; gif_url: string | null }> {
+  gif_url?: string | null;
+}): Promise<{
+  id: string;
+  nom: string;
+  groupe_musculaire: string;
+  equipement: string | null;
+  gif_url: string | null;
+}> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
 
   const { data: ex, error } = await supabase
-    .from('exercises')
-    .insert({ user_id: user.id, is_global: false, ...data })
-    .select('id, nom, groupe_musculaire, equipement, gif_url')
+    .from("exercises")
+    .insert({
+      user_id: user.id,
+      is_global: false,
+      nom: data.nom,
+      groupe_musculaire: data.groupe_musculaire,
+      equipement: data.equipement,
+      gif_url: data.gif_url ?? null,
+    })
+    .select("id, nom, groupe_musculaire, equipement, gif_url")
     .single();
 
-  if (error || !ex) throw new Error(error?.message ?? 'Erreur création exercice');
+  if (error || !ex)
+    throw new Error(error?.message ?? "Erreur création exercice");
+  return ex;
+}
+
+export async function updateExercise(
+  exerciseId: string,
+  data: {
+    nom: string;
+    groupe_musculaire: string;
+    equipement: string | null;
+    gif_url?: string | null;
+  },
+): Promise<{
+  id: string;
+  nom: string;
+  groupe_musculaire: string;
+  equipement: string | null;
+  gif_url: string | null;
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const updateData: Record<string, unknown> = {
+    nom: data.nom,
+    groupe_musculaire: data.groupe_musculaire,
+    equipement: data.equipement,
+  };
+  if (data.gif_url !== undefined) updateData.gif_url = data.gif_url;
+
+  const { data: ex, error } = await supabase
+    .from("exercises")
+    .update(updateData)
+    .eq("id", exerciseId)
+    .select("id, nom, groupe_musculaire, equipement, gif_url")
+    .single();
+
+  if (error || !ex)
+    throw new Error(error?.message ?? "Erreur modification exercice");
   return ex;
 }
 
@@ -39,19 +96,30 @@ type RoutineExRow = {
   series_cible: number | null;
   reps_cible: number | null;
   reps_cible_max: number | null;
-  exercises: { id: string; nom: string; groupe_musculaire: string; gif_url: string | null } | null;
+  exercises: {
+    id: string;
+    nom: string;
+    groupe_musculaire: string;
+    gif_url: string | null;
+  } | null;
 };
 
-export async function getRoutineExercises(routineId: string): Promise<RoutineExerciseData[]> {
+export async function getRoutineExercises(
+  routineId: string,
+): Promise<RoutineExerciseData[]> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
 
   const { data, error } = await supabase
-    .from('routine_exercises')
-    .select('ordre, series_cible, reps_cible, reps_cible_max, exercises(id, nom, groupe_musculaire, gif_url)')
-    .eq('routine_id', routineId)
-    .order('ordre');
+    .from("routine_exercises")
+    .select(
+      "ordre, series_cible, reps_cible, reps_cible_max, exercises(id, nom, groupe_musculaire, gif_url)",
+    )
+    .eq("routine_id", routineId)
+    .order("ordre");
 
   if (error) throw new Error(error.message);
 
@@ -71,22 +139,31 @@ export async function getRoutineExercises(routineId: string): Promise<RoutineExe
 
 export async function createRoutine(
   nom: string,
-  exercices: { exerciseId: string; seriesCible: number; repsCible: number; repsCibleMax: number | null; ordre: number }[]
+  exercices: {
+    exerciseId: string;
+    seriesCible: number;
+    repsCible: number;
+    repsCibleMax: number | null;
+    ordre: number;
+  }[],
 ): Promise<{ id: string }> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
 
   const { data: routine, error } = await supabase
-    .from('routines')
+    .from("routines")
     .insert({ user_id: user.id, nom })
-    .select('id')
+    .select("id")
     .single();
 
-  if (error || !routine) throw new Error(error?.message ?? 'Erreur création routine');
+  if (error || !routine)
+    throw new Error(error?.message ?? "Erreur création routine");
 
   if (exercices.length > 0) {
-    const { error: reError } = await supabase.from('routine_exercises').insert(
+    const { error: reError } = await supabase.from("routine_exercises").insert(
       exercices.map((e) => ({
         routine_id: routine.id,
         exercise_id: e.exerciseId,
@@ -94,29 +171,41 @@ export async function createRoutine(
         series_cible: e.seriesCible,
         reps_cible: e.repsCible,
         reps_cible_max: e.repsCibleMax ?? null,
-      }))
+      })),
     );
     if (reError) throw new Error(reError.message);
   }
 
-  revalidatePath('/workout');
+  revalidatePath("/workout");
   return { id: routine.id };
 }
 
 export async function updateRoutine(
   routineId: string,
   nom: string,
-  exercices: { exerciseId: string; seriesCible: number; repsCible: number; repsCibleMax: number | null; ordre: number }[]
+  exercices: {
+    exerciseId: string;
+    seriesCible: number;
+    repsCible: number;
+    repsCibleMax: number | null;
+    ordre: number;
+  }[],
 ): Promise<void> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
 
-  await supabase.from('routines').update({ nom }).eq('id', routineId).eq('user_id', user.id);
-  await supabase.from('routine_exercises').delete().eq('routine_id', routineId);
+  await supabase
+    .from("routines")
+    .update({ nom })
+    .eq("id", routineId)
+    .eq("user_id", user.id);
+  await supabase.from("routine_exercises").delete().eq("routine_id", routineId);
 
   if (exercices.length > 0) {
-    await supabase.from('routine_exercises').insert(
+    await supabase.from("routine_exercises").insert(
       exercices.map((e) => ({
         routine_id: routineId,
         exercise_id: e.exerciseId,
@@ -124,25 +213,31 @@ export async function updateRoutine(
         series_cible: e.seriesCible,
         reps_cible: e.repsCible,
         reps_cible_max: e.repsCibleMax ?? null,
-      }))
+      })),
     );
   }
-  revalidatePath('/workout');
+  revalidatePath("/workout");
 }
 
 export async function deleteRoutine(routineId: string): Promise<void> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
 
-  await supabase.from('routines').delete().eq('id', routineId).eq('user_id', user.id);
-  revalidatePath('/workout');
+  await supabase
+    .from("routines")
+    .delete()
+    .eq("id", routineId)
+    .eq("user_id", user.id);
+  revalidatePath("/workout");
 }
 
 export async function saveWorkout(
   exercises: WorkoutExercise[],
   debutAt: number,
-  routineId: string | null
+  routineId: string | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
   const {
@@ -155,11 +250,17 @@ export async function saveWorkout(
 
   const { data: workout, error: wError } = await supabase
     .from("workouts")
-    .insert({ user_id: user.id, routine_id: routineId, date, duree_minutes: dureeMinutes })
+    .insert({
+      user_id: user.id,
+      routine_id: routineId,
+      date,
+      duree_minutes: dureeMinutes,
+    })
     .select("id")
     .single();
 
-  if (wError || !workout) throw new Error(wError?.message ?? "Erreur lors de la sauvegarde");
+  if (wError || !workout)
+    throw new Error(wError?.message ?? "Erreur lors de la sauvegarde");
 
   const sets = exercises.flatMap((ex) =>
     ex.sets.map((s) => ({
@@ -171,7 +272,7 @@ export async function saveWorkout(
       reps: s.reps,
       completed: s.completed,
       is_warmup: s.isWarmup,
-    }))
+    })),
   );
 
   if (sets.length > 0) {

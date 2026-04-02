@@ -19,7 +19,8 @@ export default function BottomNav() {
       <nav
         className="pointer-events-auto flex items-center px-2 py-2 gap-0.5"
         style={{
-          background: "color-mix(in srgb, var(--bg-secondary) 90%, transparent)",
+          background:
+            "color-mix(in srgb, var(--bg-secondary) 90%, transparent)",
           backdropFilter: "blur(16px)",
           border: "1px solid var(--border)",
           borderRadius: "32px",
@@ -33,6 +34,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
+              prefetch={true}
               className="flex flex-1 items-center justify-center py-3 rounded-[22px] transition-colors"
               style={{
                 background: active ? "var(--accent)" : "transparent",

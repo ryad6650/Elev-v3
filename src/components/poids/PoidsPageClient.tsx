@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PoidsHero from "./PoidsHero";
 import PoidsChart from "./PoidsChart";
 import PoidsComposition from "./PoidsComposition";
@@ -25,26 +25,44 @@ const EMPTY_MENSURATIONS = {
 };
 
 export default function PoidsPageClient() {
-  const [data, setData] = useState<PoidsPageData | null>(getCached<PoidsPageData>(CACHE_KEY));
+  const [data, setData] = useState<PoidsPageData | null>(
+    getCached<PoidsPageData>(CACHE_KEY),
+  );
   const [modal, setModal] = useState<{ open: boolean; entry?: PoidsEntry }>({
     open: false,
   });
 
-  useEffect(() => {
+  const refreshData = useCallback(() => {
     const supabase = createClient();
-    fetchPoidsData(supabase).then((d) => {
-      setData(d);
-      setCache(CACHE_KEY, d);
-    }).catch(console.error);
+    fetchPoidsData(supabase)
+      .then((d) => {
+        setData(d);
+        setCache(CACHE_KEY, d);
+      })
+      .catch(console.error);
   }, []);
 
-  if (!data) return (
-    <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
-      <div className="flex items-center justify-center" style={{ height: "50vh" }}>
-        <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
-      </div>
-    </main>
-  );
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
+
+  if (!data)
+    return (
+      <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
+        <div
+          className="flex items-center justify-center"
+          style={{ height: "50vh" }}
+        >
+          <div
+            className="w-7 h-7 rounded-full border-2 animate-spin"
+            style={{
+              borderColor: "var(--accent)",
+              borderTopColor: "transparent",
+            }}
+          />
+        </div>
+      </main>
+    );
 
   const entries = data.entries;
   const current = entries.length > 0 ? entries[entries.length - 1] : null;
@@ -59,7 +77,11 @@ export default function PoidsPageClient() {
       <div className="mb-5">
         <div
           className="font-semibold uppercase mb-1"
-          style={{ fontSize: "0.65rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}
+          style={{
+            fontSize: "0.65rem",
+            color: "var(--text-muted)",
+            letterSpacing: "0.1em",
+          }}
         >
           Suivi corporel
         </div>
@@ -80,6 +102,7 @@ export default function PoidsPageClient() {
       <PoidsHero
         poidsActuel={current?.poids ?? null}
         poidsVeille={previous?.poids ?? null}
+        onSaved={refreshData}
       />
 
       {/* Graphique */}
@@ -100,6 +123,7 @@ export default function PoidsPageClient() {
       <PoidsHistorique
         entries={entries}
         onEdit={(entry) => setModal({ open: true, entry })}
+        onDeleted={refreshData}
       />
 
       {modal.open && (
@@ -107,6 +131,7 @@ export default function PoidsPageClient() {
           defaultDate={modal.entry?.date}
           defaultPoids={modal.entry?.poids}
           onClose={() => setModal({ open: false })}
+          onSaved={refreshData}
         />
       )}
     </main>
