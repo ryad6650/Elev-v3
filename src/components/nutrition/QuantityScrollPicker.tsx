@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from "react";
 
 interface Props {
   value: number;
@@ -19,22 +19,70 @@ interface Props {
 }
 
 export default function QuantityScrollPicker({
-  value, onChange, min = 1, max = 2000, step = 1, suffix, compact, onCenterTap,
-  editing, editValue, onEditChange, onEditConfirm, inputRef,
+  value,
+  onChange,
+  min = 1,
+  max = 2000,
+  step = 1,
+  suffix,
+  compact,
+  onCenterTap,
+  editing,
+  editValue,
+  onEditChange,
+  onEditConfirm,
+  inputRef,
 }: Props) {
   const ITEM_H = compact ? 46 : 52;
   const VISIBLE = compact ? 3 : 5;
   const half = Math.floor(VISIBLE / 2);
 
-  const touchRef = useRef<{ startY: number; startVal: number; moved: boolean; startTime: number } | null>(null);
+  const touchRef = useRef<{
+    startY: number;
+    startVal: number;
+    moved: boolean;
+    startTime: number;
+  } | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const valueRef = useRef(value);
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
-  const clamp = useCallback((v: number) => {
-    const rounded = Math.round(v / step) * step;
-    const fixed = Math.round(rounded * 10) / 10;
-    return Math.min(max, Math.max(min, fixed));
-  }, [step, min, max]);
+  const clamp = useCallback(
+    (v: number) => {
+      const rounded = Math.round(v / step) * step;
+      const fixed = Math.round(rounded * 10) / 10;
+      return Math.min(max, Math.max(min, fixed));
+    },
+    [step, min, max],
+  );
+
+  // Listener natif non-passif pour bloquer le scroll de la page
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    function handleTouchMove(e: TouchEvent) {
+      if (!touchRef.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const dy = e.touches[0].clientY - touchRef.current.startY;
+      if (Math.abs(dy) > 8) touchRef.current.moved = true;
+      const ITEM = compact ? 46 : 52;
+      setDragOffset(
+        ((dy % ITEM) + ITEM) % ITEM > ITEM / 2 ? (dy % ITEM) - ITEM : dy % ITEM,
+      );
+      const steps = -Math.round(dy / ITEM);
+      const newVal = clamp(touchRef.current.startVal + steps * step);
+      if (newVal !== valueRef.current) onChange(newVal);
+    }
+
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", handleTouchMove);
+  }, [clamp, step, onChange, compact]);
 
   function onTouchStart(e: React.TouchEvent) {
     touchRef.current = {
@@ -44,19 +92,7 @@ export default function QuantityScrollPicker({
       startTime: Date.now(),
     };
     setDragOffset(0);
-  }
-
-  function onTouchMove(e: React.TouchEvent) {
-    if (!touchRef.current) return;
-    e.preventDefault();
-    const dy = e.touches[0].clientY - touchRef.current.startY;
-    if (Math.abs(dy) > 8) touchRef.current.moved = true;
-    setDragOffset(((dy % ITEM_H) + ITEM_H) % ITEM_H > ITEM_H / 2
-      ? (dy % ITEM_H) - ITEM_H
-      : dy % ITEM_H);
-    const steps = -Math.round(dy / ITEM_H);
-    const newVal = clamp(touchRef.current.startVal + steps * step);
-    if (newVal !== value) onChange(newVal);
+    setDragging(true);
   }
 
   function onTouchEnd() {
@@ -65,101 +101,185 @@ export default function QuantityScrollPicker({
     const elapsed = Date.now() - touchRef.current.startTime;
     touchRef.current = null;
     setDragOffset(0);
-    // Tap court sans mouvement → édition clavier
+    setDragging(false);
+    // Tap court sans mouvement → édition clavier (géré par onClick sur l'élément central)
     if (!wasDrag && elapsed < 300 && onCenterTap) {
       onCenterTap();
     }
   }
 
-  useEffect(() => { setDragOffset(0); }, [value]);
+  // Auto-focus l'input quand on passe en mode édition
+  useEffect(() => {
+    if (editing && inputRef?.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 300);
+    }
+  }, [editing, inputRef]);
 
   const indices = Array.from({ length: VISIBLE }, (_, i) => i - half);
 
   return (
     <div
       ref={containerRef}
-      style={{ height: ITEM_H * VISIBLE, overflow: 'hidden', position: 'relative', touchAction: 'none', userSelect: 'none' }}
+      style={{
+        height: ITEM_H * VISIBLE,
+        overflow: "hidden",
+        position: "relative",
+        touchAction: "none",
+        userSelect: "none",
+      }}
       onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       {/* Centre highlight */}
-      <div style={{
-        position: 'absolute', top: ITEM_H * half, height: ITEM_H, left: 8, right: 8,
-        background: 'var(--accent-bg)', borderRadius: 14,
-        border: '1px solid rgba(232,134,12,0.35)', zIndex: 0,
-        boxShadow: '0 0 12px rgba(232,134,12,0.1)',
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          top: ITEM_H * half,
+          height: ITEM_H,
+          left: 8,
+          right: 8,
+          background: "var(--accent-bg)",
+          borderRadius: 14,
+          border: "1px solid rgba(232,134,12,0.35)",
+          zIndex: 0,
+          boxShadow: "0 0 12px rgba(232,134,12,0.1)",
+        }}
+      />
       {/* Gradient haut */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: ITEM_H * half,
-        background: 'linear-gradient(to bottom, var(--bg-secondary) 10%, transparent)',
-        zIndex: 2, pointerEvents: 'none',
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: ITEM_H * half,
+          background:
+            "linear-gradient(to bottom, var(--bg-secondary) 10%, transparent)",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
       {/* Gradient bas */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: ITEM_H * half,
-        background: 'linear-gradient(to top, var(--bg-secondary) 10%, transparent)',
-        zIndex: 2, pointerEvents: 'none',
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: ITEM_H * half,
+          background:
+            "linear-gradient(to top, var(--bg-secondary) 10%, transparent)",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
       {/* Items */}
-      <div style={{
-        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-        transform: `translateY(${dragOffset}px)`,
-        transition: touchRef.current ? 'none' : 'transform 0.12s ease-out',
-        zIndex: 1,
-      }}>
-        {indices.map(i => {
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          transform: `translateY(${dragOffset}px)`,
+          transition: dragging ? "none" : "transform 0.12s ease-out",
+          zIndex: 1,
+        }}
+      >
+        {indices.map((i) => {
           const v = clamp(value + i * step);
           const isCenter = i === 0;
           const dist = Math.abs(i);
           return (
-            <div key={i} style={{ height: ITEM_H, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+            <div
+              key={i}
+              style={{
+                height: ITEM_H,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
                 {isCenter && editing ? (
                   <>
                     <input
                       ref={inputRef}
                       type="number"
                       inputMode="decimal"
-                      value={editValue ?? ''}
-                      onChange={e => onEditChange?.(e.target.value)}
+                      value={editValue ?? ""}
+                      onChange={(e) => onEditChange?.(e.target.value)}
                       onBlur={() => onEditConfirm?.()}
-                      onKeyDown={e => e.key === 'Enter' && onEditConfirm?.()}
+                      onKeyDown={(e) => e.key === "Enter" && onEditConfirm?.()}
                       style={{
                         fontSize: compact ? 26 : 30,
                         fontWeight: 800,
-                        color: 'var(--accent-text)',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        textAlign: 'center',
-                        width: '4ch',
+                        color: "var(--accent-text)",
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        textAlign: "center",
+                        width: "4ch",
                         lineHeight: 1,
-                        fontFamily: 'inherit',
-                        caretColor: 'var(--accent)',
+                        fontFamily: "inherit",
+                        caretColor: "var(--accent)",
                       }}
                     />
                     {suffix && (
-                      <span style={{ fontSize: compact ? 11 : 14, fontWeight: 500, color: 'var(--text-muted)', opacity: 0.8 }}>
+                      <span
+                        style={{
+                          fontSize: compact ? 11 : 14,
+                          fontWeight: 500,
+                          color: "var(--text-muted)",
+                          opacity: 0.8,
+                        }}
+                      >
                         {suffix}
                       </span>
                     )}
                   </>
                 ) : (
                   <>
-                    <span style={{
-                      fontSize: isCenter ? (compact ? 26 : 30) : dist === 1 ? (compact ? 19 : 22) : (compact ? 13 : 15),
-                      fontWeight: isCenter ? 800 : dist === 1 ? 600 : 400,
-                      color: isCenter ? 'var(--accent-text)' : 'var(--text-secondary)',
-                      opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
-                      transition: 'font-size 0.1s, opacity 0.1s',
-                      lineHeight: 1,
-                    }}>
+                    <span
+                      style={{
+                        fontSize: isCenter
+                          ? compact
+                            ? 26
+                            : 30
+                          : dist === 1
+                            ? compact
+                              ? 19
+                              : 22
+                            : compact
+                              ? 13
+                              : 15,
+                        fontWeight: isCenter ? 800 : dist === 1 ? 600 : 400,
+                        color: isCenter
+                          ? "var(--accent-text)"
+                          : "var(--text-secondary)",
+                        opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
+                        transition: "font-size 0.1s, opacity 0.1s",
+                        lineHeight: 1,
+                      }}
+                    >
                       {v}
                     </span>
                     {isCenter && suffix && (
-                      <span style={{ fontSize: compact ? 11 : 14, fontWeight: 500, color: 'var(--text-muted)', opacity: 0.8 }}>
+                      <span
+                        style={{
+                          fontSize: compact ? 11 : 14,
+                          fontWeight: 500,
+                          color: "var(--text-muted)",
+                          opacity: 0.8,
+                        }}
+                      >
                         {suffix}
                       </span>
                     )}

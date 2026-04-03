@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
@@ -8,14 +8,8 @@ import MealSection from "./MealSection";
 import AddFoodModal from "./AddFoodModal";
 import FoodViewSheet from "./FoodViewSheet";
 import { sumEntries, groupByMeal, nextMealNumber } from "@/lib/nutrition-utils";
-import type { NutritionPageData, NutritionEntry } from "@/lib/nutrition-utils";
-import { fetchNutritionData } from "@/lib/nutrition";
-import { createClient } from "@/lib/supabase/client";
-import { getCached, setCache } from "@/lib/pageCache";
-
-function cacheKey(date: string) {
-  return `nutrition:${date}`;
-}
+import type { NutritionEntry } from "@/lib/nutrition-utils";
+import { useNutritionStore } from "@/store/nutritionStore";
 
 function formatLabel(d: string) {
   const t = new Date();
@@ -37,38 +31,20 @@ export default function NutritionPageClient() {
   const today = new Date().toISOString().split("T")[0];
   const date = searchParams.get("date") ?? today;
 
-  const [data, setData] = useState<NutritionPageData | null>(
-    getCached<NutritionPageData>(cacheKey(date)),
-  );
+  const { entries, profile, isLoading, hasFetched, fetchDay, removeEntry } =
+    useNutritionStore();
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
-  const [supabaseRef] = useState(() => createClient());
-
-  const refreshData = useCallback(() => {
-    fetchNutritionData(supabaseRef, date)
-      .then((d) => {
-        setData(d);
-        setCache(cacheKey(date), d);
-      })
-      .catch(console.error);
-  }, [supabaseRef, date]);
 
   useEffect(() => {
-    // Charger le cache immédiatement via l'initializer de useState,
-    // puis fetch les données fraîches
-    fetchNutritionData(supabaseRef, date)
-      .then((d) => {
-        setData(d);
-        setCache(cacheKey(date), d);
-      })
-      .catch(console.error);
-  }, [date, supabaseRef]);
+    fetchDay(date);
+  }, [date, fetchDay]);
 
-  const total = useMemo(() => (data ? sumEntries(data.entries) : null), [data]);
-  const meals = useMemo(() => (data ? groupByMeal(data.entries) : []), [data]);
+  const total = useMemo(() => sumEntries(entries), [entries]);
+  const meals = useMemo(() => groupByMeal(entries), [entries]);
 
-  if (!data || !total)
+  if (!hasFetched && isLoading)
     return (
       <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
         <div
@@ -93,7 +69,7 @@ export default function NutritionPageClient() {
   }
 
   function handleCreateMeal() {
-    const num = nextMealNumber(data!.entries);
+    const num = nextMealNumber(entries);
     const now = new Date().toISOString();
     setModalMealTime(now);
     setModalMeal(num);
@@ -169,7 +145,7 @@ export default function NutritionPageClient() {
           totalProteines={total.proteines}
           totalGlucides={total.glucides}
           totalLipides={total.lipides}
-          profile={data.profile}
+          profile={profile}
         />
 
         <p
@@ -184,16 +160,7 @@ export default function NutritionPageClient() {
             key={meal.meal_number}
             meal={meal}
             onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-            onEntryDeleted={(id) => {
-              setData((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      entries: prev.entries.filter((e) => e.id !== id),
-                    }
-                  : prev,
-              );
-            }}
+            onEntryDeleted={removeEntry}
             onFoodClick={(entry) => setViewEntry(entry)}
           />
         ))}
@@ -236,11 +203,10 @@ export default function NutritionPageClient() {
         <AddFoodModal
           mealNumber={modalMeal}
           mealTime={modalMealTime ?? new Date().toISOString()}
-          date={data.date}
+          date={date}
           onClose={() => {
             setModalMeal(null);
             setModalMealTime(null);
-            refreshData();
           }}
         />
       )}

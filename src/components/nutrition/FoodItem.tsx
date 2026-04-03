@@ -1,7 +1,7 @@
 "use client";
 
+import { memo } from "react";
 import { Trash2 } from "lucide-react";
-import { deleteNutritionEntry } from "@/app/actions/nutrition";
 import { calcNutrients } from "@/lib/nutrition-utils";
 import type { NutritionEntry } from "@/lib/nutrition-utils";
 
@@ -11,13 +11,12 @@ interface Props {
   onClick?: () => void;
 }
 
-export default function FoodItem({ entry, onDeleted, onClick }: Props) {
+export default memo(function FoodItem({ entry, onDeleted, onClick }: Props) {
   const n = calcNutrients(entry.aliment, entry.quantite_g);
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
     onDeleted?.(entry.id);
-    deleteNutritionEntry(entry.id).catch(console.error);
   }
 
   return (
@@ -65,4 +64,4 @@ export default function FoodItem({ entry, onDeleted, onClick }: Props) {
       </button>
     </div>
   );
-}
+});

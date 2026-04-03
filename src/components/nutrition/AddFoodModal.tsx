@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useTransition, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import {
   addNutritionEntry,
   getRecentAliments,
@@ -12,6 +11,7 @@ import FoodSearchStep from "./FoodSearchStep";
 import FoodDetailSheet from "./FoodDetailSheet";
 import CustomFoodForm from "./CustomFoodForm";
 import BarcodeScanner from "./BarcodeScanner";
+import { useNutritionStore } from "@/store/nutritionStore";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 type Step = "search" | "scan" | "quantity" | "custom" | "edit";
@@ -29,7 +29,7 @@ export default function AddFoodModal({
   date,
   onClose,
 }: Props) {
-  const router = useRouter();
+  const addEntry = useNutritionStore((s) => s.addEntry);
   const [step, setStep] = useState<Step>("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NutritionAliment[]>([]);
@@ -38,7 +38,7 @@ export default function AddFoodModal({
   const [selected, setSelected] = useState<NutritionAliment | null>(null);
   const [populaires, setPopulaires] = useState<NutritionAliment[]>([]);
   const [loadingInitial, setLoadingInitial] = useState(true);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -106,32 +106,31 @@ export default function AddFoodModal({
     setStep("quantity");
   }
 
-  function handleConfirm(quantite: number) {
-    if (!selected) return;
-    startTransition(async () => {
-      let alimentId = selected.id;
-      if (!alimentId && selected.source === "openfoodfacts") {
-        const { id } = await upsertExternalAliment(selected);
-        alimentId = id;
-      }
-      await addNutritionEntry(mealNumber, alimentId, quantite, date, mealTime);
-      router.refresh();
-      onClose();
-    });
+  async function handleConfirm(quantite: number) {
+    if (!selected || pending) return;
+    setPending(true);
+
+    let alimentId = selected.id;
+    if (!alimentId && selected.source === "openfoodfacts") {
+      const { id } = await upsertExternalAliment(selected);
+      alimentId = id;
+    }
+
+    // Update optimiste via le store — ferme le modal instantanément
+    addEntry(mealNumber, selected, alimentId, quantite, date, mealTime);
+    onClose();
   }
 
-  function handleCustomCreated(id: string) {
-    startTransition(async () => {
-      await addNutritionEntry(mealNumber, id, 100, date, mealTime);
-      router.refresh();
-      onClose();
-    });
+  async function handleCustomCreated(id: string) {
+    // Créer l'entrée nutrition côté serveur puis rafraîchir le store
+    onClose();
+    await addNutritionEntry(mealNumber, id, 100, date, mealTime);
+    useNutritionStore.getState().fetchDay(date);
   }
 
   function handleEdited(updated: NutritionAliment) {
     setSelected(updated);
     setStep("quantity");
-    router.refresh();
   }
 
   const isCustom = selected?.is_global === false && !!selected?.id;

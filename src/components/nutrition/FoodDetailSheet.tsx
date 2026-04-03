@@ -59,17 +59,6 @@ export default function FoodDetailSheet({
   function startEdit() {
     setEditingQty(true);
     setQtyInput(String(pickerVal));
-    setTimeout(() => {
-      qtyInputRef.current?.focus();
-      qtyInputRef.current?.select();
-      // Scroll le picker dans la vue quand le clavier apparaît
-      setTimeout(() => {
-        qtyInputRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }, 300);
-    }, 100);
   }
 
   function confirmEdit() {

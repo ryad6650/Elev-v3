@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import FoodItem from "./FoodItem";
 import { sumEntries } from "@/lib/nutrition-utils";
@@ -20,7 +20,7 @@ interface Props {
   onFoodClick?: (entry: NutritionEntry) => void;
 }
 
-export default function MealSection({
+export default memo(function MealSection({
   meal,
   onAdd,
   onEntryDeleted,
@@ -138,4 +138,4 @@ export default function MealSection({
       </div>
     </div>
   );
-}
+});
