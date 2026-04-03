@@ -10,6 +10,7 @@ import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
 import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
 import ThemeToggleButton from "@/components/dashboard/ThemeToggleButton";
+import MondayReportCard from "@/components/dashboard/MondayReportCard";
 
 function formatDateFr(): string {
   return new Date()
@@ -196,6 +197,8 @@ export default function DashboardPageClient({ initialData }: Props) {
           }}
         />
       </div>
+
+      <MondayReportCard />
 
       <SectionDivider label="Calories" />
 
