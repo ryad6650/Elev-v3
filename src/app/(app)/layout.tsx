@@ -49,6 +49,7 @@ export default async function AppLayout({
         secondary={secondary}
         balance={balance}
         ssrCSS={ssrCSS}
+        theme={theme}
       />
       <OfflineBanner />
       {children}

@@ -9,11 +9,12 @@ interface Props {
   balance: number;
   /** CSS pré-calculé côté serveur (déclarations custom properties) */
   ssrCSS: string;
+  theme: "dark" | "light";
 }
 
 /**
- * Injecte les couleurs d'accent :
- * - SSR : balise <style> pour zéro flash
+ * Injecte les couleurs d'accent + restaure le thème :
+ * - SSR : balise <style> pour zéro flash + script inline pour data-theme
  * - Client : useLayoutEffect pour le MutationObserver (toggle thème)
  */
 export default function AccentInit({
@@ -21,10 +22,29 @@ export default function AccentInit({
   secondary,
   balance,
   ssrCSS,
+  theme,
 }: Props) {
   useLayoutEffect(() => {
+    if (theme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
     applyAccent(primary, secondary, balance);
-  }, [primary, secondary, balance]);
+  }, [primary, secondary, balance, theme]);
 
-  return <style dangerouslySetInnerHTML={{ __html: `:root{${ssrCSS}}` }} />;
+  /* Script inline exécuté avant le paint pour éviter le flash */
+  const themeScript =
+    theme === "light"
+      ? `document.documentElement.setAttribute("data-theme","light");`
+      : "";
+
+  return (
+    <>
+      {themeScript && (
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      )}
+      <style dangerouslySetInnerHTML={{ __html: `:root{${ssrCSS}}` }} />
+    </>
+  );
 }
