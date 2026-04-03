@@ -128,8 +128,8 @@ export default function AddFoodModal({
       alimentId = id;
     }
 
-    // Update optimiste via le store — ferme le modal instantanément
-    addEntry(mealNumber, selected, alimentId, quantite, date, mealTime);
+    // Update optimiste + attend la persistance Supabase avant de fermer
+    await addEntry(mealNumber, selected, alimentId, quantite, date, mealTime);
     onClose();
   }
 

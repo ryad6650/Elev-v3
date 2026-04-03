@@ -8,31 +8,40 @@ interface Props {
   onClose: () => void;
 }
 
-// Types pour l'API native BarcodeDetector (Safari 17.2+, Chrome 83+)
 interface DetectedBarcode {
   rawValue: string;
   format: string;
 }
-type BarcodeDetectorCtor = new (opts: { formats: string[] }) => {
-  detect: (
-    source: CanvasImageSource | ImageBitmapSource,
-  ) => Promise<DetectedBarcode[]>;
+type BarcodeDetectorCtor = {
+  new (opts: { formats: string[] }): {
+    detect: (
+      source: HTMLVideoElement | HTMLCanvasElement,
+    ) => Promise<DetectedBarcode[]>;
+  };
+  getSupportedFormats?: () => Promise<string[]>;
 };
 
 const EAN_FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e"];
+const SCAN_INTERVAL_MS = 150; // ~6-7 fps, laisse le temps à detect()
 
-/** Vérifie si l'API native BarcodeDetector est dispo */
-function getNativeDetector(): BarcodeDetectorCtor | null {
+/** Vérifie si l'API native supporte les formats EAN */
+async function getNativeDetector(): Promise<BarcodeDetectorCtor | null> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BD = (globalThis as any).BarcodeDetector as
     | BarcodeDetectorCtor
     | undefined;
-  return BD ?? null;
+  if (!BD) return null;
+  try {
+    const supported = await BD.getSupportedFormats?.();
+    if (supported && !supported.includes("ean_13")) return null;
+  } catch {
+    // getSupportedFormats pas dispo → on tente quand même
+  }
+  return BD;
 }
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [torch, setTorch] = useState(false);
@@ -44,14 +53,12 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     (code: string) => {
       if (detectedRef.current) return;
       detectedRef.current = true;
-      // Vibration feedback
       navigator.vibrate?.(100);
       onDetected(code);
     },
     [onDetected],
   );
 
-  // Toggle lampe torche
   const toggleTorch = useCallback(async () => {
     const track = trackRef.current;
     if (!track) return;
@@ -68,7 +75,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
   useEffect(() => {
     let stopped = false;
     let stream: MediaStream | null = null;
-    let rafId: number;
+    let timerId: ReturnType<typeof setTimeout>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let zxingReader: any = null;
 
@@ -76,7 +83,6 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       try {
         if (stopped || !videoRef.current) return;
 
-        // Résolution haute + autofocus continu
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: { ideal: "environment" },
@@ -96,7 +102,6 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         const track = stream.getVideoTracks()[0];
         trackRef.current = track;
 
-        // Vérifier si torche disponible
         const caps = track.getCapabilities?.() as
           | Record<string, unknown>
           | undefined;
@@ -107,8 +112,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         if (stopped) return;
         setLoading(false);
 
-        // Choisir le moteur de scan
-        const BD = getNativeDetector();
+        const BD = await getNativeDetector();
         if (BD) {
           scanWithNative(BD);
         } else {
@@ -127,40 +131,31 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       }
     }
 
-    /** Scan natif — ultra rapide sur iPhone Safari 17.2+ */
-    async function scanWithNative(BD: BarcodeDetectorCtor) {
+    /** Scan natif — passe le <video> directement (pas de canvas) */
+    function scanWithNative(BD: BarcodeDetectorCtor) {
       const detector = new BD({ formats: EAN_FORMATS });
       const video = videoRef.current!;
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
 
-      function loop() {
+      async function loop() {
         if (stopped || detectedRef.current) return;
         if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          ctx.drawImage(video, 0, 0);
-
-          detector
-            .detect(canvas)
-            .then((barcodes) => {
-              if (barcodes.length > 0 && !stopped) {
-                stableOnDetected(barcodes[0].rawValue);
-                return;
-              }
-              rafId = requestAnimationFrame(loop);
-            })
-            .catch(() => {
-              rafId = requestAnimationFrame(loop);
-            });
-        } else {
-          rafId = requestAnimationFrame(loop);
+          try {
+            const barcodes = await detector.detect(video);
+            if (barcodes.length > 0 && !stopped) {
+              stableOnDetected(barcodes[0].rawValue);
+              return;
+            }
+          } catch (e) {
+            console.warn("BarcodeDetector.detect():", e);
+          }
         }
+        // Attendre avant le prochain scan (évite d'empiler les appels)
+        timerId = setTimeout(loop, SCAN_INTERVAL_MS);
       }
-      rafId = requestAnimationFrame(loop);
+      loop();
     }
 
-    /** Fallback ZXing pour navigateurs sans BarcodeDetector */
+    /** Fallback ZXing avec scan canvas pour meilleure détection */
     async function scanWithZxing() {
       const {
         BrowserMultiFormatReader,
@@ -202,7 +197,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
     return () => {
       stopped = true;
-      cancelAnimationFrame(rafId);
+      clearTimeout(timerId);
       stream?.getTracks().forEach((t) => t.stop());
       trackRef.current = null;
       try {
@@ -223,7 +218,6 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         muted
         autoPlay
       />
-      <canvas ref={canvasRef} className="hidden" />
 
       {/* Chargement */}
       {loading && !error && (

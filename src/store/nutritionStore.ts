@@ -23,7 +23,7 @@ interface NutritionState {
     quantiteG: number,
     date: string,
     mealTime: string,
-  ) => void;
+  ) => Promise<void>;
   updateEntry: (id: string, quantiteG: number) => void;
   removeEntry: (id: string) => void;
   setEntries: (entries: NutritionEntry[]) => void;
@@ -110,7 +110,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     set({ entries, profile, isLoading: false, hasFetched: true });
   },
 
-  addEntry: (mealNumber, aliment, alimentId, quantiteG, date, mealTime) => {
+  addEntry: async (
+    mealNumber,
+    aliment,
+    alimentId,
+    quantiteG,
+    date,
+    mealTime,
+  ) => {
     const tempId = crypto.randomUUID();
 
     // 1. Update optimiste immédiat
@@ -123,40 +130,37 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     };
     set((s) => ({ entries: [...s.entries, optimisticEntry] }));
 
-    // 2. Sync Supabase en arrière-plan
-    (async () => {
-      const userId = await getCurrentUserId();
-      if (!userId) {
-        // Rollback si pas d'utilisateur
-        set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
-        return;
-      }
+    // 2. Sync Supabase (await pour garantir la persistance)
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
+      return;
+    }
 
-      const { data, error } = await supabase
-        .from("nutrition_entries")
-        .insert({
-          user_id: userId,
-          meal_number: mealNumber,
-          meal_time: mealTime,
-          aliment_id: alimentId,
-          quantite_g: quantiteG,
-          date,
-        })
-        .select("id")
-        .single();
+    const { data, error } = await supabase
+      .from("nutrition_entries")
+      .insert({
+        user_id: userId,
+        meal_number: mealNumber,
+        meal_time: mealTime,
+        aliment_id: alimentId,
+        quantite_g: quantiteG,
+        date,
+      })
+      .select("id")
+      .single();
 
-      if (error || !data) {
-        set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
-        return;
-      }
+    if (error || !data) {
+      set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
+      return;
+    }
 
-      // Remplacer tempId par vrai id
-      set((s) => ({
-        entries: s.entries.map((e) =>
-          e.id === tempId ? { ...e, id: data.id } : e,
-        ),
-      }));
-    })();
+    // Remplacer tempId par vrai id
+    set((s) => ({
+      entries: s.entries.map((e) =>
+        e.id === tempId ? { ...e, id: data.id } : e,
+      ),
+    }));
   },
 
   updateEntry: (id: string, quantiteG: number) => {
