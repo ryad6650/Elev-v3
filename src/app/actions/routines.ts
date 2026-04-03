@@ -44,8 +44,9 @@ async function getLastSessionRefs(
     .eq("completed", true)
     .in("exercise_id", exerciseIds)
     .eq("workouts.user_id", userId)
-    .order("workout_id", { ascending: false })
-    .order("poids", { ascending: false });
+    .order("date", { referencedTable: "workouts", ascending: false })
+    .order("poids", { ascending: false })
+    .limit(500);
 
   const map: Record<string, { poids: number; reps: number }> = {};
   for (const row of data ?? []) {
@@ -184,11 +185,14 @@ export async function updateRoutine(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
-  await supabase
+  const { data: owned } = await supabase
     .from("routines")
     .update({ nom })
     .eq("id", routineId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id")
+    .single();
+  if (!owned) throw new Error("Non autorisé");
   await supabase.from("routine_exercises").delete().eq("routine_id", routineId);
 
   if (exercices.length > 0) {

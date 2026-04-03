@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
@@ -8,7 +8,7 @@ import MealSection from "./MealSection";
 import AddFoodModal from "./AddFoodModal";
 import FoodViewSheet from "./FoodViewSheet";
 import { sumEntries, groupByMeal, nextMealNumber } from "@/lib/nutrition-utils";
-import type { NutritionEntry } from "@/lib/nutrition-utils";
+import type { NutritionEntry, NutritionPageData } from "@/lib/nutrition-utils";
 import { useNutritionStore } from "@/store/nutritionStore";
 
 function formatLabel(d: string) {
@@ -25,42 +25,45 @@ function formatLabel(d: string) {
   });
 }
 
-export default function NutritionPageClient() {
+interface Props {
+  initialData: NutritionPageData;
+}
+
+export default function NutritionPageClient({ initialData }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const today = new Date().toISOString().split("T")[0];
   const date = searchParams.get("date") ?? today;
 
-  const { entries, profile, isLoading, hasFetched, fetchDay, removeEntry } =
+  const { entries, profile, hasFetched, fetchDay, removeEntry } =
     useNutritionStore();
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
+  const hydratedDateRef = useRef<string | null>(null);
 
+  // Hydrater le store avec les données SSR au premier rendu (sync, pas dans un effet)
+  if (hydratedDateRef.current !== initialData.date) {
+    hydratedDateRef.current = initialData.date;
+    useNutritionStore.setState({
+      entries: initialData.entries,
+      profile: initialData.profile,
+      date: initialData.date,
+      hasFetched: true,
+      isLoading: false,
+    });
+  }
+
+  // Re-fetch côté client uniquement si la date change via navigation
   useEffect(() => {
-    fetchDay(date);
-  }, [date, fetchDay]);
+    if (date !== initialData.date) fetchDay(date);
+  }, [date, initialData.date, fetchDay]);
 
-  const total = useMemo(() => sumEntries(entries), [entries]);
-  const meals = useMemo(() => groupByMeal(entries), [entries]);
-
-  if (!hasFetched && isLoading)
-    return (
-      <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
-        <div
-          className="flex items-center justify-center"
-          style={{ height: "50vh" }}
-        >
-          <div
-            className="w-7 h-7 rounded-full border-2 animate-spin"
-            style={{
-              borderColor: "var(--accent)",
-              borderTopColor: "transparent",
-            }}
-          />
-        </div>
-      </main>
-    );
+  // Utiliser les données SSR tant que le store n'a pas fetchDay
+  const displayEntries = hasFetched ? entries : initialData.entries;
+  const displayProfile = hasFetched ? profile : initialData.profile;
+  const total = useMemo(() => sumEntries(displayEntries), [displayEntries]);
+  const meals = useMemo(() => groupByMeal(displayEntries), [displayEntries]);
 
   function navigate(delta: number) {
     const d = new Date(date + "T12:00:00");
@@ -145,7 +148,7 @@ export default function NutritionPageClient() {
           totalProteines={total.proteines}
           totalGlucides={total.glucides}
           totalLipides={total.lipides}
-          profile={profile}
+          profile={displayProfile}
         />
 
         <p

@@ -23,7 +23,8 @@ export async function fetchPoidsData(
       .from("poids_history")
       .select("id, date, poids")
       .eq("user_id", userId)
-      .order("date", { ascending: true }),
+      .order("date", { ascending: true })
+      .limit(400),
     supabase.from("profiles").select("taille").eq("id", userId).single(),
     supabase
       .from("mensurations")

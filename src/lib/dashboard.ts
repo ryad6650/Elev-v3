@@ -90,12 +90,14 @@ export async function fetchDashboardData(
       .from("workouts")
       .select("date")
       .eq("user_id", userId)
-      .gte("date", sevenWeeksAgo),
+      .gte("date", sevenWeeksAgo)
+      .limit(100),
     supabase
       .from("nutrition_entries")
       .select("date")
       .eq("user_id", userId)
-      .gte("date", sevenWeeksAgo),
+      .gte("date", sevenWeeksAgo)
+      .limit(500),
     supabase
       .from("routines")
       .select(

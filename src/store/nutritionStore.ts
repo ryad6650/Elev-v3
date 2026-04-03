@@ -37,7 +37,13 @@ const DEFAULT_PROFILE: NutritionProfile = {
 };
 
 const supabase = createClient();
-let cachedUserId: string | null = null;
+
+async function getCurrentUserId(): Promise<string | null> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
   entries: [],
@@ -49,14 +55,11 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   fetchDay: async (date: string) => {
     set({ isLoading: true, date });
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
+    const userId = await getCurrentUserId();
+    if (!userId) {
       set({ isLoading: false });
       return;
     }
-    cachedUserId = user.id;
 
     const [entriesRes, profileRes] = await Promise.all([
       supabase
@@ -64,7 +67,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .select(
           "id, meal_number, meal_time, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
         )
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("date", date)
         .order("meal_number")
         .order("meal_time"),
@@ -73,7 +76,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .select(
           "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides",
         )
-        .eq("id", user.id)
+        .eq("id", userId)
         .single(),
     ]);
 
@@ -121,12 +124,17 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
 
     // 2. Sync Supabase en arrière-plan
     (async () => {
-      if (!cachedUserId) return;
+      const userId = await getCurrentUserId();
+      if (!userId) {
+        // Rollback si pas d'utilisateur
+        set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
+        return;
+      }
 
       const { data, error } = await supabase
         .from("nutrition_entries")
         .insert({
-          user_id: cachedUserId,
+          user_id: userId,
           meal_number: mealNumber,
           meal_time: mealTime,
           aliment_id: alimentId,
@@ -137,14 +145,11 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .single();
 
       if (error || !data) {
-        // 3. Rollback si erreur
-        set((s) => ({
-          entries: s.entries.filter((e) => e.id !== tempId),
-        }));
+        set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
         return;
       }
 
-      // 4. Remplacer tempId par vrai id
+      // Remplacer tempId par vrai id
       set((s) => ({
         entries: s.entries.map((e) =>
           e.id === tempId ? { ...e, id: data.id } : e,
@@ -154,25 +159,32 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   },
 
   removeEntry: (id: string) => {
-    // Capturer l'entrée supprimée (pas le snapshot complet)
-    const removedEntry = get().entries.find((e) => e.id === id);
+    // Capturer l'entrée + sa position pour rollback correct
+    const entries = get().entries;
+    const removedIndex = entries.findIndex((e) => e.id === id);
+    const removedEntry = removedIndex >= 0 ? entries[removedIndex] : null;
 
     // 1. Suppression optimiste immédiate
     set((s) => ({ entries: s.entries.filter((e) => e.id !== id) }));
 
     // 2. Sync Supabase en arrière-plan
     (async () => {
-      if (!cachedUserId) return;
+      const userId = await getCurrentUserId();
+      if (!userId) return;
 
       const { error } = await supabase
         .from("nutrition_entries")
         .delete()
         .eq("id", id)
-        .eq("user_id", cachedUserId);
+        .eq("user_id", userId);
 
       if (error && removedEntry) {
-        // 3. Rollback : réinsérer uniquement l'entrée supprimée
-        set((s) => ({ entries: [...s.entries, removedEntry] }));
+        // Rollback : réinsérer à la bonne position
+        set((s) => {
+          const copy = [...s.entries];
+          copy.splice(removedIndex, 0, removedEntry);
+          return { entries: copy };
+        });
       }
     })();
   },

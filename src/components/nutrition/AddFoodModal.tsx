@@ -6,7 +6,6 @@ import {
   addNutritionEntry,
   getRecentAliments,
   getFavoriteAliments,
-  getFavoriteIds,
   toggleFavoriteAliment,
   upsertExternalAliment,
 } from "@/app/actions/nutrition";
@@ -67,10 +66,11 @@ export default function AddFoodModal({
       .then((d) => setPopulaires(Array.isArray(d) ? d : []))
       .catch(() => {})
       .finally(finish);
-    Promise.all([getFavoriteAliments(), getFavoriteIds()])
-      .then(([favAliments, favIds]) => {
-        setFavoris(favAliments as NutritionAliment[]);
-        setFavoriteIds(new Set(favIds));
+    getFavoriteAliments()
+      .then((favAliments) => {
+        const aliments = favAliments as NutritionAliment[];
+        setFavoris(aliments);
+        setFavoriteIds(new Set(aliments.map((a) => a.id)));
       })
       .catch(() => {})
       .finally(finish);

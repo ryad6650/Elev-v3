@@ -343,16 +343,18 @@ export const useWorkoutStore = create<WorkoutStore>()(
             }),
           };
         });
-        set({ activeWorkout: { ...activeWorkout, exercises: updated } });
-        if (justCompleted && exerciseRest != null && exerciseRest > 0) {
-          set({
-            restTimer: {
-              active: true,
-              endAt: Date.now() + exerciseRest * 1000,
-              duration: exerciseRest,
-            },
-          });
-        }
+        set(
+          justCompleted && exerciseRest != null && exerciseRest > 0
+            ? {
+                activeWorkout: { ...activeWorkout, exercises: updated },
+                restTimer: {
+                  active: true,
+                  endAt: Date.now() + exerciseRest * 1000,
+                  duration: exerciseRest,
+                },
+              }
+            : { activeWorkout: { ...activeWorkout, exercises: updated } },
+        );
       },
 
       startRestTimer: () => {

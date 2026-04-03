@@ -81,7 +81,8 @@ export async function fetchWorkoutPageData(
       .select("routine_id, date")
       .eq("user_id", user.id)
       .not("routine_id", "is", null)
-      .order("date", { ascending: false }),
+      .order("date", { ascending: false })
+      .limit(100),
   ]);
 
   const lastWorkoutMap = new Map<string, string>();

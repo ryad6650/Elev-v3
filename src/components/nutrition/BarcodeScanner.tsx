@@ -69,6 +69,8 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     let stopped = false;
     let stream: MediaStream | null = null;
     let rafId: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let zxingReader: any = null;
 
     async function start() {
       try {
@@ -176,7 +178,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       ]);
       hints.set(DecodeHintType.TRY_HARDER, true);
 
+      if (stopped) return;
       const reader = new BrowserMultiFormatReader(hints);
+      zxingReader = reader;
 
       reader.decodeFromVideoElementContinuously(
         videoRef.current!,
@@ -201,6 +205,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       cancelAnimationFrame(rafId);
       stream?.getTracks().forEach((t) => t.stop());
       trackRef.current = null;
+      try {
+        zxingReader?.reset();
+      } catch {}
     };
   }, [stableOnDetected]);
 

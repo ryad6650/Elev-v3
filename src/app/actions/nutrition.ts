@@ -68,13 +68,42 @@ export async function upsertExternalAliment(aliment: {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
+  // Si code-barres fourni, upsert atomique pour éviter les doublons
   if (aliment.code_barres) {
+    const { data, error } = await supabase
+      .from("aliments")
+      .upsert(
+        {
+          user_id: user.id,
+          nom: aliment.nom,
+          marque: aliment.marque ?? null,
+          calories: aliment.calories,
+          proteines: aliment.proteines,
+          glucides: aliment.glucides,
+          lipides: aliment.lipides,
+          fibres: aliment.fibres ?? null,
+          sucres: aliment.sucres ?? null,
+          sel: aliment.sel ?? null,
+          code_barres: aliment.code_barres,
+          is_global: false,
+        },
+        { onConflict: "code_barres", ignoreDuplicates: true },
+      )
+      .select("id")
+      .single();
+
+    if (data) return { id: data.id };
+
+    // Si ignoreDuplicates a ignoré, récupérer l'existant accessible à cet utilisateur
     const { data: existing } = await supabase
       .from("aliments")
       .select("id")
       .eq("code_barres", aliment.code_barres)
-      .maybeSingle();
+      .or(`is_global.eq.true,user_id.eq.${user.id}`)
+      .limit(1)
+      .single();
     if (existing) return { id: existing.id };
+    if (error) throw new Error(error.message);
   }
 
   const { data, error } = await supabase
@@ -90,7 +119,7 @@ export async function upsertExternalAliment(aliment: {
       fibres: aliment.fibres ?? null,
       sucres: aliment.sucres ?? null,
       sel: aliment.sel ?? null,
-      code_barres: aliment.code_barres ?? null,
+      code_barres: null,
       is_global: false,
     })
     .select("id")

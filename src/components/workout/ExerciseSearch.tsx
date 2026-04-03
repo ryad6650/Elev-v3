@@ -48,6 +48,10 @@ const EQUIPEMENTS = [
 ];
 
 // Badge couleur par équipement
+// Cache résultats exercices (5 min TTL)
+const exerciseCache = new Map<string, { data: Exercise[]; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
+
 const EQUIPEMENT_COLOR: Record<string, string> = {
   Barre: "#6366F1",
   Haltères: "#3B82F6",
@@ -86,18 +90,28 @@ export default function ExerciseSearch({
     };
   }, [q]);
 
-  // Fetch exercices
+  // Fetch exercices avec cache 5 min
   const fetchExercises = useCallback(
     async (search: string, grp: string, equip: string) => {
       const params = new URLSearchParams();
       if (search) params.set("q", search);
       if (grp) params.set("groupe", grp);
       if (equip) params.set("equipement", equip);
+      const cacheKey = params.toString();
+
+      const cached = exerciseCache.get(cacheKey);
+      if (cached && Date.now() - cached.ts < CACHE_TTL) {
+        setResults(cached.data);
+        return;
+      }
+
       setLoading(true);
       try {
         const r = await fetch(`/api/exercises?${params}`);
         const data: Exercise[] = await r.json();
-        setResults(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data) ? data : [];
+        exerciseCache.set(cacheKey, { data: list, ts: Date.now() });
+        setResults(list);
       } catch {
         setResults([]);
       } finally {

@@ -9,12 +9,31 @@ const subscribe = () => () => {};
 const getSnapshot = () => true;
 const getServerSnapshot = () => false;
 
+// Timer partagé : un seul setInterval pour tous les abonnés
+const sharedTimerListeners = new Set<() => void>();
+let sharedTimerInterval: ReturnType<typeof setInterval> | null = null;
+
+function subscribeSharedTimer(cb: () => void) {
+  sharedTimerListeners.add(cb);
+  if (!sharedTimerInterval) {
+    sharedTimerInterval = setInterval(() => {
+      sharedTimerListeners.forEach((fn) => fn());
+    }, 1000);
+  }
+  return () => {
+    sharedTimerListeners.delete(cb);
+    if (sharedTimerListeners.size === 0 && sharedTimerInterval) {
+      clearInterval(sharedTimerInterval);
+      sharedTimerInterval = null;
+    }
+  };
+}
+
 function useElapsed(startedAt: number): string {
   const [elapsed, setElapsed] = useState(() => Date.now() - startedAt);
 
   useEffect(() => {
-    const id = setInterval(() => setElapsed(Date.now() - startedAt), 1000);
-    return () => clearInterval(id);
+    return subscribeSharedTimer(() => setElapsed(Date.now() - startedAt));
   }, [startedAt]);
 
   const totalSecs = Math.floor(Math.max(0, elapsed) / 1000);
@@ -25,6 +44,8 @@ function useElapsed(startedAt: number): string {
     return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
+
+export { subscribeSharedTimer };
 
 function BannerInner({
   workout,
