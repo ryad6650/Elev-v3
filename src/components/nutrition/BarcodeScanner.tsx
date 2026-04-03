@@ -1,49 +1,86 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { X, ZapOff, Loader2 } from "lucide-react";
-import {
-  BrowserMultiFormatReader,
-  DecodeHintType,
-  BarcodeFormat,
-  NotFoundException,
-} from "@zxing/library";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { X, ZapOff, Loader2, Zap } from "lucide-react";
 
 interface Props {
   onDetected: (barcode: string) => void;
   onClose: () => void;
 }
 
-const HINTS = new Map();
-HINTS.set(DecodeHintType.POSSIBLE_FORMATS, [
-  BarcodeFormat.EAN_13,
-  BarcodeFormat.EAN_8,
-  BarcodeFormat.UPC_A,
-  BarcodeFormat.UPC_E,
-]);
-HINTS.set(DecodeHintType.TRY_HARDER, true);
+// Types pour l'API native BarcodeDetector (Safari 17.2+, Chrome 83+)
+interface DetectedBarcode {
+  rawValue: string;
+  format: string;
+}
+type BarcodeDetectorCtor = new (opts: { formats: string[] }) => {
+  detect: (
+    source: CanvasImageSource | ImageBitmapSource,
+  ) => Promise<DetectedBarcode[]>;
+};
+
+const EAN_FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e"];
+
+/** Vérifie si l'API native BarcodeDetector est dispo */
+function getNativeDetector(): BarcodeDetectorCtor | null {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const BD = (globalThis as any).BarcodeDetector as
+    | BarcodeDetectorCtor
+    | undefined;
+  return BD ?? null;
+}
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [torch, setTorch] = useState(false);
+  const [hasTorch, setHasTorch] = useState(false);
+  const trackRef = useRef<MediaStreamTrack | null>(null);
+  const detectedRef = useRef(false);
+
+  const stableOnDetected = useCallback(
+    (code: string) => {
+      if (detectedRef.current) return;
+      detectedRef.current = true;
+      // Vibration feedback
+      navigator.vibrate?.(100);
+      onDetected(code);
+    },
+    [onDetected],
+  );
+
+  // Toggle lampe torche
+  const toggleTorch = useCallback(async () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const next = !torch;
+    try {
+      await track.applyConstraints({
+        // @ts-expect-error – torch pas typé mais supporté mobile
+        advanced: [{ torch: next }],
+      });
+      setTorch(next);
+    } catch {}
+  }, [torch]);
 
   useEffect(() => {
-    const reader = new BrowserMultiFormatReader(HINTS);
     let stopped = false;
     let stream: MediaStream | null = null;
+    let rafId: number;
 
     async function start() {
       try {
         if (stopped || !videoRef.current) return;
 
-        // Contraintes caméra optimisées pour scanner de code-barres
+        // Résolution haute + autofocus continu
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            // @ts-expect-error – focusMode supporté sur mobile mais pas typé
+            width: { ideal: 1920, min: 1280 },
+            height: { ideal: 1080, min: 720 },
+            // @ts-expect-error – focusMode supporté mobile
             focusMode: { ideal: "continuous" },
           },
           audio: false,
@@ -54,41 +91,27 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           return;
         }
 
-        // Désactiver le zoom si possible
         const track = stream.getVideoTracks()[0];
+        trackRef.current = track;
+
+        // Vérifier si torche disponible
         const caps = track.getCapabilities?.() as
           | Record<string, unknown>
           | undefined;
-        if (caps?.zoom) {
-          const zoomRange = caps.zoom as { min: number };
-          await track.applyConstraints({
-            // @ts-expect-error – zoom supporté sur mobile mais pas typé
-            advanced: [{ zoom: zoomRange.min }],
-          });
-        }
+        if (caps?.torch) setHasTorch(true);
 
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-
         if (stopped) return;
-
         setLoading(false);
 
-        reader.decodeFromVideoElementContinuously(
-          videoRef.current,
-          (
-            result: ReturnType<BrowserMultiFormatReader["decode"]> | null,
-            err?: Error,
-          ) => {
-            if (result) {
-              onDetected(result.getText());
-              return;
-            }
-            if (err && !(err instanceof NotFoundException)) {
-              console.warn("Scanner:", err);
-            }
-          },
-        );
+        // Choisir le moteur de scan
+        const BD = getNativeDetector();
+        if (BD) {
+          scanWithNative(BD);
+        } else {
+          scanWithZxing();
+        }
       } catch (err) {
         if (stopped) return;
         if (err instanceof Error && err.name === "NotAllowedError") {
@@ -102,14 +125,84 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       }
     }
 
+    /** Scan natif — ultra rapide sur iPhone Safari 17.2+ */
+    async function scanWithNative(BD: BarcodeDetectorCtor) {
+      const detector = new BD({ formats: EAN_FORMATS });
+      const video = videoRef.current!;
+      const canvas = canvasRef.current!;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+
+      function loop() {
+        if (stopped || detectedRef.current) return;
+        if (video.readyState >= video.HAVE_CURRENT_DATA) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0);
+
+          detector
+            .detect(canvas)
+            .then((barcodes) => {
+              if (barcodes.length > 0 && !stopped) {
+                stableOnDetected(barcodes[0].rawValue);
+                return;
+              }
+              rafId = requestAnimationFrame(loop);
+            })
+            .catch(() => {
+              rafId = requestAnimationFrame(loop);
+            });
+        } else {
+          rafId = requestAnimationFrame(loop);
+        }
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    /** Fallback ZXing pour navigateurs sans BarcodeDetector */
+    async function scanWithZxing() {
+      const {
+        BrowserMultiFormatReader,
+        DecodeHintType,
+        BarcodeFormat,
+        NotFoundException,
+      } = await import("@zxing/library");
+
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        BarcodeFormat.EAN_13,
+        BarcodeFormat.EAN_8,
+        BarcodeFormat.UPC_A,
+        BarcodeFormat.UPC_E,
+      ]);
+      hints.set(DecodeHintType.TRY_HARDER, true);
+
+      const reader = new BrowserMultiFormatReader(hints);
+
+      reader.decodeFromVideoElementContinuously(
+        videoRef.current!,
+        (result, err) => {
+          if (stopped || detectedRef.current) return;
+          if (result) {
+            stableOnDetected(result.getText());
+            reader.reset();
+            return;
+          }
+          if (err && !(err instanceof NotFoundException)) {
+            console.warn("Scanner ZXing:", err);
+          }
+        },
+      );
+    }
+
     start();
 
     return () => {
       stopped = true;
-      reader.reset();
+      cancelAnimationFrame(rafId);
       stream?.getTracks().forEach((t) => t.stop());
+      trackRef.current = null;
     };
-  }, [onDetected]);
+  }, [stableOnDetected]);
 
   return (
     <div
@@ -121,7 +214,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         className="w-full h-full object-cover"
         playsInline
         muted
+        autoPlay
       />
+      <canvas ref={canvasRef} className="hidden" />
 
       {/* Chargement */}
       {loading && !error && (
@@ -200,13 +295,25 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         </div>
       )}
 
-      <button
-        onClick={onClose}
-        className="absolute top-2 right-2 p-1.5 rounded-full z-20"
-        style={{ background: "rgba(0,0,0,0.55)" }}
-      >
-        <X size={15} className="text-white" />
-      </button>
+      {/* Boutons overlay */}
+      <div className="absolute top-2 right-2 flex gap-2 z-20">
+        {hasTorch && (
+          <button
+            onClick={toggleTorch}
+            className="p-1.5 rounded-full"
+            style={{ background: torch ? "var(--accent)" : "rgba(0,0,0,0.55)" }}
+          >
+            <Zap size={15} className="text-white" />
+          </button>
+        )}
+        <button
+          onClick={onClose}
+          className="p-1.5 rounded-full"
+          style={{ background: "rgba(0,0,0,0.55)" }}
+        >
+          <X size={15} className="text-white" />
+        </button>
+      </div>
     </div>
   );
 }
