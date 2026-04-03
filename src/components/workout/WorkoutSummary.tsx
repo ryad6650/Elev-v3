@@ -8,6 +8,7 @@ import { saveWorkout } from "@/app/actions/workout";
 
 interface Props {
   workout: ActiveWorkout;
+  totalPausedMs?: number;
 }
 
 function formatDuration(ms: number): string {
@@ -18,13 +19,15 @@ function formatDuration(ms: number): string {
   return `${m} min`;
 }
 
-export default function WorkoutSummary({ workout }: Props) {
+export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
   const clearWorkout = useWorkoutStore((s) => s.clearWorkout);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
 
-  const [duration] = useState(() => Date.now() - workout.debutAt);
+  const [duration] = useState(
+    () => Date.now() - workout.debutAt - totalPausedMs,
+  );
   const completedSets = workout.exercises.flatMap((e) =>
     e.sets.filter((s) => s.completed),
   );
@@ -65,6 +68,7 @@ export default function WorkoutSummary({ workout }: Props) {
       workout.exercises,
       workout.debutAt,
       workout.routineId,
+      totalPausedMs,
     );
     if (result.success) {
       setSaved(true);

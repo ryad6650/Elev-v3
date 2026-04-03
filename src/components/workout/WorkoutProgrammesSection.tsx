@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import ProgrammeDetail from "@/components/programmes/ProgrammeDetail";
 import CreateProgrammeModal from "@/components/programmes/CreateProgrammeModal";
-import { getRoutineExercises } from "@/app/actions/workout";
+import { getRoutineExercises } from "@/app/actions/routines";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { ProgrammesPageData, Programme } from "@/lib/programmes";
 

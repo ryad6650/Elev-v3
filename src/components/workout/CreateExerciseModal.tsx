@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { X, Check, ImagePlus } from "lucide-react";
-import { createExercise } from "@/app/actions/workout";
+import { createExercise } from "@/app/actions/exercises";
 
 interface Exercise {
   id: string;
@@ -151,11 +152,12 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
           />
           {imagePreview ? (
             <div className="relative w-20 h-20 rounded-xl overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={imagePreview}
                 alt="Aperçu"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
               <button
                 onClick={removeImage}

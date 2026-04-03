@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { X, Check, ImagePlus } from "lucide-react";
-import { updateExercise } from "@/app/actions/workout";
+import { updateExercise } from "@/app/actions/exercises";
 import ExerciseGif from "./ExerciseGif";
 
 interface Exercise {
@@ -181,12 +182,13 @@ export default function EditExerciseModal({
           {currentImage ? (
             <div className="flex items-center gap-3">
               {imagePreview ? (
-                <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                  <Image
                     src={imagePreview}
                     alt="Aperçu"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 </div>
               ) : (

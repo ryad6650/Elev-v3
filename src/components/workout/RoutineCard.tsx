@@ -2,7 +2,7 @@
 
 import { MoreVertical, ChevronDown, Play } from "lucide-react";
 import type { Routine } from "@/lib/workout";
-import type { RoutineExerciseData } from "@/app/actions/workout";
+import type { RoutineExerciseData } from "@/app/actions/routines";
 import ExerciseGif from "./ExerciseGif";
 
 interface Props {

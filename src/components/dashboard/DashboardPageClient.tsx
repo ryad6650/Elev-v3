@@ -1,19 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { fetchDashboardData, type DashboardData } from "@/lib/dashboard";
-import { getCached, setCache } from "@/lib/pageCache";
+import type { DashboardData } from "@/lib/dashboard";
 import { applyAccent } from "@/lib/apply-accent";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
 import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
 import ThemeToggleButton from "@/components/dashboard/ThemeToggleButton";
-
-const CACHE_KEY = "dashboard";
 
 function formatDateFr(): string {
   return new Date()
@@ -75,7 +71,12 @@ function MiniStat({
   );
 }
 
-function DashboardContent({ data }: { data: DashboardData }) {
+interface Props {
+  initialData: DashboardData;
+}
+
+export default function DashboardPageClient({ initialData }: Props) {
+  const data = initialData;
   const prenom = data.prenom ?? "toi";
 
   useEffect(() => {
@@ -291,43 +292,4 @@ function DashboardContent({ data }: { data: DashboardData }) {
       </div>
     </main>
   );
-}
-
-export default function DashboardPageClient() {
-  const [data, setData] = useState<DashboardData | null>(
-    getCached<DashboardData>(CACHE_KEY),
-  );
-
-  useEffect(() => {
-    const supabase = createClient();
-    fetchDashboardData(supabase)
-      .then((d) => {
-        setData(d);
-        setCache(CACHE_KEY, d);
-      })
-      .catch(console.error);
-  }, []);
-
-  if (!data)
-    return (
-      <main
-        className="px-4 pt-5 pb-4 space-y-4"
-        style={{ maxWidth: 520, margin: "0 auto" }}
-      >
-        <div
-          className="flex items-center justify-center"
-          style={{ height: "50vh" }}
-        >
-          <div
-            className="w-7 h-7 rounded-full border-2 animate-spin"
-            style={{
-              borderColor: "var(--accent)",
-              borderTopColor: "transparent",
-            }}
-          />
-        </div>
-      </main>
-    );
-
-  return <DashboardContent data={data} />;
 }

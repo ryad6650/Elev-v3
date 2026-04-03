@@ -45,7 +45,10 @@ interface WorkoutStore {
   startWorkout: (params: {
     routineId?: string | null;
     routineName?: string | null;
-    exercises?: Omit<WorkoutExercise, "uid" | "sets">[];
+    exercises?: (Omit<WorkoutExercise, "uid" | "sets"> & {
+      poidsRef?: number | null;
+      repsRef?: number | null;
+    })[];
   }) => void;
   minimizeWorkout: () => void;
   maximizeWorkout: () => void;
@@ -76,6 +79,8 @@ function buildSets(
   seriesCible: number,
   repsCible: number,
   repsCibleMax: number | null = null,
+  poidsRef: number | null = null,
+  repsRef: number | null = null,
 ): WorkoutSet[] {
   return Array.from({ length: seriesCible }, (_, i) => ({
     id: crypto.randomUUID(),
@@ -85,8 +90,8 @@ function buildSets(
     completed: false,
     repsCible,
     repsCibleMax,
-    poidsRef: null,
-    repsRef: null,
+    poidsRef,
+    repsRef,
     isWarmup: false,
   }));
 }
@@ -111,7 +116,13 @@ export const useWorkoutStore = create<WorkoutStore>()(
           ...e,
           uid: crypto.randomUUID(),
           ordre: i,
-          sets: buildSets(e.seriesCible, e.repsCible, e.repsCibleMax ?? null),
+          sets: buildSets(
+            e.seriesCible,
+            e.repsCible,
+            e.repsCibleMax ?? null,
+            e.poidsRef ?? null,
+            e.repsRef ?? null,
+          ),
         }));
         set({
           activeWorkout: {

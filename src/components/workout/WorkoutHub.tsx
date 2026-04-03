@@ -10,7 +10,7 @@ import {
   getRoutineExercises,
   deleteRoutine,
   type RoutineExerciseData,
-} from "@/app/actions/workout";
+} from "@/app/actions/routines";
 import type { WorkoutPageData, Routine } from "@/lib/workout";
 
 const FILTRES = ["Tous", "Push / Pull", "Upper / Lower", "Full Body"];

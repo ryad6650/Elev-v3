@@ -5,6 +5,9 @@ import { X } from "lucide-react";
 import {
   addNutritionEntry,
   getRecentAliments,
+  getFavoriteAliments,
+  getFavoriteIds,
+  toggleFavoriteAliment,
   upsertExternalAliment,
 } from "@/app/actions/nutrition";
 import FoodSearchStep from "./FoodSearchStep";
@@ -37,6 +40,8 @@ export default function AddFoodModal({
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<NutritionAliment | null>(null);
   const [populaires, setPopulaires] = useState<NutritionAliment[]>([]);
+  const [favoris, setFavoris] = useState<NutritionAliment[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [pending, setPending] = useState(false);
 
@@ -51,7 +56,7 @@ export default function AddFoodModal({
     let done = 0;
     const finish = () => {
       done++;
-      if (done >= 2) setLoadingInitial(false);
+      if (done >= 3) setLoadingInitial(false);
     };
     getRecentAliments()
       .then((r) => setRecents(r as NutritionAliment[]))
@@ -60,6 +65,13 @@ export default function AddFoodModal({
     fetch("/api/aliments?q=")
       .then((r) => r.json())
       .then((d) => setPopulaires(Array.isArray(d) ? d : []))
+      .catch(() => {})
+      .finally(finish);
+    Promise.all([getFavoriteAliments(), getFavoriteIds()])
+      .then(([favAliments, favIds]) => {
+        setFavoris(favAliments as NutritionAliment[]);
+        setFavoriteIds(new Set(favIds));
+      })
       .catch(() => {})
       .finally(finish);
   }, []);
@@ -124,13 +136,41 @@ export default function AddFoodModal({
   async function handleCustomCreated(id: string) {
     // Créer l'entrée nutrition côté serveur puis rafraîchir le store
     onClose();
-    await addNutritionEntry(mealNumber, id, 100, date, mealTime);
-    useNutritionStore.getState().fetchDay(date);
+    try {
+      await addNutritionEntry(mealNumber, id, 100, date, mealTime);
+      useNutritionStore.getState().fetchDay(date);
+    } catch {
+      // Re-fetch pour afficher l'état réel
+      useNutritionStore.getState().fetchDay(date);
+    }
   }
 
   function handleEdited(updated: NutritionAliment) {
     setSelected(updated);
     setStep("quantity");
+  }
+
+  async function handleToggleFavorite(aliment: NutritionAliment) {
+    if (!aliment.id) return;
+    const isFav = favoriteIds.has(aliment.id);
+    // Optimiste
+    const next = new Set(favoriteIds);
+    if (isFav) {
+      next.delete(aliment.id);
+      setFavoris((prev) => prev.filter((f) => f.id !== aliment.id));
+    } else {
+      next.add(aliment.id);
+      setFavoris((prev) => [aliment, ...prev]);
+    }
+    setFavoriteIds(next);
+    try {
+      await toggleFavoriteAliment(aliment.id);
+    } catch {
+      // Rollback
+      setFavoriteIds(favoriteIds);
+      if (isFav) setFavoris((prev) => [aliment, ...prev]);
+      else setFavoris((prev) => prev.filter((f) => f.id !== aliment.id));
+    }
   }
 
   const isCustom = selected?.is_global === false && !!selected?.id;
@@ -206,9 +246,12 @@ export default function AddFoodModal({
               results={results}
               recents={recents}
               populaires={populaires}
+              favoris={favoris}
+              favoriteIds={favoriteIds}
               loading={loading}
               loadingInitial={loadingInitial}
               onSelect={handleSelect}
+              onToggleFavorite={handleToggleFavorite}
               onScan={() => setStep("scan")}
               onCustom={() => setStep("custom")}
             />

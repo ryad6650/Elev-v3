@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { HistoriquePageData } from "@/lib/historique";
 import { fetchHistoriqueData } from "@/lib/historique";
 import { createClient } from "@/lib/supabase/client";
-import { getCached, setCache } from "@/lib/pageCache";
 import { fetchWorkoutDetail } from "@/app/actions/historique";
 import type { WorkoutDetail } from "@/app/actions/historique";
 import HistoriqueStatsCards from "./HistoriqueStatsCards";
@@ -13,12 +12,12 @@ import PRSection from "./PRSection";
 import HistoriqueList from "./HistoriqueList";
 import WorkoutDetailSheet from "./WorkoutDetailSheet";
 
-const CACHE_KEY = "historique";
+interface Props {
+  initialData: HistoriquePageData;
+}
 
-export default function HistoriquePageClient() {
-  const [data, setData] = useState<HistoriquePageData | null>(
-    getCached<HistoriquePageData>(CACHE_KEY),
-  );
+export default function HistoriquePageClient({ initialData }: Props) {
+  const [data, setData] = useState(initialData);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDetail | null>(
     null,
   );
@@ -26,16 +25,9 @@ export default function HistoriquePageClient() {
   const reload = () => {
     const supabase = createClient();
     fetchHistoriqueData(supabase)
-      .then((d) => {
-        setData(d);
-        setCache(CACHE_KEY, d);
-      })
+      .then((d) => setData(d))
       .catch(console.error);
   };
-
-  useEffect(() => {
-    reload();
-  }, []);
 
   const handleSelect = async (id: string) => {
     try {
@@ -55,24 +47,6 @@ export default function HistoriquePageClient() {
     setSelectedWorkout(w);
     reload();
   };
-
-  if (!data)
-    return (
-      <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
-        <div
-          className="flex items-center justify-center"
-          style={{ height: "50vh" }}
-        >
-          <div
-            className="w-7 h-7 rounded-full border-2 animate-spin"
-            style={{
-              borderColor: "var(--accent)",
-              borderTopColor: "transparent",
-            }}
-          />
-        </div>
-      </main>
-    );
 
   return (
     <main

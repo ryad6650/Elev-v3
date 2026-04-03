@@ -1,36 +1,43 @@
-'use client';
+"use client";
 
-import { Check, Trash2 } from 'lucide-react';
-import type { WorkoutSet } from '@/store/workoutStore';
+import { memo } from "react";
+import { Check, Trash2 } from "lucide-react";
+import type { WorkoutSet } from "@/store/workoutStore";
 
 interface Props {
   set: WorkoutSet;
   isActive: boolean;
-  onUpdate: (field: 'reps' | 'poids', value: number | null) => void;
+  onUpdate: (field: "reps" | "poids", value: number | null) => void;
   onToggle: () => void;
   onRemove: () => void;
 }
 
-export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
-  const repsPlaceholder = set.repsCible > 0
-    ? (set.repsCibleMax ? `${set.repsCible}-${set.repsCibleMax}` : `${set.repsCible}`)
-    : '—';
+function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
+  const repsPlaceholder =
+    set.repsCible > 0
+      ? set.repsCibleMax
+        ? `${set.repsCible}-${set.repsCibleMax}`
+        : `${set.repsCible}`
+      : "—";
 
   const numLabel = set.isWarmup ? `W${set.numSerie}` : `${set.numSerie}`;
 
-  const precStr = set.poidsRef != null
-    ? (set.repsRef != null ? `${set.poidsRef}×${set.repsRef}` : `${set.poidsRef}kg`)
-    : '—';
+  const precStr =
+    set.poidsRef != null
+      ? set.repsRef != null
+        ? `${set.poidsRef}×${set.repsRef}`
+        : `${set.poidsRef}kg`
+      : "—";
 
   const inputBorder = isActive
-    ? '1.5px solid var(--accent)'
-    : '1.5px solid var(--border)';
+    ? "1.5px solid var(--accent)"
+    : "1.5px solid var(--border)";
 
   return (
     <div
       className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
       style={{
-        background: set.completed ? 'rgba(34,197,94,0.06)' : 'transparent',
+        background: set.completed ? "rgba(34,197,94,0.06)" : "transparent",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
@@ -39,14 +46,16 @@ export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: 
         {set.completed ? (
           <div
             className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: 'var(--success)' }}
+            style={{ background: "var(--success)" }}
           >
             <Check size={11} strokeWidth={3} color="white" />
           </div>
         ) : (
           <span
             className="text-xs font-bold"
-            style={{ color: set.isWarmup ? 'var(--accent-text)' : 'var(--text-muted)' }}
+            style={{
+              color: set.isWarmup ? "var(--accent-text)" : "var(--text-muted)",
+            }}
           >
             {numLabel}
           </span>
@@ -62,15 +71,24 @@ export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: 
             inputMode="decimal"
             min={0}
             step={0.5}
-            placeholder={set.poidsRef != null ? `${set.poidsRef}` : '0'}
-            value={set.poids ?? ''}
-            onChange={(e) => onUpdate('poids', e.target.value === '' ? null : Number(e.target.value))}
+            placeholder={set.poidsRef != null ? `${set.poidsRef}` : "0"}
+            value={set.poids ?? ""}
+            onChange={(e) =>
+              onUpdate(
+                "poids",
+                e.target.value === "" ? null : Number(e.target.value),
+              )
+            }
             className="w-full text-center text-sm font-semibold rounded-xl py-1.5 pl-1 pr-6 outline-none"
-            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: inputBorder }}
+            style={{
+              background: "var(--bg-elevated)",
+              color: "var(--text-primary)",
+              border: inputBorder,
+            }}
           />
           <span
             className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none select-none"
-            style={{ color: 'var(--text-muted)' }}
+            style={{ color: "var(--text-muted)" }}
           >
             kg
           </span>
@@ -83,17 +101,28 @@ export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: 
             inputMode="numeric"
             min={0}
             placeholder={repsPlaceholder}
-            value={set.reps ?? ''}
-            onChange={(e) => onUpdate('reps', e.target.value === '' ? null : Number(e.target.value))}
+            value={set.reps ?? ""}
+            onChange={(e) =>
+              onUpdate(
+                "reps",
+                e.target.value === "" ? null : Number(e.target.value),
+              )
+            }
             className="w-full text-center text-sm font-semibold rounded-xl py-1.5 outline-none"
-            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: inputBorder }}
+            style={{
+              background: "var(--bg-elevated)",
+              color: "var(--text-primary)",
+              border: inputBorder,
+            }}
           />
         </div>
       </div>
 
       {/* Précédent */}
       <div className="w-11 text-center shrink-0">
-        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{precStr}</span>
+        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+          {precStr}
+        </span>
       </div>
 
       {/* Bouton valider */}
@@ -101,9 +130,9 @@ export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: 
         onClick={onToggle}
         className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
         style={{
-          background: set.completed ? 'var(--success)' : 'transparent',
-          color: set.completed ? 'white' : 'var(--text-muted)',
-          border: set.completed ? 'none' : '1.5px solid var(--border)',
+          background: set.completed ? "var(--success)" : "transparent",
+          color: set.completed ? "white" : "var(--text-muted)",
+          border: set.completed ? "none" : "1.5px solid var(--border)",
         }}
       >
         <Check size={13} strokeWidth={2.5} />
@@ -113,10 +142,15 @@ export default function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: 
       <button
         onClick={onRemove}
         className="w-7 h-7 flex items-center justify-center shrink-0 rounded-lg transition-opacity active:opacity-50"
-        style={{ color: 'var(--text-muted)' }}
+        style={{ color: "var(--text-muted)" }}
       >
         <Trash2 size={13} />
       </button>
     </div>
   );
 }
+
+export default memo(
+  SetRow,
+  (prev, next) => prev.set === next.set && prev.isActive === next.isActive,
+);

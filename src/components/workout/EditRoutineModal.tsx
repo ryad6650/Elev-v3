@@ -3,22 +3,17 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, Plus, Dumbbell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { updateRoutine, getRoutineExercises } from "@/app/actions/workout";
+import { updateRoutine, getRoutineExercises } from "@/app/actions/routines";
 import ExerciseSearch from "./ExerciseSearch";
 import EditExerciseModal from "./EditExerciseModal";
 import ExerciseEditMenu from "./ExerciseEditMenu";
 import RoutineExerciseCard from "./RoutineExerciseCard";
-import type { RoutineExercise } from "./RoutineExerciseCard";
 import { getGroupeColor } from "./exerciseColors";
 import { useUiStore } from "@/store/uiStore";
+import { useRoutineExercises } from "@/hooks/useRoutineExercises";
+import type { RawExercise } from "@/hooks/useRoutineExercises";
 import type { Routine } from "@/lib/workout";
 
-interface RawExercise {
-  id: string;
-  nom: string;
-  groupe_musculaire: string;
-  gif_url: string | null;
-}
 interface Props {
   routine: Routine;
   onClose: () => void;
@@ -27,7 +22,17 @@ interface Props {
 export default function EditRoutineModal({ routine, onClose }: Props) {
   const router = useRouter();
   const [nom, setNom] = useState(routine.nom);
-  const [exercices, setExercices] = useState<RoutineExercise[]>([]);
+  const {
+    exercices,
+    setExercices,
+    addExercise,
+    replaceExercise,
+    updateSeries,
+    toggleReps,
+    updateIntField,
+    remove,
+    move,
+  } = useRoutineExercises([]);
   const [loading, setLoading] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState<number | null>(null);
@@ -58,39 +63,14 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
         ),
       )
       .finally(() => setLoading(false));
-  }, [routine.id]);
+  }, [routine.id, setExercices]);
 
   const handleSelect = (ex: RawExercise) => {
     if (replaceIndex !== null) {
-      setExercices((p) =>
-        p.map((e, i) =>
-          i === replaceIndex
-            ? {
-                exerciseId: ex.id,
-                nom: ex.nom,
-                groupeMusculaire: ex.groupe_musculaire,
-                gifUrl: ex.gif_url,
-                seriesCible: e.seriesCible,
-                repsCible: e.repsCible,
-                repsCibleMax: e.repsCibleMax,
-              }
-            : e,
-        ),
-      );
+      replaceExercise(replaceIndex, ex);
       setReplaceIndex(null);
     } else {
-      setExercices((p) => [
-        ...p,
-        {
-          exerciseId: ex.id,
-          nom: ex.nom,
-          groupeMusculaire: ex.groupe_musculaire,
-          gifUrl: ex.gif_url,
-          seriesCible: 3,
-          repsCible: 10,
-          repsCibleMax: null,
-        },
-      ]);
+      addExercise(ex);
     }
     setShowSearch(false);
   };
@@ -115,47 +95,6 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
       ),
     );
     setEditIndex(null);
-  };
-
-  const updateSeries = (i: number, d: number) =>
-    setExercices((p) =>
-      p.map((e, idx) =>
-        idx === i ? { ...e, seriesCible: Math.max(1, e.seriesCible + d) } : e,
-      ),
-    );
-  const toggleReps = (i: number) =>
-    setExercices((p) =>
-      p.map((e, idx) =>
-        idx !== i
-          ? e
-          : e.repsCibleMax !== null
-            ? { ...e, repsCibleMax: null }
-            : { ...e, repsCibleMax: e.repsCible + 4 },
-      ),
-    );
-  const updateIntField = (
-    i: number,
-    field: "repsCible" | "repsCibleMax",
-    v: string,
-  ) => {
-    const n = parseInt(v);
-    if (v === "" || (!isNaN(n) && n >= 0))
-      setExercices((p) =>
-        p.map((e, idx) =>
-          idx === i ? { ...e, [field]: isNaN(n) ? 0 : n } : e,
-        ),
-      );
-  };
-  const remove = (i: number) =>
-    setExercices((p) => p.filter((_, idx) => idx !== i));
-  const move = (i: number, dir: -1 | 1) => {
-    const t = i + dir;
-    if (t < 0 || t >= exercices.length) return;
-    setExercices((p) => {
-      const n = [...p];
-      [n[i], n[t]] = [n[t], n[i]];
-      return n;
-    });
   };
 
   const handleSave = async () => {
@@ -252,10 +191,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
             onClick={handleSave}
             disabled={saving || !nom.trim()}
             className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
-            style={{
-              background: "var(--accent)",
-              color: "white",
-            }}
+            style={{ background: "var(--accent)", color: "white" }}
           >
             {saving ? "Sauvegarde..." : "Sauvegarder"}
           </button>
@@ -338,8 +274,8 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
             index={i}
             total={exercices.length}
             onUpdateSeries={updateSeries}
-            onUpdateReps={(i, v) => updateIntField(i, "repsCible", v)}
-            onUpdateRepsMax={(i, v) => updateIntField(i, "repsCibleMax", v)}
+            onUpdateReps={(idx, v) => updateIntField(idx, "repsCible", v)}
+            onUpdateRepsMax={(idx, v) => updateIntField(idx, "repsCibleMax", v)}
             onToggleRepsMode={toggleReps}
             onMove={move}
             onRemove={remove}
@@ -365,7 +301,6 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
         )}
       </div>
 
-      {/* Modal édition exercice */}
       {editIndex !== null && exercices[editIndex] && (
         <EditExerciseModal
           exercise={{

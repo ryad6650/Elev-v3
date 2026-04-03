@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
-import { getUserExerciseRests } from "@/app/actions/workout";
+import { getUserExerciseRests } from "@/app/actions/routines";
 import ExerciseCard from "./ExerciseCard";
 import ExerciseSearch from "./ExerciseSearch";
 import WorkoutTimer from "./WorkoutTimer";
@@ -32,7 +32,10 @@ export default function ActiveWorkout() {
   );
 
   if (!activeWorkout) return null;
-  if (showSummary) return <WorkoutSummary workout={activeWorkout} />;
+  if (showSummary)
+    return (
+      <WorkoutSummary workout={activeWorkout} totalPausedMs={totalPausedMs} />
+    );
 
   const isPaused = pausedAt !== null;
   const handlePause = () => setPausedAt(Date.now());

@@ -1,10 +1,12 @@
 import { memo } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Heart } from "lucide-react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
   results: NutritionAliment[];
   onSelect: (aliment: NutritionAliment) => void;
+  onToggleFavorite?: (aliment: NutritionAliment) => void;
+  favoriteIds?: Set<string>;
   loading: boolean;
   emptyMessage?: string;
 }
@@ -12,6 +14,8 @@ interface Props {
 export default memo(function FoodSearchResults({
   results,
   onSelect,
+  onToggleFavorite,
+  favoriteIds,
   loading,
   emptyMessage = "Aucun résultat",
 }: Props) {
@@ -52,15 +56,37 @@ export default memo(function FoodSearchResults({
             border: "1px solid var(--border)",
           }}
         >
-          {/* Avatar monogramme */}
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-extrabold shrink-0"
-            style={{
-              background: "var(--accent-bg)",
-              color: "var(--accent-text)",
-            }}
-          >
-            {a.nom.charAt(0).toUpperCase()}
+          {/* Avatar monogramme + favori */}
+          <div className="relative shrink-0">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-extrabold"
+              style={{
+                background: "var(--accent-bg)",
+                color: "var(--accent-text)",
+              }}
+            >
+              {a.nom.charAt(0).toUpperCase()}
+            </div>
+            {onToggleFavorite && a.id && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(a);
+                }}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
+                style={{ background: "var(--bg-card)" }}
+              >
+                <Heart
+                  size={11}
+                  fill={favoriteIds?.has(a.id) ? "var(--accent)" : "none"}
+                  style={{
+                    color: favoriteIds?.has(a.id)
+                      ? "var(--accent)"
+                      : "var(--text-muted)",
+                  }}
+                />
+              </button>
+            )}
           </div>
 
           {/* Infos */}

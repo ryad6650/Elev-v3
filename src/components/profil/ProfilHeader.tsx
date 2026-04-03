@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import { Camera, Loader2 } from "lucide-react";
 import { uploadPhotoProfil } from "@/app/actions/profil";
 import type { ProfilData } from "@/lib/profil";
@@ -21,9 +22,7 @@ export default function ProfilHeader({ profil }: Props) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const initiale = profil.prenom
-    ? profil.prenom[0].toUpperCase()
-    : "?";
+  const initiale = profil.prenom ? profil.prenom[0].toUpperCase() : "?";
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -62,11 +61,13 @@ export default function ProfilHeader({ profil }: Props) {
         aria-label="Modifier la photo de profil"
       >
         {photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={photoUrl}
             alt="Avatar"
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-full object-cover"
+            unoptimized
           />
         ) : (
           <div
@@ -83,10 +84,11 @@ export default function ProfilHeader({ profil }: Props) {
           style={{ background: "rgba(0,0,0,0.45)", opacity: isPending ? 1 : 0 }}
           aria-hidden
         >
-          {isPending
-            ? <Loader2 size={20} color="#fff" className="animate-spin" />
-            : <Camera size={18} color="#fff" />
-          }
+          {isPending ? (
+            <Loader2 size={20} color="#fff" className="animate-spin" />
+          ) : (
+            <Camera size={18} color="#fff" />
+          )}
         </div>
 
         {/* Indicateur hover */}
@@ -124,7 +126,9 @@ export default function ProfilHeader({ profil }: Props) {
           </p>
         )}
         {uploadError && (
-          <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>{uploadError}</p>
+          <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
+            {uploadError}
+          </p>
         )}
       </div>
     </div>

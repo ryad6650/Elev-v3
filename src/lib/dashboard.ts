@@ -204,27 +204,8 @@ export async function fetchDashboardData(
     };
   }
 
-  // Streak de connexions
   const profil = profileRes.data;
-  const hier = getNDaysAgo(1);
-  const derniereConnexion = profil?.derniere_connexion ?? null;
-
-  let streakConnexions = profil?.streak_connexions ?? 1;
-  if (derniereConnexion === null || derniereConnexion < hier) {
-    streakConnexions = 1;
-  } else if (derniereConnexion === hier) {
-    streakConnexions = streakConnexions + 1;
-  }
-
-  if (derniereConnexion !== today) {
-    await supabase
-      .from("profiles")
-      .update({
-        streak_connexions: streakConnexions,
-        derniere_connexion: today,
-      })
-      .eq("id", user.id);
-  }
+  const streakConnexions = profil?.streak_connexions ?? 1;
 
   return {
     prenom: profil?.prenom ?? null,

@@ -457,6 +457,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_aliment_favorites: {
+        Row: {
+          aliment_id: string;
+          created_at: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          aliment_id: string;
+          created_at?: string;
+          id?: string;
+          user_id: string;
+        };
+        Update: {
+          aliment_id?: string;
+          created_at?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_aliment_favorites_aliment_id_fkey";
+            columns: ["aliment_id"];
+            isOneToOne: false;
+            referencedRelation: "aliments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_aliment_favorites_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_exercise_rest: {
         Row: {
           exercise_id: string;

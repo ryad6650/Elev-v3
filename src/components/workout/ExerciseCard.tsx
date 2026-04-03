@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, useCallback } from "react";
 import {
   Plus,
   ChevronRight,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { WorkoutExercise, WorkoutSet } from "@/store/workoutStore";
-import { saveExerciseRest } from "@/app/actions/workout";
+import { saveExerciseRest } from "@/app/actions/routines";
 import SetRow from "./SetRow";
 import RestDurationPicker from "./RestDurationPicker";
 import ExerciseGif from "./ExerciseGif";
@@ -52,18 +52,35 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
   const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
-  const handleToggle = (set: WorkoutSet) => {
-    if (
-      !set.completed &&
-      set.poids &&
-      set.reps &&
-      set.poidsRef &&
-      set.poids > set.poidsRef
-    ) {
-      onPR?.(exercise.nom, set.poids, set.reps);
-    }
-    toggleComplete(exercise.uid, set.id);
-  };
+  const handleToggle = useCallback(
+    (set: WorkoutSet) => {
+      if (
+        !set.completed &&
+        set.poids &&
+        set.reps &&
+        set.poidsRef &&
+        set.poids > set.poidsRef
+      ) {
+        onPR?.(exercise.nom, set.poids, set.reps);
+      }
+      toggleComplete(exercise.uid, set.id);
+    },
+    [exercise.uid, exercise.nom, onPR, toggleComplete],
+  );
+
+  const handleUpdateSet = useCallback(
+    (setId: string, field: "reps" | "poids", value: number | null) => {
+      updateSet(exercise.uid, setId, field, value);
+    },
+    [exercise.uid, updateSet],
+  );
+
+  const handleRemoveSet = useCallback(
+    (setId: string) => {
+      removeSet(exercise.uid, setId);
+    },
+    [exercise.uid, removeSet],
+  );
 
   // Vue condensée (exercice fermé)
   if (!isOpen) {
@@ -315,18 +332,21 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                   </span>
                 </div>
               ) : (
-                warmupSets.map((set, idx) => (
-                  <SetRow
-                    key={set.id}
-                    set={set}
-                    isActive={idx === firstIncompleteIdx}
-                    onUpdate={(field, value) =>
-                      updateSet(exercise.uid, set.id, field, value)
-                    }
-                    onToggle={() => handleToggle(set)}
-                    onRemove={() => removeSet(exercise.uid, set.id)}
-                  />
-                ))
+                warmupSets.map((set) => {
+                  const globalIdx = exercise.sets.indexOf(set);
+                  return (
+                    <SetRow
+                      key={set.id}
+                      set={set}
+                      isActive={globalIdx === firstIncompleteIdx}
+                      onUpdate={(field, value) =>
+                        handleUpdateSet(set.id, field, value)
+                      }
+                      onToggle={() => handleToggle(set)}
+                      onRemove={() => handleRemoveSet(set.id)}
+                    />
+                  );
+                })
               )}
               {workingSets.map((set) => {
                 const globalIdx = exercise.sets.indexOf(set);
@@ -336,10 +356,10 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                     set={set}
                     isActive={globalIdx === firstIncompleteIdx}
                     onUpdate={(field, value) =>
-                      updateSet(exercise.uid, set.id, field, value)
+                      handleUpdateSet(set.id, field, value)
                     }
                     onToggle={() => handleToggle(set)}
-                    onRemove={() => removeSet(exercise.uid, set.id)}
+                    onRemove={() => handleRemoveSet(set.id)}
                   />
                 );
               })}

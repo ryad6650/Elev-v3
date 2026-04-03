@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import PoidsHero from "./PoidsHero";
 import PoidsChart from "./PoidsChart";
 import PoidsComposition from "./PoidsComposition";
@@ -10,9 +10,6 @@ import AddPoidsModal from "./AddPoidsModal";
 import { createClient } from "@/lib/supabase/client";
 import { fetchPoidsData } from "@/lib/poids";
 import type { PoidsPageData, PoidsEntry } from "@/lib/poids";
-import { getCached, setCache } from "@/lib/pageCache";
-
-const CACHE_KEY = "poids";
 
 const EMPTY_MENSURATIONS = {
   cou: null,
@@ -24,10 +21,12 @@ const EMPTY_MENSURATIONS = {
   mollet: null,
 };
 
-export default function PoidsPageClient() {
-  const [data, setData] = useState<PoidsPageData | null>(
-    getCached<PoidsPageData>(CACHE_KEY),
-  );
+interface Props {
+  initialData: PoidsPageData;
+}
+
+export default function PoidsPageClient({ initialData }: Props) {
+  const [data, setData] = useState(initialData);
   const [modal, setModal] = useState<{ open: boolean; entry?: PoidsEntry }>({
     open: false,
   });
@@ -35,34 +34,9 @@ export default function PoidsPageClient() {
   const refreshData = useCallback(() => {
     const supabase = createClient();
     fetchPoidsData(supabase)
-      .then((d) => {
-        setData(d);
-        setCache(CACHE_KEY, d);
-      })
+      .then((d) => setData(d))
       .catch(console.error);
   }, []);
-
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
-
-  if (!data)
-    return (
-      <main className="px-4 pt-6" style={{ maxWidth: 520, margin: "0 auto" }}>
-        <div
-          className="flex items-center justify-center"
-          style={{ height: "50vh" }}
-        >
-          <div
-            className="w-7 h-7 rounded-full border-2 animate-spin"
-            style={{
-              borderColor: "var(--accent)",
-              borderTopColor: "transparent",
-            }}
-          />
-        </div>
-      </main>
-    );
 
   const entries = data.entries;
   const current = entries.length > 0 ? entries[entries.length - 1] : null;

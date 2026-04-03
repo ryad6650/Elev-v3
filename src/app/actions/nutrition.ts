@@ -228,3 +228,71 @@ export async function getRecentAliments() {
   }
   return recents;
 }
+
+export async function getFavoriteAliments(): Promise<
+  EntryWithAliment["aliments"][]
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("user_aliment_favorites")
+    .select(
+      "aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (!data) return [];
+  return (data as unknown as { aliments: EntryWithAliment["aliments"] }[])
+    .map((r) => r.aliments)
+    .filter(Boolean);
+}
+
+export async function toggleFavoriteAliment(
+  alimentId: string,
+): Promise<boolean> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const { data: existing } = await supabase
+    .from("user_aliment_favorites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("aliment_id", alimentId)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("user_aliment_favorites")
+      .delete()
+      .eq("id", existing.id);
+    return false;
+  }
+
+  await supabase
+    .from("user_aliment_favorites")
+    .insert({ user_id: user.id, aliment_id: alimentId });
+  return true;
+}
+
+export async function getFavoriteIds(): Promise<string[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("user_aliment_favorites")
+    .select("aliment_id")
+    .eq("user_id", user.id);
+
+  return (data ?? []).map((r) => r.aliment_id);
+}

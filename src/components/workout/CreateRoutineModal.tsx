@@ -3,22 +3,17 @@
 import { useState, useCallback, useEffect } from "react";
 import { ChevronLeft, Plus, Dumbbell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createRoutine } from "@/app/actions/workout";
+import { createRoutine } from "@/app/actions/routines";
 import ExerciseSearch from "./ExerciseSearch";
 import RoutineExerciseCard from "./RoutineExerciseCard";
 import type { RoutineExercise } from "./RoutineExerciseCard";
 import { getGroupeColor } from "./exerciseColors";
 import { useUiStore } from "@/store/uiStore";
-
-interface RawExercise {
-  id: string;
-  nom: string;
-  groupe_musculaire: string;
-  gif_url: string | null;
-}
+import { useRoutineExercises } from "@/hooks/useRoutineExercises";
+import type { RawExercise } from "@/hooks/useRoutineExercises";
 
 const STORAGE_KEY = "elev-draft-routine";
-const DRAFT_TTL = 5 * 60 * 1000; // 5 minutes
+const DRAFT_TTL = 5 * 60 * 1000;
 
 interface DraftRoutine {
   nom: string;
@@ -46,12 +41,10 @@ function saveDraft(nom: string, exercices: RoutineExercise[]) {
     localStorage.removeItem(STORAGE_KEY);
     return;
   }
-  const draft: DraftRoutine = { nom, exercices, savedAt: Date.now() };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-}
-
-function clearDraft() {
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ nom, exercices, savedAt: Date.now() }),
+  );
 }
 
 interface Props {
@@ -62,91 +55,36 @@ export default function CreateRoutineModal({ onClose }: Props) {
   const router = useRouter();
   const [draft] = useState(loadDraft);
   const [nom, setNom] = useState(draft?.nom ?? "");
-  const [exercices, setExercices] = useState<RoutineExercise[]>(
-    draft?.exercices ?? [],
-  );
+  const {
+    exercices,
+    addExercise,
+    updateSeries,
+    toggleReps,
+    updateIntField,
+    remove,
+    move,
+  } = useRoutineExercises(draft?.exercices ?? []);
   const [showSearch, setShowSearch] = useState(false);
   const [saving, setSaving] = useState(false);
   const [erreur, setErreur] = useState("");
 
-  // Masquer la bottom nav
   const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
   useEffect(() => {
     setFullscreenModal(true);
     return () => setFullscreenModal(false);
   }, [setFullscreenModal]);
 
-  // Sauvegarder le brouillon à chaque changement
   useEffect(() => {
     saveDraft(nom, exercices);
   }, [nom, exercices]);
 
-  const handleSelect = useCallback((ex: RawExercise) => {
-    setExercices((prev) => [
-      ...prev,
-      {
-        exerciseId: ex.id,
-        nom: ex.nom,
-        groupeMusculaire: ex.groupe_musculaire,
-        gifUrl: ex.gif_url,
-        seriesCible: 3,
-        repsCible: 10,
-        repsCibleMax: null,
-      },
-    ]);
-    setShowSearch(false);
-  }, []);
-
-  const updateSeries = (i: number, d: number) =>
-    setExercices((p) =>
-      p.map((e, idx) =>
-        idx === i ? { ...e, seriesCible: Math.max(1, e.seriesCible + d) } : e,
-      ),
-    );
-
-  const toggleReps = (i: number) =>
-    setExercices((p) =>
-      p.map((e, idx) =>
-        idx !== i
-          ? e
-          : e.repsCibleMax !== null
-            ? { ...e, repsCibleMax: null }
-            : { ...e, repsCibleMax: e.repsCible + 4 },
-      ),
-    );
-
-  const updateReps = (i: number, v: string) => {
-    const n = parseInt(v);
-    if (v === "" || (!isNaN(n) && n >= 0))
-      setExercices((p) =>
-        p.map((e, idx) =>
-          idx === i ? { ...e, repsCible: isNaN(n) ? 0 : n } : e,
-        ),
-      );
-  };
-
-  const updateRepsMax = (i: number, v: string) => {
-    const n = parseInt(v);
-    if (v === "" || (!isNaN(n) && n >= 0))
-      setExercices((p) =>
-        p.map((e, idx) =>
-          idx === i ? { ...e, repsCibleMax: isNaN(n) ? 0 : n } : e,
-        ),
-      );
-  };
-
-  const remove = (i: number) =>
-    setExercices((p) => p.filter((_, idx) => idx !== i));
-
-  const move = (i: number, dir: -1 | 1) => {
-    const t = i + dir;
-    if (t < 0 || t >= exercices.length) return;
-    setExercices((p) => {
-      const n = [...p];
-      [n[i], n[t]] = [n[t], n[i]];
-      return n;
-    });
-  };
+  const handleSelect = useCallback(
+    (ex: RawExercise) => {
+      addExercise(ex);
+      setShowSearch(false);
+    },
+    [addExercise],
+  );
 
   const handleSave = async () => {
     if (!nom.trim()) {
@@ -165,7 +103,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
           ordre: i,
         })),
       );
-      clearDraft();
+      localStorage.removeItem(STORAGE_KEY);
       router.refresh();
       onClose();
     } catch (err) {
@@ -216,10 +154,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
             onClick={handleSave}
             disabled={saving || !nom.trim()}
             className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
-            style={{
-              background: "var(--accent)",
-              color: "white",
-            }}
+            style={{ background: "var(--accent)", color: "white" }}
           >
             {saving ? "Création..." : "Créer"}
           </button>
@@ -295,8 +230,8 @@ export default function CreateRoutineModal({ onClose }: Props) {
             index={i}
             total={exercices.length}
             onUpdateSeries={updateSeries}
-            onUpdateReps={updateReps}
-            onUpdateRepsMax={updateRepsMax}
+            onUpdateReps={(idx, v) => updateIntField(idx, "repsCible", v)}
+            onUpdateRepsMax={(idx, v) => updateIntField(idx, "repsCibleMax", v)}
             onToggleRepsMode={toggleReps}
             onMove={move}
             onRemove={remove}

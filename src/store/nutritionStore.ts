@@ -37,6 +37,7 @@ const DEFAULT_PROFILE: NutritionProfile = {
 };
 
 const supabase = createClient();
+let cachedUserId: string | null = null;
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
   entries: [],
@@ -55,6 +56,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       set({ isLoading: false });
       return;
     }
+    cachedUserId = user.id;
 
     const [entriesRes, profileRes] = await Promise.all([
       supabase
@@ -119,15 +121,12 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
 
     // 2. Sync Supabase en arrière-plan
     (async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!cachedUserId) return;
 
       const { data, error } = await supabase
         .from("nutrition_entries")
         .insert({
-          user_id: user.id,
+          user_id: cachedUserId,
           meal_number: mealNumber,
           meal_time: mealTime,
           aliment_id: alimentId,
@@ -155,27 +154,25 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   },
 
   removeEntry: (id: string) => {
-    const prev = get().entries;
+    // Capturer l'entrée supprimée (pas le snapshot complet)
+    const removedEntry = get().entries.find((e) => e.id === id);
 
     // 1. Suppression optimiste immédiate
     set((s) => ({ entries: s.entries.filter((e) => e.id !== id) }));
 
     // 2. Sync Supabase en arrière-plan
     (async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!cachedUserId) return;
 
       const { error } = await supabase
         .from("nutrition_entries")
         .delete()
         .eq("id", id)
-        .eq("user_id", user.id);
+        .eq("user_id", cachedUserId);
 
-      if (error) {
-        // 3. Rollback si erreur
-        set({ entries: prev });
+      if (error && removedEntry) {
+        // 3. Rollback : réinsérer uniquement l'entrée supprimée
+        set((s) => ({ entries: [...s.entries, removedEntry] }));
       }
     })();
   },

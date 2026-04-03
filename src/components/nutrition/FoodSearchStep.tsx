@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ScanBarcode, X, Plus } from "lucide-react";
+import { Search, ScanBarcode, X, Plus, Heart } from "lucide-react";
 import FoodSearchResults from "./FoodSearchResults";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
@@ -132,9 +132,12 @@ interface Props {
   results: NutritionAliment[];
   recents: NutritionAliment[];
   populaires: NutritionAliment[];
+  favoris: NutritionAliment[];
+  favoriteIds: Set<string>;
   loading: boolean;
   loadingInitial: boolean;
   onSelect: (a: NutritionAliment) => void;
+  onToggleFavorite: (a: NutritionAliment) => void;
   onScan: () => void;
   onCustom: () => void;
 }
@@ -157,9 +160,12 @@ export default function FoodSearchStep({
   results,
   recents,
   populaires,
+  favoris,
+  favoriteIds,
   loading,
   loadingInitial,
   onSelect,
+  onToggleFavorite,
   onScan,
   onCustom,
 }: Props) {
@@ -197,7 +203,7 @@ export default function FoodSearchStep({
         : instantResults
       : tab === "recents"
         ? recentsOrPopulaires
-        : [];
+        : favoris;
   const displayList = filterByCat(resultsList, cat);
   const emptyMsg =
     tab === "favoris"
@@ -322,7 +328,7 @@ export default function FoodSearchStep({
       </div>
 
       {/* Compteur */}
-      {tab !== "favoris" && !loading && displayList.length > 0 && (
+      {!loading && displayList.length > 0 && (
         <p
           className="text-[10px] font-bold uppercase tracking-widest"
           style={{ color: "var(--text-muted)" }}
@@ -334,6 +340,8 @@ export default function FoodSearchStep({
       <FoodSearchResults
         results={displayList}
         onSelect={onSelect}
+        onToggleFavorite={onToggleFavorite}
+        favoriteIds={favoriteIds}
         loading={
           loading &&
           tab === "resultats" &&

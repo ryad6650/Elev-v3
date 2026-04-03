@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
-import { getUserExerciseRests } from "@/app/actions/workout";
+import { getUserExerciseRests } from "@/app/actions/routines";
 import CreateExerciseModal from "./CreateExerciseModal";
 import ExerciseGif from "./ExerciseGif";
 

@@ -17,7 +17,7 @@ export default function CaloriesRing({ consumed, objective }: Props) {
 
   const radius = 30;
   const circumference = 2 * Math.PI * radius;
-  const ratio = Math.min(consumed / objective, 1);
+  const ratio = objective > 0 ? Math.min(consumed / objective, 1) : 0;
   const dashOffset = circumference * (1 - (animated ? ratio : 0));
   const remaining = Math.max(objective - consumed, 0);
   const percent = Math.round(ratio * 100);
