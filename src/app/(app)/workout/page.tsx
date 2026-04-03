@@ -1,12 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchWorkoutPageData } from "@/lib/workout";
 import { fetchProgrammesData } from "@/lib/programmes";
 import WorkoutPageClient from "@/components/workout/WorkoutPageClient";
 
 export default async function WorkoutPage() {
+  const user = await getUserFromMiddleware();
+  if (!user) return null;
+
   const supabase = await createClient();
   const [workoutData, programmesData] = await Promise.all([
-    fetchWorkoutPageData(supabase),
+    fetchWorkoutPageData(supabase, user.id),
     fetchProgrammesData(supabase),
   ]);
 

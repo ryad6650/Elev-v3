@@ -54,17 +54,22 @@ type WorkoutJoin = {
 
 export async function fetchWorkoutPageData(
   supabase: SupabaseClient<Database>,
+  userId?: string,
 ): Promise<WorkoutPageData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
+  let uid = userId;
+  if (!uid) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Non authentifié");
+    uid = user.id;
+  }
 
   const [routinesRes, workoutsRes, lastWorkoutsRes] = await Promise.all([
     supabase
       .from("routines")
       .select("id, nom, routine_exercises(id, exercises(groupe_musculaire))")
-      .eq("user_id", user.id)
+      .eq("user_id", uid)
       .order("created_at", { ascending: false }),
     supabase
       .from("workouts")
@@ -73,13 +78,13 @@ export async function fetchWorkoutPageData(
         routines(nom),
         workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
       )
-      .eq("user_id", user.id)
+      .eq("user_id", uid)
       .order("date", { ascending: false })
       .limit(5),
     supabase
       .from("workouts")
       .select("routine_id, date")
-      .eq("user_id", user.id)
+      .eq("user_id", uid)
       .not("routine_id", "is", null)
       .order("date", { ascending: false })
       .limit(100),

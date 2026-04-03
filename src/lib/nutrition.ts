@@ -17,11 +17,16 @@ export { calcNutrients, sumEntries } from "@/lib/nutrition-utils";
 export async function fetchNutritionData(
   supabase: SupabaseClient<Database>,
   date: string,
+  userId?: string,
 ): Promise<NutritionPageData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
+  let uid = userId;
+  if (!uid) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Non authentifié");
+    uid = user.id;
+  }
 
   const [entriesRes, profileRes] = await Promise.all([
     supabase
@@ -29,7 +34,7 @@ export async function fetchNutritionData(
       .select(
         "id, meal_number, meal_time, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
       )
-      .eq("user_id", user.id)
+      .eq("user_id", uid)
       .eq("date", date)
       .order("meal_number")
       .order("meal_time"),
@@ -38,7 +43,7 @@ export async function fetchNutritionData(
       .select(
         "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides",
       )
-      .eq("id", user.id)
+      .eq("id", uid)
       .single(),
   ]);
 

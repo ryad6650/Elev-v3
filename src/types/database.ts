@@ -643,6 +643,15 @@ export type Database = {
           usage_count: number;
         }[];
       };
+      get_dashboard_data: {
+        Args: {
+          p_today: string;
+          p_week_start: string;
+          p_thirty_days_ago: string;
+          p_seven_weeks_ago: string;
+        };
+        Returns: Json;
+      };
       show_limit: { Args: never; Returns: number };
       show_trgm: { Args: { "": string }; Returns: string[] };
     };

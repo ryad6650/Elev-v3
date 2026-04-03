@@ -1,15 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchDashboardData } from "@/lib/dashboard";
 import { updateConnexionStreak } from "@/app/actions/streak";
 import DashboardPageClient from "@/components/dashboard/DashboardPageClient";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUserFromMiddleware();
   if (!user) return null;
 
+  const supabase = await createClient();
   const [data, streakConnexions] = await Promise.all([
     fetchDashboardData(supabase, user.id),
     updateConnexionStreak(supabase, user.id).catch(() => null),

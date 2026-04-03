@@ -15,15 +15,15 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -31,8 +31,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-
-  const publicPaths = ["/login", "/register", "/forgot-password", "/auth/callback"];
+  const publicPaths = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/auth/callback",
+  ];
   const isPublicPath = publicPaths.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublicPath) {
@@ -45,6 +49,14 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
+  }
+
+  // Passer les infos user aux Server Components via headers
+  // Évite un 2e appel getUser() dans chaque page
+  if (user) {
+    supabaseResponse.headers.set("x-user-id", user.id);
+    supabaseResponse.headers.set("x-user-email", user.email ?? "");
+    supabaseResponse.headers.set("x-user-created-at", user.created_at ?? "");
   }
 
   return supabaseResponse;
