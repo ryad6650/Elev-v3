@@ -148,6 +148,8 @@ export default function AddFoodModal({
   function handleEdited(updated: NutritionAliment) {
     setSelected(updated);
     setStep("quantity");
+    // Rafraîchir le store pour que les entries affichent les données à jour
+    useNutritionStore.getState().fetchDay(date);
   }
 
   async function handleToggleFavorite(aliment: NutritionAliment) {

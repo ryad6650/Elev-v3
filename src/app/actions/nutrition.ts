@@ -204,6 +204,7 @@ export async function updateCustomAliment(
 
   if (error || !data)
     throw new Error(error?.message ?? "Erreur modification aliment");
+  revalidatePath("/nutrition");
   return { id: data.id };
 }
 
