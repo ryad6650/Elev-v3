@@ -52,12 +52,8 @@ type AlimentJoin = {
 
 export async function fetchDashboardData(
   supabase: SupabaseClient<Database>,
+  userId: string,
 ): Promise<DashboardData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-
   const today = getTodayString();
   const weekStart = getWeekStart();
   const thirtyDaysAgo = getNDaysAgo(30);
@@ -77,42 +73,42 @@ export async function fetchDashboardData(
       .select(
         "prenom, photo_url, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions, derniere_connexion, theme, accent_color",
       )
-      .eq("id", user.id)
+      .eq("id", userId)
       .single(),
     supabase
       .from("nutrition_entries")
       .select("quantite_g, aliments(calories, proteines, glucides, lipides)")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("date", today),
     supabase
       .from("poids_history")
       .select("poids, date")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("date", thirtyDaysAgo)
       .order("date", { ascending: false }),
     supabase
       .from("workouts")
       .select("date")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("date", sevenWeeksAgo),
     supabase
       .from("nutrition_entries")
       .select("date")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("date", sevenWeeksAgo),
     supabase
       .from("routines")
       .select(
         "id, nom, jours, routine_exercises(series_cible, exercises(groupe_musculaire))",
       )
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single(),
     supabase
       .from("sommeil")
       .select("duree_minutes")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("date", today)
       .maybeSingle(),
   ]);

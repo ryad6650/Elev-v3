@@ -16,23 +16,19 @@ export interface PoidsPageData {
 
 export async function fetchPoidsData(
   supabase: SupabaseClient<Database>,
+  userId: string,
 ): Promise<PoidsPageData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-
   const [poidsRes, profileRes, mensurationsRes] = await Promise.all([
     supabase
       .from("poids_history")
       .select("id, date, poids")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("date", { ascending: true }),
-    supabase.from("profiles").select("taille").eq("id", user.id).single(),
+    supabase.from("profiles").select("taille").eq("id", userId).single(),
     supabase
       .from("mensurations")
       .select("cou, tour_taille, poitrine, hanches, bras, cuisse, mollet")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle(),
   ]);
 

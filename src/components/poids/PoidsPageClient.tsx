@@ -31,9 +31,13 @@ export default function PoidsPageClient({ initialData }: Props) {
     open: false,
   });
 
-  const refreshData = useCallback(() => {
+  const refreshData = useCallback(async () => {
     const supabase = createClient();
-    fetchPoidsData(supabase)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+    fetchPoidsData(supabase, user.id)
       .then((d) => setData(d))
       .catch(console.error);
   }, []);

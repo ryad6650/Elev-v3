@@ -5,9 +5,14 @@ import DashboardPageClient from "@/components/dashboard/DashboardPageClient";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const [data, streakConnexions] = await Promise.all([
-    fetchDashboardData(supabase),
-    updateConnexionStreak().catch(() => null),
+    fetchDashboardData(supabase, user.id),
+    updateConnexionStreak(supabase, user.id).catch(() => null),
   ]);
 
   const finalData =

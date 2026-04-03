@@ -1,26 +1,24 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import { getTodayString, getNDaysAgo } from "@/lib/date-utils";
 
 /**
  * Met à jour le streak de connexions de l'utilisateur.
  * Appelé une fois par visite dashboard.
  */
-export async function updateConnexionStreak(): Promise<number> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-
+export async function updateConnexionStreak(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+): Promise<number> {
   const today = getTodayString();
   const hier = getNDaysAgo(1);
 
   const { data: profil } = await supabase
     .from("profiles")
     .select("streak_connexions, derniere_connexion")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   const derniereConnexion = profil?.derniere_connexion ?? null;
@@ -39,7 +37,7 @@ export async function updateConnexionStreak(): Promise<number> {
         streak_connexions: streakConnexions,
         derniere_connexion: today,
       })
-      .eq("id", user.id);
+      .eq("id", userId);
   }
 
   return streakConnexions;

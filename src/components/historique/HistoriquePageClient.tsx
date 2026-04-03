@@ -22,9 +22,13 @@ export default function HistoriquePageClient({ initialData }: Props) {
     null,
   );
 
-  const reload = () => {
+  const reload = async () => {
     const supabase = createClient();
-    fetchHistoriqueData(supabase)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+    fetchHistoriqueData(supabase, user.id)
       .then((d) => setData(d))
       .catch(console.error);
   };

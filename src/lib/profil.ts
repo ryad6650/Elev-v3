@@ -38,12 +38,9 @@ export interface ProfilPageData {
 
 export async function fetchProfilData(
   supabase: SupabaseClient<Database>,
+  userId: string,
+  userMeta?: { email?: string | null; created_at?: string | null },
 ): Promise<ProfilPageData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-
   const now = new Date();
   const debutMois = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
@@ -53,21 +50,21 @@ export async function fetchProfilData(
       .select(
         "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, created_at",
       )
-      .eq("id", user.id)
+      .eq("id", userId)
       .single(),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id),
+      .eq("user_id", userId),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("date", debutMois),
     supabase
       .from("workouts")
       .select("date")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("date", { ascending: false })
       .limit(60),
   ]);
@@ -93,7 +90,7 @@ export async function fetchProfilData(
 
   return {
     profil: {
-      id: user.id,
+      id: userId,
       prenom: profileRes.data?.prenom ?? null,
       taille: profileRes.data?.taille ?? null,
       objectif_calories: profileRes.data?.objectif_calories ?? 2000,
@@ -103,8 +100,8 @@ export async function fetchProfilData(
       photo_url: profileRes.data?.photo_url ?? null,
       theme: (profileRes.data?.theme ?? "dark") as "dark" | "light",
       accent_color: (profileRes.data?.accent_color ?? "orange") as AccentColor,
-      created_at: profileRes.data?.created_at ?? user.created_at ?? "",
-      email: user.email ?? null,
+      created_at: profileRes.data?.created_at ?? userMeta?.created_at ?? "",
+      email: userMeta?.email ?? null,
     },
     stats: {
       totalSeances: totalRes.count ?? 0,

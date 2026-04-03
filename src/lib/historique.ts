@@ -76,12 +76,8 @@ function computePRs(workouts: WorkoutJoin[]): PRRecord[] {
 
 export async function fetchHistoriqueData(
   supabase: SupabaseClient<Database>,
+  userId: string,
 ): Promise<HistoriquePageData> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-
   const [workoutsRes, countRes] = await Promise.all([
     supabase
       .from("workouts")
@@ -90,13 +86,13 @@ export async function fetchHistoriqueData(
         routines(nom),
         workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
       )
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("date", { ascending: false })
       .limit(30),
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id),
+      .eq("user_id", userId),
   ]);
 
   const raw = (workoutsRes.data ?? []) as unknown as WorkoutJoin[];

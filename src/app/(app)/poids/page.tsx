@@ -4,7 +4,11 @@ import PoidsPageClient from "@/components/poids/PoidsPageClient";
 
 export default async function PoidsPage() {
   const supabase = await createClient();
-  const data = await fetchPoidsData(supabase);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
 
+  const data = await fetchPoidsData(supabase, user.id);
   return <PoidsPageClient initialData={data} />;
 }
