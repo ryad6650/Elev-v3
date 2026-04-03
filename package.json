@@ -22,7 +22,6 @@
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.100.1",
-    "@zxing/library": "^0.21.3",
     "html2canvas": "^1.4.1",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",

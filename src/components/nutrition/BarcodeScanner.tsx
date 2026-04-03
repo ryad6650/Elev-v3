@@ -8,46 +8,46 @@ interface Props {
   onClose: () => void;
 }
 
-interface DetectedBarcode {
-  rawValue: string;
-  format: string;
-}
-type BarcodeDetectorCtor = {
-  new (opts: { formats: string[] }): {
-    detect: (
-      source: HTMLVideoElement | HTMLCanvasElement,
-    ) => Promise<DetectedBarcode[]>;
-  };
-  getSupportedFormats?: () => Promise<string[]>;
-};
+const QUAGGA_CDN =
+  "https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js";
 
-const EAN_FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e"];
-const SCAN_INTERVAL_MS = 150; // ~6-7 fps, laisse le temps à detect()
+const BARCODE_FORMATS = [
+  "ean_reader",
+  "ean_8_reader",
+  "upc_reader",
+  "upc_e_reader",
+  "code_128_reader",
+];
 
-/** Vérifie si l'API native supporte les formats EAN */
-async function getNativeDetector(): Promise<BarcodeDetectorCtor | null> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type QuaggaInstance = any;
+
+/** Charge Quagga2 depuis le CDN (une seule fois) */
+function loadQuagga(): Promise<QuaggaInstance> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const BD = (globalThis as any).BarcodeDetector as
-    | BarcodeDetectorCtor
-    | undefined;
-  if (!BD) return null;
-  try {
-    const supported = await BD.getSupportedFormats?.();
-    if (supported && !supported.includes("ean_13")) return null;
-  } catch {
-    // getSupportedFormats pas dispo → on tente quand même
-  }
-  return BD;
+  const w = window as any;
+  if (w.Quagga) return Promise.resolve(w.Quagga);
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = QUAGGA_CDN;
+    script.async = true;
+    script.onload = () =>
+      w.Quagga ? resolve(w.Quagga) : reject(new Error("Quagga non chargé"));
+    script.onerror = () => reject(new Error("Échec chargement Quagga CDN"));
+    document.head.appendChild(script);
+  });
 }
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const scannerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [torch, setTorch] = useState(false);
   const [hasTorch, setHasTorch] = useState(false);
   const trackRef = useRef<MediaStreamTrack | null>(null);
   const detectedRef = useRef(false);
+  const lastCodeRef = useRef<string | null>(null);
 
   const stableOnDetected = useCallback(
     (code: string) => {
@@ -74,50 +74,71 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
   useEffect(() => {
     let stopped = false;
-    let stream: MediaStream | null = null;
-    let timerId: ReturnType<typeof setTimeout>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let zxingReader: any = null;
+    let Q: any = null;
 
     async function start() {
       try {
-        if (stopped || !videoRef.current) return;
+        Q = await loadQuagga();
+        if (stopped || !scannerRef.current) return;
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920, min: 1280 },
-            height: { ideal: 1080, min: 720 },
-            // @ts-expect-error – focusMode supporté mobile
-            focusMode: { ideal: "continuous" },
-          },
-          audio: false,
+        await new Promise<void>((resolve, reject) => {
+          Q.init(
+            {
+              inputStream: {
+                type: "LiveStream",
+                target: scannerRef.current!,
+                constraints: {
+                  facingMode: "environment",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                },
+                area: {
+                  top: "20%",
+                  right: "5%",
+                  bottom: "20%",
+                  left: "5%",
+                },
+              },
+              decoder: { readers: BARCODE_FORMATS },
+              locate: true,
+              frequency: 10,
+            },
+            (err: Error | null) => (err ? reject(err) : resolve()),
+          );
         });
 
-        if (stopped || !videoRef.current) {
-          stream.getTracks().forEach((t) => t.stop());
+        if (stopped) {
+          Q.stop();
           return;
         }
 
-        const track = stream.getVideoTracks()[0];
-        trackRef.current = track;
+        // Récupérer le track pour la lampe torche
+        const video = scannerRef.current?.querySelector("video");
+        if (video?.srcObject) {
+          const track = (video.srcObject as MediaStream).getVideoTracks()[0];
+          trackRef.current = track;
+          const caps = track?.getCapabilities?.() as
+            | Record<string, unknown>
+            | undefined;
+          if (caps?.torch) setHasTorch(true);
+        }
 
-        const caps = track.getCapabilities?.() as
-          | Record<string, unknown>
-          | undefined;
-        if (caps?.torch) setHasTorch(true);
-
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        if (stopped) return;
+        Q.start();
         setLoading(false);
 
-        const BD = await getNativeDetector();
-        if (BD) {
-          scanWithNative(BD);
-        } else {
-          scanWithZxing();
-        }
+        // 2 lectures identiques consécutives avant validation
+        Q.onDetected((result: { codeResult?: { code?: string } }) => {
+          if (stopped || detectedRef.current) return;
+          const code = result?.codeResult?.code;
+          if (!code) return;
+
+          if (lastCodeRef.current === code) {
+            stableOnDetected(code);
+          } else {
+            lastCodeRef.current = code;
+          }
+        });
       } catch (err) {
         if (stopped) return;
         if (err instanceof Error && err.name === "NotAllowedError") {
@@ -131,77 +152,13 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       }
     }
 
-    /** Scan natif — passe le <video> directement (pas de canvas) */
-    function scanWithNative(BD: BarcodeDetectorCtor) {
-      const detector = new BD({ formats: EAN_FORMATS });
-      const video = videoRef.current!;
-
-      async function loop() {
-        if (stopped || detectedRef.current) return;
-        if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          try {
-            const barcodes = await detector.detect(video);
-            if (barcodes.length > 0 && !stopped) {
-              stableOnDetected(barcodes[0].rawValue);
-              return;
-            }
-          } catch (e) {
-            console.warn("BarcodeDetector.detect():", e);
-          }
-        }
-        // Attendre avant le prochain scan (évite d'empiler les appels)
-        timerId = setTimeout(loop, SCAN_INTERVAL_MS);
-      }
-      loop();
-    }
-
-    /** Fallback ZXing avec scan canvas pour meilleure détection */
-    async function scanWithZxing() {
-      const {
-        BrowserMultiFormatReader,
-        DecodeHintType,
-        BarcodeFormat,
-        NotFoundException,
-      } = await import("@zxing/library");
-
-      const hints = new Map();
-      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-        BarcodeFormat.EAN_13,
-        BarcodeFormat.EAN_8,
-        BarcodeFormat.UPC_A,
-        BarcodeFormat.UPC_E,
-      ]);
-      hints.set(DecodeHintType.TRY_HARDER, true);
-
-      if (stopped) return;
-      const reader = new BrowserMultiFormatReader(hints);
-      zxingReader = reader;
-
-      reader.decodeFromVideoElementContinuously(
-        videoRef.current!,
-        (result, err) => {
-          if (stopped || detectedRef.current) return;
-          if (result) {
-            stableOnDetected(result.getText());
-            reader.reset();
-            return;
-          }
-          if (err && !(err instanceof NotFoundException)) {
-            console.warn("Scanner ZXing:", err);
-          }
-        },
-      );
-    }
-
     start();
 
     return () => {
       stopped = true;
-      clearTimeout(timerId);
-      stream?.getTracks().forEach((t) => t.stop());
       trackRef.current = null;
       try {
-        zxingReader?.reset();
+        Q?.stop();
       } catch {}
     };
   }, [stableOnDetected]);
@@ -211,12 +168,10 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       className="relative w-full rounded-2xl overflow-hidden bg-black"
       style={{ aspectRatio: "4/3" }}
     >
-      <video
-        ref={videoRef}
-        className="w-full h-full object-cover"
-        playsInline
-        muted
-        autoPlay
+      {/* Conteneur Quagga — le <video> est injecté ici */}
+      <div
+        ref={scannerRef}
+        className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover [&>canvas]:hidden"
       />
 
       {/* Chargement */}
