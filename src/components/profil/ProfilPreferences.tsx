@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Sun, Moon, Check } from "lucide-react";
-import { updateTheme, updateAccentColor } from "@/app/actions/profil";
-import { applyAccent } from "@/lib/apply-accent";
+import { useState, useTransition, useRef } from "react";
+import { Sun, Moon, Check, Pipette, Sparkles } from "lucide-react";
+import { updateTheme, updateAccentColors } from "@/app/actions/profil";
+import { applyAccent, deriveSecondary } from "@/lib/apply-accent";
 import type { ProfilData } from "@/lib/profil";
-import type { AccentColor } from "@/lib/profil";
 
-const ACCENT_OPTIONS: { value: AccentColor; color: string; label: string }[] = [
-  { value: "orange", color: "#E8860C", label: "Orange" },
-  { value: "green", color: "#22c55e", label: "Vert" },
-  { value: "blue", color: "#3b82f6", label: "Bleu" },
-  { value: "purple", color: "#a855f7", label: "Violet" },
-  { value: "red", color: "#ef4444", label: "Rouge" },
-  { value: "cyan", color: "#06b6d4", label: "Cyan" },
-  { value: "silver", color: "#a8a29e", label: "Argent" },
+const PRESETS = [
+  "#E8860C",
+  "#22C55E",
+  "#3B82F6",
+  "#A855F7",
+  "#EF4444",
+  "#06B6D4",
+  "#EC4899",
+  "#F59E0B",
 ];
 
 interface Props {
@@ -23,37 +23,72 @@ interface Props {
 
 export default function ProfilPreferences({ profil }: Props) {
   const [theme, setTheme] = useState<"dark" | "light">(profil.theme);
-  const [accent, setAccent] = useState<AccentColor>(profil.accent_color);
+  const [primary, setPrimary] = useState(profil.accent_color);
+  const [secondary, setSecondary] = useState(profil.accent_secondary);
+  const [autoSecondary, setAutoSecondary] = useState(!profil.accent_secondary);
+  const [intensity, setIntensity] = useState(profil.gradient_intensity);
   const [isPending, startTransition] = useTransition();
+  const pickerRef = useRef<HTMLInputElement>(null);
+  const secPickerRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  /** Applique immédiatement + persiste en DB (debounced) */
+  function commitAll(p: string, s: string | null, g: number) {
+    applyAccent(p, s, g);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      startTransition(async () => {
+        await updateAccentColors(p, s, g);
+      });
+    }, 400);
+  }
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
-
     document.documentElement.classList.add("theme-transitioning");
     setTimeout(
       () => document.documentElement.classList.remove("theme-transitioning"),
       350,
     );
-
     if (next === "light") {
       document.documentElement.setAttribute("data-theme", "light");
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
-
     startTransition(async () => {
       await updateTheme(next);
     });
+    // Les gradients sont recalculés automatiquement via le MutationObserver
   }
 
-  function selectAccent(color: AccentColor) {
-    setAccent(color);
-    applyAccent(color);
-    startTransition(async () => {
-      await updateAccentColor(color);
-    });
+  function selectPrimary(hex: string) {
+    setPrimary(hex);
+    commitAll(hex, autoSecondary ? null : secondary, intensity);
   }
+
+  function selectSecondary(hex: string) {
+    setSecondary(hex);
+    setAutoSecondary(false);
+    commitAll(primary, hex, intensity);
+  }
+
+  function toggleAutoSecondary() {
+    const next = !autoSecondary;
+    setAutoSecondary(next);
+    const sec = next ? null : (secondary ?? deriveSecondary(primary));
+    if (!next && !secondary) setSecondary(deriveSecondary(primary));
+    commitAll(primary, sec, intensity);
+  }
+
+  function changeIntensity(val: number) {
+    setIntensity(val);
+    commitAll(primary, autoSecondary ? null : secondary, val);
+  }
+
+  const computedSecondary = autoSecondary
+    ? deriveSecondary(primary)
+    : (secondary ?? deriveSecondary(primary));
 
   return (
     <section
@@ -110,44 +145,43 @@ export default function ProfilPreferences({ profil }: Props) {
         </button>
       </div>
 
-      {/* Séparateur */}
       <div
         className="my-4"
         style={{ height: 1, background: "var(--border)" }}
       />
 
-      {/* Couleur d'accent */}
+      {/* Couleur principale */}
       <div>
         <p
           className="text-sm font-medium mb-1"
           style={{ color: "var(--text-primary)" }}
         >
-          Couleur d&apos;accent
+          Couleur principale
         </p>
         <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
-          {ACCENT_OPTIONS.find((o) => o.value === accent)?.label ?? "Orange"}
+          {primary.toUpperCase()}
         </p>
-        <div className="flex gap-3">
-          {ACCENT_OPTIONS.map((opt) => (
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {PRESETS.map((hex) => (
             <button
-              key={opt.value}
-              onClick={() => selectAccent(opt.value)}
+              key={hex}
+              onClick={() => selectPrimary(hex)}
               disabled={isPending}
               className="relative rounded-full transition-transform active:scale-90 disabled:opacity-50"
               style={{
-                width: 36,
-                height: 36,
-                background: opt.color,
+                width: 34,
+                height: 34,
+                background: hex,
                 boxShadow:
-                  accent === opt.value
-                    ? `0 0 0 2px var(--bg-secondary), 0 0 0 4px ${opt.color}`
+                  primary === hex
+                    ? `0 0 0 2px var(--bg-secondary), 0 0 0 4px ${hex}`
                     : "none",
               }}
-              aria-label={opt.label}
+              aria-label={hex}
             >
-              {accent === opt.value && (
+              {primary === hex && (
                 <Check
-                  size={16}
+                  size={14}
                   color="#fff"
                   className="absolute inset-0 m-auto"
                   strokeWidth={3}
@@ -155,7 +189,201 @@ export default function ProfilPreferences({ profil }: Props) {
               )}
             </button>
           ))}
+          <button
+            onClick={() => pickerRef.current?.click()}
+            disabled={isPending}
+            className="relative rounded-full transition-transform active:scale-90 disabled:opacity-50 flex items-center justify-center"
+            style={{
+              width: 34,
+              height: 34,
+              background: PRESETS.includes(primary)
+                ? "var(--bg-elevated)"
+                : primary,
+              border: PRESETS.includes(primary)
+                ? "1.5px dashed var(--text-muted)"
+                : `2px solid var(--bg-secondary)`,
+              boxShadow: !PRESETS.includes(primary)
+                ? `0 0 0 2px ${primary}`
+                : "none",
+            }}
+            aria-label="Couleur personnalisée"
+          >
+            {PRESETS.includes(primary) ? (
+              <Pipette size={14} style={{ color: "var(--text-muted)" }} />
+            ) : (
+              <Check size={14} color="#fff" strokeWidth={3} />
+            )}
+          </button>
+          <input
+            ref={pickerRef}
+            type="color"
+            value={primary}
+            onChange={(e) => selectPrimary(e.target.value)}
+            className="sr-only"
+            aria-hidden
+          />
         </div>
+      </div>
+
+      <div
+        className="my-4"
+        style={{ height: 1, background: "var(--border)" }}
+      />
+
+      {/* Couleur secondaire */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <p
+            className="text-sm font-medium"
+            style={{ color: "var(--text-primary)" }}
+          >
+            Couleur secondaire
+          </p>
+          <button
+            onClick={toggleAutoSecondary}
+            disabled={isPending}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors disabled:opacity-50"
+            style={{
+              background: autoSecondary
+                ? "var(--accent-bg)"
+                : "var(--bg-elevated)",
+              color: autoSecondary ? "var(--accent-text)" : "var(--text-muted)",
+              border: autoSecondary
+                ? "1px solid color-mix(in srgb, var(--accent) 25%, transparent)"
+                : "1px solid var(--border)",
+            }}
+          >
+            <Sparkles size={10} />
+            {autoSecondary ? "Auto" : "Manuel"}
+          </button>
+        </div>
+        <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
+          {autoSecondary
+            ? "Dérivée automatiquement"
+            : computedSecondary.toUpperCase()}
+        </p>
+        <div className="flex items-center gap-3">
+          <div
+            className="rounded-xl flex items-center justify-center"
+            style={{
+              width: 48,
+              height: 48,
+              background: computedSecondary,
+              opacity: autoSecondary ? 0.8 : 1,
+              transition: "background 0.3s ease",
+            }}
+          >
+            <span className="text-white text-xs font-bold">Aa</span>
+          </div>
+          {!autoSecondary && (
+            <>
+              <button
+                onClick={() => secPickerRef.current?.click()}
+                disabled={isPending}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
+                style={{
+                  background: "var(--bg-elevated)",
+                  color: "var(--text-secondary)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <Pipette size={14} />
+                Choisir
+              </button>
+              <input
+                ref={secPickerRef}
+                type="color"
+                value={computedSecondary}
+                onChange={(e) => selectSecondary(e.target.value)}
+                className="sr-only"
+                aria-hidden
+              />
+            </>
+          )}
+          <div className="flex-1 flex items-center gap-1.5 justify-end">
+            <div
+              className="rounded-full"
+              style={{ width: 18, height: 18, background: primary }}
+            />
+            <span
+              className="text-[10px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              +
+            </span>
+            <div
+              className="rounded-full"
+              style={{ width: 18, height: 18, background: computedSecondary }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="my-4"
+        style={{ height: 1, background: "var(--border)" }}
+      />
+
+      {/* Balance du dégradé */}
+      <div>
+        <p
+          className="text-sm font-medium mb-1"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Balance du dégradé
+        </p>
+        <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
+          {intensity}% primaire · {100 - intensity}% secondaire
+        </p>
+
+        {/* Indicateurs couleurs */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <div
+              className="rounded-full"
+              style={{ width: 12, height: 12, background: computedSecondary }}
+            />
+            <span
+              className="text-[10px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Secondaire
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-[10px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Primaire
+            </span>
+            <div
+              className="rounded-full"
+              style={{ width: 12, height: 12, background: primary }}
+            />
+          </div>
+        </div>
+
+        {/* Slider avec fond dégradé secondaire → primaire */}
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={intensity}
+          onChange={(e) => changeIntensity(Number(e.target.value))}
+          className="w-full h-2 rounded-full appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, ${computedSecondary}, ${primary})`,
+            accentColor: primary,
+          }}
+        />
+
+        {/* Aperçu gradient live */}
+        <div
+          className="mt-3 rounded-xl overflow-hidden"
+          style={{ height: 40, background: "var(--grad-workout)" }}
+        />
       </div>
     </section>
   );

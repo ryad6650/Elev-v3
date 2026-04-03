@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { DashboardData } from "@/lib/dashboard";
-import { applyAccent } from "@/lib/apply-accent";
 import CaloriesRing from "@/components/dashboard/CaloriesRing";
 import MacrosBars from "@/components/dashboard/MacrosBars";
 import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
@@ -49,9 +47,8 @@ function MiniStat({
 }) {
   return (
     <div
-      className="flex flex-col items-center justify-center p-4 rounded-2xl border gap-1"
+      className="flex flex-col items-center justify-center p-4 rounded-2xl border gap-1 card-surface"
       style={{
-        background: "var(--bg-secondary)",
         borderColor: "var(--border)",
       }}
     >
@@ -79,10 +76,6 @@ interface Props {
 export default function DashboardPageClient({ initialData }: Props) {
   const data = initialData;
   const prenom = data.prenom ?? "toi";
-
-  useEffect(() => {
-    applyAccent(data.accentColor);
-  }, [data.accentColor]);
 
   return (
     <main
@@ -128,7 +121,7 @@ export default function DashboardPageClient({ initialData }: Props) {
                 height: 46,
                 background: data.photoUrl ? "transparent" : "var(--bg-card)",
                 border:
-                  "1px solid color-mix(in srgb, var(--accent) 28%, transparent)",
+                  "1px solid color-mix(in srgb, var(--accent-secondary) 35%, transparent)",
               }}
             >
               {data.photoUrl ? (
@@ -192,8 +185,7 @@ export default function DashboardPageClient({ initialData }: Props) {
           className="mt-4 rounded-full"
           style={{
             height: 2.5,
-            background:
-              "linear-gradient(to right, var(--accent-hover), var(--accent), transparent)",
+            background: "var(--grad-header-line)",
           }}
         />
       </div>
@@ -203,11 +195,8 @@ export default function DashboardPageClient({ initialData }: Props) {
       <SectionDivider label="Calories" />
 
       <div
-        className="p-5 rounded-2xl border"
-        style={{
-          background: "var(--bg-secondary)",
-          borderColor: "var(--border)",
-        }}
+        className="p-5 rounded-2xl border card-surface"
+        style={{ borderColor: "var(--border)" }}
       >
         <CaloriesRing
           consumed={data.caloriesConsommees}
@@ -218,11 +207,8 @@ export default function DashboardPageClient({ initialData }: Props) {
       <SectionDivider label="Macronutriments" />
 
       <div
-        className="p-5 rounded-2xl border"
-        style={{
-          background: "var(--bg-secondary)",
-          borderColor: "var(--border)",
-        }}
+        className="p-5 rounded-2xl border card-surface"
+        style={{ borderColor: "var(--border)" }}
       >
         <MacrosBars
           proteines={{

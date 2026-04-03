@@ -39,67 +39,25 @@
   --accent-text: #c2410c;
 }
 
-/* ===== ACCENT COLOR PALETTES ===== */
-/* Orange (défaut) — pas besoin de surcharge */
-
-[data-accent="green"] {
-  --accent: #22c55e;
-  --accent-hover: #16a34a;
-  --accent-bg: rgba(34, 197, 94, 0.15);
-  --accent-text: #86efac;
-}
-[data-theme="light"][data-accent="green"] {
-  --accent-text: #15803d;
-}
-
-[data-accent="blue"] {
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-bg: rgba(59, 130, 246, 0.15);
-  --accent-text: #93c5fd;
-}
-[data-theme="light"][data-accent="blue"] {
-  --accent-text: #1d4ed8;
-}
-
-[data-accent="purple"] {
-  --accent: #a855f7;
-  --accent-hover: #9333ea;
-  --accent-bg: rgba(168, 85, 247, 0.15);
-  --accent-text: #d8b4fe;
-}
-[data-theme="light"][data-accent="purple"] {
-  --accent-text: #7c3aed;
-}
-
-[data-accent="red"] {
-  --accent: #ef4444;
-  --accent-hover: #dc2626;
-  --accent-bg: rgba(239, 68, 68, 0.15);
-  --accent-text: #fca5a5;
-}
-[data-theme="light"][data-accent="red"] {
-  --accent-text: #b91c1c;
-}
-
-[data-accent="cyan"] {
-  --accent: #06b6d4;
-  --accent-hover: #0891b2;
-  --accent-bg: rgba(6, 182, 212, 0.15);
-  --accent-text: #67e8f9;
-}
-[data-theme="light"][data-accent="cyan"] {
-  --accent-text: #0e7490;
-}
-
-[data-accent="silver"] {
-  --accent: #a8a29e;
-  --accent-hover: #78716c;
-  --accent-bg: rgba(168, 162, 158, 0.15);
-  --accent-text: #d6d3d1;
-}
-[data-theme="light"][data-accent="silver"] {
-  --accent-text: #57534e;
+/* Variables d'accent appliquées dynamiquement (apply-accent.ts).
+   Fallbacks SSR avant hydratation JS. */
+:root {
+  --accent-secondary: #f59e0b;
+  --grad-workout: linear-gradient(
+    135deg,
+    #1a0a00 0%,
+    #7a4207 30%,
+    #e8860c 100%
+  );
+  --grad-btn-accent: linear-gradient(
+    135deg,
+    #1a0a00 0%,
+    #7a4207 30%,
+    #e8860c 100%
+  );
+  --grad-sleep: linear-gradient(135deg, #201c19 0%, #1c1917 70%);
+  --grad-header-line: linear-gradient(to right, #e8860c, #f59e0b, transparent);
+  --grad-monday: linear-gradient(135deg, #e8860c22 0%, #1c1917 100%);
 }
 
 @theme inline {
@@ -130,41 +88,27 @@ html {
   color-scheme: light;
 }
 
-/* Card "Prochain entraînement" — gradient dynamique basé sur --accent */
+/* Gradients pilotés par JS (apply-accent.ts) via --grad-* */
 .workout-next-card {
-  background: linear-gradient(
-    135deg,
-    #0d0808 0%,
-    color-mix(in srgb, var(--accent) 25%, #0d0808) 40%,
-    var(--accent) 100%
-  );
-}
-[data-theme="light"] .workout-next-card {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 60%, #000) 0%,
-    color-mix(in srgb, var(--accent) 80%, #000) 40%,
-    var(--accent) 100%
-  );
+  background: var(--grad-workout);
 }
 
-/* Bouton accent — gradient identique au workout-next-card */
+.sleep-card {
+  background: var(--grad-sleep);
+}
+
 .btn-accent {
-  background: linear-gradient(
-    135deg,
-    #0d0808 0%,
-    color-mix(in srgb, var(--accent) 25%, #0d0808) 40%,
-    var(--accent) 100%
-  );
+  background: var(--grad-btn-accent);
   color: #fff;
 }
-[data-theme="light"] .btn-accent {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 60%, #000) 0%,
-    color-mix(in srgb, var(--accent) 80%, #000) 40%,
-    var(--accent) 100%
-  );
+
+/* Cards — contraste garanti dark & light */
+.card-surface {
+  background: var(--bg-secondary);
+}
+[data-theme="light"] .card-surface {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 body {

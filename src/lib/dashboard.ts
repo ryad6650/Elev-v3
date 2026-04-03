@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import type { AccentColor } from "@/lib/profil";
+import { DEFAULT_ACCENT } from "@/lib/profil";
 import {
   getTodayString,
   getWeekStart,
@@ -40,7 +40,9 @@ export interface DashboardData {
   prochaineRoutine: ProchaineRoutine | null;
   sommeilMinutes: number | null;
   theme: "dark" | "light";
-  accentColor: AccentColor;
+  accentColor: string;
+  accentSecondary: string | null;
+  gradientIntensity: number;
 }
 
 // Types pour la réponse RPC
@@ -69,6 +71,8 @@ interface RpcResult {
     derniere_connexion: string | null;
     theme: string | null;
     accent_color: string | null;
+    accent_secondary: string | null;
+    gradient_intensity: number | null;
   } | null;
   nutrition_today: RpcNutritionEntry[];
   poids_history: { poids: number; date: string }[];
@@ -197,6 +201,8 @@ export async function fetchDashboardData(
     streakConnexions: profil?.streak_connexions ?? 1,
     sommeilMinutes: d.sommeil?.duree_minutes ?? null,
     theme: (profil?.theme ?? "dark") as "dark" | "light",
-    accentColor: (profil?.accent_color ?? "orange") as AccentColor,
+    accentColor: profil?.accent_color ?? DEFAULT_ACCENT,
+    accentSecondary: profil?.accent_secondary ?? null,
+    gradientIntensity: profil?.gradient_intensity ?? 50,
   };
 }

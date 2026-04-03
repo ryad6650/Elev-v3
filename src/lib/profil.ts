@@ -1,14 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
-export type AccentColor =
-  | "orange"
-  | "green"
-  | "blue"
-  | "purple"
-  | "red"
-  | "cyan"
-  | "silver";
+/** Couleur d'accent par défaut (orange doré Élev) */
+export const DEFAULT_ACCENT = "#E8860C";
 
 export interface ProfilData {
   id: string;
@@ -20,7 +14,9 @@ export interface ProfilData {
   objectif_lipides: number | null;
   photo_url: string | null;
   theme: "dark" | "light";
-  accent_color: AccentColor;
+  accent_color: string;
+  accent_secondary: string | null;
+  gradient_intensity: number;
   created_at: string;
   email: string | null;
 }
@@ -48,7 +44,7 @@ export async function fetchProfilData(
     supabase
       .from("profiles")
       .select(
-        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, created_at",
+        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, accent_secondary, gradient_intensity, created_at",
       )
       .eq("id", userId)
       .single(),
@@ -99,7 +95,9 @@ export async function fetchProfilData(
       objectif_lipides: profileRes.data?.objectif_lipides ?? null,
       photo_url: profileRes.data?.photo_url ?? null,
       theme: (profileRes.data?.theme ?? "dark") as "dark" | "light",
-      accent_color: (profileRes.data?.accent_color ?? "orange") as AccentColor,
+      accent_color: profileRes.data?.accent_color ?? "#E8860C",
+      accent_secondary: profileRes.data?.accent_secondary ?? null,
+      gradient_intensity: profileRes.data?.gradient_intensity ?? 50,
       created_at: profileRes.data?.created_at ?? userMeta?.created_at ?? "",
       email: userMeta?.email ?? null,
     },

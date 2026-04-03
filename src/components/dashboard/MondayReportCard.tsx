@@ -15,8 +15,7 @@ export default function MondayReportCard() {
       <div
         className="p-4 rounded-2xl border flex items-center gap-4 transition-all active:scale-[0.98]"
         style={{
-          background:
-            "linear-gradient(135deg, var(--accent-bg), color-mix(in srgb, var(--accent) 8%, var(--bg-secondary)))",
+          background: "var(--grad-monday)",
           borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)",
         }}
       >

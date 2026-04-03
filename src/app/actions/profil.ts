@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { AccentColor } from "@/lib/profil";
 
 export async function updateInfosProfil(data: {
   prenom: string;
@@ -67,8 +66,10 @@ export async function updateTheme(theme: "dark" | "light"): Promise<void> {
   revalidatePath("/profil");
 }
 
-export async function updateAccentColor(
-  accent_color: AccentColor,
+export async function updateAccentColors(
+  accent_color: string,
+  accent_secondary: string | null,
+  gradient_intensity?: number,
 ): Promise<void> {
   const supabase = await createClient();
   const {
@@ -76,9 +77,18 @@ export async function updateAccentColor(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
 
+  const payload: Record<string, unknown> = {
+    accent_color,
+    accent_secondary,
+    updated_at: new Date().toISOString(),
+  };
+  if (gradient_intensity !== undefined) {
+    payload.gradient_intensity = gradient_intensity;
+  }
+
   const { error } = await supabase
     .from("profiles")
-    .update({ accent_color, updated_at: new Date().toISOString() })
+    .update(payload)
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);

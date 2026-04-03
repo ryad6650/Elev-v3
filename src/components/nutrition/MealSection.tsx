@@ -26,7 +26,7 @@ export default memo(function MealSection({
   onEntryDeleted,
   onFoodClick,
 }: Props) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const total = sumEntries(meal.entries);
 
   return (

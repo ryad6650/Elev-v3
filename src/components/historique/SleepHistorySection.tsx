@@ -36,10 +36,10 @@ function formatDate(dateStr: string): string {
 }
 
 function qualiteLabel(minutes: number): { text: string; color: string } {
-  if (minutes >= 420) return { text: "Excellent", color: "var(--success)" };
-  if (minutes >= 360) return { text: "Bon", color: "var(--accent-text)" };
-  if (minutes >= 300) return { text: "Moyen", color: "#F5A623" };
-  return { text: "Insuffisant", color: "var(--danger)" };
+  if (minutes >= 480) return { text: "Excellent", color: "var(--success)" };
+  if (minutes >= 420) return { text: "Bien", color: "var(--accent-text)" };
+  if (minutes >= 360) return { text: "Moyen", color: "#F5A623" };
+  return { text: "Mauvais", color: "var(--danger)" };
 }
 
 export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
@@ -87,9 +87,8 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
       {stats && (
         <div className="flex gap-2 mb-3">
           <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3"
+            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
             style={{
-              background: "var(--bg-secondary)",
               border: "1px solid var(--border)",
             }}
           >
@@ -98,7 +97,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
               style={{
                 width: 3,
                 borderRadius: "0 2px 2px 0",
-                background: "#8B5CF6",
+                background: "var(--accent)",
               }}
             />
             <div
@@ -118,9 +117,8 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
             </div>
           </div>
           <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3"
+            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
             style={{
-              background: "var(--bg-secondary)",
               border: "1px solid var(--border)",
             }}
           >
@@ -149,9 +147,8 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
             </div>
           </div>
           <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3"
+            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
             style={{
-              background: "var(--bg-secondary)",
               border: "1px solid var(--border)",
             }}
           >
@@ -160,7 +157,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
               style={{
                 width: 3,
                 borderRadius: "0 2px 2px 0",
-                background: "#5B9BF5",
+                background: "var(--accent)",
               }}
             />
             <div
@@ -200,9 +197,8 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
             return (
               <div
                 key={record.id}
-                className="relative overflow-hidden rounded-[18px] p-3.5"
+                className="relative overflow-hidden rounded-[18px] p-3.5 sleep-card"
                 style={{
-                  background: "var(--bg-secondary)",
                   border: "1px solid var(--border)",
                 }}
               >
@@ -211,13 +207,13 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
                   style={{
                     width: 3,
                     borderRadius: "0 2px 2px 0",
-                    background: "#8B5CF6",
+                    background: "var(--accent)",
                   }}
                 />
 
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Moon size={14} style={{ color: "#8B5CF6" }} />
+                    <Moon size={14} style={{ color: "var(--accent)" }} />
                     <span
                       className="font-semibold"
                       style={{
@@ -279,7 +275,8 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
                     className="h-1.5 rounded-full transition-all duration-500"
                     style={{
                       width: `${pct}%`,
-                      background: "linear-gradient(90deg, #8B5CF6, #A78BFA)",
+                      background:
+                        "linear-gradient(90deg, var(--accent), var(--accent-hover))",
                     }}
                   />
                 </div>
