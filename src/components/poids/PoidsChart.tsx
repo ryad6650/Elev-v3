@@ -42,7 +42,7 @@ export default function PoidsChart({ entries }: Props) {
 
   const filtered = useMemo(
     () => filterByPeriode(entries, periodeConfig.days),
-    [entries, periodeConfig.days]
+    [entries, periodeConfig.days],
   );
 
   const chart = useMemo(() => {
@@ -59,10 +59,16 @@ export default function PoidsChart({ entries }: Props) {
     const toX = (i: number) => PAD.left + (i / (filtered.length - 1)) * innerW;
     const toY = (v: number) => PAD.top + ((yMax - v) / yRange) * innerH;
 
-    const points = filtered.map((e, i) => ({ ...e, x: toX(i), y: toY(e.poids) }));
+    const points = filtered.map((e, i) => ({
+      ...e,
+      x: toX(i),
+      y: toY(e.poids),
+    }));
     const maVals = calcMovingAvg(vals);
     const maPoints = maVals.map((v, i) => ({ x: toX(i), y: toY(v) }));
-    const maPath = maPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`).join(" ");
+    const maPath = maPoints
+      .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`)
+      .join(" ");
     const areaPath =
       `M ${maPoints[0].x},${PAD.top + innerH} ` +
       maPoints.map((p) => `L ${p.x},${p.y}`).join(" ") +
@@ -81,9 +87,16 @@ export default function PoidsChart({ entries }: Props) {
     return (
       <div
         className="rounded-2xl p-5 mb-3 flex items-center justify-center"
-        style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", height: 80 }}
+        style={{
+          background: "var(--bg-secondary)",
+          border: "1px solid var(--border)",
+          height: 80,
+        }}
       >
-        <p className="text-sm text-center" style={{ color: "var(--text-muted)" }}>
+        <p
+          className="text-sm text-center"
+          style={{ color: "var(--text-muted)" }}
+        >
           Ajoutez votre premier poids pour voir le graphique
         </p>
       </div>
@@ -93,13 +106,21 @@ export default function PoidsChart({ entries }: Props) {
   return (
     <div
       className="rounded-2xl mb-3"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", padding: 18 }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+        padding: 18,
+      }}
     >
       {/* Header avec pills période */}
       <div className="flex items-center justify-between mb-3.5">
         <div
           className="font-semibold uppercase"
-          style={{ fontSize: "0.7rem", color: "var(--text-secondary)", letterSpacing: "0.07em" }}
+          style={{
+            fontSize: "0.7rem",
+            color: "var(--text-secondary)",
+            letterSpacing: "0.07em",
+          }}
         >
           Évolution — {periodeConfig.label}
         </div>
@@ -113,8 +134,10 @@ export default function PoidsChart({ entries }: Props) {
                 padding: "3px 9px",
                 fontSize: "0.62rem",
                 fontWeight: 600,
-                background: periode === p.key ? "var(--accent-bg)" : "transparent",
-                color: periode === p.key ? "var(--accent)" : "var(--text-muted)",
+                background:
+                  periode === p.key ? "var(--accent-bg)" : "transparent",
+                color:
+                  periode === p.key ? "var(--accent)" : "var(--text-muted)",
               }}
             >
               {p.label}
@@ -125,7 +148,10 @@ export default function PoidsChart({ entries }: Props) {
 
       {/* SVG */}
       <div style={{ position: "relative", height: H }}>
-        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: H, overflow: "visible" }}>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          style={{ width: "100%", height: H, overflow: "visible" }}
+        >
           <defs>
             <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.25" />
@@ -178,7 +204,7 @@ export default function PoidsChart({ entries }: Props) {
                 cy={chart.last.y}
                 r={4}
                 fill="var(--accent)"
-                filter="drop-shadow(0 0 4px rgba(232,134,12,0.6))"
+                filter="drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent))"
               />
               <circle cx={chart.last.x} cy={chart.last.y} r={2} fill="#fff" />
             </>

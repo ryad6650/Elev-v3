@@ -10,6 +10,7 @@ import HistoriqueStatsCards from "./HistoriqueStatsCards";
 import HistoriqueCalendar from "./HistoriqueCalendar";
 import PRSection from "./PRSection";
 import HistoriqueList from "./HistoriqueList";
+import SleepHistorySection from "./SleepHistorySection";
 import WorkoutDetailSheet from "./WorkoutDetailSheet";
 
 interface Props {
@@ -110,6 +111,17 @@ export default function HistoriquePageClient({ initialData }: Props) {
         </div>
         <HistoriqueList workouts={data.workouts} onSelect={handleSelect} />
       </div>
+
+      {/* Sommeil */}
+      <SleepHistorySection
+        sommeil={data.sommeil}
+        onDeleted={(id) => {
+          setData((d) => ({
+            ...d,
+            sommeil: d.sommeil.filter((s) => s.id !== id),
+          }));
+        }}
+      />
 
       {/* Records personnels */}
       <PRSection prs={data.prsRecents} />

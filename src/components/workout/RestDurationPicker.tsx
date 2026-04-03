@@ -97,7 +97,7 @@ export default function RestDurationPicker({
                 className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-opacity active:opacity-70"
                 style={{
                   background: isSelected
-                    ? "rgba(232,134,12,0.12)"
+                    ? "color-mix(in srgb, var(--accent) 12%, transparent)"
                     : "var(--bg-elevated)",
                   color: isSelected ? "var(--accent)" : "var(--text-primary)",
                   border: isSelected
@@ -124,7 +124,7 @@ export default function RestDurationPicker({
             className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-opacity active:opacity-70"
             style={{
               background: showCustom
-                ? "rgba(232,134,12,0.12)"
+                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
                 : "var(--bg-elevated)",
               color: showCustom ? "var(--accent)" : "var(--text-primary)",
               border: showCustom

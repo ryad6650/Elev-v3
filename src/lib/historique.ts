@@ -16,11 +16,18 @@ export interface PRRecord {
   repsAuMax: number;
 }
 
+export interface SommeilRecord {
+  id: string;
+  date: string;
+  duree_minutes: number;
+}
+
 export interface HistoriquePageData {
   totalSeances: number;
   streakActuel: number;
   prsRecents: PRRecord[];
   workouts: HistoriqueWorkout[];
+  sommeil: SommeilRecord[];
 }
 
 type SetJoin = {
@@ -78,7 +85,7 @@ export async function fetchHistoriqueData(
   supabase: SupabaseClient<Database>,
   userId: string,
 ): Promise<HistoriquePageData> {
-  const [workoutsRes, countRes] = await Promise.all([
+  const [workoutsRes, countRes, sommeilRes] = await Promise.all([
     supabase
       .from("workouts")
       .select(
@@ -93,6 +100,12 @@ export async function fetchHistoriqueData(
       .from("workouts")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId),
+    supabase
+      .from("sommeil")
+      .select("id, date, duree_minutes")
+      .eq("user_id", userId)
+      .order("date", { ascending: false })
+      .limit(30),
   ]);
 
   const raw = (workoutsRes.data ?? []) as unknown as WorkoutJoin[];
@@ -120,10 +133,17 @@ export async function fetchHistoriqueData(
     };
   });
 
+  const sommeil: SommeilRecord[] = (sommeilRes.data ?? []).map((s) => ({
+    id: s.id,
+    date: s.date,
+    duree_minutes: s.duree_minutes,
+  }));
+
   return {
     totalSeances: countRes.count ?? 0,
     streakActuel: computeStreak(raw.map((w) => w.date)),
     prsRecents: computePRs(raw),
     workouts,
+    sommeil,
   };
 }

@@ -93,8 +93,8 @@ function getRoutineIcon(
   const fallback = nom.slice(0, 2);
   return {
     label: fallback,
-    color: "#E8860C",
-    bg: "linear-gradient(135deg, rgba(232,134,12,0.2), rgba(249,115,22,0.2))",
+    color: "var(--accent)",
+    bg: `linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 20%, transparent))`,
   };
 }
 

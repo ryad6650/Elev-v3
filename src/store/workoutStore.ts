@@ -52,7 +52,12 @@ interface WorkoutStore {
   }) => void;
   minimizeWorkout: () => void;
   maximizeWorkout: () => void;
-  addExercise: (exercise: Omit<WorkoutExercise, "uid" | "sets">) => void;
+  addExercise: (
+    exercise: Omit<WorkoutExercise, "uid" | "sets"> & {
+      poidsRef?: number | null;
+      repsRef?: number | null;
+    },
+  ) => void;
   removeExercise: (uid: string) => void;
   replaceExercise: (
     uid: string,
@@ -139,14 +144,17 @@ export const useWorkoutStore = create<WorkoutStore>()(
       addExercise: (exercise) => {
         const { activeWorkout } = get();
         if (!activeWorkout) return;
+        const { poidsRef, repsRef, ...exData } = exercise;
         const newEx: WorkoutExercise = {
-          ...exercise,
+          ...exData,
           uid: crypto.randomUUID(),
           ordre: activeWorkout.exercises.length,
           sets: buildSets(
             exercise.seriesCible,
             exercise.repsCible,
             exercise.repsCibleMax ?? null,
+            poidsRef ?? null,
+            repsRef ?? null,
           ),
         };
         set({

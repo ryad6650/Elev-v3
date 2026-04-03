@@ -265,6 +265,10 @@ export default function AddFoodModal({
               onConfirm={handleConfirm}
               onEdit={() => setStep("edit")}
               pending={pending}
+              isFavorite={!!selected.id && favoriteIds.has(selected.id)}
+              onToggleFavorite={
+                selected.id ? () => handleToggleFavorite(selected) : undefined
+              }
             />
           )}
 

@@ -24,6 +24,7 @@ interface NutritionState {
     date: string,
     mealTime: string,
   ) => void;
+  updateEntry: (id: string, quantiteG: number) => void;
   removeEntry: (id: string) => void;
   setEntries: (entries: NutritionEntry[]) => void;
   reset: () => void;
@@ -155,6 +156,45 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
           e.id === tempId ? { ...e, id: data.id } : e,
         ),
       }));
+    })();
+  },
+
+  updateEntry: (id: string, quantiteG: number) => {
+    const entries = get().entries;
+    const oldEntry = entries.find((e) => e.id === id);
+    if (!oldEntry) return;
+
+    // Update optimiste
+    set((s) => ({
+      entries: s.entries.map((e) =>
+        e.id === id ? { ...e, quantite_g: quantiteG } : e,
+      ),
+    }));
+
+    // Sync Supabase
+    (async () => {
+      const userId = await getCurrentUserId();
+      if (!userId) {
+        set((s) => ({
+          entries: s.entries.map((e) =>
+            e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+          ),
+        }));
+        return;
+      }
+      const { error } = await supabase
+        .from("nutrition_entries")
+        .update({ quantite_g: quantiteG })
+        .eq("id", id)
+        .eq("user_id", userId);
+
+      if (error) {
+        set((s) => ({
+          entries: s.entries.map((e) =>
+            e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+          ),
+        }));
+      }
     })();
   },
 

@@ -13,6 +13,10 @@ interface Props {
   onConfirm: (quantite: number) => void;
   onEdit?: () => void;
   pending?: boolean;
+  initialQuantity?: number;
+  confirmLabel?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export default function FoodDetailSheet({
@@ -22,14 +26,34 @@ export default function FoodDetailSheet({
   onConfirm,
   onEdit,
   pending,
+  initialQuantity,
+  confirmLabel,
+  isFavorite,
+  onToggleFavorite,
 }: Props) {
   const portionG = aliment.taille_portion_g ?? 0;
   const hasPortion = portionG > 0;
-  const [mode, setMode] = useState<"g" | "portion">(
-    hasPortion ? "portion" : "g",
-  );
-  const [pickerVal, setPickerVal] = useState(hasPortion ? 1 : 100);
-  const [fav, setFav] = useState(false);
+
+  // Calcul de la valeur initiale du picker
+  const initMode =
+    initialQuantity && hasPortion && portionG > 0
+      ? ("portion" as const)
+      : initialQuantity
+        ? ("g" as const)
+        : hasPortion
+          ? ("portion" as const)
+          : ("g" as const);
+  const initVal = initialQuantity
+    ? initMode === "portion" && portionG > 0
+      ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
+      : initialQuantity
+    : hasPortion
+      ? 1
+      : 100;
+
+  const [mode, setMode] = useState<"g" | "portion">(initMode);
+  const [pickerVal, setPickerVal] = useState(initVal);
+  const [fav, setFav] = useState(isFavorite ?? false);
   const [showDetails, setShowDetails] = useState(false);
   const [editingQty, setEditingQty] = useState(false);
   const [qtyInput, setQtyInput] = useState("");
@@ -105,7 +129,10 @@ export default function FoodDetailSheet({
             </button>
           )}
           <button
-            onClick={() => setFav((f) => !f)}
+            onClick={() => {
+              setFav((f) => !f);
+              onToggleFavorite?.();
+            }}
             className="p-2 rounded-xl transition-colors"
             style={{
               background: fav ? "var(--accent-bg)" : "var(--bg-elevated)",
@@ -137,7 +164,8 @@ export default function FoodDetailSheet({
             style={{
               background: "var(--accent-bg)",
               color: "var(--accent-text)",
-              border: "1px solid rgba(232,134,12,0.2)",
+              border:
+                "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
             }}
           >
             {aliment.nom.charAt(0).toUpperCase()}
@@ -267,10 +295,11 @@ export default function FoodDetailSheet({
           className="btn-accent w-full py-4 rounded-2xl font-bold text-sm transition-opacity"
           style={{
             opacity: pending ? 0.6 : 1,
-            boxShadow: "0 4px 20px rgba(232,134,12,0.3)",
+            boxShadow:
+              "0 4px 20px color-mix(in srgb, var(--accent) 30%, transparent)",
           }}
         >
-          {pending ? "Ajout..." : `Ajouter au ${mealLabel}`}
+          {pending ? "Ajout..." : (confirmLabel ?? `Ajouter au ${mealLabel}`)}
         </button>
       </div>
     </div>

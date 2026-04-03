@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
 import MealSection from "./MealSection";
 import AddFoodModal from "./AddFoodModal";
-import FoodViewSheet from "./FoodViewSheet";
+import EditEntryModal from "./EditEntryModal";
 import { sumEntries, groupByMeal, nextMealNumber } from "@/lib/nutrition-utils";
 import type { NutritionEntry, NutritionPageData } from "@/lib/nutrition-utils";
 import { useNutritionStore } from "@/store/nutritionStore";
@@ -190,7 +190,10 @@ export default function NutritionPageClient({ initialData }: Props) {
         <button
           onClick={handleCreateMeal}
           className="btn-accent w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-semibold text-sm mt-1 transition-all active:scale-[0.97]"
-          style={{ boxShadow: "0 4px 20px rgba(232,134,12,0.3)" }}
+          style={{
+            boxShadow:
+              "0 4px 20px color-mix(in srgb, var(--accent) 30%, transparent)",
+          }}
         >
           <div
             className="w-6 h-6 rounded-full flex items-center justify-center"
@@ -215,7 +218,7 @@ export default function NutritionPageClient({ initialData }: Props) {
       )}
 
       {viewEntry && (
-        <FoodViewSheet entry={viewEntry} onClose={() => setViewEntry(null)} />
+        <EditEntryModal entry={viewEntry} onClose={() => setViewEntry(null)} />
       )}
     </>
   );

@@ -137,7 +137,8 @@ export default function PoidsHero({
             padding: "10px 20px",
             fontSize: "0.82rem",
             fontWeight: 700,
-            boxShadow: "0 4px 16px rgba(232,134,12,0.35)",
+            boxShadow:
+              "0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent)",
             opacity: isPending || !value ? 0.6 : 1,
             cursor: isPending || !value ? "not-allowed" : "pointer",
           }}

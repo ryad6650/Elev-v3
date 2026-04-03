@@ -147,9 +147,11 @@ export default function QuantityScrollPicker({
           right: 8,
           background: "var(--accent-bg)",
           borderRadius: 14,
-          border: "1px solid rgba(232,134,12,0.35)",
+          border:
+            "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
           zIndex: 0,
-          boxShadow: "0 0 12px rgba(232,134,12,0.1)",
+          boxShadow:
+            "0 0 12px color-mix(in srgb, var(--accent) 10%, transparent)",
         }}
       />
       {/* Gradient haut */}

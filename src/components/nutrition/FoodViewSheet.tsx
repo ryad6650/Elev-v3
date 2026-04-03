@@ -63,7 +63,8 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
                 style={{
                   background: "var(--accent-bg)",
                   color: "var(--accent-text)",
-                  border: "1px solid rgba(232,134,12,0.2)",
+                  border:
+                    "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
                 }}
               >
                 {aliment.nom.charAt(0).toUpperCase()}
@@ -99,7 +100,8 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
               className="rounded-2xl p-4 mb-3"
               style={{
                 background: "var(--accent-bg)",
-                border: "1px solid rgba(232,134,12,0.15)",
+                border:
+                  "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
               }}
             >
               <p

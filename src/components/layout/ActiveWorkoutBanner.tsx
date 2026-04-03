@@ -70,7 +70,8 @@ function BannerInner({
           backdropFilter: "blur(16px)",
           border: "1px solid var(--accent)",
           borderRadius: "16px",
-          boxShadow: "0 4px 24px rgba(232,134,12,0.15)",
+          boxShadow:
+            "0 4px 24px color-mix(in srgb, var(--accent) 15%, transparent)",
         }}
       >
         <span className="text-xl leading-none">💪</span>

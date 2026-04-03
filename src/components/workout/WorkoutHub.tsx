@@ -188,8 +188,7 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={() => handleStartRoutine(menuRoutine)}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)",
+                  background: `linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, #000) 0%, var(--accent) 40%, var(--accent-text) 100%)`,
                   color: "white",
                 }}
               >

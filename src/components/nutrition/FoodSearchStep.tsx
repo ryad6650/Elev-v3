@@ -264,7 +264,10 @@ export default function FoodSearchStep({
         <button
           onClick={onScan}
           className="btn-accent w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-          style={{ boxShadow: "0 4px 14px rgba(232,134,12,0.35)" }}
+          style={{
+            boxShadow:
+              "0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent)",
+          }}
         >
           <ScanBarcode size={20} color="white" />
         </button>
@@ -355,7 +358,8 @@ export default function FoodSearchStep({
         onClick={onCustom}
         className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold mt-1"
         style={{
-          border: "1.5px dashed rgba(232,134,12,0.3)",
+          border:
+            "1.5px dashed color-mix(in srgb, var(--accent) 30%, transparent)",
           color: "var(--accent-text)",
           background: "transparent",
         }}

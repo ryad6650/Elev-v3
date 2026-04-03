@@ -62,7 +62,8 @@ export default function WorkoutProgrammesSection({
             className="rounded-2xl p-4"
             style={{
               background: "var(--bg-secondary)",
-              border: "1px solid rgba(232,134,12,0.35)",
+              border:
+                "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
             }}
           >
             <div className="flex items-start justify-between mb-1">
@@ -98,8 +99,10 @@ export default function WorkoutProgrammesSection({
                   style={{
                     minWidth: 148,
                     background:
-                      i === 0 ? "rgba(232,134,12,0.12)" : "var(--bg-card)",
-                    border: `1px solid ${i === 0 ? "rgba(232,134,12,0.4)" : "var(--border)"}`,
+                      i === 0
+                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                        : "var(--bg-card)",
+                    border: `1px solid ${i === 0 ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "var(--border)"}`,
                   }}
                 >
                   <p
@@ -128,8 +131,7 @@ export default function WorkoutProgrammesSection({
                       onClick={() => handleDemarrer(r.routine_id, r.nom)}
                       className="mt-auto w-full py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
                       style={{
-                        background:
-                          "linear-gradient(135deg, #A85200 0%, #E8860C 40%, #FFB347 100%)",
+                        background: `linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, #000) 0%, var(--accent) 40%, var(--accent-text) 100%)`,
                       }}
                     >
                       Démarrer →

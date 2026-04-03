@@ -197,7 +197,7 @@ export default function RoutineExerciseCard({
           style={{
             background:
               ex.repsCibleMax !== null
-                ? "rgba(232,134,12,0.1)"
+                ? "color-mix(in srgb, var(--accent) 10%, transparent)"
                 : "var(--bg-elevated)",
             color:
               ex.repsCibleMax !== null
@@ -205,7 +205,7 @@ export default function RoutineExerciseCard({
                 : "var(--text-muted)",
             border:
               ex.repsCibleMax !== null
-                ? "1px solid rgba(232,134,12,0.2)"
+                ? "1px solid color-mix(in srgb, var(--accent) 20%, transparent)"
                 : "1px solid var(--border)",
           }}
         >

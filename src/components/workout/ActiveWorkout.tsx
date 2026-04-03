@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
-import { getUserExerciseRests } from "@/app/actions/routines";
+import {
+  getUserExerciseRests,
+  getExerciseLastRefs,
+} from "@/app/actions/routines";
 import ExerciseCard from "./ExerciseCard";
 import ExerciseSearch from "./ExerciseSearch";
 import WorkoutTimer from "./WorkoutTimer";
@@ -26,6 +29,22 @@ export default function ActiveWorkout() {
   const [pausedAt, setPausedAt] = useState<number | null>(null);
   const [totalPausedMs, setTotalPausedMs] = useState(0);
   const [prNotif, setPrNotif] = useState<PRNotif | null>(null);
+  const prTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-dismiss PR banner après 4s + vibration
+  useEffect(() => {
+    if (!prNotif) return;
+    // Vibration haptic
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+    if (prTimerRef.current) clearTimeout(prTimerRef.current);
+    prTimerRef.current = setTimeout(() => setPrNotif(null), 4000);
+    return () => {
+      if (prTimerRef.current) clearTimeout(prTimerRef.current);
+    };
+  }, [prNotif]);
+
   // UID de l'exercice actuellement ouvert (accordéon)
   const [openUid, setOpenUid] = useState<string | null>(
     () => activeWorkout?.exercises[0]?.uid ?? null,
@@ -187,25 +206,28 @@ export default function ActiveWorkout() {
           <div
             className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl"
             style={{
-              background: "rgba(234,179,8,0.15)",
-              border: "1px solid rgba(234,179,8,0.3)",
+              background:
+                "linear-gradient(135deg, rgba(234,179,8,0.2) 0%, rgba(217,119,6,0.15) 100%)",
+              border: "1px solid rgba(234,179,8,0.4)",
+              backdropFilter: "blur(12px)",
+              animation: "prSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1)",
             }}
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl"
-              style={{ background: "rgba(234,179,8,0.2)" }}
+              style={{ background: "rgba(234,179,8,0.25)" }}
             >
-              💪
+              🏆
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="text-sm font-semibold truncate"
+                className="text-sm font-bold truncate"
                 style={{ color: "#FDE68A" }}
               >
-                PR sur {prNotif.exerciseName} !
+                Nouveau record !
               </p>
               <p className="text-xs" style={{ color: "#CA8A04" }}>
-                {prNotif.poids}kg × {prNotif.reps} reps — nouveau record
+                {prNotif.exerciseName} — {prNotif.poids}kg × {prNotif.reps}
               </p>
             </div>
             <button
@@ -229,7 +251,10 @@ export default function ActiveWorkout() {
           onSelect={
             replacingUid
               ? async (ex) => {
-                  const restMap = await getUserExerciseRests([ex.id]);
+                  const [restMap, refsMap] = await Promise.all([
+                    getUserExerciseRests([ex.id]),
+                    getExerciseLastRefs([ex.id]),
+                  ]);
                   replaceExercise(replacingUid, {
                     exerciseId: ex.id,
                     nom: ex.nom,

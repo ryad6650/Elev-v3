@@ -8,10 +8,22 @@ import { createClient } from "@/lib/supabase/client";
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
-      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
-      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
-      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+      <path
+        d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z"
+        fill="#4285F4"
+      />
+      <path
+        d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z"
+        fill="#34A853"
+      />
+      <path
+        d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z"
+        fill="#EA4335"
+      />
     </svg>
   );
 }
@@ -30,13 +42,16 @@ export default function LoginPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       setError(
         error.message === "Invalid login credentials"
           ? "Email ou mot de passe incorrect"
-          : error.message
+          : error.message,
       );
       setLoading(false);
       return;
@@ -96,9 +111,17 @@ export default function LoginPage() {
 
         {/* Séparateur */}
         <div className="flex items-center gap-3 my-5">
-          <div className="flex-1" style={{ height: 1, background: "var(--border)" }} />
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>ou</span>
-          <div className="flex-1" style={{ height: 1, background: "var(--border)" }} />
+          <div
+            className="flex-1"
+            style={{ height: 1, background: "var(--border)" }}
+          />
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+            ou
+          </span>
+          <div
+            className="flex-1"
+            style={{ height: 1, background: "var(--border)" }}
+          />
         </div>
 
         {/* Formulaire email/MDP */}
@@ -117,7 +140,7 @@ export default function LoginPage() {
               required
               autoComplete="email"
               placeholder="ton@email.com"
-              className="w-full rounded-[10px] px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[#E8860C] transition-all"
+              className="w-full rounded-[10px] px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
               style={{
                 background: "var(--bg-elevated)",
                 border: "1px solid var(--border)",
@@ -140,7 +163,7 @@ export default function LoginPage() {
               required
               autoComplete="current-password"
               placeholder="••••••••"
-              className="w-full rounded-[10px] px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[#E8860C] transition-all"
+              className="w-full rounded-[10px] px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
               style={{
                 background: "var(--bg-elevated)",
                 border: "1px solid var(--border)",
@@ -152,7 +175,10 @@ export default function LoginPage() {
           {error && (
             <p
               className="text-sm rounded-xl px-4 py-3"
-              style={{ background: "rgba(239,68,68,0.12)", color: "var(--danger)" }}
+              style={{
+                background: "rgba(239,68,68,0.12)",
+                color: "var(--danger)",
+              }}
             >
               {error}
             </p>
@@ -162,7 +188,9 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-            style={{ background: loading ? "var(--accent-hover)" : "var(--accent)" }}
+            style={{
+              background: loading ? "var(--accent-hover)" : "var(--accent)",
+            }}
           >
             {loading ? "Connexion…" : "Se connecter"}
           </button>

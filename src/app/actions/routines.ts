@@ -58,6 +58,18 @@ async function getLastSessionRefs(
   return map;
 }
 
+export async function getExerciseLastRefs(
+  exerciseIds: string[],
+): Promise<Record<string, { poids: number; reps: number }>> {
+  if (exerciseIds.length === 0) return {};
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return {};
+  return getLastSessionRefs(supabase, user.id, exerciseIds);
+}
+
 export async function getUserExerciseRests(
   exerciseIds: string[],
 ): Promise<Record<string, number>> {

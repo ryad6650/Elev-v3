@@ -104,7 +104,8 @@ export default function WorkoutPageClient({
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
           style={{
             background: "var(--bg-card)",
-            border: "1px solid rgba(232,134,12,0.35)",
+            border:
+              "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
             color: "var(--accent-text)",
           }}
         >
@@ -114,7 +115,8 @@ export default function WorkoutPageClient({
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
           style={{
             background: "var(--bg-card)",
-            border: "1px solid rgba(232,134,12,0.35)",
+            border:
+              "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
             color: "var(--accent-text)",
           }}
         >

@@ -42,13 +42,21 @@ export default function MensurationsCard({ initial }: Props) {
   return (
     <div
       className="rounded-2xl mb-3"
-      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", padding: 18 }}
+      style={{
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--border)",
+        padding: 18,
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3.5">
         <div
           className="font-semibold uppercase"
-          style={{ fontSize: "0.7rem", color: "var(--text-secondary)", letterSpacing: "0.07em" }}
+          style={{
+            fontSize: "0.7rem",
+            color: "var(--text-secondary)",
+            letterSpacing: "0.07em",
+          }}
         >
           Mensurations
         </div>
@@ -62,7 +70,8 @@ export default function MensurationsCard({ initial }: Props) {
               padding: "5px 12px",
               color: "var(--accent)",
               background: "var(--accent-bg)",
-              border: "1px solid rgba(232,134,12,0.25)",
+              border:
+                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
             }}
           >
             {isPending ? "…" : "Sauvegarder"}
@@ -76,7 +85,8 @@ export default function MensurationsCard({ initial }: Props) {
               padding: "5px 12px",
               color: "var(--accent)",
               background: "var(--accent-bg)",
-              border: "1px solid rgba(232,134,12,0.25)",
+              border:
+                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
             }}
           >
             Modifier
@@ -90,9 +100,19 @@ export default function MensurationsCard({ initial }: Props) {
           <div
             key={key}
             className="rounded-[10px]"
-            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", padding: "10px 12px" }}
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              padding: "10px 12px",
+            }}
           >
-            <div style={{ fontSize: "0.6rem", color: "var(--text-muted)", marginBottom: 3 }}>
+            <div
+              style={{
+                fontSize: "0.6rem",
+                color: "var(--text-muted)",
+                marginBottom: 3,
+              }}
+            >
               {label}
             </div>
             {editing ? (
@@ -110,10 +130,20 @@ export default function MensurationsCard({ initial }: Props) {
                     }))
                   }
                   className="w-full outline-none bg-transparent"
-                  style={{ fontSize: "0.88rem", fontWeight: 600, color: "var(--text-primary)" }}
+                  style={{
+                    fontSize: "0.88rem",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                  }}
                   placeholder="—"
                 />
-                <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", flexShrink: 0 }}>
+                <span
+                  style={{
+                    fontSize: "0.65rem",
+                    color: "var(--text-muted)",
+                    flexShrink: 0,
+                  }}
+                >
                   cm
                 </span>
               </div>

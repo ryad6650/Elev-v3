@@ -207,6 +207,17 @@ body {
   animation: scan-line 2s ease-in-out infinite;
 }
 
+@keyframes prSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
 /* Supprime le délai 300ms sur tap mobile (iOS/Android) */
 a,
 button,

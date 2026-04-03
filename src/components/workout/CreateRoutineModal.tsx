@@ -241,9 +241,9 @@ export default function CreateRoutineModal({ onClose }: Props) {
           onClick={() => setShowSearch(true)}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98] border-2 border-dashed"
           style={{
-            borderColor: "rgba(232,134,12,0.3)",
+            borderColor: "color-mix(in srgb, var(--accent) 30%, transparent)",
             color: "var(--accent)",
-            background: "rgba(232,134,12,0.06)",
+            background: "color-mix(in srgb, var(--accent) 6%, transparent)",
           }}
         >
           <Plus size={18} strokeWidth={2.5} />

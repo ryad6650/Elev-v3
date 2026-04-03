@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
-import { getUserExerciseRests } from "@/app/actions/routines";
+import {
+  getUserExerciseRests,
+  getExerciseLastRefs,
+} from "@/app/actions/routines";
 import CreateExerciseModal from "./CreateExerciseModal";
 import ExerciseGif from "./ExerciseGif";
 
@@ -129,7 +132,10 @@ export default function ExerciseSearch({
     if (onSelect) {
       onSelect(ex);
     } else {
-      const restMap = await getUserExerciseRests([ex.id]);
+      const [restMap, refsMap] = await Promise.all([
+        getUserExerciseRests([ex.id]),
+        getExerciseLastRefs([ex.id]),
+      ]);
       addExercise({
         exerciseId: ex.id,
         nom: ex.nom,
@@ -140,6 +146,8 @@ export default function ExerciseSearch({
         repsCible: 10,
         repsCibleMax: null,
         restDuration: restMap[ex.id] ?? null,
+        poidsRef: refsMap[ex.id]?.poids ?? null,
+        repsRef: refsMap[ex.id]?.reps ?? null,
       });
       onClose();
     }
@@ -162,7 +170,7 @@ export default function ExerciseSearch({
           borderColor: "var(--border)",
           paddingTop: "max(1.5rem, env(safe-area-inset-top))",
           background:
-            "linear-gradient(180deg, rgba(232,134,12,0.06) 0%, transparent 100%)",
+            "linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 100%)",
         }}
       >
         <div className="flex items-center gap-3 mb-3">
@@ -235,10 +243,10 @@ export default function ExerciseSearch({
             className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
             style={{
               background: groupe
-                ? "rgba(232,134,12,0.12)"
+                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
                 : "var(--bg-elevated)",
               border: groupe
-                ? "1px solid rgba(232,134,12,0.3)"
+                ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
                 : "1px solid var(--border)",
               color: groupe ? "var(--accent-text)" : "var(--text-secondary)",
             }}
@@ -263,10 +271,10 @@ export default function ExerciseSearch({
             className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
             style={{
               background: equipement
-                ? "rgba(232,134,12,0.12)"
+                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
                 : "var(--bg-elevated)",
               border: equipement
-                ? "1px solid rgba(232,134,12,0.3)"
+                ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
                 : "1px solid var(--border)",
               color: equipement
                 ? "var(--accent-text)"
