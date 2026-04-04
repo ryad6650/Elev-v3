@@ -46,8 +46,8 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     if (alimentChanged) {
       await updateEntryAlimentId(entry.id, aliment.id);
     }
-    // updateEntry fait un update optimiste immédiat — pas besoin d'attendre Supabase
-    updateEntry(entry.id, quantite, quantitePortion);
+    // Attendre le sync Supabase pour garantir la persistance avant navigation
+    await updateEntry(entry.id, quantite, quantitePortion);
     onClose(alimentChanged);
   }
 
