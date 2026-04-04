@@ -9,12 +9,14 @@ interface Props {
   nom: string;
   size?: "sm" | "md" | "lg";
   className?: string;
+  /** Charger en priorité (au-dessus du fold) */
+  priority?: boolean;
 }
 
 const SIZES = {
-  sm: { container: "w-10 h-10", icon: 14, radius: "rounded-lg" },
-  md: { container: "w-14 h-14", icon: 18, radius: "rounded-xl" },
-  lg: { container: "w-24 h-24", icon: 28, radius: "rounded-2xl" },
+  sm: { container: "w-10 h-10", icon: 14, radius: "rounded-lg", px: 40 },
+  md: { container: "w-14 h-14", icon: 18, radius: "rounded-xl", px: 56 },
+  lg: { container: "w-24 h-24", icon: 28, radius: "rounded-2xl", px: 96 },
 };
 
 export default function ExerciseGif({
@@ -22,6 +24,7 @@ export default function ExerciseGif({
   nom,
   size = "md",
   className = "",
+  priority = false,
 }: Props) {
   const [error, setError] = useState(false);
   const s = SIZES[size];
@@ -37,6 +40,9 @@ export default function ExerciseGif({
     );
   }
 
+  // Les GIFs animés ne bénéficient pas de l'optimisation Next.js
+  const isGif = gifUrl.endsWith(".gif");
+
   return (
     <div
       className={`${s.container} ${s.radius} overflow-hidden shrink-0 relative ${className}`}
@@ -46,8 +52,11 @@ export default function ExerciseGif({
         src={gifUrl}
         alt={nom}
         fill
-        sizes={size === "lg" ? "96px" : size === "md" ? "56px" : "40px"}
+        sizes={`${s.px}px`}
         className="object-cover"
+        loading={priority ? "eager" : "lazy"}
+        priority={priority}
+        unoptimized={isGif}
         onError={() => setError(true)}
       />
     </div>
