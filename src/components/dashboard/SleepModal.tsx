@@ -101,7 +101,7 @@ function ScrollPicker({
 
       <div
         className="relative overflow-hidden select-none"
-        style={{ height: containerHeight, width: 72 }}
+        style={{ height: containerHeight, width: 72, touchAction: "none" }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -190,6 +190,24 @@ export default function SleepModal({
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  // Bloquer le scroll du body quand la modale est ouverte
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   const totalMinutes = heuresIdx * 60 + minutesIdx;
 
   const handleSave = () => {
@@ -214,8 +232,9 @@ export default function SleepModal({
       {/* Fond semi-transparent */}
       <div
         className="fixed inset-0 z-40"
-        style={{ background: "rgba(0,0,0,0.45)" }}
+        style={{ background: "rgba(0,0,0,0.45)", touchAction: "none" }}
         onClick={onClose}
+        onTouchMove={(e) => e.preventDefault()}
       />
 
       {/* Card flottante au-dessus de la bottom nav */}

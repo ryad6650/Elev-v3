@@ -6,7 +6,7 @@ import { upsertPoids } from "@/app/actions/poids";
 interface Props {
   poidsActuel: number | null;
   poidsVeille: number | null;
-  onSaved?: () => void;
+  onSaved?: (date: string, poids: number) => void;
 }
 
 export default function PoidsHero({
@@ -34,7 +34,7 @@ export default function PoidsHero({
     startTransition(async () => {
       await upsertPoids(today, num);
       setValue("");
-      onSaved?.();
+      onSaved?.(today, num);
     });
   };
 

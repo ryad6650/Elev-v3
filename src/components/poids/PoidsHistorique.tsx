@@ -8,7 +8,7 @@ import type { PoidsEntry } from "@/lib/poids";
 interface Props {
   entries: PoidsEntry[];
   onEdit: (entry: PoidsEntry) => void;
-  onDeleted?: () => void;
+  onDeleted?: (id: string) => void;
 }
 
 function formatDate(dateStr: string): string {
@@ -26,7 +26,7 @@ function HistoriqueRow({
 }: {
   entry: PoidsEntry;
   onEdit: () => void;
-  onDeleted?: () => void;
+  onDeleted?: (id: string) => void;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -34,7 +34,7 @@ function HistoriqueRow({
     if (!confirm("Supprimer cette entrée ?")) return;
     startTransition(async () => {
       await deletePoids(entry.id);
-      onDeleted?.();
+      onDeleted?.(entry.id);
     });
   };
 

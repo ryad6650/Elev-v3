@@ -40,6 +40,17 @@ export default function NutritionPageClient({ initialData }: Props) {
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
+
+  // Rafraîchir le store après fermeture d'un modal (ajout ou modif)
+  const closeAddModal = () => {
+    setModalMeal(null);
+    setModalMealTime(null);
+    fetchDay(date);
+  };
+  const closeEditModal = () => {
+    setViewEntry(null);
+    fetchDay(date);
+  };
   const hydratedDateRef = useRef<string | null>(null);
 
   // Hydrater le store avec les données SSR au premier rendu (sync, pas dans un effet)
@@ -210,15 +221,12 @@ export default function NutritionPageClient({ initialData }: Props) {
           mealNumber={modalMeal}
           mealTime={modalMealTime ?? new Date().toISOString()}
           date={date}
-          onClose={() => {
-            setModalMeal(null);
-            setModalMealTime(null);
-          }}
+          onClose={closeAddModal}
         />
       )}
 
       {viewEntry && (
-        <EditEntryModal entry={viewEntry} onClose={() => setViewEntry(null)} />
+        <EditEntryModal entry={viewEntry} onClose={closeEditModal} />
       )}
     </>
   );

@@ -8,7 +8,7 @@ interface Props {
   defaultDate?: string;
   defaultPoids?: number;
   onClose: () => void;
-  onSaved?: () => void;
+  onSaved?: (date: string, poids: number) => void;
 }
 
 export default function AddPoidsModal({
@@ -33,7 +33,7 @@ export default function AddPoidsModal({
     startTransition(async () => {
       try {
         await upsertPoids(date, val);
-        onSaved?.();
+        onSaved?.(date, val);
         onClose();
       } catch {
         setError("Erreur lors de la sauvegarde");

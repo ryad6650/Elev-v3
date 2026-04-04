@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Trophy, Clock, Zap, Check, Star } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { ActiveWorkout } from "@/store/workoutStore";
@@ -20,6 +21,7 @@ function formatDuration(ms: number): string {
 }
 
 export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
+  const router = useRouter();
   const clearWorkout = useWorkoutStore((s) => s.clearWorkout);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -72,7 +74,9 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
     );
     if (result.success) {
       setSaved(true);
-      setTimeout(() => clearWorkout(), 1500);
+      // Rafraîchir les données serveur pendant l'animation "Enregistré !"
+      router.refresh();
+      setTimeout(() => clearWorkout(), 800);
     } else {
       setSaving(false);
       alert("Erreur lors de la sauvegarde. Réessaie.");

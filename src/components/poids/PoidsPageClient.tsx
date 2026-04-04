@@ -42,6 +42,42 @@ export default function PoidsPageClient({ initialData }: Props) {
       .catch(console.error);
   }, []);
 
+  // Update optimiste : met à jour l'UI immédiatement sans attendre le réseau
+  const optimisticUpsert = useCallback(
+    (date: string, poids: number) => {
+      setData((prev) => {
+        const exists = prev.entries.findIndex((e) => e.date === date);
+        let entries: PoidsEntry[];
+        if (exists >= 0) {
+          entries = prev.entries.map((e) =>
+            e.date === date ? { ...e, poids } : e,
+          );
+        } else {
+          entries = [
+            ...prev.entries,
+            { id: crypto.randomUUID(), date, poids },
+          ].sort((a, b) => a.date.localeCompare(b.date));
+        }
+        return { ...prev, entries };
+      });
+      // Sync serveur en arrière-plan
+      refreshData();
+    },
+    [refreshData],
+  );
+
+  // Suppression optimiste
+  const optimisticDelete = useCallback(
+    (id: string) => {
+      setData((prev) => ({
+        ...prev,
+        entries: prev.entries.filter((e) => e.id !== id),
+      }));
+      refreshData();
+    },
+    [refreshData],
+  );
+
   const entries = data.entries;
   const current = entries.length > 0 ? entries[entries.length - 1] : null;
   const previous = entries.length > 1 ? entries[entries.length - 2] : null;
@@ -80,7 +116,7 @@ export default function PoidsPageClient({ initialData }: Props) {
       <PoidsHero
         poidsActuel={current?.poids ?? null}
         poidsVeille={previous?.poids ?? null}
-        onSaved={refreshData}
+        onSaved={optimisticUpsert}
       />
 
       {/* Graphique */}
@@ -101,7 +137,7 @@ export default function PoidsPageClient({ initialData }: Props) {
       <PoidsHistorique
         entries={entries}
         onEdit={(entry) => setModal({ open: true, entry })}
-        onDeleted={refreshData}
+        onDeleted={optimisticDelete}
       />
 
       {modal.open && (
@@ -109,7 +145,7 @@ export default function PoidsPageClient({ initialData }: Props) {
           defaultDate={modal.entry?.date}
           defaultPoids={modal.entry?.poids}
           onClose={() => setModal({ open: false })}
-          onSaved={refreshData}
+          onSaved={optimisticUpsert}
         />
       )}
     </main>
