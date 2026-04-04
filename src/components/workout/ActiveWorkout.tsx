@@ -162,7 +162,10 @@ export default function ActiveWorkout() {
         </div>
 
         {/* Exercices (accordéon) */}
-        <div className="flex-1 px-4 py-4 space-y-2 pb-36">
+        <div
+          className="flex-1 px-4 py-4 space-y-2 pb-36"
+          style={{ minHeight: "calc(100dvh - 10rem)" }}
+        >
           {activeWorkout.exercises.length === 0 && (
             <div className="text-center py-16 space-y-4">
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
