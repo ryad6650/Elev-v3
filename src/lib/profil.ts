@@ -32,22 +32,47 @@ export interface ProfilPageData {
   stats: ProfilStats;
 }
 
-export async function fetchProfilData(
+/** Fetch rapide — uniquement la table profiles (1 requête) */
+export async function fetchProfil(
   supabase: SupabaseClient<Database>,
   userId: string,
   userMeta?: { email?: string | null; created_at?: string | null },
-): Promise<ProfilPageData> {
+): Promise<ProfilData> {
+  const { data } = await supabase
+    .from("profiles")
+    .select(
+      "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, accent_secondary, gradient_intensity, created_at",
+    )
+    .eq("id", userId)
+    .single();
+
+  return {
+    id: userId,
+    prenom: data?.prenom ?? null,
+    taille: data?.taille ?? null,
+    objectif_calories: data?.objectif_calories ?? 2000,
+    objectif_proteines: data?.objectif_proteines ?? null,
+    objectif_glucides: data?.objectif_glucides ?? null,
+    objectif_lipides: data?.objectif_lipides ?? null,
+    photo_url: data?.photo_url ?? null,
+    theme: (data?.theme ?? "dark") as "dark" | "light",
+    accent_color: data?.accent_color ?? "#E8860C",
+    accent_secondary: data?.accent_secondary ?? null,
+    gradient_intensity: data?.gradient_intensity ?? 50,
+    created_at: data?.created_at ?? userMeta?.created_at ?? "",
+    email: userMeta?.email ?? null,
+  };
+}
+
+/** Fetch stats — 3 requêtes workouts en parallèle (plus lent) */
+export async function fetchProfilStats(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+): Promise<ProfilStats> {
   const now = new Date();
   const debutMois = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
-  const [profileRes, totalRes, moisRes, recentRes] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select(
-        "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, accent_secondary, gradient_intensity, created_at",
-      )
-      .eq("id", userId)
-      .single(),
+  const [totalRes, moisRes, recentRes] = await Promise.all([
     supabase
       .from("workouts")
       .select("id", { count: "exact", head: true })
@@ -85,26 +110,21 @@ export async function fetchProfilData(
   }
 
   return {
-    profil: {
-      id: userId,
-      prenom: profileRes.data?.prenom ?? null,
-      taille: profileRes.data?.taille ?? null,
-      objectif_calories: profileRes.data?.objectif_calories ?? 2000,
-      objectif_proteines: profileRes.data?.objectif_proteines ?? null,
-      objectif_glucides: profileRes.data?.objectif_glucides ?? null,
-      objectif_lipides: profileRes.data?.objectif_lipides ?? null,
-      photo_url: profileRes.data?.photo_url ?? null,
-      theme: (profileRes.data?.theme ?? "dark") as "dark" | "light",
-      accent_color: profileRes.data?.accent_color ?? "#E8860C",
-      accent_secondary: profileRes.data?.accent_secondary ?? null,
-      gradient_intensity: profileRes.data?.gradient_intensity ?? 50,
-      created_at: profileRes.data?.created_at ?? userMeta?.created_at ?? "",
-      email: userMeta?.email ?? null,
-    },
-    stats: {
-      totalSeances: totalRes.count ?? 0,
-      seancesCeMois: moisRes.count ?? 0,
-      streakActuel: streak,
-    },
+    totalSeances: totalRes.count ?? 0,
+    seancesCeMois: moisRes.count ?? 0,
+    streakActuel: streak,
   };
+}
+
+/** Fetch tout d'un coup (rétro-compatibilité) */
+export async function fetchProfilData(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  userMeta?: { email?: string | null; created_at?: string | null },
+): Promise<ProfilPageData> {
+  const [profil, stats] = await Promise.all([
+    fetchProfil(supabase, userId, userMeta),
+    fetchProfilStats(supabase, userId),
+  ]);
+  return { profil, stats };
 }
