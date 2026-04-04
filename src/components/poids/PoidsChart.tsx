@@ -80,7 +80,7 @@ export default function PoidsChart({ entries }: Props) {
     ];
 
     const last = points[points.length - 1];
-    return { maPath, areaPath, yLabels, last };
+    return { points, maPath, areaPath, yLabels, last };
   }, [filtered]);
 
   if (entries.length === 0) {
@@ -198,14 +198,22 @@ export default function PoidsChart({ entries }: Props) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              {/* Dernier point */}
-              <circle
-                cx={chart.last.x}
-                cy={chart.last.y}
-                r={4}
-                fill="var(--accent)"
-                filter="drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent))"
-              />
+              {/* Points de données */}
+              {chart.points.map((p, i) => (
+                <circle
+                  key={p.date}
+                  cx={p.x}
+                  cy={p.y}
+                  r={i === chart.points.length - 1 ? 4 : 3}
+                  fill="var(--accent)"
+                  filter={
+                    i === chart.points.length - 1
+                      ? "drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent))"
+                      : undefined
+                  }
+                />
+              ))}
+              {/* Point blanc central sur le dernier point */}
               <circle cx={chart.last.x} cy={chart.last.y} r={2} fill="#fff" />
             </>
           ) : (
