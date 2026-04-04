@@ -65,7 +65,11 @@ export default function PoidsChart({ entries }: Props) {
       y: toY(e.poids),
     }));
     const maVals = calcMovingAvg(vals);
-    const maPoints = maVals.map((v, i) => ({ x: toX(i), y: toY(v) }));
+    const maPoints = maVals.map((v, i) => ({
+      date: filtered[i].date,
+      x: toX(i),
+      y: toY(v),
+    }));
     const maPath = maPoints
       .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`)
       .join(" ");
@@ -79,8 +83,8 @@ export default function PoidsChart({ entries }: Props) {
       { value: Math.round(maxP * 10) / 10, y: toY(maxP) },
     ];
 
-    const last = points[points.length - 1];
-    return { points, maPath, areaPath, yLabels, last };
+    const last = maPoints[maPoints.length - 1];
+    return { maPoints, maPath, areaPath, yLabels, last };
   }, [filtered]);
 
   if (entries.length === 0) {
@@ -198,16 +202,16 @@ export default function PoidsChart({ entries }: Props) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              {/* Points de données */}
-              {chart.points.map((p, i) => (
+              {/* Points sur la courbe */}
+              {chart.maPoints.map((p, i) => (
                 <circle
                   key={p.date}
                   cx={p.x}
                   cy={p.y}
-                  r={i === chart.points.length - 1 ? 4 : 3}
+                  r={i === chart.maPoints.length - 1 ? 4 : 3}
                   fill="var(--accent)"
                   filter={
-                    i === chart.points.length - 1
+                    i === chart.maPoints.length - 1
                       ? "drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent))"
                       : undefined
                   }
