@@ -35,9 +35,13 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     };
   }, []);
 
-  function handleConfirm(quantite: number) {
+  async function handleConfirm(quantite: number) {
     if (pending) return;
     setPending(true);
+    // Si l'aliment a changé (fork), mettre à jour l'aliment_id de l'entrée
+    if (aliment.id !== entry.aliment.id) {
+      await updateEntryAlimentId(entry.id, aliment.id);
+    }
     updateEntry(entry.id, quantite);
     onClose();
   }
@@ -67,10 +71,10 @@ export default function EditEntryModal({ entry, onClose }: Props) {
       );
   }
 
-  async function handleCreated(newAlimentId: string) {
-    // Fork : mettre à jour l'entrée pour pointer vers le nouvel aliment
-    await updateEntryAlimentId(entry.id, newAlimentId);
-    onClose();
+  function handleCreated(created: NutritionAliment) {
+    // Fork : revenir à la vue détail avec le nouvel aliment, sans enregistrer dans le repas
+    setAliment(created);
+    setStep("detail");
   }
 
   return (
@@ -96,7 +100,11 @@ export default function EditEntryModal({ entry, onClose }: Props) {
               onEdit={() => setStep("edit")}
               pending={pending}
               initialQuantity={entry.quantite_g}
-              confirmLabel="Modifier la quantité"
+              confirmLabel={
+                aliment.id !== entry.aliment.id
+                  ? "Enregistrer les modifications"
+                  : "Modifier la quantité"
+              }
               isFavorite={!!aliment.id && favIds.has(aliment.id)}
               onToggleFavorite={aliment.id ? handleToggleFavorite : undefined}
             />

@@ -9,7 +9,7 @@ import type { NutritionAliment } from "@/lib/nutrition-utils";
 import BarcodeScanner from "./BarcodeScanner";
 
 interface Props {
-  onCreated?: (id: string) => void;
+  onCreated?: (aliment: NutritionAliment) => void;
   onEdited?: (aliment: NutritionAliment) => void;
   editAliment?: NutritionAliment;
   isForking?: boolean;
@@ -125,7 +125,22 @@ export default function CustomFoodForm({
           sucres,
           sel,
         );
-        onCreated?.(id);
+        onCreated?.({
+          id,
+          nom: vals.nom,
+          calories: cal,
+          proteines: prot,
+          glucides: gluc,
+          lipides: lip,
+          fibres,
+          sucres,
+          sel,
+          portion_nom: portionNom,
+          taille_portion_g: portionG,
+          code_barres: codeBarres,
+          is_global: false,
+          source: undefined,
+        });
       }
     });
   }

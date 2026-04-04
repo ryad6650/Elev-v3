@@ -130,11 +130,11 @@ export default function AddFoodModal({
     onClose();
   }
 
-  async function handleCustomCreated(id: string) {
+  async function handleCustomCreated(created: NutritionAliment) {
     // Créer l'entrée nutrition côté serveur puis rafraîchir le store
     onClose();
     try {
-      await addNutritionEntry(mealNumber, id, 100, date, mealTime);
+      await addNutritionEntry(mealNumber, created.id, 100, date, mealTime);
       useNutritionStore.getState().fetchDay(date);
     } catch {
       // Re-fetch pour afficher l'état réel
