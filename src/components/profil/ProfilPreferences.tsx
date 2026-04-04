@@ -38,7 +38,11 @@ export default function ProfilPreferences({ profil }: Props) {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       startTransition(async () => {
-        await updateAccentColors(p, s, g);
+        try {
+          await updateAccentColors(p, s, g);
+        } catch (err) {
+          console.error("[Profil] Erreur sauvegarde accent:", err);
+        }
       });
     }, 400);
   }
@@ -57,9 +61,12 @@ export default function ProfilPreferences({ profil }: Props) {
       document.documentElement.removeAttribute("data-theme");
     }
     startTransition(async () => {
-      await updateTheme(next);
+      try {
+        await updateTheme(next);
+      } catch (err) {
+        console.error("[Profil] Erreur sauvegarde thème:", err);
+      }
     });
-    // Les gradients sont recalculés automatiquement via le MutationObserver
   }
 
   function selectPrimary(hex: string) {
