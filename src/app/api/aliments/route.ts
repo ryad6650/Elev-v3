@@ -2,6 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
+// Cache mémoire pour les résultats OpenFoodFacts (évite les appels externes répétés)
+const offCache = new Map<string, { data: NutritionAliment[]; ts: number }>();
+const OFF_CACHE_TTL = 60_000; // 60 secondes
+
+function getCachedOFF(q: string): NutritionAliment[] | null {
+  const entry = offCache.get(q.toLowerCase());
+  if (!entry) return null;
+  if (Date.now() - entry.ts > OFF_CACHE_TTL) {
+    offCache.delete(q.toLowerCase());
+    return null;
+  }
+  return entry.data;
+}
+
+function setCachedOFF(q: string, data: NutritionAliment[]): void {
+  // Limiter la taille du cache à 100 entrées
+  if (offCache.size >= 100) {
+    const oldest = offCache.keys().next().value;
+    if (oldest) offCache.delete(oldest);
+  }
+  offCache.set(q.toLowerCase(), { data, ts: Date.now() });
+}
+
 const SELECT_COLS =
   "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global";
 
@@ -167,8 +190,10 @@ export async function GET(request: NextRequest) {
   // Si assez de résultats locaux, pas besoin d'OFF
   if (local.length >= 8) return NextResponse.json(local);
 
-  // Compléter avec OFF en parallèle (timeout court)
-  const offResults = await searchOFF(q, 1500);
+  // Compléter avec OFF en parallèle (cache mémoire + timeout court)
+  const cachedOFF = getCachedOFF(q);
+  const offResults = cachedOFF ?? (await searchOFF(q, 1500));
+  if (!cachedOFF) setCachedOFF(q, offResults);
   const localCodes = new Set(local.map((a) => a.code_barres).filter(Boolean));
   const localNoms = new Set(local.map((a) => a.nom.toLowerCase()));
   const offFiltered = offResults.filter((r) => {

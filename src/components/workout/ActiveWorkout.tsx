@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import {
@@ -8,10 +9,13 @@ import {
   getExerciseLastRefs,
 } from "@/app/actions/routines";
 import ExerciseCard from "./ExerciseCard";
-import ExerciseSearch from "./ExerciseSearch";
 import WorkoutTimer from "./WorkoutTimer";
 import RestTimer from "./RestTimer";
 import WorkoutSummary from "./WorkoutSummary";
+
+const ExerciseSearch = dynamic(() => import("./ExerciseSearch"), {
+  ssr: false,
+});
 
 interface PRNotif {
   exerciseName: string;

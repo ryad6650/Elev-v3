@@ -139,6 +139,9 @@ export async function createCustomAliment(
   portion_nom?: string | null,
   taille_portion_g?: number | null,
   code_barres?: string | null,
+  fibres?: number | null,
+  sucres?: number | null,
+  sel?: number | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
   const {
@@ -155,6 +158,9 @@ export async function createCustomAliment(
       proteines,
       glucides,
       lipides,
+      fibres: fibres ?? null,
+      sucres: sucres ?? null,
+      sel: sel ?? null,
       is_global: false,
       portion_nom: portion_nom ?? null,
       taille_portion_g: taille_portion_g ?? null,
@@ -178,6 +184,9 @@ export async function updateCustomAliment(
   portion_nom: string | null,
   taille_portion_g: number | null,
   code_barres?: string | null,
+  fibres?: number | null,
+  sucres?: number | null,
+  sel?: number | null,
 ): Promise<{ id: string }> {
   const supabase = await createClient();
   const {
@@ -193,6 +202,9 @@ export async function updateCustomAliment(
       proteines,
       glucides,
       lipides,
+      fibres: fibres ?? null,
+      sucres: sucres ?? null,
+      sel: sel ?? null,
       portion_nom,
       taille_portion_g,
       code_barres: code_barres ?? null,

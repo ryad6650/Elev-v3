@@ -38,22 +38,24 @@ async function getLastSessionRefs(
   exerciseIds: string[],
 ): Promise<Record<string, { poids: number; reps: number }>> {
   if (exerciseIds.length === 0) return {};
+
+  // Requête optimisée : récupère directement le meilleur poids par exercice
+  // via un tri date DESC + poids DESC et LIMIT par exercice côté client
   const { data } = await supabase
     .from("workout_sets")
-    .select("exercise_id, poids, reps, workout_id, workouts!inner(date)")
+    .select("exercise_id, poids, reps, workouts!inner(date)")
     .eq("completed", true)
     .in("exercise_id", exerciseIds)
     .eq("workouts.user_id", userId)
+    .not("poids", "is", null)
     .order("date", { referencedTable: "workouts", ascending: false })
     .order("poids", { ascending: false })
-    .limit(500);
+    .limit(exerciseIds.length * 5);
 
   const map: Record<string, { poids: number; reps: number }> = {};
   for (const row of data ?? []) {
     if (map[row.exercise_id]) continue;
-    if (row.poids != null) {
-      map[row.exercise_id] = { poids: Number(row.poids), reps: row.reps ?? 0 };
-    }
+    map[row.exercise_id] = { poids: Number(row.poids), reps: row.reps ?? 0 };
   }
   return map;
 }

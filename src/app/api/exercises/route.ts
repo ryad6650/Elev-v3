@@ -6,7 +6,8 @@ export async function GET(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const q = req.nextUrl.searchParams.get("q") ?? "";
   const groupe = req.nextUrl.searchParams.get("groupe") ?? "";
@@ -25,7 +26,12 @@ export async function GET(req: NextRequest) {
   if (equipement) query = query.eq("equipement", equipement);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json(data ?? []);
+  return NextResponse.json(data ?? [], {
+    headers: {
+      "Cache-Control": "private, max-age=300, stale-while-revalidate=600",
+    },
+  });
 }

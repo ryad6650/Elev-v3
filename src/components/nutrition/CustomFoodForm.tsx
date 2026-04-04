@@ -6,6 +6,7 @@ import {
   updateCustomAliment,
 } from "@/app/actions/nutrition";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
+import BarcodeScanner from "./BarcodeScanner";
 
 interface Props {
   onCreated?: (id: string) => void;
@@ -20,6 +21,9 @@ const BASE_FIELDS = [
   { label: "Protéines (g)", key: "prot" as const, type: "number" },
   { label: "Glucides (g)", key: "gluc" as const, type: "number" },
   { label: "Lipides (g)", key: "lip" as const, type: "number" },
+  { label: "Fibres (g)", key: "fibres" as const, type: "number" },
+  { label: "Sucres (g)", key: "sucres" as const, type: "number" },
+  { label: "Sel (g)", key: "sel" as const, type: "number" },
 ] as const;
 
 type ValKey =
@@ -28,6 +32,9 @@ type ValKey =
   | "prot"
   | "gluc"
   | "lip"
+  | "fibres"
+  | "sucres"
+  | "sel"
   | "portionNom"
   | "portionG"
   | "codeBarres";
@@ -46,11 +53,15 @@ export default function CustomFoodForm({
     prot: editAliment?.proteines?.toString() ?? "",
     gluc: editAliment?.glucides?.toString() ?? "",
     lip: editAliment?.lipides?.toString() ?? "",
+    fibres: editAliment?.fibres?.toString() ?? "",
+    sucres: editAliment?.sucres?.toString() ?? "",
+    sel: editAliment?.sel?.toString() ?? "",
     portionNom: editAliment?.portion_nom ?? "",
     portionG: editAliment?.taille_portion_g?.toString() ?? "",
     codeBarres: editAliment?.code_barres ?? "",
   });
   const [showBarcode, setShowBarcode] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function set(key: ValKey, val: string) {
@@ -65,6 +76,9 @@ export default function CustomFoodForm({
     const prot = vals.prot ? parseFloat(vals.prot) : null;
     const gluc = vals.gluc ? parseFloat(vals.gluc) : null;
     const lip = vals.lip ? parseFloat(vals.lip) : null;
+    const fibres = vals.fibres ? parseFloat(vals.fibres) : null;
+    const sucres = vals.sucres ? parseFloat(vals.sucres) : null;
+    const sel = vals.sel ? parseFloat(vals.sel) : null;
     const codeBarres = showBarcode && vals.codeBarres ? vals.codeBarres : null;
 
     startTransition(async () => {
@@ -79,6 +93,9 @@ export default function CustomFoodForm({
           portionNom,
           portionG,
           codeBarres,
+          fibres,
+          sucres,
+          sel,
         );
         onEdited?.({
           ...editAliment,
@@ -87,6 +104,9 @@ export default function CustomFoodForm({
           proteines: prot,
           glucides: gluc,
           lipides: lip,
+          fibres,
+          sucres,
+          sel,
           portion_nom: portionNom,
           taille_portion_g: portionG,
           code_barres: codeBarres,
@@ -101,6 +121,9 @@ export default function CustomFoodForm({
           portionNom,
           portionG,
           codeBarres,
+          fibres,
+          sucres,
+          sel,
         );
         onCreated?.(id);
       }
@@ -202,26 +225,48 @@ export default function CustomFoodForm({
       </button>
 
       {showBarcode && (
-        <div>
+        <div className="flex flex-col gap-2">
           <label
             className="text-xs font-semibold uppercase tracking-wide"
             style={{ color: "var(--text-muted)" }}
           >
             Code-barres
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="ex: 3017620422003"
-            value={vals.codeBarres}
-            onChange={(e) => set("codeBarres", e.target.value)}
-            className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-            style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
-            }}
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="ex: 3017620422003"
+              value={vals.codeBarres}
+              onChange={(e) => set("codeBarres", e.target.value)}
+              className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
+              style={{
+                background: "var(--bg-elevated)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border)",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="px-3 py-2.5 rounded-xl text-sm font-semibold shrink-0"
+              style={{
+                background: "var(--accent)",
+                color: "#fff",
+              }}
+            >
+              Scanner
+            </button>
+          </div>
+          {showScanner && (
+            <BarcodeScanner
+              onDetected={(code) => {
+                set("codeBarres", code);
+                setShowScanner(false);
+              }}
+              onClose={() => setShowScanner(false)}
+            />
+          )}
         </div>
       )}
 

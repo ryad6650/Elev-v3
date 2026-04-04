@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import BottomNav from "@/components/layout/BottomNav";
 import OfflineBanner from "@/components/layout/OfflineBanner";
 import ActiveWorkoutBanner from "@/components/layout/ActiveWorkoutBanner";
@@ -6,6 +7,25 @@ import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_ACCENT } from "@/lib/profil";
 import { computeAccentCSS } from "@/lib/accent-compute";
+
+const getLayoutProfile = unstable_cache(
+  async (userId: string) => {
+    const supabase = await createClient();
+    const { data: profil } = await supabase
+      .from("profiles")
+      .select("accent_color, accent_secondary, gradient_intensity, theme")
+      .eq("id", userId)
+      .single();
+    return {
+      accent: profil?.accent_color ?? DEFAULT_ACCENT,
+      secondary: profil?.accent_secondary ?? null,
+      balance: profil?.gradient_intensity ?? 50,
+      theme: (profil?.theme as "dark" | "light") ?? "dark",
+    };
+  },
+  ["layout-profile"],
+  { revalidate: 300, tags: ["layout-profile"] },
+);
 
 export default async function AppLayout({
   children,
@@ -23,17 +43,11 @@ export default async function AppLayout({
   let theme: "dark" | "light" = "dark";
 
   if (user) {
-    const { data: profil } = await supabase
-      .from("profiles")
-      .select("accent_color, accent_secondary, gradient_intensity, theme")
-      .eq("id", user.id)
-      .single();
-    if (profil) {
-      accent = profil.accent_color ?? DEFAULT_ACCENT;
-      secondary = profil.accent_secondary ?? null;
-      balance = profil.gradient_intensity ?? 50;
-      theme = (profil.theme as "dark" | "light") ?? "dark";
-    }
+    const profil = await getLayoutProfile(user.id);
+    accent = profil.accent;
+    secondary = profil.secondary;
+    balance = profil.balance;
+    theme = profil.theme;
   }
 
   const ssrCSS = computeAccentCSS({

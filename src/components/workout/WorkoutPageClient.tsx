@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Plus, Search } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import WorkoutHub from "./WorkoutHub";
 import ActiveWorkout from "./ActiveWorkout";
-import CreateRoutineModal from "./CreateRoutineModal";
-import ExerciseSearch from "./ExerciseSearch";
 import WorkoutProgrammesSection from "./WorkoutProgrammesSection";
 import type { WorkoutPageData } from "@/lib/workout";
 import type { ProgrammesPageData } from "@/lib/programmes";
+
+const CreateRoutineModal = dynamic(() => import("./CreateRoutineModal"), {
+  ssr: false,
+});
+const ExerciseSearch = dynamic(() => import("./ExerciseSearch"), {
+  ssr: false,
+});
 
 function getDateFr(): string {
   return new Date()

@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Play, Trash2, X, Pencil } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useRouter } from "next/navigation";
 import RoutineCard from "./RoutineCard";
-import EditRoutineModal from "./EditRoutineModal";
 import {
   getRoutineExercises,
   deleteRoutine,
   type RoutineExerciseData,
 } from "@/app/actions/routines";
 import type { WorkoutPageData, Routine } from "@/lib/workout";
+
+const EditRoutineModal = dynamic(() => import("./EditRoutineModal"), {
+  ssr: false,
+});
 
 const FILTRES = ["Tous", "Push / Pull", "Upper / Lower", "Full Body"];
 
