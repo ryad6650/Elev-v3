@@ -29,6 +29,26 @@ export async function addNutritionEntry(
   revalidatePath("/nutrition");
 }
 
+export async function updateEntryAlimentId(
+  entryId: string,
+  newAlimentId: string,
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non authentifié");
+
+  const { error } = await supabase
+    .from("nutrition_entries")
+    .update({ aliment_id: newAlimentId })
+    .eq("id", entryId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/nutrition");
+}
+
 export async function deleteNutritionEntry(id: string): Promise<void> {
   const supabase = await createClient();
   const {

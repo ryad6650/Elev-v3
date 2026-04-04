@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import FoodDetailSheet from "./FoodDetailSheet";
 import CustomFoodForm from "./CustomFoodForm";
 import { useNutritionStore } from "@/store/nutritionStore";
-import { toggleFavoriteAliment, getFavoriteIds } from "@/app/actions/nutrition";
+import {
+  toggleFavoriteAliment,
+  getFavoriteIds,
+  updateEntryAlimentId,
+} from "@/app/actions/nutrition";
 import type { NutritionEntry, NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
@@ -54,6 +58,19 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   function handleEdited(updated: NutritionAliment) {
     setAliment(updated);
     setStep("detail");
+    // Rafraîchir le store pour refléter les modifications
+    useNutritionStore
+      .getState()
+      .fetchDay(
+        new URL(window.location.href).searchParams.get("date") ??
+          new Date().toISOString().split("T")[0],
+      );
+  }
+
+  async function handleCreated(newAlimentId: string) {
+    // Fork : mettre à jour l'entrée pour pointer vers le nouvel aliment
+    await updateEntryAlimentId(entry.id, newAlimentId);
+    onClose();
   }
 
   return (
@@ -90,7 +107,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
               editAliment={isCustom ? aliment : { ...aliment, id: "" }}
               isForking={!isCustom}
               onEdited={handleEdited}
-              onCreated={() => setStep("detail")}
+              onCreated={handleCreated}
             />
           )}
         </div>
