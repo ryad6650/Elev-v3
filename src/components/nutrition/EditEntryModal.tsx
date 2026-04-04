@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import FoodDetailSheet from "./FoodDetailSheet";
+import CustomFoodForm from "./CustomFoodForm";
 import { useNutritionStore } from "@/store/nutritionStore";
 import { toggleFavoriteAliment, getFavoriteIds } from "@/app/actions/nutrition";
-import type { NutritionEntry } from "@/lib/nutrition-utils";
+import type { NutritionEntry, NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
   entry: NutritionEntry;
@@ -15,6 +16,10 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   const updateEntry = useNutritionStore((s) => s.updateEntry);
   const [pending, setPending] = useState(false);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
+  const [step, setStep] = useState<"detail" | "edit">("detail");
+  const [aliment, setAliment] = useState<NutritionAliment>(entry.aliment);
+
+  const isCustom = !!aliment.id && !aliment.source;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -34,16 +39,21 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   }
 
   async function handleToggleFavorite() {
-    if (!entry.aliment.id) return;
+    if (!aliment.id) return;
     const next = new Set(favIds);
-    if (next.has(entry.aliment.id)) next.delete(entry.aliment.id);
-    else next.add(entry.aliment.id);
+    if (next.has(aliment.id)) next.delete(aliment.id);
+    else next.add(aliment.id);
     setFavIds(next);
     try {
-      await toggleFavoriteAliment(entry.aliment.id);
+      await toggleFavoriteAliment(aliment.id);
     } catch {
       setFavIds(favIds);
     }
+  }
+
+  function handleEdited(updated: NutritionAliment) {
+    setAliment(updated);
+    setStep("detail");
   }
 
   return (
@@ -60,19 +70,29 @@ export default function EditEntryModal({ entry, onClose }: Props) {
             maxHeight: "calc(100dvh - 165px - env(safe-area-inset-top, 20px))",
           }}
         >
-          <FoodDetailSheet
-            aliment={entry.aliment}
-            mealLabel={`Repas ${entry.meal_number}`}
-            onBack={onClose}
-            onConfirm={handleConfirm}
-            pending={pending}
-            initialQuantity={entry.quantite_g}
-            confirmLabel="Modifier la quantité"
-            isFavorite={!!entry.aliment.id && favIds.has(entry.aliment.id)}
-            onToggleFavorite={
-              entry.aliment.id ? handleToggleFavorite : undefined
-            }
-          />
+          {step === "detail" && (
+            <FoodDetailSheet
+              aliment={aliment}
+              mealLabel={`Repas ${entry.meal_number}`}
+              onBack={onClose}
+              onConfirm={handleConfirm}
+              onEdit={() => setStep("edit")}
+              pending={pending}
+              initialQuantity={entry.quantite_g}
+              confirmLabel="Modifier la quantité"
+              isFavorite={!!aliment.id && favIds.has(aliment.id)}
+              onToggleFavorite={aliment.id ? handleToggleFavorite : undefined}
+            />
+          )}
+
+          {step === "edit" && (
+            <CustomFoodForm
+              editAliment={isCustom ? aliment : { ...aliment, id: "" }}
+              isForking={!isCustom}
+              onEdited={handleEdited}
+              onCreated={() => setStep("detail")}
+            />
+          )}
         </div>
       </div>
     </div>
