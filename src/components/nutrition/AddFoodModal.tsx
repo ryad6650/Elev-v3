@@ -115,7 +115,10 @@ export default function AddFoodModal({
     setStep("quantity");
   }
 
-  async function handleConfirm(quantite: number) {
+  async function handleConfirm(
+    quantite: number,
+    quantitePortion: number | null,
+  ) {
     if (!selected || pending) return;
     setPending(true);
 
@@ -126,7 +129,15 @@ export default function AddFoodModal({
     }
 
     // Update optimiste + attend la persistance Supabase avant de fermer
-    await addEntry(mealNumber, selected, alimentId, quantite, date, mealTime);
+    await addEntry(
+      mealNumber,
+      selected,
+      alimentId,
+      quantite,
+      date,
+      mealTime,
+      quantitePortion,
+    );
     onClose();
   }
 

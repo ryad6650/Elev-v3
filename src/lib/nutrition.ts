@@ -32,7 +32,7 @@ export async function fetchNutritionData(
     supabase
       .from("nutrition_entries")
       .select(
-        "id, meal_number, meal_time, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
+        "id, meal_number, meal_time, quantite_g, quantite_portion, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
       )
       .eq("user_id", uid)
       .eq("date", date)
@@ -54,6 +54,7 @@ export async function fetchNutritionData(
     meal_number: number;
     meal_time: string;
     quantite_g: number;
+    quantite_portion: number | null;
     aliments: {
       id: string;
       nom: string;
@@ -76,6 +77,7 @@ export async function fetchNutritionData(
       meal_number: e.meal_number,
       meal_time: e.meal_time,
       quantite_g: e.quantite_g,
+      quantite_portion: e.quantite_portion,
       aliment: e.aliments as NutritionAliment,
     }),
   );

@@ -10,10 +10,11 @@ interface Props {
   aliment: NutritionAliment;
   mealLabel: string;
   onBack: () => void;
-  onConfirm: (quantite: number) => void;
+  onConfirm: (quantite: number, quantitePortion: number | null) => void;
   onEdit?: () => void;
   pending?: boolean;
   initialQuantity?: number;
+  initialPortionQty?: number | null;
   confirmLabel?: string;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
@@ -27,6 +28,7 @@ export default function FoodDetailSheet({
   onEdit,
   pending,
   initialQuantity,
+  initialPortionQty,
   confirmLabel,
   isFavorite,
   onToggleFavorite,
@@ -35,18 +37,21 @@ export default function FoodDetailSheet({
   const hasPortion = portionG > 0;
 
   // Calcul de la valeur initiale du picker
+  // Si on a une quantité portion enregistrée, on affiche en mode portion
   const initMode =
-    initialQuantity && hasPortion && portionG > 0
+    initialPortionQty != null && hasPortion
       ? ("portion" as const)
-      : initialQuantity
+      : initialQuantity && !initialPortionQty
         ? ("g" as const)
         : hasPortion
           ? ("portion" as const)
           : ("g" as const);
   const initVal = initialQuantity
-    ? initMode === "portion" && portionG > 0
-      ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
-      : initialQuantity
+    ? initMode === "portion" && initialPortionQty != null
+      ? initialPortionQty
+      : initMode === "portion" && portionG > 0
+        ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
+        : initialQuantity
     : hasPortion
       ? 1
       : 100;
@@ -290,7 +295,7 @@ export default function FoodDetailSheet({
         </div>
 
         <button
-          onClick={() => onConfirm(qty)}
+          onClick={() => onConfirm(qty, mode === "portion" ? pickerVal : null)}
           disabled={pending}
           className="btn-accent w-full py-4 rounded-2xl font-bold text-sm transition-opacity"
           style={{

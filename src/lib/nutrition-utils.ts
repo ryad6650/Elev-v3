@@ -23,6 +23,7 @@ export interface NutritionEntry {
   meal_number: number;
   meal_time: string; // ISO timestamp
   quantite_g: number;
+  quantite_portion: number | null; // null = grammage, valeur = nb portions
   aliment: NutritionAliment;
 }
 

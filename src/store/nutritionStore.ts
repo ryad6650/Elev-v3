@@ -23,8 +23,13 @@ interface NutritionState {
     quantiteG: number,
     date: string,
     mealTime: string,
+    quantitePortion?: number | null,
   ) => Promise<void>;
-  updateEntry: (id: string, quantiteG: number) => Promise<void>;
+  updateEntry: (
+    id: string,
+    quantiteG: number,
+    quantitePortion?: number | null,
+  ) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
   setEntries: (entries: NutritionEntry[]) => void;
   reset: () => void;
@@ -66,7 +71,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       supabase
         .from("nutrition_entries")
         .select(
-          "id, meal_number, meal_time, quantite_g, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
+          "id, meal_number, meal_time, quantite_g, quantite_portion, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
         )
         .eq("user_id", userId)
         .eq("date", date)
@@ -91,6 +96,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       meal_number: number;
       meal_time: string;
       quantite_g: number;
+      quantite_portion: number | null;
       aliments: NutritionAliment | null;
     };
 
@@ -101,6 +107,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       meal_number: e.meal_number,
       meal_time: e.meal_time,
       quantite_g: e.quantite_g,
+      quantite_portion: e.quantite_portion,
       aliment: e.aliments as NutritionAliment,
     }));
 
@@ -122,6 +129,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     quantiteG,
     date,
     mealTime,
+    quantitePortion,
   ) => {
     const tempId = crypto.randomUUID();
 
@@ -131,6 +139,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       meal_number: mealNumber,
       meal_time: mealTime,
       quantite_g: quantiteG,
+      quantite_portion: quantitePortion ?? null,
       aliment,
     };
     set((s) => ({ entries: [...s.entries, optimisticEntry] }));
@@ -150,6 +159,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         meal_time: mealTime,
         aliment_id: alimentId,
         quantite_g: quantiteG,
+        quantite_portion: quantitePortion ?? null,
         date,
       })
       .select("id")
@@ -168,15 +178,23 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     }));
   },
 
-  updateEntry: async (id: string, quantiteG: number) => {
+  updateEntry: async (
+    id: string,
+    quantiteG: number,
+    quantitePortion?: number | null,
+  ) => {
     const entries = get().entries;
     const oldEntry = entries.find((e) => e.id === id);
     if (!oldEntry) return;
 
+    const portionVal = quantitePortion ?? null;
+
     // Update optimiste
     set((s) => ({
       entries: s.entries.map((e) =>
-        e.id === id ? { ...e, quantite_g: quantiteG } : e,
+        e.id === id
+          ? { ...e, quantite_g: quantiteG, quantite_portion: portionVal }
+          : e,
       ),
     }));
 
@@ -185,21 +203,33 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     if (!userId) {
       set((s) => ({
         entries: s.entries.map((e) =>
-          e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+          e.id === id
+            ? {
+                ...e,
+                quantite_g: oldEntry.quantite_g,
+                quantite_portion: oldEntry.quantite_portion,
+              }
+            : e,
         ),
       }));
       return;
     }
     const { error } = await supabase
       .from("nutrition_entries")
-      .update({ quantite_g: quantiteG })
+      .update({ quantite_g: quantiteG, quantite_portion: portionVal })
       .eq("id", id)
       .eq("user_id", userId);
 
     if (error) {
       set((s) => ({
         entries: s.entries.map((e) =>
-          e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+          e.id === id
+            ? {
+                ...e,
+                quantite_g: oldEntry.quantite_g,
+                quantite_portion: oldEntry.quantite_portion,
+              }
+            : e,
         ),
       }));
     }

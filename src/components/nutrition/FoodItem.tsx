@@ -14,6 +14,12 @@ interface Props {
 export default memo(function FoodItem({ entry, onDeleted, onClick }: Props) {
   const n = calcNutrients(entry.aliment, entry.quantite_g);
 
+  // Afficher en portions si enregistré en mode portion
+  const qtyLabel =
+    entry.quantite_portion != null
+      ? `${entry.quantite_portion} ${entry.aliment.portion_nom ?? "portion"}`
+      : `${entry.quantite_g}g`;
+
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
     onDeleted?.(entry.id);
@@ -41,8 +47,7 @@ export default memo(function FoodItem({ entry, onDeleted, onClick }: Props) {
           className="text-xs tabular-nums mt-0.5"
           style={{ color: "var(--text-muted)" }}
         >
-          {entry.quantite_g}g · P {n.proteines}g · G {n.glucides}g · L{" "}
-          {n.lipides}g
+          {qtyLabel} · P {n.proteines}g · G {n.glucides}g · L {n.lipides}g
         </p>
       </div>
       <p

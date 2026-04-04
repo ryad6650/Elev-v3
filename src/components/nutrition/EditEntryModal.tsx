@@ -35,14 +35,17 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     };
   }, []);
 
-  async function handleConfirm(quantite: number) {
+  async function handleConfirm(
+    quantite: number,
+    quantitePortion: number | null,
+  ) {
     if (pending) return;
     setPending(true);
     // Si l'aliment a changé (fork), mettre à jour l'aliment_id de l'entrée
     if (aliment.id !== entry.aliment.id) {
       await updateEntryAlimentId(entry.id, aliment.id);
     }
-    await updateEntry(entry.id, quantite);
+    await updateEntry(entry.id, quantite, quantitePortion);
     onClose(aliment.id !== entry.aliment.id);
   }
 
@@ -100,6 +103,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
               onEdit={() => setStep("edit")}
               pending={pending}
               initialQuantity={entry.quantite_g}
+              initialPortionQty={entry.quantite_portion}
               confirmLabel={
                 aliment.id !== entry.aliment.id
                   ? "Enregistrer les modifications"

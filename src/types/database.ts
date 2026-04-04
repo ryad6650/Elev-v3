@@ -153,6 +153,7 @@ export type Database = {
           meal_number: number;
           meal_time: string;
           quantite_g: number;
+          quantite_portion: number | null;
           user_id: string;
         };
         Insert: {
@@ -162,6 +163,7 @@ export type Database = {
           meal_number: number;
           meal_time: string;
           quantite_g: number;
+          quantite_portion?: number | null;
           user_id: string;
         };
         Update: {
@@ -171,6 +173,7 @@ export type Database = {
           meal_number?: number;
           meal_time?: string;
           quantite_g?: number;
+          quantite_portion?: number | null;
           user_id?: string;
         };
         Relationships: [
