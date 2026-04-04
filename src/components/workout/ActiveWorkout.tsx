@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
@@ -53,6 +53,18 @@ export default function ActiveWorkout() {
   const [openUid, setOpenUid] = useState<string | null>(
     () => activeWorkout?.exercises[0]?.uid ?? null,
   );
+
+  // Callbacks stables pour ExerciseCard (évite re-renders en cascade)
+  const handleOpen = useCallback((uid: string) => setOpenUid(uid), []);
+  const handlePR = useCallback(
+    (name: string, poids: number, reps: number) =>
+      setPrNotif({ exerciseName: name, poids, reps }),
+    [],
+  );
+  const handleReplace = useCallback((uid: string) => {
+    setReplacingUid(uid);
+    setShowSearch(true);
+  }, []);
 
   if (!activeWorkout) return null;
   if (showSummary)
@@ -184,14 +196,9 @@ export default function ActiveWorkout() {
               key={ex.uid}
               exercise={ex}
               isOpen={openUid === ex.uid}
-              onOpen={() => setOpenUid(ex.uid)}
-              onPR={(name, poids, reps) =>
-                setPrNotif({ exerciseName: name, poids, reps })
-              }
-              onReplace={() => {
-                setReplacingUid(ex.uid);
-                setShowSearch(true);
-              }}
+              onOpen={handleOpen}
+              onPR={handlePR}
+              onReplace={handleReplace}
             />
           ))}
         </div>

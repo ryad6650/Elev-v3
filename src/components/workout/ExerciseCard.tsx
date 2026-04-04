@@ -28,9 +28,9 @@ function formatRest(s: number): string {
 interface Props {
   exercise: WorkoutExercise;
   isOpen: boolean;
-  onOpen: () => void;
+  onOpen: (uid: string) => void;
   onPR?: (exerciseName: string, poids: number, reps: number) => void;
-  onReplace?: () => void;
+  onReplace?: (uid: string) => void;
 }
 
 function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
@@ -86,7 +86,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   if (!isOpen) {
     return (
       <button
-        onClick={onOpen}
+        onClick={() => onOpen(exercise.uid)}
         className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-opacity active:opacity-70"
         style={{
           background: "var(--bg-secondary)",
@@ -188,7 +188,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                 <button
                   onClick={() => {
                     setShowMenu(false);
-                    onReplace?.();
+                    onReplace?.(exercise.uid);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold transition-opacity active:opacity-70"
                   style={{ color: "var(--text-primary)" }}
@@ -400,4 +400,12 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   );
 }
 
-export default memo(ExerciseCard);
+export default memo(
+  ExerciseCard,
+  (prev, next) =>
+    prev.exercise === next.exercise &&
+    prev.isOpen === next.isOpen &&
+    prev.onOpen === next.onOpen &&
+    prev.onPR === next.onPR &&
+    prev.onReplace === next.onReplace,
+);
