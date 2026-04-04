@@ -19,7 +19,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   const [step, setStep] = useState<"detail" | "edit">("detail");
   const [aliment, setAliment] = useState<NutritionAliment>(entry.aliment);
 
-  const isCustom = !!aliment.id && !aliment.source;
+  const isCustom = !!aliment.id && aliment.is_global === false;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
