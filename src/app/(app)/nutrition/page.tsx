@@ -20,7 +20,31 @@ export default async function NutritionPage({ searchParams }: Props) {
   const initialData = await fetchNutritionData(supabase, d, user.id);
 
   return (
-    <Suspense>
+    <Suspense
+      fallback={
+        <div
+          className="px-4 pt-6 pb-28"
+          style={{ maxWidth: 520, margin: "0 auto" }}
+        >
+          <div
+            className="h-8 w-32 rounded-lg mb-5"
+            style={{ background: "var(--bg-secondary)" }}
+          />
+          <div
+            className="h-40 rounded-2xl mb-4"
+            style={{ background: "var(--bg-secondary)" }}
+          />
+          <div
+            className="h-24 rounded-2xl mb-3"
+            style={{ background: "var(--bg-secondary)" }}
+          />
+          <div
+            className="h-24 rounded-2xl mb-3"
+            style={{ background: "var(--bg-secondary)" }}
+          />
+        </div>
+      }
+    >
       <NutritionPageClient initialData={initialData} />
     </Suspense>
   );

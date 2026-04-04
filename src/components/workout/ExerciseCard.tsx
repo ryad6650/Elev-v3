@@ -340,11 +340,9 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                       key={set.id}
                       set={set}
                       isActive={globalIdx === firstIncompleteIdx}
-                      onUpdate={(field, value) =>
-                        handleUpdateSet(set.id, field, value)
-                      }
-                      onToggle={() => handleToggle(set)}
-                      onRemove={() => handleRemoveSet(set.id)}
+                      onUpdate={handleUpdateSet}
+                      onToggle={handleToggle}
+                      onRemove={handleRemoveSet}
                     />
                   );
                 })
@@ -356,11 +354,9 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                     key={set.id}
                     set={set}
                     isActive={globalIdx === firstIncompleteIdx}
-                    onUpdate={(field, value) =>
-                      handleUpdateSet(set.id, field, value)
-                    }
-                    onToggle={() => handleToggle(set)}
-                    onRemove={() => handleRemoveSet(set.id)}
+                    onUpdate={handleUpdateSet}
+                    onToggle={handleToggle}
+                    onRemove={handleRemoveSet}
                   />
                 );
               })}

@@ -17,10 +17,17 @@ export default function ProfilCompte() {
   const [pwSuccess, setPwSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+
   async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      router.push("/login");
+    } catch {
+      setSignOutError("Erreur lors de la déconnexion. Réessaie.");
+    }
   }
 
   function handlePasswordSubmit(e: React.FormEvent) {
@@ -187,6 +194,11 @@ export default function ProfilCompte() {
           <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
             Confirmer la déconnexion ?
           </p>
+          {signOutError && (
+            <p className="text-xs" style={{ color: "var(--danger)" }}>
+              {signOutError}
+            </p>
+          )}
           <div className="flex gap-2">
             <button
               onClick={() => setShowLogoutConfirm(false)}

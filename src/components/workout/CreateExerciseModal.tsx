@@ -97,6 +97,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
         equipement: equipement || null,
         gif_url: gifUrl,
       });
+      setLoading(false);
       onCreated(ex);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur inattendue");
@@ -157,7 +158,6 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 alt="Aperçu"
                 fill
                 className="object-cover"
-                unoptimized
               />
               <button
                 onClick={removeImage}

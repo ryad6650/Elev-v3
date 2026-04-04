@@ -35,8 +35,11 @@ export default function NutritionPageClient({ initialData }: Props) {
   const today = new Date().toISOString().split("T")[0];
   const date = searchParams.get("date") ?? today;
 
-  const { entries, profile, hasFetched, fetchDay, removeEntry } =
-    useNutritionStore();
+  const entries = useNutritionStore((s) => s.entries);
+  const profile = useNutritionStore((s) => s.profile);
+  const hasFetched = useNutritionStore((s) => s.hasFetched);
+  const fetchDay = useNutritionStore((s) => s.fetchDay);
+  const removeEntry = useNutritionStore((s) => s.removeEntry);
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);

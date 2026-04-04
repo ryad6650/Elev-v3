@@ -1,15 +1,19 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { Check, Trash2 } from "lucide-react";
 import type { WorkoutSet } from "@/store/workoutStore";
 
 interface Props {
   set: WorkoutSet;
   isActive: boolean;
-  onUpdate: (field: "reps" | "poids", value: number | null) => void;
-  onToggle: () => void;
-  onRemove: () => void;
+  onUpdate: (
+    setId: string,
+    field: "reps" | "poids",
+    value: number | null,
+  ) => void;
+  onToggle: (set: WorkoutSet) => void;
+  onRemove: (setId: string) => void;
 }
 
 function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
@@ -75,6 +79,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
             value={set.poids ?? ""}
             onChange={(e) =>
               onUpdate(
+                set.id,
                 "poids",
                 e.target.value === "" ? null : Number(e.target.value),
               )
@@ -104,6 +109,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
             value={set.reps ?? ""}
             onChange={(e) =>
               onUpdate(
+                set.id,
                 "reps",
                 e.target.value === "" ? null : Number(e.target.value),
               )
@@ -127,7 +133,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
 
       {/* Bouton valider */}
       <button
-        onClick={onToggle}
+        onClick={() => onToggle(set)}
         className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
         style={{
           background: set.completed ? "var(--success)" : "transparent",
@@ -140,7 +146,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
 
       {/* Bouton supprimer */}
       <button
-        onClick={onRemove}
+        onClick={() => onRemove(set.id)}
         className="w-7 h-7 flex items-center justify-center shrink-0 rounded-lg transition-opacity active:opacity-50"
         style={{ color: "var(--text-muted)" }}
       >

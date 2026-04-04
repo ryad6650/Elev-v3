@@ -48,7 +48,6 @@ export default function ExerciseGif({
         fill
         sizes={size === "lg" ? "96px" : size === "md" ? "56px" : "40px"}
         className="object-cover"
-        unoptimized
         onError={() => setError(true)}
       />
     </div>

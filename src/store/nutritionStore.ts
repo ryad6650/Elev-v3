@@ -24,8 +24,8 @@ interface NutritionState {
     date: string,
     mealTime: string,
   ) => Promise<void>;
-  updateEntry: (id: string, quantiteG: number) => void;
-  removeEntry: (id: string) => void;
+  updateEntry: (id: string, quantiteG: number) => Promise<void>;
+  removeEntry: (id: string) => Promise<void>;
   setEntries: (entries: NutritionEntry[]) => void;
   reset: () => void;
 }
@@ -163,7 +163,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     }));
   },
 
-  updateEntry: (id: string, quantiteG: number) => {
+  updateEntry: async (id: string, quantiteG: number) => {
     const entries = get().entries;
     const oldEntry = entries.find((e) => e.id === id);
     if (!oldEntry) return;
@@ -176,33 +176,31 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     }));
 
     // Sync Supabase
-    (async () => {
-      const userId = await getCurrentUserId();
-      if (!userId) {
-        set((s) => ({
-          entries: s.entries.map((e) =>
-            e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
-          ),
-        }));
-        return;
-      }
-      const { error } = await supabase
-        .from("nutrition_entries")
-        .update({ quantite_g: quantiteG })
-        .eq("id", id)
-        .eq("user_id", userId);
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      set((s) => ({
+        entries: s.entries.map((e) =>
+          e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+        ),
+      }));
+      return;
+    }
+    const { error } = await supabase
+      .from("nutrition_entries")
+      .update({ quantite_g: quantiteG })
+      .eq("id", id)
+      .eq("user_id", userId);
 
-      if (error) {
-        set((s) => ({
-          entries: s.entries.map((e) =>
-            e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
-          ),
-        }));
-      }
-    })();
+    if (error) {
+      set((s) => ({
+        entries: s.entries.map((e) =>
+          e.id === id ? { ...e, quantite_g: oldEntry.quantite_g } : e,
+        ),
+      }));
+    }
   },
 
-  removeEntry: (id: string) => {
+  removeEntry: async (id: string) => {
     // Capturer l'entrée + sa position pour rollback correct
     const entries = get().entries;
     const removedIndex = entries.findIndex((e) => e.id === id);
@@ -211,26 +209,24 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     // 1. Suppression optimiste immédiate
     set((s) => ({ entries: s.entries.filter((e) => e.id !== id) }));
 
-    // 2. Sync Supabase en arrière-plan
-    (async () => {
-      const userId = await getCurrentUserId();
-      if (!userId) return;
+    // 2. Sync Supabase
+    const userId = await getCurrentUserId();
+    if (!userId) return;
 
-      const { error } = await supabase
-        .from("nutrition_entries")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("nutrition_entries")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
 
-      if (error && removedEntry) {
-        // Rollback : réinsérer à la bonne position
-        set((s) => {
-          const copy = [...s.entries];
-          copy.splice(removedIndex, 0, removedEntry);
-          return { entries: copy };
-        });
-      }
-    })();
+    if (error && removedEntry) {
+      // Rollback : réinsérer à la bonne position
+      set((s) => {
+        const copy = [...s.entries];
+        copy.splice(removedIndex, 0, removedEntry);
+        return { entries: copy };
+      });
+    }
   },
 
   setEntries: (entries) => set({ entries }),

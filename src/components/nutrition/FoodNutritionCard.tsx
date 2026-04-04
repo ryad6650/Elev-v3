@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   hasPortion: boolean;
 }
 
-export default function FoodNutritionCard({
+export default memo(function FoodNutritionCard({
   aliment,
   showDetails,
   onToggleDetails,
@@ -285,4 +286,4 @@ export default function FoodNutritionCard({
       )}
     </>
   );
-}
+});

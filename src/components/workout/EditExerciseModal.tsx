@@ -188,7 +188,6 @@ export default function EditExerciseModal({
                     alt="Aperçu"
                     fill
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
               ) : (

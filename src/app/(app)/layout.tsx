@@ -2,6 +2,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import OfflineBanner from "@/components/layout/OfflineBanner";
 import ActiveWorkoutBanner from "@/components/layout/ActiveWorkoutBanner";
 import AccentInit from "@/components/layout/AccentInit";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_ACCENT } from "@/lib/profil";
 import { computeAccentCSS } from "@/lib/accent-compute";
@@ -44,6 +45,7 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-dvh pb-20">
+      <ServiceWorkerRegistration />
       <AccentInit
         primary={accent}
         secondary={secondary}

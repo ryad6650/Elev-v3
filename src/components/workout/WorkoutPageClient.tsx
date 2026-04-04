@@ -6,6 +6,7 @@ import { useWorkoutStore } from "@/store/workoutStore";
 import WorkoutHub from "./WorkoutHub";
 import ActiveWorkout from "./ActiveWorkout";
 import CreateRoutineModal from "./CreateRoutineModal";
+import ExerciseSearch from "./ExerciseSearch";
 import WorkoutProgrammesSection from "./WorkoutProgrammesSection";
 import type { WorkoutPageData } from "@/lib/workout";
 import type { ProgrammesPageData } from "@/lib/programmes";
@@ -45,6 +46,8 @@ export default function WorkoutPageClient({
   const isMinimized = useWorkoutStore((s) => s.isMinimized);
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const [showCreate, setShowCreate] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showProgrammes, setShowProgrammes] = useState(false);
 
   if (activeWorkout && !isMinimized) return <ActiveWorkout />;
 
@@ -72,7 +75,8 @@ export default function WorkoutPageClient({
         </div>
         <div className="flex gap-2">
           <button
-            className="w-10 h-10 rounded-full flex items-center justify-center"
+            onClick={() => setShowSearch(true)}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
             style={{
               background: "var(--bg-card)",
               border: "1px solid var(--border)",
@@ -112,6 +116,7 @@ export default function WorkoutPageClient({
           ⚡ Séance libre
         </button>
         <button
+          onClick={() => setShowProgrammes((v) => !v)}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
           style={{
             background: "var(--bg-card)",
@@ -124,11 +129,19 @@ export default function WorkoutPageClient({
         </button>
       </div>
 
-      <WorkoutProgrammesSection data={initialProgrammesData} />
+      {showProgrammes && (
+        <WorkoutProgrammesSection data={initialProgrammesData} />
+      )}
       <WorkoutHub data={initialWorkoutData} />
 
       {showCreate && (
         <CreateRoutineModal onClose={() => setShowCreate(false)} />
+      )}
+      {showSearch && (
+        <ExerciseSearch
+          onClose={() => setShowSearch(false)}
+          title="Rechercher un exercice"
+        />
       )}
     </main>
   );

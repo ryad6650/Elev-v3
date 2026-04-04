@@ -67,7 +67,6 @@ export default function ProfilHeader({ profil }: Props) {
             width={64}
             height={64}
             className="w-16 h-16 rounded-full object-cover"
-            unoptimized
           />
         ) : (
           <div
