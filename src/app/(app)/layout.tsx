@@ -8,20 +8,32 @@ import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_ACCENT } from "@/lib/profil";
 import { computeAccentCSS } from "@/lib/accent-compute";
 
+const DEFAULT_PROFILE = {
+  accent: DEFAULT_ACCENT,
+  secondary: null as string | null,
+  balance: 50,
+  theme: "dark" as "dark" | "light",
+};
+
 const getLayoutProfile = unstable_cache(
   async (userId: string) => {
-    const supabase = await createClient();
-    const { data: profil } = await supabase
-      .from("profiles")
-      .select("accent_color, accent_secondary, gradient_intensity, theme")
-      .eq("id", userId)
-      .single();
-    return {
-      accent: profil?.accent_color ?? DEFAULT_ACCENT,
-      secondary: profil?.accent_secondary ?? null,
-      balance: profil?.gradient_intensity ?? 50,
-      theme: (profil?.theme as "dark" | "light") ?? "dark",
-    };
+    try {
+      const supabase = await createClient();
+      const { data: profil } = await supabase
+        .from("profiles")
+        .select("accent_color, accent_secondary, gradient_intensity, theme")
+        .eq("id", userId)
+        .single();
+      return {
+        accent: profil?.accent_color ?? DEFAULT_ACCENT,
+        secondary: profil?.accent_secondary ?? null,
+        balance: profil?.gradient_intensity ?? 50,
+        theme: (profil?.theme as "dark" | "light") ?? "dark",
+      };
+    } catch (err) {
+      console.error("[Layout] Erreur fetch profil:", err);
+      return DEFAULT_PROFILE;
+    }
   },
   ["layout-profile"],
   { revalidate: 300, tags: ["layout-profile"] },
@@ -32,22 +44,26 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   let accent = DEFAULT_ACCENT;
   let secondary: string | null = null;
   let balance = 50;
   let theme: "dark" | "light" = "dark";
 
-  if (user) {
-    const profil = await getLayoutProfile(user.id);
-    accent = profil.accent;
-    secondary = profil.secondary;
-    balance = profil.balance;
-    theme = profil.theme;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const profil = await getLayoutProfile(user.id);
+      accent = profil.accent;
+      secondary = profil.secondary;
+      balance = profil.balance;
+      theme = profil.theme;
+    }
+  } catch (err) {
+    console.error("[Layout] Erreur auth:", err);
   }
 
   const ssrCSS = computeAccentCSS({
