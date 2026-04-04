@@ -189,7 +189,7 @@ export default function CustomFoodForm({
             </label>
             <input
               type="text"
-              placeholder="ex: 1 biscuit"
+              placeholder="ex: biscuit, tranche"
               value={vals.portionNom}
               onChange={(e) => set("portionNom", e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
