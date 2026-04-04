@@ -67,13 +67,8 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   function handleEdited(updated: NutritionAliment) {
     setAliment(updated);
     setStep("detail");
-    // Rafraîchir le store pour refléter les modifications
-    useNutritionStore
-      .getState()
-      .fetchDay(
-        new URL(window.location.href).searchParams.get("date") ??
-          new Date().toISOString().split("T")[0],
-      );
+    // Mise à jour instantanée de l'aliment dans toutes les entrées du store
+    useNutritionStore.getState().updateAlimentInEntries(updated.id, updated);
   }
 
   function handleCreated(created: NutritionAliment) {

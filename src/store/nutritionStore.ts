@@ -30,6 +30,10 @@ interface NutritionState {
     quantiteG: number,
     quantitePortion?: number | null,
   ) => Promise<void>;
+  updateAlimentInEntries: (
+    alimentId: string,
+    aliment: NutritionAliment,
+  ) => void;
   removeEntry: (id: string) => Promise<void>;
   setEntries: (entries: NutritionEntry[]) => void;
   reset: () => void;
@@ -262,6 +266,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         return { entries: copy };
       });
     }
+  },
+
+  updateAlimentInEntries: (alimentId, aliment) => {
+    set((s) => ({
+      entries: s.entries.map((e) =>
+        e.aliment.id === alimentId ? { ...e, aliment } : e,
+      ),
+    }));
   },
 
   setEntries: (entries) => set({ entries }),
