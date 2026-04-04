@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import {
@@ -12,9 +13,12 @@ import {
 import FoodSearchStep from "./FoodSearchStep";
 import FoodDetailSheet from "./FoodDetailSheet";
 import CustomFoodForm from "./CustomFoodForm";
-import BarcodeScanner from "./BarcodeScanner";
 import { useNutritionStore } from "@/store/nutritionStore";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
+
+const BarcodeScanner = dynamic(() => import("./BarcodeScanner"), {
+  ssr: false,
+});
 
 type Step = "search" | "scan" | "quantity" | "custom" | "edit";
 
@@ -52,28 +56,21 @@ export default function AddFoodModal({
   }, []);
 
   useEffect(() => {
-    let done = 0;
-    const finish = () => {
-      done++;
-      if (done >= 3) setLoadingInitial(false);
-    };
-    getRecentAliments()
-      .then((r) => setRecents(r as NutritionAliment[]))
-      .catch(() => {})
-      .finally(finish);
-    fetch("/api/aliments?q=")
-      .then((r) => r.json())
-      .then((d) => setPopulaires(Array.isArray(d) ? d : []))
-      .catch(() => {})
-      .finally(finish);
-    getFavoriteAliments()
-      .then((favAliments) => {
-        const aliments = favAliments as NutritionAliment[];
-        setFavoris(aliments);
-        setFavoriteIds(new Set(aliments.map((a) => a.id)));
-      })
-      .catch(() => {})
-      .finally(finish);
+    Promise.all([
+      getRecentAliments().catch(() => [] as NutritionAliment[]),
+      fetch("/api/aliments?q=")
+        .then((r) => r.json())
+        .then((d) => (Array.isArray(d) ? d : []))
+        .catch(() => []),
+      getFavoriteAliments().catch(() => [] as NutritionAliment[]),
+    ]).then(([r, pop, favAliments]) => {
+      setRecents(r as NutritionAliment[]);
+      setPopulaires(pop);
+      const aliments = favAliments as NutritionAliment[];
+      setFavoris(aliments);
+      setFavoriteIds(new Set(aliments.map((a: NutritionAliment) => a.id)));
+      setLoadingInitial(false);
+    });
   }, []);
 
   const search = useCallback(async (q: string) => {

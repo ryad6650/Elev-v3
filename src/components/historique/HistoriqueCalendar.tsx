@@ -169,7 +169,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
         }}
       >
         🔥 Streak actuel :&nbsp;
-        <strong style={{ color: "#F5A623", fontWeight: 700 }}>
+        <strong style={{ color: "var(--accent-text)", fontWeight: 700 }}>
           {streakActuel} jour{streakActuel > 1 ? "s" : ""}
         </strong>
         &nbsp;consécutif{streakActuel > 1 ? "s" : ""}

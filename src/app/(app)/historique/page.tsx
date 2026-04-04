@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Historique — Élev" };
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchHistoriqueData } from "@/lib/historique";
 import HistoriquePageClient from "@/components/historique/HistoriquePageClient";

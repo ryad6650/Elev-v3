@@ -108,6 +108,8 @@ export async function fetchHistoriqueData(
       .limit(30),
   ]);
 
+  if (workoutsRes.error) throw new Error(workoutsRes.error.message);
+
   const raw = (workoutsRes.data ?? []) as unknown as WorkoutJoin[];
 
   const workouts: HistoriqueWorkout[] = raw.map((w) => {

@@ -1,15 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
 import MealSection from "./MealSection";
-import AddFoodModal from "./AddFoodModal";
-import EditEntryModal from "./EditEntryModal";
 import { sumEntries, groupByMeal, nextMealNumber } from "@/lib/nutrition-utils";
 import type { NutritionEntry, NutritionPageData } from "@/lib/nutrition-utils";
 import { useNutritionStore } from "@/store/nutritionStore";
+
+const AddFoodModal = dynamic(() => import("./AddFoodModal"), { ssr: false });
+const EditEntryModal = dynamic(() => import("./EditEntryModal"), {
+  ssr: false,
+});
 
 function formatLabel(d: string) {
   const t = new Date();

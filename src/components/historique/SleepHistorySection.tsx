@@ -38,7 +38,7 @@ function formatDate(dateStr: string): string {
 function qualiteLabel(minutes: number): { text: string; color: string } {
   if (minutes >= 480) return { text: "Excellent", color: "var(--success)" };
   if (minutes >= 420) return { text: "Bien", color: "var(--accent-text)" };
-  if (minutes >= 360) return { text: "Moyen", color: "#F5A623" };
+  if (minutes >= 360) return { text: "Moyen", color: "var(--accent-text)" };
   return { text: "Mauvais", color: "var(--danger)" };
 }
 

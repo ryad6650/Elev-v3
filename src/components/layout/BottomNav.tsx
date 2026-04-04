@@ -19,9 +19,9 @@ export default function BottomNav() {
   if (hidden) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none h-[72px]">
       <nav
-        className="pointer-events-auto flex items-center px-2 py-2 gap-0.5"
+        className="pointer-events-auto flex items-center px-2 py-2 gap-0.5 h-[56px]"
         style={{
           background:
             "color-mix(in srgb, var(--bg-secondary) 90%, transparent)",

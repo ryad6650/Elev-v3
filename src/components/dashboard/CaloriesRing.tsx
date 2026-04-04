@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 interface Props {
   consumed: number;
   objective: number;
 }
 
-export default function CaloriesRing({ consumed, objective }: Props) {
+export default memo(function CaloriesRing({ consumed, objective }: Props) {
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
@@ -119,4 +119,4 @@ export default function CaloriesRing({ consumed, objective }: Props) {
       </div>
     </div>
   );
-}
+});

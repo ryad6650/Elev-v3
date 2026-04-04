@@ -90,6 +90,9 @@ export async function fetchWorkoutPageData(
       .limit(100),
   ]);
 
+  if (routinesRes.error) throw new Error(routinesRes.error.message);
+  if (workoutsRes.error) throw new Error(workoutsRes.error.message);
+
   const lastWorkoutMap = new Map<string, string>();
   for (const w of lastWorkoutsRes.data ?? []) {
     if (w.routine_id && !lastWorkoutMap.has(w.routine_id)) {

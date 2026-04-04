@@ -25,7 +25,11 @@ export default function HistoriqueStatsCards({
 
   const stats = [
     { val: seances, label: "séances", color: "var(--accent)" },
-    { val: `🔥 ${streakActuel} j`, label: "streak", color: "#F5A623" },
+    {
+      val: `🔥 ${streakActuel} j`,
+      label: "streak",
+      color: "var(--accent-text)",
+    },
     { val: formatVolume(volume), label: "kg volume", color: "#5B9BF5" },
   ];
 
@@ -35,7 +39,10 @@ export default function HistoriqueStatsCards({
         <div
           key={label}
           className="flex-1 relative overflow-hidden rounded-[18px] p-3"
-          style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+          style={{
+            background: "var(--bg-secondary)",
+            border: "1px solid var(--border)",
+          }}
         >
           {/* Barre colorée gauche */}
           <div
@@ -48,7 +55,13 @@ export default function HistoriqueStatsCards({
           >
             {val}
           </div>
-          <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: "0.58rem",
+              color: "var(--text-muted)",
+              marginTop: 2,
+            }}
+          >
             {label}
           </div>
         </div>

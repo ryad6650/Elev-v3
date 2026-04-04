@@ -131,7 +131,7 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
                 </span>
                 <span
                   className="text-xs font-semibold"
-                  style={{ color: "#C084FC" }}
+                  style={{ color: "var(--color-fat)" }}
                 >
                   L {n.lipides}g
                 </span>

@@ -81,6 +81,11 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .single(),
     ]);
 
+    if (entriesRes.error || profileRes.error) {
+      set({ isLoading: false });
+      return;
+    }
+
     type RawEntry = {
       id: string;
       meal_number: number;

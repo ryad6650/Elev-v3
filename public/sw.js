@@ -1,8 +1,9 @@
 // Service Worker — Élev v3
 // Stratégies : cache-first (assets statiques), stale-while-revalidate (pages)
 
-const CACHE_NAME = "elev-v2";
-const GIF_CACHE_NAME = "elev-gifs";
+const CACHE_VERSION = 2;
+const CACHE_NAME = `elev-v3-v${CACHE_VERSION}`;
+const GIF_CACHE_NAME = `elev-gifs-v${CACHE_VERSION}`;
 const SYNC_TAG = "elev-sync";
 
 // Assets statiques Next.js → permanents (hash dans le nom)

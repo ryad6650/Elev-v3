@@ -47,6 +47,8 @@ export async function fetchNutritionData(
       .single(),
   ]);
 
+  if (entriesRes.error) throw new Error(entriesRes.error.message);
+
   type RawEntry = {
     id: string;
     meal_number: number;

@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Séances — Élev" };
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchWorkoutPageData } from "@/lib/workout";
 import { fetchProgrammesData } from "@/lib/programmes";

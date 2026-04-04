@@ -73,6 +73,7 @@ export default function LoginPage() {
       });
     } catch {
       setGoogleLoading(false);
+      setError("Erreur lors de la connexion Google");
     }
   }
 
@@ -180,7 +181,7 @@ export default function LoginPage() {
             <p
               className="text-sm rounded-xl px-4 py-3"
               style={{
-                background: "rgba(239,68,68,0.12)",
+                background: "var(--danger-bg)",
                 color: "var(--danger)",
               }}
             >

@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Poids — Élev" };
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchPoidsData } from "@/lib/poids";
 import PoidsPageClient from "@/components/poids/PoidsPageClient";

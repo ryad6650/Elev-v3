@@ -33,6 +33,8 @@ export async function fetchPoidsData(
       .maybeSingle(),
   ]);
 
+  if (poidsRes.error) throw new Error(poidsRes.error.message);
+
   const entries: PoidsEntry[] = (poidsRes.data ?? []).map((e) => ({
     id: e.id,
     date: e.date ?? "",

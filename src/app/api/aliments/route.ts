@@ -134,6 +134,10 @@ export async function GET(request: NextRequest) {
 
   const q = request.nextUrl.searchParams.get("q") ?? "";
 
+  const cacheHeaders = {
+    "Cache-Control": "private, max-age=60, stale-while-revalidate=120",
+  };
+
   // Pas de requête → aliments globaux populaires (état initial)
   if (!q.trim()) {
     const { data } = await supabase
@@ -143,16 +147,20 @@ export async function GET(request: NextRequest) {
       .limit(24);
     return NextResponse.json(
       (data ?? []).map((r) => ({ ...r, source: "local" as const })),
+      { headers: cacheHeaders },
     );
   }
 
   // Recherche via RPC (trigram + ILIKE, priorité aliments utilisés)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: rpcData } = (await (supabase.rpc as any)("search_aliments", {
-    search_query: q,
-    user_uuid: user.id,
-    max_results: 25,
-  })) as {
+  const { data: rpcData, error: rpcError } = (await (supabase.rpc as any)(
+    "search_aliments",
+    {
+      search_query: q,
+      user_uuid: user.id,
+      max_results: 25,
+    },
+  )) as {
     data: Array<{
       id: string;
       nom: string;
@@ -169,7 +177,12 @@ export async function GET(request: NextRequest) {
       usage_count: number;
       match_rank: number;
     }> | null;
+    error: { message: string } | null;
   };
+
+  if (rpcError) {
+    return NextResponse.json({ error: rpcError.message }, { status: 500 });
+  }
 
   const local: NutritionAliment[] = (rpcData ?? []).map((r) => ({
     id: r.id,
@@ -188,7 +201,8 @@ export async function GET(request: NextRequest) {
   }));
 
   // Si assez de résultats locaux, pas besoin d'OFF
-  if (local.length >= 8) return NextResponse.json(local);
+  if (local.length >= 8)
+    return NextResponse.json(local, { headers: cacheHeaders });
 
   // Compléter avec OFF en parallèle (cache mémoire + timeout court)
   const cachedOFF = getCachedOFF(q);
@@ -202,5 +216,7 @@ export async function GET(request: NextRequest) {
     return true;
   });
 
-  return NextResponse.json([...local, ...offFiltered]);
+  return NextResponse.json([...local, ...offFiltered], {
+    headers: cacheHeaders,
+  });
 }

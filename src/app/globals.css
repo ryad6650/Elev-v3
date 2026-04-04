@@ -23,6 +23,7 @@
   --color-fat: #ef4444;
   --success: #22c55e;
   --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
 }
 
 /* Light mode */

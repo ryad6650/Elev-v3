@@ -38,13 +38,15 @@ export async function fetchProfil(
   userId: string,
   userMeta?: { email?: string | null; created_at?: string | null },
 ): Promise<ProfilData> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
     .select(
       "prenom, taille, objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, photo_url, theme, accent_color, accent_secondary, gradient_intensity, created_at",
     )
     .eq("id", userId)
-    .single();
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
 
   return {
     id: userId,
