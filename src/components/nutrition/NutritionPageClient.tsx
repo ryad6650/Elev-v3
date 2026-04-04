@@ -54,9 +54,9 @@ export default function NutritionPageClient({ initialData }: Props) {
     setModalMealTime(null);
     fetchDay(date);
   };
-  const closeEditModal = () => {
+  const closeEditModal = (needsRefresh?: boolean) => {
     setViewEntry(null);
-    fetchDay(date);
+    if (needsRefresh) fetchDay(date);
   };
   const hydratedDateRef = useRef<string | null>(null);
 

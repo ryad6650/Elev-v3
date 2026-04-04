@@ -13,7 +13,7 @@ import type { NutritionEntry, NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
   entry: NutritionEntry;
-  onClose: () => void;
+  onClose: (needsRefresh?: boolean) => void;
 }
 
 export default function EditEntryModal({ entry, onClose }: Props) {
@@ -42,8 +42,8 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     if (aliment.id !== entry.aliment.id) {
       await updateEntryAlimentId(entry.id, aliment.id);
     }
-    updateEntry(entry.id, quantite);
-    onClose();
+    await updateEntry(entry.id, quantite);
+    onClose(aliment.id !== entry.aliment.id);
   }
 
   async function handleToggleFavorite() {

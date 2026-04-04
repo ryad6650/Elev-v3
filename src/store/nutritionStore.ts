@@ -41,9 +41,9 @@ const supabase = createClient();
 
 async function getCurrentUserId(): Promise<string | null> {
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user?.id ?? null;
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.user?.id ?? null;
 }
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
