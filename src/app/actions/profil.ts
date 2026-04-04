@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export async function updateInfosProfil(data: {
   prenom: string;
@@ -63,7 +63,6 @@ export async function updateTheme(theme: "dark" | "light"): Promise<void> {
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);
-  revalidateTag("layout-profile", "max");
   revalidatePath("/profil");
 }
 
@@ -93,7 +92,6 @@ export async function updateAccentColors(
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);
-  revalidateTag("layout-profile", "max");
   revalidatePath("/profil");
   revalidatePath("/dashboard");
 }
