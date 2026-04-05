@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
 export interface WorkoutDetailExercise {
@@ -28,32 +29,36 @@ export interface WorkoutDetail {
 export async function fetchWorkoutDetail(
   workoutId: string,
 ): Promise<WorkoutDetail> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
-  const { data: workout, error: wErr } = await supabase
-    .from("workouts")
-    .select("id, date, duree_minutes, routine_id, routines(nom)")
-    .eq("id", workoutId)
-    .eq("user_id", user.id)
-    .single();
+  const [workoutRes, setsRes] = await Promise.all([
+    supabase
+      .from("workouts")
+      .select("id, date, duree_minutes, routine_id, routines(nom)")
+      .eq("id", workoutId)
+      .eq("user_id", user.id)
+      .single(),
+    supabase
+      .from("workout_sets")
+      .select("id, exercise_id, numero_serie, poids, reps, completed")
+      .eq("workout_id", workoutId)
+      .order("ordre_exercice")
+      .order("numero_serie"),
+  ]);
 
-  if (wErr || !workout) throw new Error(wErr?.message ?? "Séance introuvable");
+  if (workoutRes.error || !workoutRes.data)
+    throw new Error(workoutRes.error?.message ?? "Séance introuvable");
+  if (setsRes.error) throw new Error(setsRes.error.message);
 
-  const { data: sets, error: sErr } = await supabase
-    .from("workout_sets")
-    .select("id, exercise_id, numero_serie, poids, reps, completed")
-    .eq("workout_id", workoutId)
-    .order("ordre_exercice")
-    .order("numero_serie");
-
-  if (sErr) throw new Error(sErr.message);
+  const workout = workoutRes.data;
+  const sets = setsRes.data ?? [];
 
   // Récupérer les exercices séparément
-  const exerciseIds = [...new Set((sets ?? []).map((s) => s.exercise_id))];
+  const exerciseIds = [...new Set(sets.map((s) => s.exercise_id))];
   const exLookup = new Map<
     string,
     { nom: string; groupe_musculaire: string }
@@ -80,7 +85,7 @@ export async function fetchWorkoutDetail(
   };
 
   const exMap = new Map<string, WorkoutDetailExercise>();
-  for (const s of sets ?? []) {
+  for (const s of sets) {
     const exId = s.exercise_id;
     if (!exMap.has(exId)) {
       const info = exLookup.get(exId);
@@ -111,10 +116,10 @@ export async function fetchWorkoutDetail(
 }
 
 export async function deleteWorkout(workoutId: string): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -132,10 +137,10 @@ export async function updateWorkoutSet(
   setId: string,
   data: { poids?: number | null; reps?: number | null },
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   // Vérifier que le set appartient à l'utilisateur

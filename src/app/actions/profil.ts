@@ -1,16 +1,17 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
 export async function updateInfosProfil(data: {
   prenom: string;
   taille: number | null;
 }): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -33,10 +34,10 @@ export async function updateObjectifsNutrition(data: {
   objectif_glucides: number | null;
   objectif_lipides: number | null;
 }): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -51,10 +52,10 @@ export async function updateObjectifsNutrition(data: {
 }
 
 export async function updateTheme(theme: "dark" | "light"): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -71,10 +72,10 @@ export async function updateAccentColors(
   accent_secondary: string | null,
   gradient_intensity?: number,
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const payload: Record<string, unknown> = {
@@ -97,10 +98,10 @@ export async function updateAccentColors(
 }
 
 export async function uploadPhotoProfil(formData: FormData): Promise<string> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const file = formData.get("photo") as File;

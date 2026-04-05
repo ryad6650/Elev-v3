@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
 export async function addNutritionEntry(
@@ -10,10 +11,10 @@ export async function addNutritionEntry(
   date: string,
   mealTime?: string,
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase.from("nutrition_entries").insert({
@@ -33,10 +34,10 @@ export async function updateEntryAlimentId(
   entryId: string,
   newAlimentId: string,
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -50,10 +51,10 @@ export async function updateEntryAlimentId(
 }
 
 export async function deleteNutritionEntry(id: string): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { error } = await supabase
@@ -82,10 +83,10 @@ export async function upsertExternalAliment(aliment: {
   sel?: number | null;
   code_barres?: string | null;
 }): Promise<{ id: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   // Si code-barres fourni, upsert atomique pour éviter les doublons
@@ -163,10 +164,10 @@ export async function createCustomAliment(
   sucres?: number | null,
   sel?: number | null,
 ): Promise<{ id: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data, error } = await supabase
@@ -208,10 +209,10 @@ export async function updateCustomAliment(
   sucres?: number | null,
   sel?: number | null,
 ): Promise<{ id: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data, error } = await supabase
@@ -261,10 +262,10 @@ type EntryWithAliment = {
 };
 
 export async function getRecentAliments() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) return [];
 
   const query = supabase
@@ -294,10 +295,10 @@ export async function getRecentAliments() {
 export async function getFavoriteAliments(): Promise<
   EntryWithAliment["aliments"][]
 > {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) return [];
 
   const { data } = await supabase
@@ -317,10 +318,10 @@ export async function getFavoriteAliments(): Promise<
 export async function toggleFavoriteAliment(
   alimentId: string,
 ): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data: existing } = await supabase
@@ -345,10 +346,10 @@ export async function toggleFavoriteAliment(
 }
 
 export async function getFavoriteIds(): Promise<string[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) return [];
 
   const { data } = await supabase

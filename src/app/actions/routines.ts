@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
 export interface RoutineExerciseData {
@@ -39,8 +40,6 @@ async function getLastSessionRefs(
 ): Promise<Record<string, { poids: number; reps: number }>> {
   if (exerciseIds.length === 0) return {};
 
-  // Requête optimisée : récupère directement le meilleur poids par exercice
-  // via un tri date DESC + poids DESC et LIMIT par exercice côté client
   const { data } = await supabase
     .from("workout_sets")
     .select("exercise_id, poids, reps, workouts!inner(date)")
@@ -64,10 +63,10 @@ export async function getExerciseLastRefs(
   exerciseIds: string[],
 ): Promise<Record<string, { poids: number; reps: number }>> {
   if (exerciseIds.length === 0) return {};
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) return {};
   return getLastSessionRefs(supabase, user.id, exerciseIds);
 }
@@ -76,10 +75,10 @@ export async function getUserExerciseRests(
   exerciseIds: string[],
 ): Promise<Record<string, number>> {
   if (exerciseIds.length === 0) return {};
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) return {};
 
   const { data } = await supabase
@@ -98,10 +97,10 @@ export async function getUserExerciseRests(
 export async function getRoutineExercises(
   routineId: string,
 ): Promise<RoutineExerciseData[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data, error } = await supabase
@@ -149,10 +148,10 @@ export async function createRoutine(
     ordre: number;
   }[],
 ): Promise<{ id: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data: routine, error } = await supabase
@@ -193,10 +192,10 @@ export async function updateRoutine(
     ordre: number;
   }[],
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   const { data: owned } = await supabase
@@ -226,10 +225,10 @@ export async function updateRoutine(
 }
 
 export async function deleteRoutine(routineId: string): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   await supabase
@@ -244,10 +243,10 @@ export async function saveExerciseRest(
   exerciseId: string,
   restDuration: number | null,
 ): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
   if (!user) throw new Error("Non authentifié");
 
   if (restDuration == null || restDuration <= 0) {

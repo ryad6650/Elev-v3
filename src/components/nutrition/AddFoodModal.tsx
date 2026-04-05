@@ -142,22 +142,16 @@ export default function AddFoodModal({
   }
 
   async function handleCustomCreated(created: NutritionAliment) {
-    // Créer l'entrée nutrition côté serveur puis rafraîchir le store
     onClose();
-    try {
-      await addNutritionEntry(mealNumber, created.id, 100, date, mealTime);
-      useNutritionStore.getState().fetchDay(date);
-    } catch {
-      // Re-fetch pour afficher l'état réel
-      useNutritionStore.getState().fetchDay(date);
-    }
+    await addNutritionEntry(mealNumber, created.id, 100, date, mealTime);
+    // Le store se met à jour via addEntry optimiste, pas besoin de fetchDay
   }
 
   function handleEdited(updated: NutritionAliment) {
     setSelected(updated);
     setStep("quantity");
-    // Rafraîchir le store pour que les entries affichent les données à jour
-    useNutritionStore.getState().fetchDay(date);
+    // Mise à jour instantanée de l'aliment dans le store
+    useNutritionStore.getState().updateAlimentInEntries(updated.id, updated);
   }
 
   async function handleToggleFavorite(aliment: NutritionAliment) {

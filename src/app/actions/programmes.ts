@@ -1,7 +1,8 @@
-'use server';
+"use server";
 
-import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
+import { createClient } from "@/lib/supabase/server";
+import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { revalidatePath } from "next/cache";
 
 interface CreateProgrammeInput {
   nom: string;
@@ -12,13 +13,17 @@ interface CreateProgrammeInput {
   routinesParJour: Record<number, string>; // jour → routine_id
 }
 
-export async function createProgramme(input: CreateProgrammeInput): Promise<void> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+export async function createProgramme(
+  input: CreateProgrammeInput,
+): Promise<void> {
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) throw new Error("Non authentifié");
 
   const { data: programme, error } = await supabase
-    .from('programmes')
+    .from("programmes")
     .insert({
       user_id: user.id,
       nom: input.nom,
@@ -27,10 +32,11 @@ export async function createProgramme(input: CreateProgrammeInput): Promise<void
       duree_semaines: input.duree_semaines,
       jours: input.jours,
     })
-    .select('id')
+    .select("id")
     .single();
 
-  if (error || !programme) throw new Error(error?.message ?? 'Erreur création programme');
+  if (error || !programme)
+    throw new Error(error?.message ?? "Erreur création programme");
 
   const lignes = Object.entries(input.routinesParJour)
     .filter(([, rid]) => rid)
@@ -41,48 +47,58 @@ export async function createProgramme(input: CreateProgrammeInput): Promise<void
     }));
 
   if (lignes.length > 0) {
-    await supabase.from('programme_routines').insert(lignes);
+    await supabase.from("programme_routines").insert(lignes);
   }
 
-  revalidatePath('/programmes');
+  revalidatePath("/programmes");
 }
 
 export async function activerProgramme(programmeId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) throw new Error("Non authentifié");
 
   await supabase
-    .from('profiles')
+    .from("profiles")
     .update({
       programme_actif_id: programmeId,
-      programme_actif_debut: new Date().toISOString().split('T')[0],
+      programme_actif_debut: new Date().toISOString().split("T")[0],
     })
-    .eq('id', user.id);
+    .eq("id", user.id);
 
-  revalidatePath('/programmes');
-  revalidatePath('/dashboard');
+  revalidatePath("/programmes");
+  revalidatePath("/dashboard");
 }
 
 export async function desactiverProgramme(): Promise<void> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) throw new Error("Non authentifié");
 
   await supabase
-    .from('profiles')
+    .from("profiles")
     .update({ programme_actif_id: null, programme_actif_debut: null })
-    .eq('id', user.id);
+    .eq("id", user.id);
 
-  revalidatePath('/programmes');
-  revalidatePath('/dashboard');
+  revalidatePath("/programmes");
+  revalidatePath("/dashboard");
 }
 
 export async function deleteProgramme(programmeId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) throw new Error("Non authentifié");
 
-  await supabase.from('programmes').delete().eq('id', programmeId).eq('user_id', user.id);
-  revalidatePath('/programmes');
+  await supabase
+    .from("programmes")
+    .delete()
+    .eq("id", programmeId)
+    .eq("user_id", user.id);
+  revalidatePath("/programmes");
 }

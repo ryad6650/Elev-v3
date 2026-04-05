@@ -42,12 +42,14 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     if (pending) return;
     setPending(true);
     const alimentChanged = aliment.id !== entry.aliment.id;
-    // Si l'aliment a changé (fork), mettre à jour l'aliment_id de l'entrée
+    // Paralléliser les deux mutations si l'aliment a changé
+    const promises: Promise<void>[] = [
+      updateEntry(entry.id, quantite, quantitePortion),
+    ];
     if (alimentChanged) {
-      await updateEntryAlimentId(entry.id, aliment.id);
+      promises.push(updateEntryAlimentId(entry.id, aliment.id));
     }
-    // Attendre le sync Supabase pour garantir la persistance avant navigation
-    await updateEntry(entry.id, quantite, quantitePortion);
+    await Promise.all(promises);
     onClose(alimentChanged);
   }
 

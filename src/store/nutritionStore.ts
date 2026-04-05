@@ -48,12 +48,21 @@ const DEFAULT_PROFILE: NutritionProfile = {
 
 const supabase = createClient();
 
+let cachedUserId: string | null = null;
+
 async function getCurrentUserId(): Promise<string | null> {
+  if (cachedUserId) return cachedUserId;
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  return session?.user?.id ?? null;
+  cachedUserId = session?.user?.id ?? null;
+  return cachedUserId;
 }
+
+// Invalider le cache quand l'auth change
+supabase.auth.onAuthStateChange((_event, session) => {
+  cachedUserId = session?.user?.id ?? null;
+});
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
   entries: [],
