@@ -141,10 +141,9 @@ export default function AddFoodModal({
     onClose();
   }
 
-  function handleCustomCreated(created: NutritionAliment) {
-    // Optimistic update via le store (pas la Server Action directement)
-    addEntry(mealNumber, created, created.id, 100, date, mealTime, null);
-    onClose();
+  function handleCustomCreated(aliment: NutritionAliment) {
+    setSelected(aliment);
+    setStep("quantity");
   }
 
   function handleEdited(updated: NutritionAliment) {

@@ -150,7 +150,7 @@ export default function CustomFoodForm({
   function buttonLabel() {
     if (pending) return isEditMode ? "Enregistrement..." : "Création...";
     if (isEditMode) return "Modifier l'aliment";
-    return "Créer et ajouter (100g)";
+    return "Créer l'aliment";
   }
 
   return (
@@ -177,51 +177,49 @@ export default function CustomFoodForm({
         </div>
       ))}
 
-      {/* Section portion — toujours visible en mode édition */}
-      {isEditMode && (
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <label
-              className="text-xs font-semibold uppercase tracking-wide"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Nom de la portion
-            </label>
-            <input
-              type="text"
-              placeholder="ex: biscuit, tranche"
-              value={vals.portionNom}
-              onChange={(e) => set("portionNom", e.target.value)}
-              className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-              style={{
-                background: "var(--bg-elevated)",
-                color: "var(--text-primary)",
-                border: "1px solid var(--border)",
-              }}
-            />
-          </div>
-          <div className="w-24">
-            <label
-              className="text-xs font-semibold uppercase tracking-wide"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Grammes
-            </label>
-            <input
-              type="number"
-              placeholder="ex: 15"
-              value={vals.portionG}
-              onChange={(e) => set("portionG", e.target.value)}
-              className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-              style={{
-                background: "var(--bg-elevated)",
-                color: "var(--text-primary)",
-                border: "1px solid var(--border)",
-              }}
-            />
-          </div>
+      {/* Section portion */}
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <label
+            className="text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Nom de la portion
+          </label>
+          <input
+            type="text"
+            placeholder="ex: biscuit, tranche"
+            value={vals.portionNom}
+            onChange={(e) => set("portionNom", e.target.value)}
+            className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+            style={{
+              background: "var(--bg-elevated)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+            }}
+          />
         </div>
-      )}
+        <div className="w-24">
+          <label
+            className="text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Grammes
+          </label>
+          <input
+            type="number"
+            placeholder="ex: 15"
+            value={vals.portionG}
+            onChange={(e) => set("portionG", e.target.value)}
+            className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+            style={{
+              background: "var(--bg-elevated)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+            }}
+          />
+        </div>
+      </div>
 
       {/* Section code-barres */}
       <button
