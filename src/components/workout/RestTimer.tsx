@@ -14,12 +14,18 @@ export default function RestTimer() {
     const update = () => {
       const r = Math.max(0, Math.ceil((restTimer.endAt - Date.now()) / 1000));
       setRemaining(r);
-      if (r === 0) dismissRestTimer();
     };
     update();
     const id = setInterval(update, 250);
     return () => clearInterval(id);
-  }, [restTimer, dismissRestTimer]);
+  }, [restTimer]);
+
+  // Dismiss via effet séparé pour ne pas muter le store depuis l'intervalle
+  useEffect(() => {
+    if (remaining === 0 && restTimer?.active) {
+      dismissRestTimer();
+    }
+  }, [remaining, restTimer, dismissRestTimer]);
 
   if (!restTimer?.active) return null;
 

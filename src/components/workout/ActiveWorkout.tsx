@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
+import { useShallow } from "zustand/react/shallow";
 import {
   getUserExerciseRests,
   getExerciseLastRefs,
@@ -24,7 +25,14 @@ interface PRNotif {
 }
 
 export default function ActiveWorkout() {
-  const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
+  const isActive = useWorkoutStore((s) => s.activeWorkout !== null);
+  const routineName = useWorkoutStore(
+    (s) => s.activeWorkout?.routineName ?? null,
+  );
+  const debutAt = useWorkoutStore((s) => s.activeWorkout?.debutAt ?? 0);
+  const exerciseUids = useWorkoutStore(
+    useShallow((s) => s.activeWorkout?.exercises.map((e) => e.uid) ?? []),
+  );
   const minimizeWorkout = useWorkoutStore((s) => s.minimizeWorkout);
   const replaceExercise = useWorkoutStore((s) => s.replaceExercise);
   const [showSearch, setShowSearch] = useState(false);
@@ -51,7 +59,7 @@ export default function ActiveWorkout() {
 
   // UID de l'exercice actuellement ouvert (accordéon)
   const [openUid, setOpenUid] = useState<string | null>(
-    () => activeWorkout?.exercises[0]?.uid ?? null,
+    () => exerciseUids[0] ?? null,
   );
 
   // Callbacks stables pour ExerciseCard (évite re-renders en cascade)
@@ -66,11 +74,12 @@ export default function ActiveWorkout() {
     setShowSearch(true);
   }, []);
 
-  if (!activeWorkout) return null;
-  if (showSummary)
-    return (
-      <WorkoutSummary workout={activeWorkout} totalPausedMs={totalPausedMs} />
-    );
+  if (!isActive) return null;
+  if (showSummary) {
+    const workout = useWorkoutStore.getState().activeWorkout;
+    if (!workout) return null;
+    return <WorkoutSummary workout={workout} totalPausedMs={totalPausedMs} />;
+  }
 
   const isPaused = pausedAt !== null;
   const handlePause = () => setPausedAt(Date.now());
@@ -108,7 +117,7 @@ export default function ActiveWorkout() {
                 className="text-[10px] uppercase tracking-widest font-semibold"
                 style={{ color: "var(--accent)" }}
               >
-                {activeWorkout.routineName ?? "Séance libre"}
+                {routineName ?? "Séance libre"}
               </p>
               <h1
                 className="text-[2rem] leading-tight italic"
@@ -129,7 +138,7 @@ export default function ActiveWorkout() {
           >
             <div>
               <WorkoutTimer
-                startedAt={activeWorkout.debutAt}
+                startedAt={debutAt}
                 pausedAt={pausedAt}
                 totalPausedMs={totalPausedMs}
                 large
@@ -178,7 +187,7 @@ export default function ActiveWorkout() {
           className="flex-1 px-4 py-4 space-y-2 pb-36"
           style={{ minHeight: "calc(100dvh - 10rem)" }}
         >
-          {activeWorkout.exercises.length === 0 && (
+          {exerciseUids.length === 0 && (
             <div className="text-center py-16 space-y-4">
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 Aucun exercice pour le moment.
@@ -191,11 +200,11 @@ export default function ActiveWorkout() {
               </button>
             </div>
           )}
-          {activeWorkout.exercises.map((ex) => (
+          {exerciseUids.map((uid) => (
             <ExerciseCard
-              key={ex.uid}
-              exercise={ex}
-              isOpen={openUid === ex.uid}
+              key={uid}
+              uid={uid}
+              isOpen={openUid === uid}
               onOpen={handleOpen}
               onPR={handlePR}
               onReplace={handleReplace}
@@ -204,7 +213,7 @@ export default function ActiveWorkout() {
         </div>
 
         {/* FAB ajouter exercice */}
-        {activeWorkout.exercises.length > 0 && (
+        {exerciseUids.length > 0 && (
           <div className="fixed bottom-24 right-4 z-20">
             <button
               onClick={() => setShowSearch(true)}

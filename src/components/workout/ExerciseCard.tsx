@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
-import type { WorkoutExercise, WorkoutSet } from "@/store/workoutStore";
+import type { WorkoutSet } from "@/store/workoutStore";
 import { saveExerciseRest } from "@/app/actions/routines";
 import SetRow from "./SetRow";
 import RestDurationPicker from "./RestDurationPicker";
@@ -26,14 +26,17 @@ function formatRest(s: number): string {
 }
 
 interface Props {
-  exercise: WorkoutExercise;
+  uid: string;
   isOpen: boolean;
   onOpen: (uid: string) => void;
   onPR?: (exerciseName: string, poids: number, reps: number) => void;
   onReplace?: (uid: string) => void;
 }
 
-function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
+function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
+  const exercise = useWorkoutStore((s) =>
+    s.activeWorkout?.exercises.find((e) => e.uid === uid),
+  );
   const addSet = useWorkoutStore((s) => s.addSet);
   const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const removeSet = useWorkoutStore((s) => s.removeSet);
@@ -46,12 +49,6 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   const [showPicker, setShowPicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const completedCount = exercise.sets.filter((s) => s.completed).length;
-  const allDone =
-    exercise.sets.length > 0 && completedCount === exercise.sets.length;
-  const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
-  const hasWarmup = exercise.sets.some((s) => s.isWarmup);
-
   const handleToggle = useCallback(
     (set: WorkoutSet) => {
       if (
@@ -61,32 +58,40 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
         set.poidsRef &&
         set.poids > set.poidsRef
       ) {
-        onPR?.(exercise.nom, set.poids, set.reps);
+        onPR?.(exercise?.nom ?? "", set.poids, set.reps);
       }
-      toggleComplete(exercise.uid, set.id);
+      toggleComplete(uid, set.id);
     },
-    [exercise.uid, exercise.nom, onPR, toggleComplete],
+    [uid, exercise?.nom, onPR, toggleComplete],
   );
 
   const handleUpdateSet = useCallback(
     (setId: string, field: "reps" | "poids", value: number | null) => {
-      updateSet(exercise.uid, setId, field, value);
+      updateSet(uid, setId, field, value);
     },
-    [exercise.uid, updateSet],
+    [uid, updateSet],
   );
 
   const handleRemoveSet = useCallback(
     (setId: string) => {
-      removeSet(exercise.uid, setId);
+      removeSet(uid, setId);
     },
-    [exercise.uid, removeSet],
+    [uid, removeSet],
   );
+
+  if (!exercise) return null;
+
+  const completedCount = exercise.sets.filter((s) => s.completed).length;
+  const allDone =
+    exercise.sets.length > 0 && completedCount === exercise.sets.length;
+  const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
+  const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
   // Vue condensée (exercice fermé)
   if (!isOpen) {
     return (
       <button
-        onClick={() => onOpen(exercise.uid)}
+        onClick={() => onOpen(uid)}
         className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-opacity active:opacity-70"
         style={{
           background: "var(--bg-secondary)",
@@ -188,7 +193,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                 <button
                   onClick={() => {
                     setShowMenu(false);
-                    onReplace?.(exercise.uid);
+                    onReplace?.(uid);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold transition-opacity active:opacity-70"
                   style={{ color: "var(--text-primary)" }}
@@ -206,7 +211,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
                 <button
                   onClick={() => {
                     setShowMenu(false);
-                    removeExercise(exercise.uid);
+                    removeExercise(uid);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold transition-opacity active:opacity-70"
                   style={{ color: "var(--danger, #EF4444)" }}
@@ -368,7 +373,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
       {/* Ajouter une série + Échauffement */}
       <div className="flex border-t" style={{ borderColor: "var(--border)" }}>
         <button
-          onClick={() => addSet(exercise.uid)}
+          onClick={() => addSet(uid)}
           className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
           style={{ color: "var(--accent)" }}
         >
@@ -377,7 +382,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
         </button>
         <div style={{ width: "1px", background: "var(--border)" }} />
         <button
-          onClick={() => addWarmupSets(exercise.uid)}
+          onClick={() => addWarmupSets(uid)}
           className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
           style={{ color: hasWarmup ? "var(--accent)" : "var(--text-muted)" }}
         >
@@ -390,7 +395,7 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
         <RestDurationPicker
           current={exercise.restDuration}
           onSelect={(d) => {
-            setExerciseRestDuration(exercise.uid, d);
+            setExerciseRestDuration(uid, d);
             saveExerciseRest(exercise.exerciseId, d);
           }}
           onClose={() => setShowPicker(false)}
@@ -400,12 +405,4 @@ function ExerciseCard({ exercise, isOpen, onOpen, onPR, onReplace }: Props) {
   );
 }
 
-export default memo(
-  ExerciseCard,
-  (prev, next) =>
-    prev.exercise === next.exercise &&
-    prev.isOpen === next.isOpen &&
-    prev.onOpen === next.onOpen &&
-    prev.onPR === next.onPR &&
-    prev.onReplace === next.onReplace,
-);
+export default memo(ExerciseCard);
