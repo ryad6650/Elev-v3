@@ -52,10 +52,14 @@ export default function NutritionPageClient({ initialData }: Props) {
   const closeAddModal = () => {
     setModalMeal(null);
     setModalMealTime(null);
+    router.refresh();
   };
   const closeEditModal = (needsRefresh?: boolean) => {
     setViewEntry(null);
-    if (needsRefresh) fetchDay(date);
+    if (needsRefresh) {
+      fetchDay(date);
+      router.refresh();
+    }
   };
   const hydratedDateRef = useRef<string | null>(null);
 
@@ -188,7 +192,10 @@ export default function NutritionPageClient({ initialData }: Props) {
             key={meal.meal_number}
             meal={meal}
             onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-            onEntryDeleted={removeEntry}
+            onEntryDeleted={(id) => {
+              removeEntry(id);
+              router.refresh();
+            }}
             onFoodClick={(entry) => setViewEntry(entry)}
           />
         ))}
