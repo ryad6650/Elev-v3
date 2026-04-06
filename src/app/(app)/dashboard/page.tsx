@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Dashboard — Élev" };
-export const revalidate = 0;
+export const dynamic = "force-dynamic";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { fetchDashboardData } from "@/lib/dashboard";
 import { updateConnexionStreak } from "@/app/actions/streak";
