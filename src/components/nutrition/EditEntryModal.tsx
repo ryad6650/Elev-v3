@@ -40,16 +40,21 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     quantitePortion: number | null,
   ) {
     if (pending) return;
-    setPending(true);
     const alimentChanged = aliment.id !== entry.aliment.id;
-    // Paralléliser les deux mutations si l'aliment a changé
-    const promises: Promise<void>[] = [
-      updateEntry(entry.id, quantite, quantitePortion),
-    ];
+
+    // L'optimistic update dans updateEntry est synchrone (début de la fonction)
+    // → on lance la promesse sans attendre pour fermer le modal immédiatement
+    const updatePromise = updateEntry(entry.id, quantite, quantitePortion);
+
     if (alimentChanged) {
-      promises.push(updateEntryAlimentId(entry.id, aliment.id));
+      // Si l'aliment a changé, attendre la synchro serveur avant de fermer
+      setPending(true);
+      await Promise.all([
+        updatePromise,
+        updateEntryAlimentId(entry.id, aliment.id),
+      ]);
     }
-    await Promise.all(promises);
+
     onClose(alimentChanged);
   }
 
