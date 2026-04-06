@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -74,6 +76,13 @@ interface Props {
 }
 
 export default function DashboardPageClient({ initialData }: Props) {
+  const router = useRouter();
+
+  // Forcer un re-fetch SSR à chaque visite pour afficher les données à jour
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
+
   const data = initialData;
   const prenom = data.prenom ?? "toi";
 
