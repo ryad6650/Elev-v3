@@ -63,13 +63,21 @@ export default function NutritionPageClient({ initialData }: Props) {
   // Hydrater le store avec les données SSR au premier rendu (sync, pas dans un effet)
   if (hydratedDateRef.current !== initialData.date) {
     hydratedDateRef.current = initialData.date;
-    useNutritionStore.setState({
-      entries: initialData.entries,
-      profile: initialData.profile,
-      date: initialData.date,
-      hasFetched: true,
-      isLoading: false,
-    });
+    const store = useNutritionStore.getState();
+    const recentlyUpdated =
+      store.hasFetched &&
+      store.date === initialData.date &&
+      Date.now() - store.lastUpdatedAt < 30_000;
+
+    if (!recentlyUpdated) {
+      useNutritionStore.setState({
+        entries: initialData.entries,
+        profile: initialData.profile,
+        date: initialData.date,
+        hasFetched: true,
+        isLoading: false,
+      });
+    }
   }
 
   // Re-fetch côté client uniquement si la date change via navigation

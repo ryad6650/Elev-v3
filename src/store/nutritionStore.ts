@@ -13,6 +13,7 @@ interface NutritionState {
   date: string;
   isLoading: boolean;
   hasFetched: boolean;
+  lastUpdatedAt: number;
 
   // Actions
   fetchDay: (date: string) => Promise<void>;
@@ -70,6 +71,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   date: "",
   isLoading: false,
   hasFetched: false,
+  lastUpdatedAt: 0,
 
   fetchDay: async (date: string) => {
     set({ isLoading: true, date });
@@ -155,7 +157,10 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       quantite_portion: quantitePortion ?? null,
       aliment,
     };
-    set((s) => ({ entries: [...s.entries, optimisticEntry] }));
+    set((s) => ({
+      entries: [...s.entries, optimisticEntry],
+      lastUpdatedAt: Date.now(),
+    }));
 
     // 2. Sync Supabase (await pour garantir la persistance)
     const userId = await getCurrentUserId();
@@ -209,6 +214,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
           ? { ...e, quantite_g: quantiteG, quantite_portion: portionVal }
           : e,
       ),
+      lastUpdatedAt: Date.now(),
     }));
 
     // Sync Supabase
@@ -255,7 +261,10 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     const removedEntry = removedIndex >= 0 ? entries[removedIndex] : null;
 
     // 1. Suppression optimiste immédiate
-    set((s) => ({ entries: s.entries.filter((e) => e.id !== id) }));
+    set((s) => ({
+      entries: s.entries.filter((e) => e.id !== id),
+      lastUpdatedAt: Date.now(),
+    }));
 
     // 2. Sync Supabase
     const userId = await getCurrentUserId();
@@ -293,5 +302,6 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       date: "",
       isLoading: false,
       hasFetched: false,
+      lastUpdatedAt: 0,
     }),
 }));
