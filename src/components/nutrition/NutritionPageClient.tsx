@@ -52,7 +52,6 @@ export default function NutritionPageClient({ initialData }: Props) {
   const closeAddModal = () => {
     setModalMeal(null);
     setModalMealTime(null);
-    fetchDay(date);
   };
   const closeEditModal = (needsRefresh?: boolean) => {
     setViewEntry(null);
