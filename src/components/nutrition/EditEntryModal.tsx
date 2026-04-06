@@ -13,7 +13,7 @@ import type { NutritionEntry, NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
   entry: NutritionEntry;
-  onClose: (needsRefresh?: boolean) => void;
+  onClose: () => void;
 }
 
 export default function EditEntryModal({ entry, onClose }: Props) {
@@ -55,7 +55,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
       ]);
     }
 
-    onClose(alimentChanged);
+    onClose();
   }
 
   async function handleToggleFavorite() {

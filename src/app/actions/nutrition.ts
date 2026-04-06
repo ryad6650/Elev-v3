@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
+/** Invalide le Router Cache du dashboard pour qu'il re-fetch au prochain accès */
+export async function revalidateDashboard() {
+  revalidatePath("/dashboard");
+}
+
 export async function addNutritionEntry(
   mealNumber: number,
   alimentId: string,

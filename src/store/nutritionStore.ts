@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createClient } from "@/lib/supabase/client";
+import { revalidateDashboard } from "@/app/actions/nutrition";
 import type {
   NutritionEntry,
   NutritionProfile,
@@ -13,7 +14,6 @@ interface NutritionState {
   date: string;
   isLoading: boolean;
   hasFetched: boolean;
-  lastUpdatedAt: number;
 
   // Actions
   fetchDay: (date: string) => Promise<void>;
@@ -71,7 +71,6 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   date: "",
   isLoading: false,
   hasFetched: false,
-  lastUpdatedAt: 0,
 
   fetchDay: async (date: string) => {
     set({ isLoading: true, date });
@@ -159,7 +158,6 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     };
     set((s) => ({
       entries: [...s.entries, optimisticEntry],
-      lastUpdatedAt: Date.now(),
     }));
 
     // 2. Sync Supabase (await pour garantir la persistance)
@@ -194,6 +192,9 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         e.id === tempId ? { ...e, id: data.id } : e,
       ),
     }));
+
+    // Invalider le cache dashboard pour qu'il affiche les données à jour
+    revalidateDashboard().catch(() => {});
   },
 
   updateEntry: async (
@@ -214,7 +215,6 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
           ? { ...e, quantite_g: quantiteG, quantite_portion: portionVal }
           : e,
       ),
-      lastUpdatedAt: Date.now(),
     }));
 
     // Sync Supabase
@@ -251,6 +251,8 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
             : e,
         ),
       }));
+    } else {
+      revalidateDashboard().catch(() => {});
     }
   },
 
@@ -263,7 +265,6 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     // 1. Suppression optimiste immédiate
     set((s) => ({
       entries: s.entries.filter((e) => e.id !== id),
-      lastUpdatedAt: Date.now(),
     }));
 
     // 2. Sync Supabase
@@ -283,6 +284,8 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         copy.splice(removedIndex, 0, removedEntry);
         return { entries: copy };
       });
+    } else {
+      revalidateDashboard().catch(() => {});
     }
   },
 
@@ -302,6 +305,5 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       date: "",
       isLoading: false,
       hasFetched: false,
-      lastUpdatedAt: 0,
     }),
 }));

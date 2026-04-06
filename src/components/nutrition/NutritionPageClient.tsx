@@ -48,31 +48,21 @@ export default function NutritionPageClient({ initialData }: Props) {
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
 
-  // Rafraîchir le store après fermeture d'un modal (ajout ou modif)
   const closeAddModal = () => {
     setModalMeal(null);
     setModalMealTime(null);
-    router.refresh();
   };
-  const closeEditModal = (needsRefresh?: boolean) => {
+  const closeEditModal = () => {
     setViewEntry(null);
-    if (needsRefresh) {
-      fetchDay(date);
-      router.refresh();
-    }
   };
   const hydratedDateRef = useRef<string | null>(null);
 
-  // Hydrater le store avec les données SSR au premier rendu (sync, pas dans un effet)
+  // Hydrater le store avec les données SSR une seule fois par date
   if (hydratedDateRef.current !== initialData.date) {
     hydratedDateRef.current = initialData.date;
     const store = useNutritionStore.getState();
-    const recentlyUpdated =
-      store.hasFetched &&
-      store.date === initialData.date &&
-      Date.now() - store.lastUpdatedAt < 30_000;
 
-    if (!recentlyUpdated) {
+    if (!store.hasFetched || store.date !== initialData.date) {
       useNutritionStore.setState({
         entries: initialData.entries,
         profile: initialData.profile,
@@ -192,10 +182,7 @@ export default function NutritionPageClient({ initialData }: Props) {
             key={meal.meal_number}
             meal={meal}
             onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-            onEntryDeleted={(id) => {
-              removeEntry(id);
-              router.refresh();
-            }}
+            onEntryDeleted={(id) => removeEntry(id)}
             onFoodClick={(entry) => setViewEntry(entry)}
           />
         ))}
