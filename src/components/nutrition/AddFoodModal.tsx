@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import {
-  addNutritionEntry,
   getRecentAliments,
   getFavoriteAliments,
   toggleFavoriteAliment,
@@ -128,8 +127,8 @@ export default function AddFoodModal({
       alimentId = id;
     }
 
-    // Update optimiste + attend la persistance Supabase avant de fermer
-    await addEntry(
+    // Lancer l'optimistic update (immédiat dans le store) + sync Supabase en arrière-plan
+    addEntry(
       mealNumber,
       selected,
       alimentId,
@@ -138,13 +137,14 @@ export default function AddFoodModal({
       mealTime,
       quantitePortion,
     );
+    // Fermer immédiatement — l'entrée est déjà visible via l'optimistic update
     onClose();
   }
 
-  async function handleCustomCreated(created: NutritionAliment) {
+  function handleCustomCreated(created: NutritionAliment) {
+    // Optimistic update via le store (pas la Server Action directement)
+    addEntry(mealNumber, created, created.id, 100, date, mealTime, null);
     onClose();
-    await addNutritionEntry(mealNumber, created.id, 100, date, mealTime);
-    // Le store se met à jour via addEntry optimiste, pas besoin de fetchDay
   }
 
   function handleEdited(updated: NutritionAliment) {
