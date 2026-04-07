@@ -14,6 +14,7 @@ export interface RoutineExerciseData {
   repsCibleMax: number | null;
   ordre: number;
   restDuration?: number | null;
+  notes?: string;
   poidsRef?: number | null;
   repsRef?: number | null;
 }
@@ -71,9 +72,9 @@ export async function getExerciseLastRefs(
   return getLastSessionRefs(supabase, user.id, exerciseIds);
 }
 
-export async function getUserExerciseRests(
+export async function getUserExerciseSettings(
   exerciseIds: string[],
-): Promise<Record<string, number>> {
+): Promise<Record<string, { restDuration: number; notes: string }>> {
   if (exerciseIds.length === 0) return {};
   const [supabase, user] = await Promise.all([
     createClient(),
@@ -83,13 +84,16 @@ export async function getUserExerciseRests(
 
   const { data } = await supabase
     .from("user_exercise_rest")
-    .select("exercise_id, rest_duration")
+    .select("exercise_id, rest_duration, notes")
     .eq("user_id", user.id)
     .in("exercise_id", exerciseIds);
 
-  const map: Record<string, number> = {};
+  const map: Record<string, { restDuration: number; notes: string }> = {};
   for (const row of data ?? []) {
-    map[row.exercise_id] = row.rest_duration;
+    map[row.exercise_id] = {
+      restDuration: row.rest_duration,
+      notes: row.notes ?? "",
+    };
   }
   return map;
 }
@@ -118,24 +122,28 @@ export async function getRoutineExercises(
   );
 
   const exerciseIds = rows.map((re) => re.exercises!.id);
-  const [restMap, refsMap] = await Promise.all([
-    getUserExerciseRests(exerciseIds),
+  const [settingsMap, refsMap] = await Promise.all([
+    getUserExerciseSettings(exerciseIds),
     getLastSessionRefs(supabase, user.id, exerciseIds),
   ]);
 
-  return rows.map((re) => ({
-    exerciseId: re.exercises!.id,
-    nom: re.exercises!.nom,
-    groupeMusculaire: re.exercises!.groupe_musculaire,
-    gifUrl: re.exercises!.gif_url ?? null,
-    seriesCible: re.series_cible ?? 3,
-    repsCible: re.reps_cible ?? 10,
-    repsCibleMax: re.reps_cible_max ?? null,
-    ordre: re.ordre,
-    restDuration: restMap[re.exercises!.id] ?? null,
-    poidsRef: refsMap[re.exercises!.id]?.poids ?? null,
-    repsRef: refsMap[re.exercises!.id]?.reps ?? null,
-  }));
+  return rows.map((re) => {
+    const s = settingsMap[re.exercises!.id];
+    return {
+      exerciseId: re.exercises!.id,
+      nom: re.exercises!.nom,
+      groupeMusculaire: re.exercises!.groupe_musculaire,
+      gifUrl: re.exercises!.gif_url ?? null,
+      seriesCible: re.series_cible ?? 3,
+      repsCible: re.reps_cible ?? 10,
+      repsCibleMax: re.reps_cible_max ?? null,
+      ordre: re.ordre,
+      restDuration: s?.restDuration ?? null,
+      notes: s?.notes ?? "",
+      poidsRef: refsMap[re.exercises!.id]?.poids ?? null,
+      repsRef: refsMap[re.exercises!.id]?.reps ?? null,
+    };
+  });
 }
 
 export async function createRoutine(
@@ -250,17 +258,79 @@ export async function saveExerciseRest(
   if (!user) throw new Error("Non authentifié");
 
   if (restDuration == null || restDuration <= 0) {
-    await supabase
+    // Vérifier si des notes existent avant de supprimer
+    const { data: existing } = await supabase
       .from("user_exercise_rest")
-      .delete()
+      .select("notes")
       .eq("user_id", user.id)
-      .eq("exercise_id", exerciseId);
+      .eq("exercise_id", exerciseId)
+      .single();
+
+    if (existing?.notes) {
+      // Garder la row pour préserver les notes
+      await supabase
+        .from("user_exercise_rest")
+        .update({ rest_duration: 0 })
+        .eq("user_id", user.id)
+        .eq("exercise_id", exerciseId);
+    } else {
+      await supabase
+        .from("user_exercise_rest")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("exercise_id", exerciseId);
+    }
   } else {
     await supabase.from("user_exercise_rest").upsert(
       {
         user_id: user.id,
         exercise_id: exerciseId,
         rest_duration: restDuration,
+      },
+      { onConflict: "user_id,exercise_id" },
+    );
+  }
+}
+
+export async function saveExerciseNote(
+  exerciseId: string,
+  note: string,
+): Promise<void> {
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) throw new Error("Non authentifié");
+
+  const trimmed = note.trim();
+  if (!trimmed) {
+    // Vérifier si un rest_duration existe avant de supprimer
+    const { data: existing } = await supabase
+      .from("user_exercise_rest")
+      .select("rest_duration")
+      .eq("user_id", user.id)
+      .eq("exercise_id", exerciseId)
+      .single();
+
+    if (existing && existing.rest_duration > 0) {
+      await supabase
+        .from("user_exercise_rest")
+        .update({ notes: "" })
+        .eq("user_id", user.id)
+        .eq("exercise_id", exerciseId);
+    } else {
+      await supabase
+        .from("user_exercise_rest")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("exercise_id", exerciseId);
+    }
+  } else {
+    await supabase.from("user_exercise_rest").upsert(
+      {
+        user_id: user.id,
+        exercise_id: exerciseId,
+        notes: trimmed,
       },
       { onConflict: "user_id,exercise_id" },
     );

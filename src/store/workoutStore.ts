@@ -26,6 +26,7 @@ export interface WorkoutExercise {
   repsCibleMax: number | null; // null = chiffre unique, sinon max de la fourchette
   sets: WorkoutSet[];
   restDuration?: number | null; // secondes de repos ; null/undefined = pas de minuteur
+  notes?: string;
 }
 
 export interface ActiveWorkout {
@@ -77,6 +78,7 @@ interface WorkoutStore {
   dismissRestTimer: () => void;
   setRestDuration: (seconds: number) => void;
   setExerciseRestDuration: (uid: string, duration: number | null) => void;
+  setExerciseNote: (uid: string, note: string) => void;
   clearWorkout: () => void;
 }
 
@@ -341,7 +343,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
         let exerciseRest: number | null = null;
         const updated = activeWorkout.exercises.map((e) => {
           if (e.uid !== uid) return e;
-          exerciseRest = e.restDuration ?? null;
+          exerciseRest = e.restDuration ?? get().restDuration;
           return {
             ...e,
             sets: e.sets.map((s) => {
@@ -386,6 +388,18 @@ export const useWorkoutStore = create<WorkoutStore>()(
             ...activeWorkout,
             exercises: activeWorkout.exercises.map((e) =>
               e.uid === uid ? { ...e, restDuration: duration } : e,
+            ),
+          },
+        });
+      },
+      setExerciseNote: (uid, note) => {
+        const { activeWorkout } = get();
+        if (!activeWorkout) return;
+        set({
+          activeWorkout: {
+            ...activeWorkout,
+            exercises: activeWorkout.exercises.map((e) =>
+              e.uid === uid ? { ...e, notes: note } : e,
             ),
           },
         });

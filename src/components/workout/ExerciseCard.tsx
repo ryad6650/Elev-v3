@@ -13,10 +13,11 @@ import {
 } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { WorkoutSet } from "@/store/workoutStore";
-import { saveExerciseRest } from "@/app/actions/routines";
+import { saveExerciseRest, saveExerciseNote } from "@/app/actions/routines";
 import SetRow from "./SetRow";
 import RestDurationPicker from "./RestDurationPicker";
 import ExerciseGif from "./ExerciseGif";
+import ExerciseNotes from "./ExerciseNotes";
 
 function formatRest(s: number): string {
   if (s < 60) return `${s}s`;
@@ -46,6 +47,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   const setExerciseRestDuration = useWorkoutStore(
     (s) => s.setExerciseRestDuration,
   );
+  const setExerciseNote = useWorkoutStore((s) => s.setExerciseNote);
   const [showPicker, setShowPicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -370,7 +372,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         })()}
       </div>
 
-      {/* Ajouter une série + Échauffement */}
+      {/* Ajouter une série + Notes + Échauffement */}
       <div className="flex border-t" style={{ borderColor: "var(--border)" }}>
         <button
           onClick={() => addSet(uid)}
@@ -378,8 +380,17 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           style={{ color: "var(--accent)" }}
         >
           <Plus size={15} />
-          Ajouter une série
+          Série
         </button>
+        <div style={{ width: "1px", background: "var(--border)" }} />
+        <ExerciseNotes
+          note={exercise.notes ?? ""}
+          onChange={(n) => {
+            setExerciseNote(uid, n);
+            saveExerciseNote(exercise.exerciseId, n);
+          }}
+          hasInitialNote={!!exercise.notes}
+        />
         <div style={{ width: "1px", background: "var(--border)" }} />
         <button
           onClick={() => addWarmupSets(uid)}

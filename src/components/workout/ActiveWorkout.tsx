@@ -6,7 +6,7 @@ import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useShallow } from "zustand/react/shallow";
 import {
-  getUserExerciseRests,
+  getUserExerciseSettings,
   getExerciseLastRefs,
 } from "@/app/actions/routines";
 import ExerciseCard from "./ExerciseCard";
@@ -274,10 +274,11 @@ export default function ActiveWorkout() {
           onSelect={
             replacingUid
               ? async (ex) => {
-                  const [restMap, refsMap] = await Promise.all([
-                    getUserExerciseRests([ex.id]),
+                  const [settingsMap, refsMap] = await Promise.all([
+                    getUserExerciseSettings([ex.id]),
                     getExerciseLastRefs([ex.id]),
                   ]);
+                  const s = settingsMap[ex.id];
                   replaceExercise(replacingUid, {
                     exerciseId: ex.id,
                     nom: ex.nom,
@@ -286,7 +287,8 @@ export default function ActiveWorkout() {
                     seriesCible: 3,
                     repsCible: 10,
                     repsCibleMax: null,
-                    restDuration: restMap[ex.id] ?? null,
+                    restDuration: s?.restDuration ?? null,
+                    notes: s?.notes ?? "",
                   });
                   setShowSearch(false);
                   setReplacingUid(null);

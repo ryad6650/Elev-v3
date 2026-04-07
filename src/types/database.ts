@@ -505,16 +505,19 @@ export type Database = {
       user_exercise_rest: {
         Row: {
           exercise_id: string;
+          notes: string;
           rest_duration: number;
           user_id: string;
         };
         Insert: {
           exercise_id: string;
-          rest_duration: number;
+          notes?: string;
+          rest_duration?: number;
           user_id: string;
         };
         Update: {
           exercise_id?: string;
+          notes?: string;
           rest_duration?: number;
           user_id?: string;
         };

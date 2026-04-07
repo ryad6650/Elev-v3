@@ -125,7 +125,7 @@ export async function upsertExternalAliment(aliment: {
       .from("aliments")
       .select("id")
       .eq("code_barres", aliment.code_barres)
-      .or(`is_global.eq.true,user_id.eq.${user.id}`)
+      .eq("is_global", true)
       .limit(1)
       .single();
     if (existing) return { id: existing.id };

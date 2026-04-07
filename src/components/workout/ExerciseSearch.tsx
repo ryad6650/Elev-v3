@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import {
-  getUserExerciseRests,
+  getUserExerciseSettings,
   getExerciseLastRefs,
 } from "@/app/actions/routines";
 import CreateExerciseModal from "./CreateExerciseModal";
@@ -132,10 +132,11 @@ export default function ExerciseSearch({
     if (onSelect) {
       onSelect(ex);
     } else {
-      const [restMap, refsMap] = await Promise.all([
-        getUserExerciseRests([ex.id]),
+      const [settingsMap, refsMap] = await Promise.all([
+        getUserExerciseSettings([ex.id]),
         getExerciseLastRefs([ex.id]),
       ]);
+      const s = settingsMap[ex.id];
       addExercise({
         exerciseId: ex.id,
         nom: ex.nom,
@@ -145,7 +146,8 @@ export default function ExerciseSearch({
         seriesCible: 3,
         repsCible: 10,
         repsCibleMax: null,
-        restDuration: restMap[ex.id] ?? null,
+        restDuration: s?.restDuration ?? null,
+        notes: s?.notes ?? "",
         poidsRef: refsMap[ex.id]?.poids ?? null,
         repsRef: refsMap[ex.id]?.reps ?? null,
       });

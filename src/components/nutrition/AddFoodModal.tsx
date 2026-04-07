@@ -121,24 +121,28 @@ export default function AddFoodModal({
     if (!selected || pending) return;
     setPending(true);
 
-    let alimentId = selected.id;
-    if (!alimentId && selected.source === "openfoodfacts") {
-      const { id } = await upsertExternalAliment(selected);
-      alimentId = id;
-    }
+    try {
+      let alimentId = selected.id;
+      if (!alimentId && selected.source === "openfoodfacts") {
+        const { id } = await upsertExternalAliment(selected);
+        alimentId = id;
+      }
 
-    // Lancer l'optimistic update (immédiat dans le store) + sync Supabase en arrière-plan
-    addEntry(
-      mealNumber,
-      selected,
-      alimentId,
-      quantite,
-      date,
-      mealTime,
-      quantitePortion,
-    );
-    // Fermer immédiatement — l'entrée est déjà visible via l'optimistic update
-    onClose();
+      // Lancer l'optimistic update (immédiat dans le store) + sync Supabase en arrière-plan
+      addEntry(
+        mealNumber,
+        selected,
+        alimentId,
+        quantite,
+        date,
+        mealTime,
+        quantitePortion,
+      );
+      // Fermer immédiatement — l'entrée est déjà visible via l'optimistic update
+      onClose();
+    } finally {
+      setPending(false);
+    }
   }
 
   function handleCustomCreated(aliment: NutritionAliment) {
