@@ -13,7 +13,7 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
 
   return (
     <div
-      className="rounded-[20px] p-4 px-[18px]"
+      className="rounded-[20px] py-5 px-[18px]"
       style={{
         background: "rgba(255,255,255,0.06)",
         backdropFilter: "blur(24px)",
@@ -28,7 +28,9 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
         Calories aujourd&apos;hui
       </p>
 
-      <div className="flex items-end gap-1.5 mb-3">
+      <div className="h-1" />
+
+      <div className="flex items-end gap-1.5 mb-4">
         <span
           className="leading-none"
           style={{

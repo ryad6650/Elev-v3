@@ -13,7 +13,7 @@ function MacroCol({ value, objective, color, label }: MacroProps) {
   const percent = objective > 0 ? Math.min((value / objective) * 100, 100) : 0;
 
   return (
-    <div className="flex-1 flex flex-col items-center gap-1">
+    <div className="flex-1 flex flex-col items-center gap-2">
       <span
         className="text-lg font-bold leading-none"
         style={{ color: "#FAFAF9", letterSpacing: "-0.01em" }}
@@ -56,7 +56,7 @@ export default memo(function MacrosCard({
 }: Props) {
   return (
     <div
-      className="rounded-2xl p-3.5 px-4 flex items-center"
+      className="rounded-2xl py-5 px-4 flex items-center"
       style={{
         background: "rgba(255,255,255,0.04)",
         backdropFilter: "blur(12px)",

@@ -9,13 +9,13 @@ interface Props {
 export default memo(function SeancesWeekCard({ count }: Props) {
   return (
     <div
-      className="flex-1 rounded-[16px] p-3.5 flex flex-col items-center justify-center gap-1"
+      className="flex-1 rounded-[16px] py-5 px-3.5 flex flex-col items-center justify-center gap-1.5"
       style={{
         background: "rgba(255,255,255,0.04)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         border: "1px solid rgba(255,255,255,0.08)",
-        minHeight: 90,
+        minHeight: 110,
       }}
     >
       <span className="text-[20px]">🏋️</span>
