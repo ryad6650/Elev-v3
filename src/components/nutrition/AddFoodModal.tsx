@@ -213,7 +213,10 @@ export default function AddFoodModal({
       <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
         <div className="flex flex-col w-full h-full">
           {step !== "quantity" && (
-            <div className="flex items-center justify-between px-5 pt-4 pb-3.5 shrink-0">
+            <div
+              className="flex items-center justify-between px-5 pb-3.5 shrink-0"
+              style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+            >
               <button
                 onClick={isBeige ? () => setStep("search") : onClose}
                 className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"

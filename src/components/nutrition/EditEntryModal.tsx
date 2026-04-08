@@ -103,7 +103,10 @@ export default function EditEntryModal({ entry, onClose }: Props) {
         style={{ background: "#F2E8D5" }}
       >
         <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
-          <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
+          <div
+            className="flex items-center justify-between px-5 pb-3 shrink-0"
+            style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
+          >
             <button
               onClick={() => setStep("detail")}
               className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
