@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 
-/** Invalide le Router Cache du dashboard pour qu'il re-fetch au prochain accès */
+/** Invalide le Router Cache pour que les pages affichent les données à jour */
 export async function revalidateDashboard() {
   revalidatePath("/dashboard");
+  revalidatePath("/nutrition");
 }
 
 export async function addNutritionEntry(
@@ -94,41 +95,38 @@ export async function upsertExternalAliment(aliment: {
   ]);
   if (!user) throw new Error("Non authentifié");
 
-  // Si code-barres fourni, upsert atomique pour éviter les doublons
+  // Si code-barres fourni, chercher d'abord un aliment existant (global ou user)
   if (aliment.code_barres) {
-    const { data, error } = await supabase
-      .from("aliments")
-      .upsert(
-        {
-          user_id: user.id,
-          nom: aliment.nom,
-          marque: aliment.marque ?? null,
-          calories: aliment.calories,
-          proteines: aliment.proteines,
-          glucides: aliment.glucides,
-          lipides: aliment.lipides,
-          fibres: aliment.fibres ?? null,
-          sucres: aliment.sucres ?? null,
-          sel: aliment.sel ?? null,
-          code_barres: aliment.code_barres,
-          is_global: false,
-        },
-        { onConflict: "code_barres", ignoreDuplicates: true },
-      )
-      .select("id")
-      .single();
-
-    if (data) return { id: data.id };
-
-    // Si ignoreDuplicates a ignoré, récupérer l'existant accessible à cet utilisateur
     const { data: existing } = await supabase
       .from("aliments")
       .select("id")
       .eq("code_barres", aliment.code_barres)
-      .eq("is_global", true)
       .limit(1)
-      .single();
+      .maybeSingle();
+
     if (existing) return { id: existing.id };
+
+    // Aucun existant → insérer (UNIQUE constraint empêche les doublons)
+    const { data, error } = await supabase
+      .from("aliments")
+      .insert({
+        user_id: user.id,
+        nom: aliment.nom,
+        marque: aliment.marque ?? null,
+        calories: aliment.calories,
+        proteines: aliment.proteines,
+        glucides: aliment.glucides,
+        lipides: aliment.lipides,
+        fibres: aliment.fibres ?? null,
+        sucres: aliment.sucres ?? null,
+        sel: aliment.sel ?? null,
+        code_barres: aliment.code_barres,
+        is_global: false,
+      })
+      .select("id")
+      .single();
+
+    if (data) return { id: data.id };
     if (error) throw new Error(error.message);
   }
 

@@ -63,6 +63,7 @@ export default function CustomFoodForm({
   const [showBarcode, setShowBarcode] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   function set(key: ValKey, val: string) {
     setVals((prev) => ({ ...prev, [key]: val }));
@@ -71,6 +72,7 @@ export default function CustomFoodForm({
   function handleSubmit() {
     const cal = parseFloat(vals.cal);
     if (!vals.nom || isNaN(cal)) return;
+    setError(null);
     const portionNom = vals.portionNom ? vals.portionNom : null;
     const portionG = vals.portionG ? parseFloat(vals.portionG) : null;
     const prot = vals.prot ? parseFloat(vals.prot) : null;
@@ -82,65 +84,69 @@ export default function CustomFoodForm({
     const codeBarres = showBarcode && vals.codeBarres ? vals.codeBarres : null;
 
     startTransition(async () => {
-      if (isEdit && editAliment) {
-        await updateCustomAliment(
-          editAliment.id,
-          vals.nom,
-          cal,
-          prot,
-          gluc,
-          lip,
-          portionNom,
-          portionG,
-          codeBarres,
-          fibres,
-          sucres,
-          sel,
-        );
-        onEdited?.({
-          ...editAliment,
-          nom: vals.nom,
-          calories: cal,
-          proteines: prot,
-          glucides: gluc,
-          lipides: lip,
-          fibres,
-          sucres,
-          sel,
-          portion_nom: portionNom,
-          taille_portion_g: portionG,
-          code_barres: codeBarres,
-        });
-      } else {
-        const { id } = await createCustomAliment(
-          vals.nom,
-          cal,
-          prot,
-          gluc,
-          lip,
-          portionNom,
-          portionG,
-          codeBarres,
-          fibres,
-          sucres,
-          sel,
-        );
-        onCreated?.({
-          id,
-          nom: vals.nom,
-          calories: cal,
-          proteines: prot,
-          glucides: gluc,
-          lipides: lip,
-          fibres,
-          sucres,
-          sel,
-          portion_nom: portionNom,
-          taille_portion_g: portionG,
-          code_barres: codeBarres,
-          is_global: false,
-          source: undefined,
-        });
+      try {
+        if (isEdit && editAliment) {
+          await updateCustomAliment(
+            editAliment.id,
+            vals.nom,
+            cal,
+            prot,
+            gluc,
+            lip,
+            portionNom,
+            portionG,
+            codeBarres,
+            fibres,
+            sucres,
+            sel,
+          );
+          onEdited?.({
+            ...editAliment,
+            nom: vals.nom,
+            calories: cal,
+            proteines: prot,
+            glucides: gluc,
+            lipides: lip,
+            fibres,
+            sucres,
+            sel,
+            portion_nom: portionNom,
+            taille_portion_g: portionG,
+            code_barres: codeBarres,
+          });
+        } else {
+          const { id } = await createCustomAliment(
+            vals.nom,
+            cal,
+            prot,
+            gluc,
+            lip,
+            portionNom,
+            portionG,
+            codeBarres,
+            fibres,
+            sucres,
+            sel,
+          );
+          onCreated?.({
+            id,
+            nom: vals.nom,
+            calories: cal,
+            proteines: prot,
+            glucides: gluc,
+            lipides: lip,
+            fibres,
+            sucres,
+            sel,
+            portion_nom: portionNom,
+            taille_portion_g: portionG,
+            code_barres: codeBarres,
+            is_global: false,
+            source: undefined,
+          });
+        }
+      } catch {
+        setError("Erreur lors de l'enregistrement. Réessayez.");
       }
     });
   }
@@ -281,6 +287,15 @@ export default function CustomFoodForm({
             />
           )}
         </div>
+      )}
+
+      {error && (
+        <p
+          className="text-xs font-medium px-1"
+          style={{ color: "var(--danger, #EF4444)" }}
+        >
+          {error}
+        </p>
       )}
 
       <button

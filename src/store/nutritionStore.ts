@@ -47,23 +47,22 @@ const DEFAULT_PROFILE: NutritionProfile = {
   objectif_lipides: 70,
 };
 
-const supabase = createClient();
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!_supabase) _supabase = createClient();
+  return _supabase;
+}
 
 let cachedUserId: string | null = null;
 
 async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId) return cachedUserId;
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  cachedUserId = session?.user?.id ?? null;
+    data: { user },
+  } = await getSupabase().auth.getUser();
+  cachedUserId = user?.id ?? null;
   return cachedUserId;
 }
-
-// Invalider le cache quand l'auth change
-supabase.auth.onAuthStateChange((_event, session) => {
-  cachedUserId = session?.user?.id ?? null;
-});
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
   entries: [],
@@ -81,8 +80,9 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       return;
     }
 
+    const sb = getSupabase();
     const [entriesRes, profileRes] = await Promise.all([
-      supabase
+      sb
         .from("nutrition_entries")
         .select(
           "id, meal_number, meal_time, quantite_g, quantite_portion, aliments(id, nom, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
@@ -91,7 +91,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .eq("date", date)
         .order("meal_number")
         .order("meal_time"),
-      supabase
+      sb
         .from("profiles")
         .select(
           "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides",
@@ -167,7 +167,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("nutrition_entries")
       .insert({
         user_id: userId,
@@ -233,7 +233,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       }));
       return;
     }
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("nutrition_entries")
       .update({ quantite_g: quantiteG, quantite_portion: portionVal })
       .eq("id", id)
@@ -271,7 +271,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     const userId = await getCurrentUserId();
     if (!userId) return;
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("nutrition_entries")
       .delete()
       .eq("id", id)

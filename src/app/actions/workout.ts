@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { revalidatePath } from "next/cache";
 import type { WorkoutExercise } from "@/store/workoutStore";
 
 export async function saveWorkout(
@@ -47,6 +48,7 @@ export async function saveWorkout(
       poids: s.poids,
       reps: s.reps,
       completed: s.completed,
+      is_warmup: s.isWarmup,
     })),
   );
 
@@ -57,6 +59,10 @@ export async function saveWorkout(
       return { success: false, error: sError.message };
     }
   }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/historique");
+  revalidatePath("/workout");
 
   return { success: true, id: workout.id };
 }
