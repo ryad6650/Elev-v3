@@ -93,87 +93,84 @@ export default memo(function MealSection({
         </div>
       </button>
 
-      {/* Contenu déplié */}
-      {expanded && (
+      {/* Macro bar — toujours visible */}
+      {isEmpty ? (
+        <div
+          className="h-[5px] rounded-[3px] mb-1"
+          style={{
+            background: "var(--border)",
+            border: "1px dashed var(--text-muted)",
+            opacity: 0.4,
+          }}
+        />
+      ) : (
         <>
-          {/* Macro bar */}
-          {isEmpty ? (
+          <div className="flex h-[5px] rounded-[3px] overflow-hidden mb-1.5">
+            <div style={{ flex: pcts.g, background: "var(--color-carbs)" }} />
             <div
-              className="h-[5px] rounded-[3px] mb-1"
               style={{
-                background: "var(--border)",
-                border: "1px dashed var(--text-muted)",
-                opacity: 0.4,
+                flex: pcts.p,
+                background: "var(--color-protein)",
+                marginLeft: 1,
               }}
             />
-          ) : (
-            <>
-              <div className="flex h-[5px] rounded-[3px] overflow-hidden mb-1.5">
-                <div
-                  style={{ flex: pcts.g, background: "var(--color-carbs)" }}
-                />
-                <div
-                  style={{
-                    flex: pcts.p,
-                    background: "var(--color-protein)",
-                    marginLeft: 1,
-                  }}
-                />
-                <div
-                  style={{
-                    flex: pcts.l,
-                    background: "var(--color-fat)",
-                    marginLeft: 1,
-                  }}
-                />
-              </div>
+            <div
+              style={{
+                flex: pcts.l,
+                background: "var(--color-fat)",
+                marginLeft: 1,
+              }}
+            />
+          </div>
 
-              {/* Macro legend */}
-              <div className="flex gap-2.5 mb-2.5">
-                {[
-                  {
-                    l: "G",
-                    v: total.glucides,
-                    p: pcts.g,
-                    c: "var(--color-carbs)",
-                  },
-                  {
-                    l: "P",
-                    v: total.proteines,
-                    p: pcts.p,
-                    c: "var(--color-protein)",
-                  },
-                  {
-                    l: "L",
-                    v: total.lipides,
-                    p: pcts.l,
-                    c: "var(--color-fat)",
-                  },
-                ].map((m) => (
-                  <div key={m.l} className="flex items-center gap-1">
-                    <div
-                      className="w-[7px] h-[7px] rounded-sm shrink-0"
-                      style={{ background: m.c }}
-                    />
-                    <span
-                      className="text-[9px]"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {m.l} <b>{Math.round(m.v)}g</b>
-                    </span>
-                    <span
-                      className="text-[8px]"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      {m.p}%
-                    </span>
-                  </div>
-                ))}
+          {/* Macro legend */}
+          <div className="flex gap-2.5 mb-2.5">
+            {[
+              {
+                l: "G",
+                v: total.glucides,
+                p: pcts.g,
+                c: "var(--color-carbs)",
+              },
+              {
+                l: "P",
+                v: total.proteines,
+                p: pcts.p,
+                c: "var(--color-protein)",
+              },
+              {
+                l: "L",
+                v: total.lipides,
+                p: pcts.l,
+                c: "var(--color-fat)",
+              },
+            ].map((m) => (
+              <div key={m.l} className="flex items-center gap-1">
+                <div
+                  className="w-[7px] h-[7px] rounded-sm shrink-0"
+                  style={{ background: m.c }}
+                />
+                <span
+                  className="text-[9px]"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {m.l} <b>{Math.round(m.v)}g</b>
+                </span>
+                <span
+                  className="text-[8px]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {m.p}%
+                </span>
               </div>
-            </>
-          )}
+            ))}
+          </div>
+        </>
+      )}
 
-          {/* Food items */}
+      {/* Aliments — dépliés uniquement */}
+      {expanded && (
+        <>
           <div className="flex flex-col gap-2.5">
             {meal.entries.map((e) => (
               <FoodItem
