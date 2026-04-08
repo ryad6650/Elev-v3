@@ -52,28 +52,28 @@ export default function WorkoutPageClient({
       style={{ maxWidth: 430, margin: "0 auto" }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-1.5">
         <span
-          className="text-[9px] font-bold tracking-[0.12em] uppercase"
+          className="text-[11px] font-bold tracking-[0.12em] uppercase"
           style={{ color: "#78716C" }}
         >
           {getDateFr()}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <RoundBtn onClick={() => setShowSearch(true)}>
-            <Search size={13} style={{ color: "#78716C" }} />
+            <Search size={15} style={{ color: "#78716C" }} />
           </RoundBtn>
           <RoundBtn onClick={() => setShowCreate(true)}>
-            <Plus size={15} strokeWidth={2.5} style={{ color: "#78716C" }} />
+            <Plus size={17} strokeWidth={2.5} style={{ color: "#78716C" }} />
           </RoundBtn>
         </div>
       </div>
       <h1
-        className="leading-tight mb-[18px]"
+        className="leading-tight mb-5"
         style={{
           fontFamily: "var(--font-dm-serif)",
           fontStyle: "italic",
-          fontSize: 30,
+          fontSize: 34,
           color: "#4A3728",
           letterSpacing: "-0.01em",
         }}
@@ -90,7 +90,7 @@ export default function WorkoutPageClient({
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-2.5 mb-4">
+      <div className="flex gap-3 mb-5">
         <QuickBtn
           icon="⚡"
           label="Séance libre"
@@ -136,7 +136,7 @@ function RoundBtn({
   return (
     <button
       onClick={onClick}
-      className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+      className="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-transform"
       style={{ background: "rgba(74,55,40,0.07)" }}
     >
       {children}
@@ -158,7 +158,7 @@ function QuickBtn({
   return (
     <button
       onClick={onClick}
-      className="flex-1 py-3.5 px-2.5 rounded-[18px] text-center active:scale-[0.98] transition-transform"
+      className="flex-1 py-4 px-3 rounded-[18px] text-center active:scale-[0.98] transition-transform"
       style={{
         background: "rgba(255,255,255,0.35)",
         backdropFilter: "blur(16px)",
@@ -167,11 +167,11 @@ function QuickBtn({
         boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
       }}
     >
-      <div className="text-[18px] mb-1">{icon}</div>
-      <div className="text-[10px] font-bold" style={{ color: "#4A3728" }}>
+      <div className="text-[22px] mb-1.5">{icon}</div>
+      <div className="text-[12px] font-bold" style={{ color: "#4A3728" }}>
         {label}
       </div>
-      <div className="text-[8px] mt-0.5" style={{ color: "#78716C" }}>
+      <div className="text-[10px] mt-0.5" style={{ color: "#78716C" }}>
         {sub}
       </div>
     </button>

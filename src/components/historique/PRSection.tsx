@@ -18,27 +18,27 @@ export default function PRSection({ prs }: Props) {
       }}
     >
       <div
-        className="font-bold uppercase mb-2"
+        className="font-bold uppercase mb-2.5"
         style={{
-          fontSize: "8px",
+          fontSize: "10px",
           color: "var(--text-secondary)",
           letterSpacing: "0.1em",
         }}
       >
         Records personnels 🏆
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-2">
         {prs.map((pr, i) => (
-          <div key={i} style={{ padding: "8px 0" }}>
-            <div style={{ fontSize: "12px", marginBottom: 2 }}>
+          <div key={i} style={{ padding: "10px 0" }}>
+            <div style={{ fontSize: "14px", marginBottom: 3 }}>
               {MEDALS[i] ?? "⭐"}
             </div>
             <div
               className="truncate"
               style={{
-                fontSize: "8px",
+                fontSize: "10px",
                 color: "var(--text-muted)",
-                marginBottom: 2,
+                marginBottom: 3,
               }}
             >
               {pr.exerciceNom}
@@ -47,7 +47,7 @@ export default function PRSection({ prs }: Props) {
               <span
                 style={{
                   fontFamily: "var(--font-dm-serif)",
-                  fontSize: "16px",
+                  fontSize: "20px",
                   color: "#C8A055",
                   letterSpacing: "-0.02em",
                 }}
@@ -56,7 +56,7 @@ export default function PRSection({ prs }: Props) {
               </span>
               <span
                 style={{
-                  fontSize: "9px",
+                  fontSize: "11px",
                   color: "var(--text-muted)",
                   marginLeft: 3,
                 }}

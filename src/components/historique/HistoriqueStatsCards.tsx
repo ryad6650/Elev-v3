@@ -30,24 +30,24 @@ export default function HistoriqueStatsCards({
   ];
 
   return (
-    <div className="flex gap-2 mb-2.5">
+    <div className="flex gap-2.5 mb-3">
       {stats.map(({ val, label, barColor }) => (
         <div
           key={label}
-          className="flex-1 flex items-center gap-2 rounded-[14px]"
+          className="flex-1 flex items-center gap-2.5 rounded-[16px]"
           style={{
             background: "rgba(255,255,255,0.35)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             border: "1px solid rgba(255,255,255,0.3)",
             boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
-            padding: "10px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               width: 3,
-              height: 32,
+              height: 36,
               borderRadius: 2,
               background: barColor,
               flexShrink: 0,
@@ -58,7 +58,7 @@ export default function HistoriqueStatsCards({
               className="leading-none"
               style={{
                 fontFamily: "var(--font-dm-serif)",
-                fontSize: "18px",
+                fontSize: "22px",
                 color: "var(--text-primary)",
                 letterSpacing: "-0.02em",
               }}
@@ -68,9 +68,9 @@ export default function HistoriqueStatsCards({
             <div
               className="font-semibold uppercase"
               style={{
-                fontSize: "8px",
+                fontSize: "10px",
                 color: "var(--text-muted)",
-                marginTop: 2,
+                marginTop: 3,
                 letterSpacing: "0.06em",
               }}
             >

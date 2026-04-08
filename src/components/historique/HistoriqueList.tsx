@@ -57,11 +57,11 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
           <div
             className="font-bold uppercase"
             style={{
-              fontSize: "8px",
+              fontSize: "10px",
               letterSpacing: "0.1em",
               color: "var(--text-secondary)",
-              marginBottom: 6,
-              marginTop: 4,
+              marginBottom: 8,
+              marginTop: 6,
             }}
           >
             {label}
@@ -93,7 +93,7 @@ function WorkoutItem({
     <div
       className="flex items-center gap-2 cursor-pointer active:opacity-70 transition-opacity"
       style={{
-        padding: "10px 0",
+        padding: "12px 0",
         borderBottom: isLast ? "none" : "1px solid rgba(74,55,40,0.08)",
       }}
       onClick={() => onSelect?.(w.id)}
@@ -102,7 +102,7 @@ function WorkoutItem({
       <div
         style={{
           width: 3,
-          height: 36,
+          height: 42,
           borderRadius: 2,
           background: "linear-gradient(180deg, #c4a882, #a0785c)",
           flexShrink: 0,
@@ -115,23 +115,23 @@ function WorkoutItem({
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "13px",
+            fontSize: "15px",
             color: "var(--text-primary)",
-            marginBottom: 2,
+            marginBottom: 3,
           }}
         >
           {w.routineNom ?? "Séance libre"}
         </div>
         <div
           style={{
-            fontSize: "9px",
+            fontSize: "11px",
             color: "var(--text-muted)",
-            marginBottom: 4,
+            marginBottom: 5,
           }}
         >
           {formatDate(w.date)}
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           {w.duree_minutes != null && <Chip label={`${w.duree_minutes} min`} />}
           {w.exercises.length > 0 && (
             <Chip label={`${w.exercises.length} exos`} />
@@ -143,7 +143,7 @@ function WorkoutItem({
       {/* Flèche */}
       <span
         style={{
-          fontSize: "12px",
+          fontSize: "14px",
           color: "var(--text-secondary)",
           flexShrink: 0,
         }}
@@ -159,12 +159,12 @@ function Chip({ label }: { label: string }) {
     <span
       className="font-bold uppercase"
       style={{
-        fontSize: "7px",
+        fontSize: "9px",
         letterSpacing: "0.04em",
         color: "var(--text-muted)",
         background: "rgba(74,55,40,0.06)",
         borderRadius: 6,
-        padding: "2px 7px",
+        padding: "3px 8px",
       }}
     >
       {label}

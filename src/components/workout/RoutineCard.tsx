@@ -46,18 +46,18 @@ export default function RoutineCard({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") onToggle();
         }}
-        className="flex items-center gap-2.5 py-2.5 cursor-pointer active:opacity-80 transition-opacity"
+        className="flex items-center gap-3 py-3 cursor-pointer active:opacity-80 transition-opacity"
       >
         {/* Barre accent */}
         <div
           className="w-1 rounded-sm shrink-0"
-          style={{ background: gradient, height: 42 }}
+          style={{ background: gradient, height: 48 }}
         />
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <p
-            className="text-[14px] leading-tight mb-[3px]"
+            className="text-[16px] leading-tight mb-1"
             style={{
               fontFamily: "var(--font-dm-serif)",
               fontStyle: "italic",
@@ -67,23 +67,23 @@ export default function RoutineCard({
             {routine.nom}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-[9px]" style={{ color: "#78716C" }}>
+            <span className="text-[11px]" style={{ color: "#78716C" }}>
               {routine.exercisesCount} exercice
               {routine.exercisesCount !== 1 ? "s" : ""}
             </span>
-            <span className="text-[9px]" style={{ color: "#78716C" }}>
+            <span className="text-[11px]" style={{ color: "#78716C" }}>
               ·
             </span>
-            <span className="text-[9px]" style={{ color: "#78716C" }}>
+            <span className="text-[11px]" style={{ color: "#78716C" }}>
               ~{routine.dureeEstimee} min
             </span>
           </div>
           {routine.groupes.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-[5px]">
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
               {routine.groupes.slice(0, 3).map((g) => (
                 <span
                   key={g}
-                  className="text-[7px] font-bold tracking-[0.04em] uppercase px-1.5 py-[2px] rounded-md"
+                  className="text-[9px] font-bold tracking-[0.04em] uppercase px-2 py-[3px] rounded-md"
                   style={{
                     background: "rgba(74,55,40,0.06)",
                     color: "#78716C",
@@ -97,9 +97,9 @@ export default function RoutineCard({
         </div>
 
         {/* Actions droite */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <ChevronDown
-            size={14}
+            size={16}
             className="transition-transform duration-200"
             style={{
               color: "#78716C",
@@ -114,17 +114,17 @@ export default function RoutineCard({
             className="p-1 active:opacity-70"
             style={{ color: "#78716C" }}
           >
-            <MoreVertical size={16} />
+            <MoreVertical size={18} />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onStart();
             }}
-            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
             style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
           >
-            <span className="text-[12px] text-white ml-[1px]">▶</span>
+            <span className="text-[13px] text-white ml-[1px]">▶</span>
           </button>
         </div>
       </div>

@@ -107,7 +107,7 @@ export default function WorkoutHub({ data }: Props) {
     <div>
       {/* Section label */}
       <div
-        className="text-[9px] font-bold tracking-[0.1em] uppercase mb-2.5"
+        className="text-[11px] font-bold tracking-[0.1em] uppercase mb-3"
         style={{ color: "#A8A29E" }}
       >
         Mes routines
@@ -115,14 +115,14 @@ export default function WorkoutHub({ data }: Props) {
 
       {/* Filtres */}
       <div
-        className="flex gap-2 overflow-x-auto pb-1 mb-3"
+        className="flex gap-2.5 overflow-x-auto pb-1.5 mb-4"
         style={{ scrollbarWidth: "none" }}
       >
         {FILTRES.map((f) => (
           <button
             key={f}
             onClick={() => setFiltre(f)}
-            className="shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all active:scale-95"
+            className="shrink-0 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
             style={
               filtre === f
                 ? {
