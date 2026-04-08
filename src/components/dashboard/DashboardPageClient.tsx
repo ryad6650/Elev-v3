@@ -4,13 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import type { DashboardData } from "@/lib/dashboard";
-import CaloriesRing from "@/components/dashboard/CaloriesRing";
-import MacrosBars from "@/components/dashboard/MacrosBars";
-import SleepMiniStat from "@/components/dashboard/SleepMiniStat";
-import ThemeToggleButton from "@/components/dashboard/ThemeToggleButton";
-import MondayReportCard from "@/components/dashboard/MondayReportCard";
+import CaloriesCard from "@/components/dashboard/CaloriesCard";
+import MacrosCard from "@/components/dashboard/MacrosCard";
+import WeeklyWorkoutCard from "@/components/dashboard/WeeklyWorkoutCard";
+import SeancesWeekCard from "@/components/dashboard/SeancesWeekCard";
+import SleepCard from "@/components/dashboard/SleepCard";
 
 function formatDateFr(): string {
   return new Date()
@@ -23,54 +22,6 @@ function formatDateFr(): string {
     .replace(/^\w/, (c) => c.toUpperCase());
 }
 
-function SectionDivider({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-      <span
-        className="text-[10px] font-semibold uppercase tracking-widest shrink-0"
-        style={{ color: "var(--text-muted)" }}
-      >
-        {label}
-      </span>
-      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-    </div>
-  );
-}
-
-function MiniStat({
-  emoji,
-  value,
-  label,
-}: {
-  emoji: string;
-  value: string;
-  label: string;
-}) {
-  return (
-    <div
-      className="flex flex-col items-center justify-center p-4 rounded-2xl border gap-1 card-surface"
-      style={{
-        borderColor: "var(--border)",
-      }}
-    >
-      <span className="text-2xl">{emoji}</span>
-      <span
-        className="text-lg font-bold"
-        style={{ color: "var(--text-primary)" }}
-      >
-        {value}
-      </span>
-      <span
-        className="text-[10px] text-center"
-        style={{ color: "var(--text-muted)" }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
 interface Props {
   initialData: DashboardData;
 }
@@ -78,7 +29,6 @@ interface Props {
 export default function DashboardPageClient({ initialData }: Props) {
   const router = useRouter();
 
-  // Forcer un re-fetch SSR à chaque visite pour afficher les données à jour
   useEffect(() => {
     router.refresh();
   }, [router]);
@@ -87,207 +37,127 @@ export default function DashboardPageClient({ initialData }: Props) {
   const prenom = data.prenom ?? "toi";
 
   return (
-    <main
-      className="px-4 pt-5 pb-4 space-y-4 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto" }}
-    >
-      {/* En-tete */}
-      <div>
-        <p
-          className="text-[10px] font-semibold uppercase tracking-widest mb-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          {formatDateFr()}
-        </p>
-        <div className="flex items-start justify-between">
-          <div>
-            <p
-              className="text-xs mb-0.5"
-              style={{ color: "var(--text-secondary)" }}
+    <>
+      {/* Fond image + overlay */}
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/bg-gym2.png')" }}
+      />
+      <div
+        className="fixed inset-0 z-[1]"
+        style={{
+          background: `linear-gradient(
+            to bottom,
+            rgba(12,8,4,0.35) 0%,
+            rgba(12,8,4,0.55) 28%,
+            rgba(12,8,4,0.80) 52%,
+            rgba(12,8,4,0.95) 70%,
+            rgba(12,8,4,1.00) 100%
+          )`,
+        }}
+      />
+
+      <main
+        className="context-dark relative z-[2] flex flex-col min-h-dvh pb-24"
+        style={{ maxWidth: 430, margin: "0 auto" }}
+      >
+        {/* Greeting */}
+        <div className="px-[22px] pt-5 shrink-0">
+          <div className="flex items-center justify-between mb-1">
+            <span
+              className="text-[11px] font-medium tracking-[0.05em]"
+              style={{ color: "#74BF7A", opacity: 0.8 }}
             >
-              Bonjour,
-            </p>
-            <h1
-              className="leading-tight"
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
-                fontSize: 38,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {prenom}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <ThemeToggleButton initialTheme={data.theme} />
+              {formatDateFr()}
+            </span>
             <Link
               href="/profil"
-              className="flex items-center justify-center rounded-[13px] overflow-hidden shrink-0"
+              className="flex items-center justify-center rounded-full shrink-0"
               style={{
-                width: 46,
-                height: 46,
-                background: data.photoUrl ? "transparent" : "var(--bg-card)",
-                border:
-                  "1px solid color-mix(in srgb, var(--accent-secondary) 35%, transparent)",
+                width: 36,
+                height: 36,
+                background: "linear-gradient(135deg, #2d4a2f 0%, #1B2E1D 100%)",
+                border: "1.5px solid rgba(116,191,122,0.3)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                overflow: "hidden",
               }}
             >
               {data.photoUrl ? (
                 <Image
                   src={data.photoUrl}
                   alt="Profil"
-                  width={46}
-                  height={46}
+                  width={36}
+                  height={36}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <span
-                  className="text-sm font-bold"
-                  style={{ color: "var(--accent)" }}
+                  className="text-[13px] font-bold tracking-[0.02em]"
+                  style={{ color: "#74BF7A" }}
                 >
                   {prenom[0]?.toUpperCase() ?? "?"}
                 </span>
               )}
             </Link>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <span
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold"
+          <p className="text-sm leading-none" style={{ color: "#d6d3d1" }}>
+            Bonjour,
+          </p>
+          <h1
+            className="leading-[1.02]"
             style={{
-              background: "var(--accent-bg)",
-              border:
-                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
-              color: "var(--accent-text)",
+              fontFamily: "var(--font-dm-serif)",
+              fontStyle: "italic",
+              fontSize: 48,
+              color: "#FAFAF9",
+              letterSpacing: "-0.025em",
+              textShadow: "0 2px 32px rgba(0,0,0,0.7)",
             }}
           >
-            ⚡ Jour {data.streakConnexions}
-          </span>
-          {data.poidsActuel != null && (
-            <span
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold"
-              style={{
-                background: "var(--bg-card)",
-                border: "1px solid var(--border)",
-                color: "var(--text-secondary)",
-              }}
-            >
-              ⚖️ {data.poidsActuel} kg
-            </span>
-          )}
-          <span
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              color: "var(--text-secondary)",
-            }}
-          >
-            💪 {data.seancesCetteSemaine} séance
-            {data.seancesCetteSemaine !== 1 ? "s" : ""} cette sem.
-          </span>
+            {prenom}.
+          </h1>
         </div>
 
+        {/* Contenu scrollable */}
         <div
-          className="mt-4 rounded-full"
-          style={{
-            height: 2.5,
-            background: "var(--grad-header-line)",
-          }}
-        />
-      </div>
+          className="flex-1 overflow-y-auto px-4 pt-3.5 flex flex-col gap-2.5"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <CaloriesCard
+            consumed={data.caloriesConsommees}
+            objective={data.objectifCalories}
+          />
 
-      <MondayReportCard />
+          <MacrosCard
+            proteines={{
+              consumed: data.proteinesConsommees,
+              objective: data.objectifProteines,
+            }}
+            glucides={{
+              consumed: data.glucidesConsommees,
+              objective: data.objectifGlucides,
+            }}
+            lipides={{
+              consumed: data.lipidesConsommees,
+              objective: data.objectifLipides,
+            }}
+          />
 
-      <SectionDivider label="Calories" />
+          <WeeklyWorkoutCard
+            seancesAujourdhui={data.seancesAujourdhui}
+            seancesCetteSemaine={data.seancesCetteSemaine}
+            prochaineRoutine={data.prochaineRoutine}
+          />
 
-      <div
-        className="p-5 rounded-2xl border card-surface"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <CaloriesRing
-          consumed={data.caloriesConsommees}
-          objective={data.objectifCalories}
-        />
-      </div>
-
-      <SectionDivider label="Macronutriments" />
-
-      <div
-        className="p-5 rounded-2xl border card-surface"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <MacrosBars
-          proteines={{
-            consumed: data.proteinesConsommees,
-            objective: data.objectifProteines,
-          }}
-          glucides={{
-            consumed: data.glucidesConsommees,
-            objective: data.objectifGlucides,
-          }}
-          lipides={{
-            consumed: data.lipidesConsommees,
-            objective: data.objectifLipides,
-          }}
-        />
-      </div>
-
-      <SectionDivider label="Entraînement" />
-
-      {data.prochaineRoutine && (
-        <Link href="/workout" className="block">
-          <div className="workout-next-card p-5 rounded-2xl flex items-center justify-between">
-            <div>
-              <p
-                className="text-[9px] font-bold uppercase tracking-widest mb-1 opacity-60"
-                style={{ color: "#fff" }}
-              >
-                Prochain entraînement
-              </p>
-              <h2
-                className="text-2xl leading-tight text-white mb-1"
-                style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
-                }}
-              >
-                {data.prochaineRoutine.nom}
-              </h2>
-              <p className="text-xs opacity-70" style={{ color: "#fff" }}>
-                {data.prochaineRoutine.nbExercices} exercice
-                {data.prochaineRoutine.nbExercices !== 1 ? "s" : ""}
-                {data.prochaineRoutine.dureeEstimee != null &&
-                  ` · ~${data.prochaineRoutine.dureeEstimee} min`}
-                {data.prochaineRoutine.groupesMusculaires.length > 0 &&
-                  ` · ${data.prochaineRoutine.groupesMusculaires.join(" + ")}`}
-              </p>
-            </div>
-            <div
-              className="flex items-center justify-center rounded-full shrink-0 ml-4"
-              style={{
-                width: 38,
-                height: 38,
-                background: "rgba(255,255,255,0.18)",
-                border: "1px solid rgba(255,255,255,0.22)",
-              }}
-            >
-              <ArrowRight size={18} color="#fff" />
-            </div>
+          {/* Stats rapides */}
+          <div className="flex gap-2.5">
+            <SeancesWeekCard count={data.seancesCetteSemaine} />
+            <SleepCard sommeilMinutes={data.sommeilMinutes} />
           </div>
-        </Link>
-      )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <MiniStat
-          emoji="💪"
-          value={String(data.seancesCetteSemaine)}
-          label="Séances / sem"
-        />
-        <SleepMiniStat initialMinutes={data.sommeilMinutes} />
-      </div>
-    </main>
+          <div className="h-2 shrink-0" />
+        </div>
+      </main>
+    </>
   );
 }

@@ -55,31 +55,33 @@ export default function HistoriquePageClient({ initialData }: Props) {
 
   return (
     <main
-      className="px-4 pt-6 pb-28 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto" }}
+      className="pt-5 pb-28 page-enter"
+      style={{ maxWidth: 520, margin: "0 auto", padding: "20px 16px 112px" }}
     >
       {/* En-tête */}
-      <div className="mb-5">
+      <div style={{ padding: "0 6px", marginBottom: 14 }}>
         <div
-          className="font-semibold uppercase mb-1"
+          className="font-medium"
           style={{
-            fontSize: "0.65rem",
-            color: "var(--text-muted)",
-            letterSpacing: "0.1em",
+            fontSize: "11px",
+            color: "var(--accent-text)",
+            letterSpacing: "0.05em",
           }}
         >
           Journal
         </div>
         <h1
-          className="leading-tight"
+          className="leading-none"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "1.9rem",
+            fontSize: "36px",
             color: "var(--text-primary)",
+            letterSpacing: "-0.025em",
+            textShadow: "0 2px 32px rgba(0,0,0,0.7)",
           }}
         >
-          Historique
+          Historique.
         </h1>
       </div>
 
@@ -98,13 +100,14 @@ export default function HistoriquePageClient({ initialData }: Props) {
       />
 
       {/* Liste des séances */}
-      <div className="mb-3">
+      <div className="mb-2.5">
         <div
-          className="font-semibold uppercase mb-2.5"
+          className="font-bold uppercase mb-2"
           style={{
-            fontSize: "0.7rem",
-            color: "var(--text-secondary)",
-            letterSpacing: "0.07em",
+            fontSize: "9px",
+            color: "var(--text-muted)",
+            letterSpacing: "0.22em",
+            padding: "2px 2px 0",
           }}
         >
           Dernières séances

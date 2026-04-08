@@ -24,42 +24,49 @@ export default function HistoriqueStatsCards({
   const volume = workouts.reduce((sum, w) => sum + w.volume, 0);
 
   const stats = [
-    { val: seances, label: "séances", color: "var(--accent)" },
-    {
-      val: `🔥 ${streakActuel} j`,
-      label: "streak",
-      color: "var(--accent-text)",
-    },
-    { val: formatVolume(volume), label: "kg volume", color: "#5B9BF5" },
+    { val: String(seances), label: "Séances", barColor: "#74BF7A" },
+    { val: `🔥 ${streakActuel}`, label: "Streak", barColor: "#C8A055" },
+    { val: formatVolume(volume), label: "Volume kg", barColor: "#6BA3D6" },
   ];
 
   return (
-    <div className="flex gap-2 mb-3">
-      {stats.map(({ val, label, color }) => (
+    <div className="flex gap-2 mb-2.5">
+      {stats.map(({ val, label, barColor }) => (
         <div
           key={label}
-          className="flex-1 relative overflow-hidden rounded-[18px] p-3"
+          className="flex-1 relative overflow-hidden rounded-[14px] py-2.5 pl-3.5 pr-2.5"
           style={{
-            background: "var(--bg-secondary)",
+            background: "var(--bg-card)",
             border: "1px solid var(--border)",
           }}
         >
-          {/* Barre colorée gauche */}
           <div
-            className="absolute left-0 top-0 bottom-0"
-            style={{ width: 3, borderRadius: "0 2px 2px 0", background: color }}
+            className="absolute left-0 rounded-r-sm"
+            style={{
+              width: "2.5px",
+              top: 6,
+              bottom: 6,
+              background: barColor,
+            }}
           />
           <div
-            className="font-bold leading-snug"
-            style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
+            className="leading-none"
+            style={{
+              fontFamily: "var(--font-dm-serif)",
+              fontSize: "22px",
+              color: "var(--text-primary)",
+              letterSpacing: "-0.02em",
+            }}
           >
             {val}
           </div>
           <div
+            className="font-semibold"
             style={{
-              fontSize: "0.58rem",
+              fontSize: "9px",
               color: "var(--text-muted)",
-              marginTop: 2,
+              marginTop: 3,
+              letterSpacing: "0.03em",
             }}
           >
             {label}

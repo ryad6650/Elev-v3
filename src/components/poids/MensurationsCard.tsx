@@ -41,21 +41,23 @@ export default function MensurationsCard({ initial }: Props) {
 
   return (
     <div
-      className="rounded-2xl mb-3"
+      className="mb-2.5"
       style={{
         background: "var(--bg-secondary)",
         border: "1px solid var(--border)",
-        padding: 18,
+        borderRadius: 16,
+        padding: "14px 16px",
       }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3.5">
         <div
-          className="font-semibold uppercase"
           style={{
-            fontSize: "0.7rem",
+            fontSize: 9,
+            fontWeight: 700,
             color: "var(--text-secondary)",
-            letterSpacing: "0.07em",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase" as const,
           }}
         >
           Mensurations

@@ -33,30 +33,32 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         : `${set.poidsRef}kg`
       : "—";
 
+  const inputBg = isActive ? "var(--accent-bg)" : "var(--glass-subtle)";
   const inputBorder = isActive
-    ? "1.5px solid var(--accent)"
-    : "1.5px solid var(--border)";
+    ? "1px solid rgba(116,191,122,0.3)"
+    : "1px solid var(--glass-border)";
 
   return (
     <div
-      className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+      className="grid items-center gap-1 px-3.5 py-1"
       style={{
-        background: set.completed ? "rgba(34,197,94,0.06)" : "transparent",
+        gridTemplateColumns: "28px 1fr 1fr 1fr 32px",
+        background: set.completed ? "rgba(116,191,122,0.06)" : "transparent",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
-      {/* Numéro ou ✓ gauche */}
-      <div className="w-6 h-6 flex items-center justify-center shrink-0">
+      {/* # ou ✓ */}
+      <div className="flex items-center justify-start">
         {set.completed ? (
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: "var(--success)" }}
+          <span
+            className="text-[11px] font-bold"
+            style={{ color: "var(--accent-text)" }}
           >
-            <Check size={11} strokeWidth={3} color="white" />
-          </div>
+            ✓
+          </span>
         ) : (
           <span
-            className="text-xs font-bold"
+            className="text-[11px] font-bold"
             style={{
               color: set.isWarmup ? "var(--accent-text)" : "var(--text-muted)",
             }}
@@ -66,92 +68,75 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         )}
       </div>
 
-      {/* Poids et Reps — même taille flex-1 chacun */}
-      <div className="flex flex-1 gap-2">
-        {/* Poids */}
-        <div className="relative flex-1">
-          <input
-            type="number"
-            inputMode="decimal"
-            min={0}
-            step={0.5}
-            placeholder={set.poidsRef != null ? `${set.poidsRef}` : "0"}
-            value={set.poids ?? ""}
-            onChange={(e) =>
-              onUpdate(
-                set.id,
-                "poids",
-                e.target.value === "" ? null : Number(e.target.value),
-              )
-            }
-            className="w-full text-center text-sm font-semibold rounded-xl py-1.5 pl-1 pr-6 outline-none"
-            style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: inputBorder,
-            }}
-          />
-          <span
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none select-none"
-            style={{ color: "var(--text-muted)" }}
-          >
-            kg
-          </span>
-        </div>
-
-        {/* Reps */}
-        <div className="flex-1">
-          <input
-            type="number"
-            inputMode="numeric"
-            min={0}
-            placeholder={repsPlaceholder}
-            value={set.reps ?? ""}
-            onChange={(e) =>
-              onUpdate(
-                set.id,
-                "reps",
-                e.target.value === "" ? null : Number(e.target.value),
-              )
-            }
-            className="w-full text-center text-sm font-semibold rounded-xl py-1.5 outline-none"
-            style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: inputBorder,
-            }}
-          />
-        </div>
+      {/* Poids */}
+      <div className="relative">
+        <input
+          type="number"
+          inputMode="decimal"
+          min={0}
+          step={0.5}
+          placeholder={set.poidsRef != null ? `${set.poidsRef}` : "0"}
+          value={set.poids ?? ""}
+          onChange={(e) =>
+            onUpdate(
+              set.id,
+              "poids",
+              e.target.value === "" ? null : Number(e.target.value),
+            )
+          }
+          className="w-full h-[30px] text-center text-[13px] font-semibold rounded-lg outline-none"
+          style={{
+            background: inputBg,
+            color: "var(--text-primary)",
+            border: inputBorder,
+          }}
+        />
       </div>
 
-      {/* Précédent */}
-      <div className="w-11 text-center shrink-0">
-        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+      {/* Reps */}
+      <div>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          placeholder={repsPlaceholder}
+          value={set.reps ?? ""}
+          onChange={(e) =>
+            onUpdate(
+              set.id,
+              "reps",
+              e.target.value === "" ? null : Number(e.target.value),
+            )
+          }
+          className="w-full h-[30px] text-center text-[13px] font-semibold rounded-lg outline-none"
+          style={{
+            background: inputBg,
+            color: "var(--text-primary)",
+            border: inputBorder,
+          }}
+        />
+      </div>
+
+      {/* Préc. */}
+      <div className="text-center">
+        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
           {precStr}
         </span>
       </div>
 
-      {/* Bouton valider */}
-      <button
-        onClick={() => onToggle(set)}
-        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
-        style={{
-          background: set.completed ? "var(--success)" : "transparent",
-          color: set.completed ? "white" : "var(--text-muted)",
-          border: set.completed ? "none" : "1.5px solid var(--border)",
-        }}
-      >
-        <Check size={13} strokeWidth={2.5} />
-      </button>
-
-      {/* Bouton supprimer */}
-      <button
-        onClick={() => onRemove(set.id)}
-        className="w-7 h-7 flex items-center justify-center shrink-0 rounded-lg transition-opacity active:opacity-50"
-        style={{ color: "var(--text-muted)" }}
-      >
-        <Trash2 size={13} />
-      </button>
+      {/* Check */}
+      <div className="flex items-center justify-center">
+        <button
+          onClick={() => onToggle(set)}
+          className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
+          style={{
+            background: set.completed ? "#4A9B54" : "var(--glass-subtle)",
+            border: set.completed ? "none" : "1.5px solid var(--glass-border)",
+          }}
+        >
+          {set.completed && <Check size={10} strokeWidth={3} color="#fff" />}
+        </button>
+      </div>
     </div>
   );
 }

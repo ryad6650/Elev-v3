@@ -43,10 +43,8 @@ export default function ActiveWorkout() {
   const [prNotif, setPrNotif] = useState<PRNotif | null>(null);
   const prTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-dismiss PR banner après 4s + vibration
   useEffect(() => {
     if (!prNotif) return;
-    // Vibration haptic
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate([100, 50, 100]);
     }
@@ -57,12 +55,10 @@ export default function ActiveWorkout() {
     };
   }, [prNotif]);
 
-  // UID de l'exercice actuellement ouvert (accordéon)
   const [openUid, setOpenUid] = useState<string | null>(
     () => exerciseUids[0] ?? null,
   );
 
-  // Callbacks stables pour ExerciseCard (évite re-renders en cascade)
   const handleOpen = useCallback((uid: string) => setOpenUid(uid), []);
   const handlePR = useCallback(
     (name: string, poids: number, reps: number) =>
@@ -95,98 +91,112 @@ export default function ActiveWorkout() {
         className="min-h-dvh flex flex-col"
         style={{ background: "var(--bg-primary)" }}
       >
-        {/* Header sticky */}
+        {/* Header */}
         <div
-          className="sticky top-0 z-30 px-4 pb-3"
+          className="shrink-0"
           style={{
-            background: "var(--bg-primary)",
-            paddingTop: "max(1rem, env(safe-area-inset-top))",
+            padding: "max(1rem, env(safe-area-inset-top)) 20px 0",
           }}
         >
-          {/* Titre */}
-          <div className="flex items-start gap-2 mb-3">
+          {/* Back row : retour + label routine + Terminer */}
+          <div className="flex items-center justify-between mb-1">
             <button
               onClick={minimizeWorkout}
-              className="p-1 rounded-lg mt-1.5 shrink-0"
-              style={{ color: "var(--text-muted)" }}
+              className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center shrink-0"
+              style={{
+                background: "var(--glass-subtle)",
+                border: "1px solid var(--glass-border)",
+              }}
             >
-              <ChevronLeft size={22} />
+              <ChevronLeft size={14} style={{ color: "var(--text-muted)" }} />
             </button>
-            <div>
-              <p
-                className="text-[10px] uppercase tracking-widest font-semibold"
-                style={{ color: "var(--accent)" }}
-              >
-                {routineName ?? "Séance libre"}
-              </p>
-              <h1
-                className="text-[2rem] leading-tight italic"
-                style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  color: "var(--text-primary)",
-                }}
-              >
-                En cours...
-              </h1>
-            </div>
+            <span
+              className="text-[9px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: "var(--accent-text)", opacity: 0.8 }}
+            >
+              {routineName ?? "Séance libre"}
+            </span>
+            <button
+              onClick={() => setShowSummary(true)}
+              className="text-[10px] font-bold tracking-[0.02em] rounded-lg px-2.5 py-1.5"
+              style={{
+                color: "#E87C6A",
+                background: "rgba(232,124,106,0.08)",
+                border: "1px solid rgba(232,124,106,0.15)",
+              }}
+            >
+              Terminer
+            </button>
           </div>
 
-          {/* Card timer — même fond que les cards exercice */}
-          <div
-            className="flex items-center justify-between px-4 py-3 rounded-2xl"
-            style={{ background: "var(--bg-secondary)" }}
+          {/* Titre */}
+          <h1
+            className="text-[28px] leading-[1.05] italic tracking-[-0.02em]"
+            style={{
+              fontFamily: "var(--font-dm-serif)",
+              color: "var(--text-primary)",
+            }}
           >
-            <div>
+            En cours...
+          </h1>
+        </div>
+
+        {/* Contenu scrollable */}
+        <div
+          className="flex-1 overflow-y-auto px-4 pt-3.5 pb-36 flex flex-col gap-2.5"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {/* Timer card */}
+          <div
+            className="flex items-center gap-3.5 px-4 py-3 rounded-2xl"
+            style={{
+              background: "var(--glass-bg)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid var(--glass-border)",
+            }}
+          >
+            <div className="flex-1">
+              <p
+                className="text-[9px] font-semibold uppercase tracking-[0.12em] mb-0.5"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Durée séance
+              </p>
               <WorkoutTimer
                 startedAt={debutAt}
                 pausedAt={pausedAt}
                 totalPausedMs={totalPausedMs}
                 large
               />
-              <p
-                className="text-xs mt-0.5"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Durée séance
-              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={isPaused ? handleResume : handlePause}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border"
+                className="w-[34px] h-[34px] rounded-xl flex items-center justify-center"
                 style={{
-                  background: "var(--bg-card)",
-                  color: "var(--text-primary)",
-                  borderColor: "var(--border)",
+                  background: "var(--glass-subtle)",
+                  border: "1px solid var(--glass-border)",
                 }}
               >
                 {isPaused ? (
-                  <Play size={13} fill="currentColor" />
+                  <Play
+                    size={14}
+                    fill="var(--text-muted)"
+                    style={{ color: "var(--text-muted)" }}
+                  />
                 ) : (
-                  <Pause size={13} />
+                  <Pause
+                    size={14}
+                    fill="var(--text-muted)"
+                    style={{ color: "var(--text-muted)" }}
+                  />
                 )}
-                {isPaused ? "Reprendre" : "Pause"}
-              </button>
-              <button
-                onClick={() => setShowSummary(true)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border"
-                style={{
-                  background: "var(--bg-card)",
-                  color: "var(--accent)",
-                  borderColor: "var(--border)",
-                }}
-              >
-                Fin
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Exercices (accordéon) */}
-        <div
-          className="flex-1 px-4 py-4 space-y-2 pb-36"
-          style={{ minHeight: "calc(100dvh - 10rem)" }}
-        >
+          {/* Exercices */}
           {exerciseUids.length === 0 && (
             <div className="text-center py-16 space-y-4">
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
@@ -214,14 +224,17 @@ export default function ActiveWorkout() {
 
         {/* FAB ajouter exercice */}
         {exerciseUids.length > 0 && (
-          <div className="fixed bottom-24 right-4 z-20">
-            <button
-              onClick={() => setShowSearch(true)}
-              className="btn-accent w-14 h-14 rounded-full flex items-center justify-center shadow-xl"
-            >
-              <Plus size={24} />
-            </button>
-          </div>
+          <button
+            onClick={() => setShowSearch(true)}
+            className="fixed bottom-[78px] right-4 z-20 w-11 h-11 rounded-[14px] flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
+              border: "1px solid rgba(116,191,122,0.3)",
+              boxShadow: "0 4px 20px rgba(27,46,29,0.6)",
+            }}
+          >
+            <Plus size={20} color="#fff" />
+          </button>
         )}
 
         {/* Bannière PR */}

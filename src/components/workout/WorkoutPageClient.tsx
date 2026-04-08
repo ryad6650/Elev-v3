@@ -7,6 +7,7 @@ import { useWorkoutStore } from "@/store/workoutStore";
 import WorkoutHub from "./WorkoutHub";
 import ActiveWorkout from "./ActiveWorkout";
 import WorkoutProgrammesSection from "./WorkoutProgrammesSection";
+import WorkoutWeekTimeline from "./WorkoutWeekTimeline";
 import type { WorkoutPageData } from "@/lib/workout";
 import type { ProgrammesPageData } from "@/lib/programmes";
 
@@ -23,20 +24,9 @@ function getDateFr(): string {
       weekday: "long",
       day: "numeric",
       month: "long",
+      year: "numeric",
     })
     .replace(/^\w/, (c) => c.toUpperCase());
-}
-
-function getLastSessionLabel(
-  historique: WorkoutPageData["historique"],
-): string {
-  if (!historique.length) return "aucune séance récente";
-  const diffDays = Math.floor(
-    (Date.now() - new Date(historique[0].date).getTime()) / 86400000,
-  );
-  if (diffDays === 0) return "dernière séance aujourd'hui";
-  if (diffDays === 1) return "dernière séance hier";
-  return `dernière séance il y a ${diffDays} jours`;
 }
 
 interface Props {
@@ -59,85 +49,108 @@ export default function WorkoutPageClient({
 
   return (
     <main
-      className="px-4 pt-6 pb-28 page-enter"
+      className="px-4 pt-5 pb-28 page-enter"
       style={{ maxWidth: 520, margin: "0 auto" }}
     >
-      {/* Header */}
-      <div className="flex items-end justify-between mb-5">
-        <div>
-          <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>
-            {getDateFr()} · {getLastSessionLabel(initialWorkoutData.historique)}
-          </p>
-          <h1
-            className="text-3xl leading-tight"
-            style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
-              color: "var(--text-primary)",
-            }}
+      {/* Header — style greeting mockup crème */}
+      <div className="mb-4" style={{ padding: "0 6px" }}>
+        <div className="flex items-center justify-between mb-1">
+          <span
+            className="text-[11px] font-medium tracking-[0.05em]"
+            style={{ color: "var(--accent)", opacity: 0.7 }}
           >
-            Séances
-          </h1>
+            {getDateFr()}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSearch(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
+              style={{
+                background: "rgba(0,0,0,0.06)",
+                border: "1px solid rgba(0,0,0,0.07)",
+              }}
+            >
+              <Search size={15} style={{ color: "var(--text-secondary)" }} />
+            </button>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
+              style={{
+                background: "rgba(0,0,0,0.06)",
+                border: "1px solid rgba(0,0,0,0.07)",
+              }}
+            >
+              <Plus
+                size={17}
+                strokeWidth={2.5}
+                style={{ color: "var(--text-primary)" }}
+              />
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowSearch(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <Search size={17} style={{ color: "var(--text-secondary)" }} />
-          </button>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <Plus
-              size={20}
-              strokeWidth={2.5}
-              style={{ color: "var(--text-primary)" }}
-            />
-          </button>
-        </div>
+        <p
+          className="text-sm"
+          style={{ color: "var(--text-secondary)", lineHeight: 1 }}
+        >
+          Mes
+        </p>
+        <h1
+          className="leading-none"
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            fontSize: 48,
+            color: "var(--text-primary)",
+            letterSpacing: "-0.025em",
+            lineHeight: 1.02,
+          }}
+        >
+          Séances.
+        </h1>
+      </div>
+
+      {/* Timeline semaine */}
+      <div className="mb-2.5">
+        <WorkoutWeekTimeline
+          historique={initialWorkoutData.historique}
+          programmeActif={initialProgrammesData.programmeActif}
+        />
       </div>
 
       {/* CTAs */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-2.5 mb-2.5">
         <button
           onClick={() => startWorkout({ routineId: null, routineName: null })}
-          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-[14px] font-semibold text-[12px] transition-all active:scale-[0.98]"
           style={{
-            background: "var(--bg-card)",
-            border:
-              "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
-            color: "var(--accent-text)",
+            background: "var(--glass-bg)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid var(--glass-border)",
+            color: "var(--accent)",
           }}
         >
-          ⚡ Séance libre
+          Séance libre
         </button>
         <button
           onClick={() => setShowProgrammes((v) => !v)}
-          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-[14px] font-semibold text-[12px] transition-all active:scale-[0.98]"
           style={{
-            background: "var(--bg-card)",
-            border:
-              "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
-            color: "var(--accent-text)",
+            background: "var(--glass-bg)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid var(--glass-border)",
+            color: "var(--accent)",
           }}
         >
-          📋 Programme
+          Programme
         </button>
       </div>
 
       {showProgrammes && (
         <WorkoutProgrammesSection data={initialProgrammesData} />
       )}
+
       <WorkoutHub data={initialWorkoutData} />
 
       {showCreate && (

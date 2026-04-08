@@ -165,7 +165,7 @@ export default function CustomFoodForm({
         <div key={key}>
           <label
             className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--text-muted)", letterSpacing: "0.05em" }}
+            style={{ color: "#78716C", letterSpacing: "0.05em" }}
           >
             {label}
           </label>
@@ -175,9 +175,9 @@ export default function CustomFoodForm({
             onChange={(e) => set(key, e.target.value)}
             className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.75)",
+              color: "#2C1E14",
+              border: "1px solid rgba(0,0,0,0.07)",
             }}
           />
         </div>
@@ -188,7 +188,7 @@ export default function CustomFoodForm({
         <div className="flex-1">
           <label
             className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--text-muted)" }}
+            style={{ color: "#78716C" }}
           >
             Nom de la portion
           </label>
@@ -199,16 +199,16 @@ export default function CustomFoodForm({
             onChange={(e) => set("portionNom", e.target.value)}
             className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.75)",
+              color: "#2C1E14",
+              border: "1px solid rgba(0,0,0,0.07)",
             }}
           />
         </div>
         <div className="w-24">
           <label
             className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--text-muted)" }}
+            style={{ color: "#78716C" }}
           >
             Grammes
           </label>
@@ -219,9 +219,9 @@ export default function CustomFoodForm({
             onChange={(e) => set("portionG", e.target.value)}
             className="mt-1 w-full px-3 py-2.5 rounded-xl text-sm outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.75)",
+              color: "#2C1E14",
+              border: "1px solid rgba(0,0,0,0.07)",
             }}
           />
         </div>
@@ -233,9 +233,9 @@ export default function CustomFoodForm({
         onClick={() => setShowBarcode((p) => !p)}
         className="w-full py-2.5 rounded-xl text-sm font-semibold transition-colors"
         style={{
-          background: "var(--bg-elevated)",
-          color: "var(--text-primary)",
-          border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.75)",
+          color: "#2C1E14",
+          border: "1px solid rgba(0,0,0,0.07)",
         }}
       >
         {editAliment?.code_barres
@@ -247,7 +247,7 @@ export default function CustomFoodForm({
         <div className="flex flex-col gap-2">
           <label
             className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--text-muted)" }}
+            style={{ color: "#78716C" }}
           >
             Code-barres
           </label>
@@ -260,9 +260,9 @@ export default function CustomFoodForm({
               onChange={(e) => set("codeBarres", e.target.value)}
               className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
               style={{
-                background: "var(--bg-elevated)",
-                color: "var(--text-primary)",
-                border: "1px solid var(--border)",
+                background: "rgba(255,255,255,0.75)",
+                color: "#2C1E14",
+                border: "1px solid rgba(0,0,0,0.07)",
               }}
             />
             <button
@@ -270,7 +270,7 @@ export default function CustomFoodForm({
               onClick={() => setShowScanner(true)}
               className="px-3 py-2.5 rounded-xl text-sm font-semibold shrink-0"
               style={{
-                background: "var(--accent)",
+                background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
                 color: "#fff",
               }}
             >
@@ -301,8 +301,13 @@ export default function CustomFoodForm({
       <button
         onClick={handleSubmit}
         disabled={disabled}
-        className="btn-accent w-full py-3 rounded-xl font-semibold mt-2 transition-opacity"
-        style={{ opacity: disabled ? 0.5 : 1 }}
+        className="w-full h-[42px] rounded-[14px] flex items-center justify-center text-[13px] font-bold text-white mt-3 active:scale-[0.98] transition-transform"
+        style={{
+          background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
+          border: "1px solid rgba(116,191,122,0.3)",
+          boxShadow: "0 4px 16px rgba(27,46,29,0.5)",
+          opacity: disabled ? 0.5 : 1,
+        }}
       >
         {buttonLabel()}
       </button>

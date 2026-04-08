@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { ChevronLeft, Heart, Pencil } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, Heart, Pencil, Plus, Minus } from "lucide-react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
-import QuantityScrollPicker from "./QuantityScrollPicker";
 import FoodNutritionCard from "./FoodNutritionCard";
+import { useUiStore } from "@/store/uiStore";
 
 interface Props {
   aliment: NutritionAliment;
@@ -36,8 +36,6 @@ export default function FoodDetailSheet({
   const portionG = aliment.taille_portion_g ?? 0;
   const hasPortion = portionG > 0;
 
-  // Calcul de la valeur initiale du picker
-  // Si on a une quantité portion enregistrée, on affiche en mode portion
   const initMode =
     initialPortionQty != null && hasPortion
       ? ("portion" as const)
@@ -59,10 +57,20 @@ export default function FoodDetailSheet({
   const [mode, setMode] = useState<"g" | "portion">(initMode);
   const [pickerVal, setPickerVal] = useState(initVal);
   const [fav, setFav] = useState(isFavorite ?? false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [editingQty, setEditingQty] = useState(false);
-  const [qtyInput, setQtyInput] = useState("");
-  const qtyInputRef = useRef<HTMLInputElement>(null);
+  const [showDetails, setShowDetails] = useState(true);
+
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+  useEffect(() => {
+    setFullscreenModal(true);
+    return () => setFullscreenModal(false);
+  }, [setFullscreenModal]);
+
+  const pickerStep = mode === "portion" ? 0.5 : 1;
+  const pickerMax = mode === "portion" ? 20 : 2000;
+  const pickerMin = mode === "portion" ? 0.5 : 1;
+
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const qty = mode === "portion" ? pickerVal * portionG : pickerVal;
   const scale = qty / 100;
@@ -71,241 +79,275 @@ export default function FoodDetailSheet({
   const gluc = Math.round((aliment.glucides ?? 0) * scale * 10) / 10;
   const lip = Math.round((aliment.lipides ?? 0) * scale * 10) / 10;
 
-  const pickerSuffix =
-    mode === "portion" ? (aliment.portion_nom ?? "portion") : "g";
-  const pickerMax = mode === "portion" ? 20 : 2000;
-  const pickerStep = mode === "portion" ? 0.5 : 1;
-
   function switchMode(m: "g" | "portion") {
     setMode(m);
     setPickerVal(m === "portion" ? 1 : 100);
-    setEditingQty(false);
   }
 
-  function startEdit() {
-    setEditingQty(true);
-    setQtyInput(String(pickerVal));
+  function inc() {
+    setPickerVal((v) => Math.min(pickerMax, v + pickerStep));
+  }
+  function dec() {
+    setPickerVal((v) => Math.max(pickerMin, v - pickerStep));
   }
 
-  function confirmEdit() {
-    const n = parseFloat(qtyInput.replace(",", "."));
-    if (!isNaN(n) && n > 0) {
-      setPickerVal(
-        Math.min(
-          pickerMax,
-          Math.max(pickerStep, Math.round(n / pickerStep) * pickerStep),
-        ),
-      );
-    }
-    setEditingQty(false);
-  }
+  const displayQty =
+    mode === "portion"
+      ? `${pickerVal} ${aliment.portion_nom ?? "portion"}`
+      : `${pickerVal}g`;
 
   return (
     <div
-      className="flex flex-col"
-      style={{
-        maxHeight: "calc(100dvh - 165px - env(safe-area-inset-top, 20px))",
-      }}
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ background: "#F2E8D5" }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-4 shrink-0">
-        <button
-          onClick={onBack}
-          className="p-2 rounded-xl"
-          style={{ background: "var(--bg-elevated)" }}
-        >
-          <ChevronLeft size={17} style={{ color: "var(--text-primary)" }} />
-        </button>
-        <p
-          className="text-sm font-semibold"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {mealLabel}
-        </p>
-        <div className="flex gap-1.5">
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="p-2 rounded-xl"
-              style={{ background: "var(--bg-elevated)" }}
-              title="Modifier l'aliment"
-            >
-              <Pencil size={15} style={{ color: "var(--accent-text)" }} />
-            </button>
-          )}
+      <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-0 shrink-0">
           <button
-            onClick={() => {
-              setFav((f) => !f);
-              onToggleFavorite?.();
-            }}
-            className="p-2 rounded-xl transition-colors"
+            onClick={onBack}
+            className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
             style={{
-              background: fav ? "var(--accent-bg)" : "var(--bg-elevated)",
+              background: "rgba(0,0,0,0.05)",
+              border: "1px solid rgba(0,0,0,0.08)",
             }}
           >
-            <Heart
-              size={17}
-              fill={fav ? "var(--accent)" : "none"}
-              style={{ color: fav ? "var(--accent)" : "var(--text-muted)" }}
-            />
+            <ChevronLeft size={14} style={{ color: "#78716C" }} />
           </button>
-        </div>
-      </div>
-
-      {/* Contenu scrollable */}
-      <div
-        className="flex-1 overflow-y-auto px-4 pb-2"
-        style={
-          {
-            overscrollBehavior: "contain",
-            WebkitOverflowScrolling: "touch",
-          } as React.CSSProperties
-        }
-      >
-        {/* Identité */}
-        <div className="flex flex-col items-center pb-5 pt-1">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-extrabold mb-3"
-            style={{
-              background: "var(--accent-bg)",
-              color: "var(--accent-text)",
-              border:
-                "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-            }}
-          >
-            {aliment.nom.charAt(0).toUpperCase()}
-          </div>
-          <p
-            className="text-center text-xl leading-snug"
-            style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
-              color: "var(--text-primary)",
-            }}
-          >
-            {aliment.nom}
-          </p>
-          {aliment.marque && (
-            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-              {aliment.marque}
-            </p>
-          )}
-          {aliment.source === "openfoodfacts" && (
-            <span
-              className="mt-2 text-[10px] font-bold px-2 py-0.5 rounded-md"
-              style={{ background: "rgba(59,130,246,0.15)", color: "#93C5FD" }}
-            >
-              OpenFoodFacts
-            </span>
-          )}
-        </div>
-
-        <FoodNutritionCard
-          aliment={aliment}
-          showDetails={showDetails}
-          onToggleDetails={() => setShowDetails((d) => !d)}
-          onEdit={onEdit}
-          hasPortion={hasPortion}
-        />
-      </div>
-
-      {/* Bottom — picker + CTA */}
-      <div
-        className="shrink-0 px-4 pb-4 pt-2"
-        style={{ borderTop: "1px solid var(--border)" }}
-      >
-        <p
-          className="text-center text-xs font-semibold mb-3"
-          style={{ color: "var(--accent-text)" }}
-        >
-          ≈ {cal} kcal · P {prot}g · G {gluc}g · L {lip}g
-        </p>
-
-        <div className="flex gap-3 mb-4">
-          <div className="shrink-0 relative" style={{ width: "55%" }}>
-            <QuantityScrollPicker
-              value={pickerVal}
-              onChange={setPickerVal}
-              min={pickerStep}
-              max={pickerMax}
-              step={pickerStep}
-              suffix={pickerSuffix}
-              compact
-              onCenterTap={startEdit}
-              editing={editingQty}
-              editValue={qtyInput}
-              onEditChange={setQtyInput}
-              onEditConfirm={confirmEdit}
-              inputRef={qtyInputRef}
-            />
-          </div>
-
-          <div
-            className="flex-1 rounded-2xl flex flex-col justify-center items-center gap-2 px-2 py-3"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {mode === "portion" && (
-              <p
-                className="text-xs font-semibold"
-                style={{ color: "var(--text-muted)" }}
+          <div className="flex gap-2">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
+                style={{
+                  background: "rgba(0,0,0,0.05)",
+                  border: "1px solid rgba(0,0,0,0.08)",
+                }}
               >
-                = {qty}g
+                <Pencil size={14} style={{ color: "#78716C" }} />
+              </button>
+            )}
+            {onToggleFavorite && (
+              <button
+                onClick={() => {
+                  setFav((f) => !f);
+                  onToggleFavorite();
+                }}
+                className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
+                style={{
+                  background: "rgba(0,0,0,0.05)",
+                  border: "1px solid rgba(0,0,0,0.08)",
+                }}
+              >
+                {fav ? (
+                  <Heart
+                    size={14}
+                    fill="#C07858"
+                    style={{ color: "#C07858" }}
+                  />
+                ) : (
+                  <span className="text-sm" style={{ color: "#78716C" }}>
+                    &#9825;
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Identity */}
+        <div className="flex items-center gap-3 px-5 pt-3 shrink-0">
+          <div
+            className="w-[3px] h-8 rounded-sm shrink-0"
+            style={{ background: "#4A3728" }}
+          />
+          <div className="flex-1 min-w-0">
+            <p
+              className="text-[22px] leading-tight tracking-tight"
+              style={{
+                fontFamily: "var(--font-dm-serif)",
+                fontStyle: "italic",
+                color: "#2C1E14",
+              }}
+            >
+              {aliment.nom}
+            </p>
+            {aliment.marque && (
+              <p className="text-[11px] mt-0.5" style={{ color: "#78716C" }}>
+                {aliment.marque}
               </p>
             )}
-            <div className="flex flex-col w-full gap-1.5">
+          </div>
+        </div>
+        {aliment.source === "openfoodfacts" && (
+          <div className="px-5 mt-1.5 shrink-0">
+            <span
+              className="inline-flex items-center gap-1 text-[8px] font-bold rounded-md px-[7px] py-[3px] tracking-wide"
+              style={{
+                background: "rgba(0,0,0,0.05)",
+                color: "#78716C",
+              }}
+            >
+              <span className="text-[10px]">&#127807;</span> OpenFoodFacts
+            </span>
+          </div>
+        )}
+
+        {/* Scrollable content */}
+        <div
+          className="flex-1 overflow-y-auto px-4 pt-3 pb-2 min-h-0"
+          style={
+            {
+              overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: "none",
+            } as React.CSSProperties
+          }
+        >
+          <FoodNutritionCard
+            aliment={aliment}
+            qty={qty}
+            cal={cal}
+            prot={prot}
+            gluc={gluc}
+            lip={lip}
+            showDetails={showDetails}
+            onToggleDetails={() => setShowDetails((d) => !d)}
+          />
+        </div>
+
+        {/* Bottom quantity bar */}
+        <div
+          className="shrink-0 px-4 pt-2.5 pb-4"
+          style={{
+            background: "rgba(255,255,255,0.5)",
+            borderTop: "1px solid rgba(0,0,0,0.08)",
+          }}
+        >
+          {/* Preview macros */}
+          <p
+            className="text-[10px] font-semibold text-center mb-2"
+            style={{ color: "#78716C" }}
+          >
+            &#8776;{" "}
+            <span className="font-bold" style={{ color: "var(--accent-text)" }}>
+              {cal} kcal
+            </span>{" "}
+            · G {gluc}g · P {prot}g · L {lip}g
+          </p>
+
+          {/* Picker row */}
+          <div className="flex gap-2 items-center">
+            <div
+              className="flex-1 flex items-center rounded-xl overflow-hidden"
+              style={{
+                background: "rgba(0,0,0,0.04)",
+                border: "1px solid rgba(0,0,0,0.08)",
+              }}
+            >
+              <button
+                onClick={dec}
+                className="w-9 h-9 flex items-center justify-center shrink-0"
+              >
+                <Minus size={16} style={{ color: "#78716C" }} />
+              </button>
+              {editing ? (
+                <input
+                  ref={inputRef}
+                  type="number"
+                  inputMode="decimal"
+                  defaultValue={pickerVal}
+                  onBlur={(e) => {
+                    const v = parseFloat(e.target.value);
+                    if (!isNaN(v) && v >= pickerMin && v <= pickerMax) {
+                      setPickerVal(
+                        mode === "portion"
+                          ? Math.round(v * 2) / 2
+                          : Math.round(v),
+                      );
+                    }
+                    setEditing(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter")
+                      (e.target as HTMLInputElement).blur();
+                  }}
+                  className="flex-1 text-center text-[15px] font-bold bg-transparent outline-none w-full [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  style={{ color: "#2C1E14" }}
+                  autoFocus
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    setEditing(true);
+                    setTimeout(() => inputRef.current?.select(), 10);
+                  }}
+                  className="flex-1 text-center text-[15px] font-bold bg-transparent"
+                  style={{ color: "#2C1E14" }}
+                >
+                  {displayQty}
+                </button>
+              )}
+              <button
+                onClick={inc}
+                className="w-9 h-9 flex items-center justify-center shrink-0"
+              >
+                <Plus size={16} style={{ color: "#78716C" }} />
+              </button>
+            </div>
+
+            {/* Unit toggle */}
+            <div
+              className="flex rounded-xl overflow-hidden shrink-0"
+              style={{
+                background: "rgba(0,0,0,0.04)",
+                border: "1px solid rgba(0,0,0,0.08)",
+              }}
+            >
               <button
                 onClick={() => switchMode("g")}
-                className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors ${mode === "g" ? "btn-accent" : ""}`}
-                style={
-                  mode === "g"
-                    ? undefined
-                    : {
-                        background: "var(--bg-elevated)",
-                        color: "var(--text-muted)",
-                        border: "1px solid var(--border)",
-                      }
-                }
+                className="px-3 py-2 text-[10px] font-bold tracking-wide"
+                style={{
+                  background: mode === "g" ? "var(--accent)" : "transparent",
+                  color: mode === "g" ? "#fff" : "#78716C",
+                }}
               >
-                Grammes
+                g
               </button>
               <button
                 onClick={() => hasPortion && switchMode("portion")}
-                className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors ${mode === "portion" ? "btn-accent" : ""}`}
+                className="px-3 py-2 text-[10px] font-bold tracking-wide"
                 style={{
-                  ...(mode === "portion"
-                    ? {}
-                    : {
-                        background: "var(--bg-elevated)",
-                        color: "var(--text-muted)",
-                        border: "1px solid var(--border)",
-                      }),
+                  background:
+                    mode === "portion" ? "var(--accent)" : "transparent",
+                  color: mode === "portion" ? "#fff" : "#78716C",
                   opacity: hasPortion ? 1 : 0.4,
                   cursor: hasPortion ? "pointer" : "default",
                 }}
               >
-                {hasPortion
-                  ? (aliment.portion_nom ?? "Portion")
-                  : "Pas de portion"}
+                Portion
               </button>
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={() => onConfirm(qty, mode === "portion" ? pickerVal : null)}
-          disabled={pending}
-          className="btn-accent w-full py-4 rounded-2xl font-bold text-sm transition-opacity"
-          style={{
-            opacity: pending ? 0.6 : 1,
-            boxShadow:
-              "0 4px 20px color-mix(in srgb, var(--accent) 30%, transparent)",
-          }}
-        >
-          {pending ? "Ajout..." : (confirmLabel ?? `Ajouter au ${mealLabel}`)}
-        </button>
+          {/* Add button */}
+          <button
+            onClick={() =>
+              onConfirm(qty, mode === "portion" ? pickerVal : null)
+            }
+            disabled={pending}
+            className="w-full h-[42px] rounded-[14px] flex items-center justify-center gap-1.5 text-[13px] font-bold text-white mt-2 active:scale-[0.98] transition-transform"
+            style={{
+              background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
+              border: "1px solid rgba(116,191,122,0.3)",
+              boxShadow: "0 4px 16px rgba(27,46,29,0.5)",
+              opacity: pending ? 0.6 : 1,
+            }}
+          >
+            <Plus size={14} />
+            {pending ? "Ajout..." : (confirmLabel ?? `Ajouter au ${mealLabel}`)}
+          </button>
+        </div>
       </div>
     </div>
   );

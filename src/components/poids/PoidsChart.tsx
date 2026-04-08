@@ -11,9 +11,9 @@ const PERIODES: { key: Periode; label: string; days: number }[] = [
   { key: "1an", label: "1an", days: 365 },
 ];
 
-const W = 360;
-const H = 120;
-const PAD = { top: 10, right: 16, bottom: 20, left: 30 };
+const W = 240;
+const H = 130;
+const PAD = { top: 8, right: 8, bottom: 4, left: 28 };
 const innerW = W - PAD.left - PAD.right;
 const innerH = H - PAD.top - PAD.bottom;
 
@@ -59,11 +59,6 @@ export default function PoidsChart({ entries }: Props) {
     const toX = (i: number) => PAD.left + (i / (filtered.length - 1)) * innerW;
     const toY = (v: number) => PAD.top + ((yMax - v) / yRange) * innerH;
 
-    const points = filtered.map((e, i) => ({
-      ...e,
-      x: toX(i),
-      y: toY(e.poids),
-    }));
     const maVals = calcMovingAvg(vals);
     const maPoints = maVals.map((v, i) => ({
       date: filtered[i].date,
@@ -78,9 +73,11 @@ export default function PoidsChart({ entries }: Props) {
       maPoints.map((p) => `L ${p.x},${p.y}`).join(" ") +
       ` L ${maPoints[maPoints.length - 1].x},${PAD.top + innerH} Z`;
 
+    const mid = Math.round(((minP + maxP) / 2) * 10) / 10;
     const yLabels = [
-      { value: Math.round(minP * 10) / 10, y: toY(minP) },
       { value: Math.round(maxP * 10) / 10, y: toY(maxP) },
+      { value: mid, y: toY(mid) },
+      { value: Math.round(minP * 10) / 10, y: toY(minP) },
     ];
 
     const last = maPoints[maPoints.length - 1];
@@ -90,17 +87,16 @@ export default function PoidsChart({ entries }: Props) {
   if (entries.length === 0) {
     return (
       <div
-        className="rounded-2xl p-5 mb-3 flex items-center justify-center"
+        className="flex items-center justify-center mb-2.5"
         style={{
           background: "var(--bg-secondary)",
           border: "1px solid var(--border)",
+          borderRadius: 20,
+          padding: "16px 18px",
           height: 80,
         }}
       >
-        <p
-          className="text-sm text-center"
-          style={{ color: "var(--text-muted)" }}
-        >
+        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
           Ajoutez votre premier poids pour voir le graphique
         </p>
       </div>
@@ -109,86 +105,82 @@ export default function PoidsChart({ entries }: Props) {
 
   return (
     <div
-      className="rounded-2xl mb-3"
+      className="mb-2.5"
       style={{
         background: "var(--bg-secondary)",
         border: "1px solid var(--border)",
-        padding: 18,
+        borderRadius: 20,
+        padding: "16px 18px",
       }}
     >
-      {/* Header avec pills période */}
-      <div className="flex items-center justify-between mb-3.5">
-        <div
-          className="font-semibold uppercase"
-          style={{
-            fontSize: "0.7rem",
-            color: "var(--text-secondary)",
-            letterSpacing: "0.07em",
-          }}
-        >
-          Évolution — {periodeConfig.label}
-        </div>
-        <div className="flex gap-1">
-          {PERIODES.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => setPeriode(p.key)}
-              className="rounded-full transition-colors"
-              style={{
-                padding: "3px 9px",
-                fontSize: "0.62rem",
-                fontWeight: 600,
-                background:
-                  periode === p.key ? "var(--accent-bg)" : "transparent",
-                color:
-                  periode === p.key ? "var(--accent)" : "var(--text-muted)",
-              }}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+      {/* Label */}
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          color: "var(--text-secondary)",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase" as const,
+          marginBottom: 10,
+        }}
+      >
+        Évolution
       </div>
 
-      {/* SVG */}
-      <div style={{ position: "relative", height: H }}>
+      {/* Period pills */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
+        {PERIODES.map((p) => (
+          <button
+            key={p.key}
+            onClick={() => setPeriode(p.key)}
+            style={{
+              flex: 1,
+              textAlign: "center",
+              fontSize: 10,
+              fontWeight: 700,
+              color: periode === p.key ? "#FAFAF9" : "var(--text-muted)",
+              padding: "5px 0",
+              borderRadius: 8,
+              background:
+                periode === p.key ? "var(--accent)" : "var(--bg-card)",
+              border:
+                periode === p.key
+                  ? "1px solid rgba(116,191,122,0.2)"
+                  : "1px solid var(--border)",
+              letterSpacing: "0.02em",
+              cursor: "pointer",
+            }}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* SVG Chart */}
+      <div style={{ position: "relative", height: H, marginBottom: 4 }}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
-          style={{ width: "100%", height: H, overflow: "visible" }}
+          preserveAspectRatio="none"
+          style={{ width: "100%", height: "100%" }}
         >
           <defs>
             <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+              <stop offset="0%" stopColor="#4A9B54" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="#4A9B54" stopOpacity={0} />
             </linearGradient>
           </defs>
 
-          {/* Grilles */}
-          {[0.25, 0.5, 0.75, 1].map((t) => (
+          {/* Grid lines */}
+          {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <line
               key={t}
-              x1={PAD.left}
+              x1={0}
               y1={PAD.top + innerH * t}
-              x2={PAD.left + innerW}
+              x2={W}
               y2={PAD.top + innerH * t}
               stroke="rgba(255,255,255,0.05)"
-              strokeWidth={1}
+              strokeWidth={0.5}
             />
-          ))}
-
-          {/* Y labels */}
-          {chart?.yLabels.map((l) => (
-            <text
-              key={l.value}
-              x={PAD.left - 5}
-              y={l.y + 3}
-              textAnchor="end"
-              fontSize={7}
-              fill="rgba(255,255,255,0.3)"
-              fontFamily="var(--font-dm-sans)"
-            >
-              {l.value}
-            </text>
           ))}
 
           {chart ? (
@@ -197,28 +189,19 @@ export default function PoidsChart({ entries }: Props) {
               <path
                 d={chart.maPath}
                 fill="none"
-                stroke="var(--accent)"
-                strokeWidth={2.5}
+                stroke="#4A9B54"
+                strokeWidth={2}
                 strokeLinecap="round"
-                strokeLinejoin="round"
               />
-              {/* Points sur la courbe */}
-              {chart.maPoints.map((p, i) => (
-                <circle
-                  key={p.date}
-                  cx={p.x}
-                  cy={p.y}
-                  r={i === chart.maPoints.length - 1 ? 4 : 3}
-                  fill="var(--accent)"
-                  filter={
-                    i === chart.maPoints.length - 1
-                      ? "drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 60%, transparent))"
-                      : undefined
-                  }
-                />
-              ))}
-              {/* Point blanc central sur le dernier point */}
-              <circle cx={chart.last.x} cy={chart.last.y} r={2} fill="#fff" />
+              {/* Dernier point */}
+              <circle
+                cx={chart.last.x}
+                cy={chart.last.y}
+                r={4}
+                fill="#4A9B54"
+                stroke="var(--bg-secondary)"
+                strokeWidth={2}
+              />
             </>
           ) : (
             <text
@@ -227,12 +210,42 @@ export default function PoidsChart({ entries }: Props) {
               textAnchor="middle"
               fontSize={10}
               fill="rgba(255,255,255,0.3)"
-              fontFamily="var(--font-dm-sans)"
             >
               Pas assez de données
             </text>
           )}
         </svg>
+
+        {/* Y labels */}
+        {chart && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "2px 0",
+              pointerEvents: "none",
+            }}
+          >
+            {chart.yLabels.map((l) => (
+              <span
+                key={l.value}
+                style={{
+                  fontSize: 8,
+                  fontWeight: 600,
+                  color: "var(--text-muted)",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {l.value}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
-/** Couleur d'accent par défaut (orange doré Élev) */
-export const DEFAULT_ACCENT = "#E8860C";
+/** Couleur d'accent par defaut (vert Elev) */
+export const DEFAULT_ACCENT = "#1B2E1D";
 
 export interface ProfilData {
   id: string;
@@ -58,7 +58,7 @@ export async function fetchProfil(
     objectif_lipides: data?.objectif_lipides ?? null,
     photo_url: data?.photo_url ?? null,
     theme: (data?.theme ?? "dark") as "dark" | "light",
-    accent_color: data?.accent_color ?? "#E8860C",
+    accent_color: data?.accent_color ?? DEFAULT_ACCENT,
     accent_secondary: data?.accent_secondary ?? null,
     gradient_intensity: data?.gradient_intensity ?? 50,
     created_at: data?.created_at ?? userMeta?.created_at ?? "",

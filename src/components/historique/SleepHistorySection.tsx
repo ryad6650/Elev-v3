@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Moon, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { SommeilRecord } from "@/lib/historique";
 import { deleteSommeil } from "@/app/actions/sommeil";
 
@@ -19,15 +19,7 @@ function formatDuree(minutes: number): string {
 }
 
 function formatDate(dateStr: string): string {
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
   const d = new Date(dateStr + "T12:00:00");
-  const label = d.toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "short",
-  });
-  if (dateStr === today) return `Auj. · ${label}`;
-  if (dateStr === yesterday) return `Hier · ${label}`;
   return d.toLocaleDateString("fr-FR", {
     weekday: "short",
     day: "numeric",
@@ -35,23 +27,17 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function qualiteLabel(minutes: number): { text: string; color: string } {
-  if (minutes >= 480) return { text: "Excellent", color: "var(--success)" };
-  if (minutes >= 420) return { text: "Bien", color: "var(--accent-text)" };
-  if (minutes >= 360) return { text: "Moyen", color: "var(--accent-text)" };
-  return { text: "Mauvais", color: "var(--danger)" };
-}
-
 export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const stats = useMemo(() => {
-    if (sommeil.length === 0) return null;
+  const avgMinutes = useMemo(() => {
+    if (sommeil.length === 0) return 0;
     const total = sommeil.reduce((s, e) => s + e.duree_minutes, 0);
-    const avg = Math.round(total / sommeil.length);
-    const best = Math.max(...sommeil.map((e) => e.duree_minutes));
-    return { avg, best, count: sommeil.length };
+    return Math.round(total / sommeil.length);
   }, [sommeil]);
+
+  const barMax = 720;
+  const avgPct = Math.min((avgMinutes / barMax) * 100, 100);
 
   const handleDelete = async (record: SommeilRecord) => {
     if (deletingId === record.id) {
@@ -67,224 +53,141 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
     }
   };
 
-  // Barre visuelle : max = 12h (720min)
-  const barMax = 720;
-
-  return (
-    <div className="mb-3">
-      <div
-        className="font-semibold uppercase mb-2.5"
-        style={{
-          fontSize: "0.7rem",
-          color: "var(--text-secondary)",
-          letterSpacing: "0.07em",
-        }}
-      >
-        Sommeil
-      </div>
-
-      {/* Stats rapides */}
-      {stats && (
-        <div className="flex gap-2 mb-3">
-          <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
-            style={{
-              border: "1px solid var(--border)",
-            }}
-          >
-            <div
-              className="absolute left-0 top-0 bottom-0"
-              style={{
-                width: 3,
-                borderRadius: "0 2px 2px 0",
-                background: "var(--accent)",
-              }}
-            />
-            <div
-              className="font-bold leading-snug"
-              style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
-            >
-              {formatDuree(stats.avg)}
-            </div>
-            <div
-              style={{
-                fontSize: "0.58rem",
-                color: "var(--text-muted)",
-                marginTop: 2,
-              }}
-            >
-              moyenne
-            </div>
-          </div>
-          <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
-            style={{
-              border: "1px solid var(--border)",
-            }}
-          >
-            <div
-              className="absolute left-0 top-0 bottom-0"
-              style={{
-                width: 3,
-                borderRadius: "0 2px 2px 0",
-                background: "var(--success)",
-              }}
-            />
-            <div
-              className="font-bold leading-snug"
-              style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
-            >
-              {formatDuree(stats.best)}
-            </div>
-            <div
-              style={{
-                fontSize: "0.58rem",
-                color: "var(--text-muted)",
-                marginTop: 2,
-              }}
-            >
-              meilleure nuit
-            </div>
-          </div>
-          <div
-            className="flex-1 relative overflow-hidden rounded-[18px] p-3 sleep-card"
-            style={{
-              border: "1px solid var(--border)",
-            }}
-          >
-            <div
-              className="absolute left-0 top-0 bottom-0"
-              style={{
-                width: 3,
-                borderRadius: "0 2px 2px 0",
-                background: "var(--accent)",
-              }}
-            />
-            <div
-              className="font-bold leading-snug"
-              style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
-            >
-              🌙 {stats.count}
-            </div>
-            <div
-              style={{
-                fontSize: "0.58rem",
-                color: "var(--text-muted)",
-                marginTop: 2,
-              }}
-            >
-              nuits suivies
-            </div>
-          </div>
-        </div>
-      )}
-
-      {sommeil.length === 0 ? (
+  if (sommeil.length === 0) {
+    return (
+      <div className="mb-2.5">
+        <SectionLabel />
         <div className="text-center py-8">
           <p className="text-3xl mb-2">🌙</p>
           <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Aucune donnée de sommeil
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-            Enregistre ton sommeil depuis le dashboard
-          </p>
         </div>
-      ) : (
-        <div className="space-y-1.5">
-          {sommeil.map((record) => {
-            const qualite = qualiteLabel(record.duree_minutes);
-            const pct = Math.min((record.duree_minutes / barMax) * 100, 100);
-            return (
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-2.5">
+      <SectionLabel />
+      <div
+        className="rounded-2xl"
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          padding: "14px 16px",
+        }}
+      >
+        {sommeil.map((record) => (
+          <div
+            key={record.id}
+            className="flex items-center gap-2.5"
+            style={{
+              padding: "8px 0",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            {/* Icône violet */}
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                background: "rgba(138,116,220,0.12)",
+                fontSize: "14px",
+              }}
+            >
+              🌙
+            </div>
+            <div className="flex-1 min-w-0">
               <div
-                key={record.id}
-                className="relative overflow-hidden rounded-[18px] p-3.5 sleep-card"
-                style={{
-                  border: "1px solid var(--border)",
-                }}
+                className="font-medium capitalize"
+                style={{ fontSize: "12px", color: "var(--text-primary)" }}
               >
-                <div
-                  className="absolute left-0 top-0 bottom-0"
-                  style={{
-                    width: 3,
-                    borderRadius: "0 2px 2px 0",
-                    background: "var(--accent)",
-                  }}
-                />
-
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Moon size={14} style={{ color: "var(--accent)" }} />
-                    <span
-                      className="font-semibold"
-                      style={{
-                        fontSize: "0.85rem",
-                        color: "var(--text-primary)",
-                      }}
-                    >
-                      {formatDuree(record.duree_minutes)}
-                    </span>
-                    <span
-                      className="rounded-full px-2 py-0.5"
-                      style={{
-                        fontSize: "0.6rem",
-                        background: "var(--bg-card)",
-                        color: qualite.color,
-                      }}
-                    >
-                      {qualite.text}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      style={{
-                        fontSize: "0.65rem",
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {formatDate(record.date)}
-                    </span>
-                    <button
-                      onClick={() => handleDelete(record)}
-                      className="p-1.5 rounded-lg transition-all active:scale-90"
-                      style={{
-                        background:
-                          deletingId === record.id
-                            ? "rgba(239,68,68,0.15)"
-                            : "transparent",
-                      }}
-                    >
-                      <Trash2
-                        size={13}
-                        style={{
-                          color:
-                            deletingId === record.id
-                              ? "var(--danger)"
-                              : "var(--text-muted)",
-                        }}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Barre de durée */}
-                <div
-                  className="h-1.5 rounded-full overflow-hidden"
-                  style={{ background: "var(--bg-elevated)" }}
-                >
-                  <div
-                    className="h-1.5 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${pct}%`,
-                      background:
-                        "linear-gradient(90deg, var(--accent), var(--accent-hover))",
-                    }}
-                  />
-                </div>
+                {formatDate(record.date)}
               </div>
-            );
-          })}
+            </div>
+            <div
+              className="font-bold shrink-0"
+              style={{ fontSize: "15px", color: "var(--text-primary)" }}
+            >
+              {formatDuree(record.duree_minutes)}
+            </div>
+            <button
+              onClick={() => handleDelete(record)}
+              className="p-1 rounded-lg transition-all active:scale-90 shrink-0"
+              style={{
+                background:
+                  deletingId === record.id
+                    ? "rgba(239,68,68,0.15)"
+                    : "transparent",
+              }}
+            >
+              <Trash2
+                size={12}
+                style={{
+                  color:
+                    deletingId === record.id
+                      ? "var(--danger)"
+                      : "var(--text-muted)",
+                }}
+              />
+            </button>
+          </div>
+        ))}
+
+        {/* Barre globale */}
+        <div
+          className="overflow-hidden mt-2"
+          style={{
+            height: 4,
+            background: "var(--bg-elevated)",
+            borderRadius: 2,
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${avgPct}%`,
+              borderRadius: 2,
+              background: "linear-gradient(to right, #6B5CA5, #8A74DC)",
+            }}
+          />
         </div>
-      )}
+
+        {/* Moyenne */}
+        <div
+          className="flex items-center justify-between mt-2.5 pt-2"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+            Moyenne 7 jours
+          </span>
+          <span
+            className="font-bold"
+            style={{ fontSize: "12px", color: "#8A74DC" }}
+          >
+            {formatDuree(avgMinutes)} / nuit
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SectionLabel() {
+  return (
+    <div
+      className="font-bold uppercase mb-2"
+      style={{
+        fontSize: "9px",
+        color: "var(--text-muted)",
+        letterSpacing: "0.22em",
+        padding: "2px 2px 0",
+      }}
+    >
+      Sommeil
     </div>
   );
 }

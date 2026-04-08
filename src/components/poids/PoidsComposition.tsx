@@ -5,22 +5,44 @@ interface Props {
   mensurationsTaille: number | null;
 }
 
-function categorieIMC(imc: number): { label: string; color: string; bgColor: string } {
-  if (imc < 18.5) return { label: "Insuffisant", color: "#5B9BF5", bgColor: "rgba(91,155,245,0.15)" };
-  if (imc < 25)   return { label: "✓ Normal", color: "#4ADE80", bgColor: "rgba(74,222,128,0.15)" };
-  if (imc < 30)   return { label: "Surpoids", color: "#F5A623", bgColor: "rgba(245,166,35,0.15)" };
-  return { label: "Obésité", color: "#EF4444", bgColor: "rgba(239,68,68,0.15)" };
+function categorieIMC(imc: number): {
+  label: string;
+  color: string;
+  bgColor: string;
+} {
+  if (imc < 18.5)
+    return {
+      label: "Insuffisant",
+      color: "#6BA3D6",
+      bgColor: "rgba(106,182,220,0.15)",
+    };
+  if (imc < 25)
+    return {
+      label: "Normal",
+      color: "#74BF7A",
+      bgColor: "rgba(116,191,122,0.15)",
+    };
+  if (imc < 30)
+    return {
+      label: "Surpoids",
+      color: "#C8A055",
+      bgColor: "rgba(200,160,85,0.15)",
+    };
+  return {
+    label: "Obésité",
+    color: "#E87C6A",
+    bgColor: "rgba(232,124,106,0.15)",
+  };
 }
 
 function imcToCursorPct(imc: number): number {
-  // Échelle visuelle : 16 = 0%, 40 = 100%
   return Math.min(98, Math.max(2, ((imc - 16) / (40 - 16)) * 100));
 }
 
 function calcBF(cou: number, abdo: number, hauteurCm: number): number | null {
-  // Formule Navy (hommes) : BF = 86.01 × log10(abdo - cou) - 70.041 × log10(hauteur_cm) + 36.76
   if (abdo <= cou) return null;
-  const bf = 86.01 * Math.log10(abdo - cou) - 70.041 * Math.log10(hauteurCm) + 36.76;
+  const bf =
+    86.01 * Math.log10(abdo - cou) - 70.041 * Math.log10(hauteurCm) + 36.76;
   return Math.round(bf * 10) / 10;
 }
 
@@ -44,117 +66,173 @@ export default function PoidsComposition({
 
   return (
     <div
-      className="rounded-2xl mb-3"
+      className="mb-2.5"
       style={{
         background: "var(--bg-secondary)",
         border: "1px solid var(--border)",
-        padding: 18,
+        borderRadius: 16,
+        padding: "14px 16px",
       }}
     >
-      {/* Titre */}
+      {/* Label */}
       <div
-        className="font-semibold uppercase mb-3.5"
-        style={{ fontSize: "0.7rem", color: "var(--text-secondary)", letterSpacing: "0.07em" }}
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          color: "var(--text-secondary)",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase" as const,
+          marginBottom: 10,
+        }}
       >
-        Composition
+        Indice de masse corporelle
       </div>
 
-      {/* Ligne IMC */}
-      <div className="flex items-center gap-3 mb-3.5">
-        <div
+      {/* IMC value + badge */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 8,
+          marginBottom: 10,
+        }}
+      >
+        <span
           style={{
             fontFamily: "var(--font-dm-serif)",
-            fontSize: "2rem",
-            fontWeight: 700,
+            fontSize: 36,
             color: "var(--text-primary)",
             lineHeight: 1,
+            letterSpacing: "-0.02em",
           }}
         >
           {imc}
-        </div>
-        <div className="flex-1">
-          <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginBottom: 4 }}>
-            IMC (kg/m²)
-          </div>
-          <div
-            className="inline-flex items-center gap-1 rounded-full font-bold"
-            style={{
-              fontSize: "0.65rem",
-              padding: "3px 9px",
-              background: cat.bgColor,
-              color: cat.color,
-            }}
-          >
-            {cat.label}
-          </div>
-        </div>
-      </div>
-
-      {/* Barre IMC gradient */}
-      <div className="mb-1.5">
-        <div
-          className="relative rounded-full mb-1"
+        </span>
+        <span
           style={{
-            height: 6,
-            background:
-              "linear-gradient(90deg, #5B9BF5 0%, #4ADE80 28%, #F5A623 52%, #E8860C 72%, #9b1c1c 100%)",
+            fontSize: 9,
+            fontWeight: 700,
+            padding: "3px 8px",
+            borderRadius: 10,
+            marginBottom: 5,
+            color: cat.color,
+            background: cat.bgColor,
           }}
         >
-          <div
-            className="absolute rounded-full border-2 bg-white"
-            style={{
-              width: 10,
-              height: 10,
-              top: "50%",
-              left: `${cursorPct}%`,
-              transform: "translate(-50%, -50%)",
-              borderColor: "var(--text-primary)",
-            }}
-          />
-        </div>
-        <div
-          className="flex justify-between"
-          style={{ fontSize: "0.55rem", color: "var(--text-muted)" }}
-        >
-          <span>16</span>
-          <span>18.5</span>
-          <span>25</span>
-          <span>30</span>
-          <span>40</span>
-        </div>
+          {cat.label}
+        </span>
       </div>
 
-      {/* Ligne masse grasse */}
+      {/* Barre IMC + dot — même conteneur pour alignement parfait */}
+      <div style={{ position: "relative", height: 6, marginBottom: 16 }}>
+        {/* Segments colorés via gradient linéaire */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: 3,
+            background: [
+              `linear-gradient(to right,`,
+              `rgba(106,182,220,0.25) 0%,`,
+              `rgba(106,182,220,0.25) ${(2.5 / 24) * 100}%,`,
+              `transparent ${(2.5 / 24) * 100}%,`,
+              `transparent calc(${(2.5 / 24) * 100}% + 1px),`,
+              `rgba(74,155,84,0.3) calc(${(2.5 / 24) * 100}% + 1px),`,
+              `rgba(74,155,84,0.3) ${(9 / 24) * 100}%,`,
+              `transparent ${(9 / 24) * 100}%,`,
+              `transparent calc(${(9 / 24) * 100}% + 1px),`,
+              `rgba(200,160,85,0.25) calc(${(9 / 24) * 100}% + 1px),`,
+              `rgba(200,160,85,0.25) ${(14 / 24) * 100}%,`,
+              `transparent ${(14 / 24) * 100}%,`,
+              `transparent calc(${(14 / 24) * 100}% + 1px),`,
+              `rgba(232,124,106,0.25) calc(${(14 / 24) * 100}% + 1px),`,
+              `rgba(232,124,106,0.25) 100%)`,
+            ].join(" "),
+          }}
+        />
+        {/* Dot — positionné dans le même conteneur */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: `${cursorPct}%`,
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: "#FAFAF9",
+            border: `2px solid ${cat.color}`,
+            boxShadow: `0 0 8px ${cat.color}80`,
+            transform: "translate(-50%, -50%)",
+            zIndex: 1,
+          }}
+        />
+      </div>
+
+      {/* Bar labels */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        {["16", "18.5", "25", "30", "40"].map((v) => (
+          <span
+            key={v}
+            style={{
+              fontSize: 7,
+              fontWeight: 600,
+              color: "var(--text-muted)",
+              letterSpacing: "0.03em",
+            }}
+          >
+            {v}
+          </span>
+        ))}
+      </div>
+
+      {/* Masse grasse */}
       {bf !== null && (
         <div
-          className="flex items-center gap-3 mt-3 pt-3"
-          style={{ borderTop: "1px solid var(--border)" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginTop: 10,
+            paddingTop: 10,
+            borderTop: "1px solid var(--border)",
+          }}
         >
-          <div
+          <span
             style={{
-              fontSize: "1.4rem",
+              fontSize: "1.3rem",
               fontWeight: 700,
               color: "var(--text-primary)",
             }}
           >
             {bf}%
-          </div>
-          <div className="flex-1">
-            <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginBottom: 4 }}>
-              Masse grasse (Navy)
-            </div>
+          </span>
+          <div>
             <div
-              className="inline-flex items-center gap-1 rounded-full"
               style={{
-                fontSize: "0.65rem",
-                fontWeight: 600,
-                padding: "3px 9px",
-                background: "var(--bg-card)",
-                color: "var(--text-secondary)",
+                fontSize: 9,
+                color: "var(--text-muted)",
+                marginBottom: 2,
               }}
             >
-              Estimé
+              Masse grasse (Navy)
             </div>
+            <span
+              style={{
+                fontSize: 8,
+                fontWeight: 600,
+                padding: "2px 6px",
+                borderRadius: 4,
+                background: "var(--bg-card)",
+                color: "var(--text-muted)",
+              }}
+            >
+              ESTIMÉ
+            </span>
           </div>
         </div>
       )}

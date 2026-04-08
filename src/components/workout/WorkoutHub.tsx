@@ -105,23 +105,31 @@ export default function WorkoutHub({ data }: Props) {
 
   return (
     <div>
+      {/* Section label */}
+      <div
+        className="text-[9px] font-bold tracking-[0.22em] uppercase mb-3"
+        style={{ color: "var(--text-muted)", padding: "2px 2px 0" }}
+      >
+        Mes routines
+      </div>
+
       {/* Filtres */}
       <div
-        className="flex gap-2 overflow-x-auto pb-1 mb-5"
+        className="flex gap-2 overflow-x-auto pb-1 mb-3"
         style={{ scrollbarWidth: "none" }}
       >
         {FILTRES.map((f) => (
           <button
             key={f}
             onClick={() => setFiltre(f)}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95 ${filtre === f ? "btn-accent" : ""}`}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${filtre === f ? "btn-accent" : ""}`}
             style={
               filtre === f
                 ? undefined
                 : {
-                    background: "transparent",
+                    background: "rgba(0,0,0,0.06)",
                     color: "var(--text-secondary)",
-                    border: "1px solid var(--border)",
+                    border: "1px solid rgba(0,0,0,0.07)",
                   }
             }
           >
@@ -132,7 +140,7 @@ export default function WorkoutHub({ data }: Props) {
 
       {/* Liste routines */}
       {routinesFiltrees.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {routinesFiltrees.map((routine) => (
             <RoutineCard
               key={routine.id}

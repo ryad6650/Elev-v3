@@ -13,6 +13,7 @@ import FoodSearchStep from "./FoodSearchStep";
 import FoodDetailSheet from "./FoodDetailSheet";
 import CustomFoodForm from "./CustomFoodForm";
 import { useNutritionStore } from "@/store/nutritionStore";
+import { useUiStore } from "@/store/uiStore";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 const BarcodeScanner = dynamic(() => import("./BarcodeScanner"), {
@@ -47,12 +48,16 @@ export default function AddFoodModal({
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [pending, setPending] = useState(false);
 
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    setFullscreenModal(true);
     return () => {
       document.body.style.overflow = "";
+      setFullscreenModal(false);
     };
-  }, []);
+  }, [setFullscreenModal]);
 
   useEffect(() => {
     Promise.all([
@@ -181,7 +186,13 @@ export default function AddFoodModal({
   }
 
   const isCustom = selected?.is_global === false && !!selected?.id;
-  const mealLabel = `Repas ${mealNumber}`;
+  const MEAL_NAMES: Record<number, string> = {
+    1: "Petit-déjeuner",
+    2: "Déjeuner",
+    3: "Collation",
+    4: "Dîner",
+  };
+  const mealLabel = MEAL_NAMES[mealNumber] ?? `Repas ${mealNumber}`;
 
   const today = new Date().toISOString().split("T")[0];
   const dateLabel =
@@ -192,48 +203,65 @@ export default function AddFoodModal({
           month: "short",
         });
 
+  const isBeige = step === "custom" || step === "edit";
+
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-end"
-      style={{ background: "rgba(0,0,0,0.65)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ background: isBeige ? "#F2E8D5" : "var(--bg-primary)" }}
     >
-      <div className="w-full max-w-[430px] px-3 mb-24 flex flex-col">
-        <div
-          className="rounded-3xl flex flex-col w-full pt-2"
-          style={{
-            background: "var(--bg-secondary)",
-            maxHeight: "calc(100dvh - 165px - env(safe-area-inset-top, 20px))",
-          }}
-        >
+      <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
+        <div className="flex flex-col w-full h-full">
           {step !== "quantity" && (
-            <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
-              <div className="w-7" />
-              <div className="text-center">
-                <p
-                  className="font-semibold text-sm leading-none"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {step === "custom"
-                    ? "Aliment personnalisé"
-                    : step === "edit"
-                      ? isCustom
-                        ? "Modifier l'aliment"
-                        : "Corriger l'aliment"
-                      : "Ajouter"}
-                </p>
-                {step === "search" && (
-                  <p
-                    className="text-[11px] mt-0.5"
-                    style={{ color: "var(--accent-text)" }}
-                  >
-                    {mealLabel} · {dateLabel}
-                  </p>
-                )}
-              </div>
-              <button onClick={onClose} className="p-1">
-                <X size={20} style={{ color: "var(--text-muted)" }} />
+            <div className="flex items-center justify-between px-5 pt-4 pb-3.5 shrink-0">
+              <button
+                onClick={isBeige ? () => setStep("search") : onClose}
+                className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
+                style={{
+                  background: isBeige ? "rgba(0,0,0,0.05)" : "var(--bg-card)",
+                  border: isBeige
+                    ? "1px solid rgba(0,0,0,0.08)"
+                    : "1px solid var(--border)",
+                }}
+              >
+                <X
+                  size={14}
+                  style={{
+                    color: isBeige ? "#78716C" : "var(--text-secondary)",
+                  }}
+                />
               </button>
+              <p
+                className="text-xl leading-none"
+                style={{
+                  fontFamily: "var(--font-dm-serif)",
+                  fontStyle: "italic",
+                  color: isBeige ? "#2C1E14" : "var(--text-primary)",
+                }}
+              >
+                {step === "custom"
+                  ? "Aliment personnalisé"
+                  : step === "edit"
+                    ? isCustom
+                      ? "Modifier"
+                      : "Corriger"
+                    : "Ajouter un aliment"}
+              </p>
+              {step === "search" ? (
+                <span
+                  className="text-[9px] font-bold rounded-lg px-2.5 py-1"
+                  style={{
+                    background: "var(--accent-bg)",
+                    border: "1px solid var(--accent)",
+                    color: "var(--accent-text)",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {mealLabel}
+                </span>
+              ) : (
+                <div className="w-[30px]" />
+              )}
             </div>
           )}
 

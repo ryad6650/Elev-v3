@@ -1,28 +1,67 @@
 "use client";
 
 import { memo, useState, useRef, useCallback } from "react";
-import { StickyNote } from "lucide-react";
+import { PenLine } from "lucide-react";
 
-interface Props {
+interface ButtonProps {
   note: string;
-  onChange: (note: string) => void;
+  isOpen: boolean;
+  onToggle: () => void;
   hasInitialNote: boolean;
 }
 
-function ExerciseNotes({ note, onChange, hasInitialNote }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+function ExerciseNotesButton({
+  note,
+  isOpen,
+  onToggle,
+  hasInitialNote,
+}: ButtonProps) {
   const [hasBlinked, setHasBlinked] = useState(false);
-  const [draft, setDraft] = useState(note);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const shouldBlink = hasInitialNote && !hasBlinked && !isOpen;
 
-  const handleOpen = useCallback(() => {
-    setIsOpen((prev) => {
-      if (!prev) setHasBlinked(true);
-      return !prev;
-    });
-  }, []);
+  const handleClick = useCallback(() => {
+    if (!isOpen) setHasBlinked(true);
+    onToggle();
+  }, [isOpen, onToggle]);
+
+  return (
+    <button
+      onClick={handleClick}
+      className="flex-1 flex items-center justify-center gap-[5px] py-[9px] text-[10px] font-semibold transition-opacity active:opacity-70"
+      style={{
+        color: note
+          ? "var(--accent-text)"
+          : isOpen
+            ? "var(--accent-text)"
+            : "var(--text-muted)",
+      }}
+    >
+      <PenLine
+        size={12}
+        className={shouldBlink ? "animate-pulse" : ""}
+        style={shouldBlink ? { color: "var(--accent-text)" } : undefined}
+      />
+      <span className={shouldBlink ? "animate-pulse" : ""}>
+        Notes
+        {shouldBlink && (
+          <span
+            className="inline-block w-1.5 h-1.5 rounded-full ml-1 align-middle"
+            style={{ background: "var(--accent-text)" }}
+          />
+        )}
+      </span>
+    </button>
+  );
+}
+
+interface AreaProps {
+  note: string;
+  onChange: (note: string) => void;
+}
+
+function ExerciseNotesArea({ note, onChange }: AreaProps) {
+  const [draft, setDraft] = useState(note);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleBlur = useCallback(() => {
     const trimmed = draft.trim();
@@ -30,54 +69,30 @@ function ExerciseNotes({ note, onChange, hasInitialNote }: Props) {
   }, [draft, note, onChange]);
 
   return (
-    <div className="flex flex-col">
-      <button
-        onClick={handleOpen}
-        className="flex items-center justify-center gap-1.5 py-3 text-sm transition-opacity hover:opacity-70"
+    <div
+      className="px-3.5 pb-3 pt-2"
+      style={{ borderTop: "1px solid var(--glass-border)" }}
+    >
+      <textarea
+        ref={textareaRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="Ex : prise large, forcer l'excentrique..."
+        rows={2}
+        className="w-full rounded-xl px-3 py-2.5 text-[13px] resize-none outline-none placeholder:text-[var(--text-muted)]"
         style={{
-          color: note
-            ? "var(--accent)"
-            : isOpen
-              ? "var(--accent)"
-              : "var(--text-muted)",
+          background: "var(--glass-subtle)",
+          color: "var(--text-primary)",
+          border: "1px solid var(--glass-border)",
         }}
-      >
-        <StickyNote
-          size={15}
-          className={shouldBlink ? "animate-pulse" : ""}
-          style={shouldBlink ? { color: "var(--accent)" } : undefined}
-        />
-        <span className={shouldBlink ? "animate-pulse" : ""}>
-          Notes
-          {shouldBlink && (
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full ml-1 align-middle"
-              style={{ background: "var(--accent)" }}
-            />
-          )}
-        </span>
-      </button>
-      {isOpen && (
-        <div className="px-4 pb-3">
-          <textarea
-            ref={textareaRef}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={handleBlur}
-            placeholder="Ex : prise large, forcer l'excentrique..."
-            rows={2}
-            className="w-full rounded-xl px-3 py-2.5 text-sm resize-none outline-none placeholder:text-[var(--text-muted)]"
-            style={{
-              background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
-            }}
-            autoFocus
-          />
-        </div>
-      )}
+        autoFocus
+      />
     </div>
   );
 }
 
-export default memo(ExerciseNotes);
+const MemoButton = memo(ExerciseNotesButton);
+const MemoArea = memo(ExerciseNotesArea);
+
+export { MemoButton as ExerciseNotesButton, MemoArea as ExerciseNotesArea };

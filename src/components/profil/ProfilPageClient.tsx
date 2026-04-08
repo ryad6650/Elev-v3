@@ -38,7 +38,7 @@ export default function ProfilPageClient({ profil, statsSlot }: Props) {
       <ProfilInfosForm profil={profil} />
       <ProfilObjectifsForm profil={profil} />
       <Suspense fallback={<PreferencesSkeleton />}>
-        <ProfilPreferences profil={profil} />
+        <ProfilPreferences />
       </Suspense>
       <ProfilCompte />
     </main>

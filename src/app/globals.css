@@ -1,9 +1,49 @@
 @import "tailwindcss";
 
-/* ===== DESIGN SYSTEM — ÉLEV V3 ===== */
+/* ===== DESIGN SYSTEM — ÉLEV V3 — Crème (défaut) ===== */
 
-/* Dark mode (default) */
 :root {
+  --bg-primary: #f2e8d5;
+  --bg-secondary: #f0eeeb;
+  --bg-card: #ffffff;
+  --bg-elevated: #e7e5e4;
+  --text-primary: #4a3728;
+  --text-secondary: #78716c;
+  --text-muted: #a8a29e;
+  --border: rgba(0, 0, 0, 0.07);
+
+  --accent: #1b2e1d;
+  --accent-hover: #162816;
+  --accent-bg: rgba(27, 46, 29, 0.15);
+  --accent-text: #74bf7a;
+  --accent-secondary: #2d4a2f;
+
+  --color-protein: #74bf7a;
+  --color-carbs: #9b6b3a;
+  --color-fat: #c07858;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+
+  /* Glass morphism crème */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.07);
+  --glass-subtle: rgba(0, 0, 0, 0.05);
+
+  --grad-workout: linear-gradient(135deg, #07100a 0%, #74bf7a 100%);
+  --grad-btn-accent: linear-gradient(
+    135deg,
+    #07100a 0%,
+    #1b2e1d 40%,
+    #74bf7a 100%
+  );
+  --grad-sleep: linear-gradient(135deg, #0f1a12 0%, #1c1917 70%);
+  --grad-header-line: linear-gradient(to right, #1b2e1d, #74bf7a, transparent);
+  --grad-monday: linear-gradient(135deg, #1b2e1d22 0%, #f2e8d5 100%);
+}
+
+/* Contexte sombre (pages avec overlay image : dashboard) */
+.context-dark {
   --bg-primary: #0c0a09;
   --bg-secondary: #1c1917;
   --bg-card: #292524;
@@ -12,53 +52,9 @@
   --text-secondary: #a8a29e;
   --text-muted: #78716c;
   --border: rgba(255, 255, 255, 0.08);
-
-  --accent: #e8860c;
-  --accent-hover: #ca6f08;
-  --accent-bg: rgba(232, 134, 12, 0.15);
-  --accent-text: #fdba74;
-
-  --color-protein: #3b82f6;
-  --color-carbs: #eab308;
-  --color-fat: #ef4444;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-}
-
-/* Light mode */
-[data-theme="light"] {
-  --bg-primary: #faf9f7;
-  --bg-secondary: #f0eeeb;
-  --bg-card: #ffffff;
-  --bg-elevated: #e7e5e4;
-  --text-primary: #1c1917;
-  --text-secondary: #78716c;
-  --text-muted: #a8a29e;
-  --border: #e7e5e4;
-
-  --accent-text: #c2410c;
-}
-
-/* Variables d'accent appliquées dynamiquement (apply-accent.ts).
-   Fallbacks SSR avant hydratation JS. */
-:root {
-  --accent-secondary: #f59e0b;
-  --grad-workout: linear-gradient(
-    135deg,
-    #1a0a00 0%,
-    #7a4207 30%,
-    #e8860c 100%
-  );
-  --grad-btn-accent: linear-gradient(
-    135deg,
-    #1a0a00 0%,
-    #7a4207 30%,
-    #e8860c 100%
-  );
-  --grad-sleep: linear-gradient(135deg, #201c19 0%, #1c1917 70%);
-  --grad-header-line: linear-gradient(to right, #e8860c, #f59e0b, transparent);
-  --grad-monday: linear-gradient(135deg, #e8860c22 0%, #1c1917 100%);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-subtle: rgba(255, 255, 255, 0.04);
 }
 
 @theme inline {
@@ -82,10 +78,6 @@
 }
 
 html {
-  color-scheme: dark;
-}
-
-[data-theme="light"] {
   color-scheme: light;
 }
 
@@ -103,11 +95,8 @@ html {
   color: #fff;
 }
 
-/* Cards — contraste garanti dark & light */
+/* Cards — surface standard */
 .card-surface {
-  background: var(--bg-secondary);
-}
-[data-theme="light"] .card-surface {
   background: var(--bg-card);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
@@ -179,14 +168,6 @@ input,
 select,
 textarea {
   font-size: 16px;
-}
-
-/* Smooth theme transitions — uniquement pendant le basculement de thème */
-.theme-transitioning * {
-  transition:
-    background-color 300ms ease,
-    border-color 300ms ease,
-    color 300ms ease !important;
 }
 
 /* Scrollbar */

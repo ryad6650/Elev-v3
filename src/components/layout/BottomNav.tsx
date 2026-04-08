@@ -23,29 +23,32 @@ export default function BottomNav() {
       <nav
         className="pointer-events-auto flex items-center px-2 py-2 gap-0.5 h-[56px]"
         style={{
-          background:
-            "color-mix(in srgb, var(--bg-secondary) 90%, transparent)",
-          backdropFilter: "blur(16px)",
-          border: "1px solid var(--border)",
+          background: "rgba(20,14,8,0.82)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.09)",
           borderRadius: "32px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
           width: "min(96vw, 460px)",
         }}
       >
-        {navItems.map(({ href, emoji }) => {
+        {navItems.map(({ href, emoji, label }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
               prefetch={true}
-              className="flex flex-1 items-center justify-center py-3 rounded-[22px] transition-colors"
-              style={{
-                background: active ? "var(--accent)" : "transparent",
-                color: active ? "#fff" : "var(--text-muted)",
-              }}
+              className="flex flex-1 items-center justify-center transition-colors"
             >
-              <span className="text-[22px] leading-none">{emoji}</span>
+              <div
+                className="flex items-center justify-center px-3.5 py-2 rounded-[20px]"
+                style={{
+                  background: active ? "var(--accent)" : "transparent",
+                }}
+              >
+                <span className="text-lg leading-none">{emoji}</span>
+              </div>
             </Link>
           );
         })}

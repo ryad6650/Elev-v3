@@ -84,31 +84,33 @@ export default function PoidsPageClient({ initialData }: Props) {
 
   return (
     <main
-      className="px-4 pt-6 pb-28 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto" }}
+      className="pt-5 pb-28 page-enter"
+      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 16px 112px" }}
     >
       {/* En-tête */}
-      <div className="mb-5">
+      <div className="mb-4" style={{ padding: "0 6px" }}>
         <div
-          className="font-semibold uppercase mb-1"
+          className="font-medium"
           style={{
-            fontSize: "0.65rem",
-            color: "var(--text-muted)",
-            letterSpacing: "0.1em",
+            fontSize: "11px",
+            color: "var(--accent-text)",
+            opacity: 0.8,
+            letterSpacing: "0.05em",
           }}
         >
-          Suivi corporel
+          Suivi
         </div>
         <h1
           className="leading-tight"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "1.9rem",
+            fontSize: "2rem",
             color: "var(--text-primary)",
+            letterSpacing: "-0.025em",
           }}
         >
-          Poids
+          Poids.
         </h1>
       </div>
 

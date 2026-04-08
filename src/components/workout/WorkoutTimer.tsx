@@ -10,14 +10,14 @@ interface Props {
   large?: boolean;
 }
 
-function formatDuration(ms: number): string {
+function formatDuration(ms: number, alwaysHours = false): string {
   const totalSecs = Math.floor(Math.max(0, ms) / 1000);
   const h = Math.floor(totalSecs / 3600);
   const m = Math.floor((totalSecs % 3600) / 60);
   const s = totalSecs % 60;
-  if (h > 0)
-    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  if (alwaysHours || h > 0)
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
 function calcElapsed(
@@ -46,18 +46,24 @@ export default function WorkoutTimer({
     );
   }, [startedAt, pausedAt, totalPausedMs]);
 
-  const text = formatDuration(elapsed);
-
   if (large) {
+    const text = formatDuration(elapsed, true);
     return (
       <span
-        className="text-4xl font-mono font-bold tracking-tight"
-        style={{ color: "var(--text-primary)" }}
+        className="text-[28px] font-normal tracking-[0.02em]"
+        style={{
+          fontFamily: "var(--font-dm-sans)",
+          fontWeight: 400,
+          color: "var(--text-primary)",
+          fontVariantNumeric: "tabular-nums",
+        }}
       >
         {text}
       </span>
     );
   }
+
+  const text = formatDuration(elapsed);
   return (
     <span
       className="text-sm font-mono font-bold"

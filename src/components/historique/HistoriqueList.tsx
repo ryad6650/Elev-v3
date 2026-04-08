@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { ArrowRight } from "lucide-react";
 import type { HistoriqueWorkout } from "@/lib/historique";
 
 interface Props {
@@ -16,11 +17,135 @@ function formatDate(dateStr: string): string {
   });
   if (dateStr === today) return `Aujourd'hui · ${dateLabel}`;
   if (dateStr === yesterday) return `Hier · ${dateLabel}`;
-  return dateLabel;
+  return (
+    d.toLocaleDateString("fr-FR", { weekday: "long" }).charAt(0).toUpperCase() +
+    d.toLocaleDateString("fr-FR", { weekday: "long" }).slice(1) +
+    ` · ${dateLabel}`
+  );
 }
 
 function formatVolume(v: number): string {
-  return v >= 1000 ? `${Math.round(v / 100) / 10}k` : String(v);
+  if (v >= 1000) {
+    const formatted = new Intl.NumberFormat("fr-FR").format(v);
+    return formatted;
+  }
+  return String(v);
+}
+
+export default function HistoriqueList({ workouts, onSelect }: Props) {
+  const grouped = useMemo(() => {
+    const g: { label: string; items: HistoriqueWorkout[] }[] = [];
+    for (const w of workouts) {
+      const label = getGroupLabel(w.date);
+      const last = g[g.length - 1];
+      if (last?.label === label) last.items.push(w);
+      else g.push({ label, items: [w] });
+    }
+    return g;
+  }, [workouts]);
+
+  if (workouts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+          Aucune séance enregistrée.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2.5">
+      {grouped.map(({ items }) =>
+        items.map((w) => <WorkoutItem key={w.id} w={w} onSelect={onSelect} />),
+      )}
+    </div>
+  );
+}
+
+function WorkoutItem({
+  w,
+  onSelect,
+}: {
+  w: HistoriqueWorkout;
+  onSelect?: (id: string) => void;
+}) {
+  return (
+    <div
+      className="relative flex items-center gap-2.5 cursor-pointer active:scale-[0.98] transition-transform"
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        borderRadius: 16,
+        padding: "12px 14px 12px 18px",
+      }}
+      onClick={() => onSelect?.(w.id)}
+    >
+      {/* Barre verte gauche */}
+      <div
+        className="absolute rounded-sm"
+        style={{
+          left: 8,
+          top: 10,
+          bottom: 10,
+          width: 2,
+          background: "#74BF7A",
+        }}
+      />
+
+      <div className="flex-1 min-w-0">
+        <div
+          className="font-bold truncate leading-tight"
+          style={{ fontSize: "15px", color: "var(--text-primary)" }}
+        >
+          {w.routineNom ?? "Séance libre"}
+        </div>
+        <div
+          style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: 2 }}
+        >
+          {formatDate(w.date)}
+        </div>
+        <div className="flex gap-1 mt-1.5">
+          {w.duree_minutes != null && <Chip label={`${w.duree_minutes} MIN`} />}
+          {w.exercises.length > 0 && (
+            <Chip label={`${w.exercises.length} EXOS`} />
+          )}
+          {w.volume > 0 && <Chip label={`${formatVolume(w.volume)} KG`} />}
+        </div>
+      </div>
+
+      {/* Flèche */}
+      <div
+        className="flex items-center justify-center shrink-0"
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          background: "var(--bg-card)",
+        }}
+      >
+        <ArrowRight size={11} style={{ color: "var(--text-muted)" }} />
+      </div>
+    </div>
+  );
+}
+
+function Chip({ label }: { label: string }) {
+  return (
+    <span
+      className="font-semibold"
+      style={{
+        fontSize: "8px",
+        color: "var(--text-secondary)",
+        background: "var(--bg-card)",
+        borderRadius: 4,
+        padding: "2px 6px",
+        letterSpacing: "0.05em",
+      }}
+    >
+      {label}
+    </span>
+  );
 }
 
 function getGroupLabel(dateStr: string): string {
@@ -43,150 +168,4 @@ function getGroupLabel(dateStr: string): string {
     month: "long",
     year: "numeric",
   }).format(date);
-}
-
-export default function HistoriqueList({ workouts, onSelect }: Props) {
-  const groups = useMemo(() => {
-    const g: { label: string; items: HistoriqueWorkout[] }[] = [];
-    for (const w of workouts) {
-      const label = getGroupLabel(w.date);
-      const last = g[g.length - 1];
-      if (last?.label === label) last.items.push(w);
-      else g.push({ label, items: [w] });
-    }
-    return g;
-  }, [workouts]);
-
-  if (workouts.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Aucune séance enregistrée.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {groups.map(({ label, items }) => (
-        <div key={label}>
-          {/* Séparateur semaine */}
-          <div className="flex items-center gap-3 my-4">
-            <div
-              className="flex-1 h-px"
-              style={{ background: "var(--border)" }}
-            />
-            <span
-              className="text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {label}
-            </span>
-            <div
-              className="flex-1 h-px"
-              style={{ background: "var(--border)" }}
-            />
-          </div>
-
-          <div className="space-y-2">
-            {items.map((w) => (
-              <div
-                key={w.id}
-                className="relative overflow-hidden rounded-[18px] p-3.5 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
-                style={{
-                  background: "var(--bg-secondary)",
-                  border: "1px solid var(--border)",
-                }}
-                onClick={() => onSelect?.(w.id)}
-              >
-                {/* Barre accent gauche */}
-                <div
-                  className="absolute left-0 top-0 bottom-0"
-                  style={{
-                    width: 3,
-                    borderRadius: "0 2px 2px 0",
-                    background: "var(--accent)",
-                  }}
-                />
-
-                <div className="flex-1 min-w-0">
-                  <div
-                    className="font-semibold truncate"
-                    style={{
-                      fontSize: "0.85rem",
-                      color: "var(--text-primary)",
-                      marginBottom: 2,
-                    }}
-                  >
-                    {w.routineNom ?? "Séance libre"}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.65rem",
-                      color: "var(--text-muted)",
-                      marginBottom: 8,
-                    }}
-                  >
-                    {formatDate(w.date)}
-                  </div>
-
-                  {/* Chips méta */}
-                  <div className="flex gap-1.5 flex-wrap">
-                    {w.duree_minutes != null && (
-                      <span
-                        className="rounded-full px-2 py-0.5"
-                        style={{
-                          fontSize: "0.6rem",
-                          background: "var(--bg-card)",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        ⏱ {w.duree_minutes} min
-                      </span>
-                    )}
-                    {w.exercises.length > 0 && (
-                      <span
-                        className="rounded-full px-2 py-0.5"
-                        style={{
-                          fontSize: "0.6rem",
-                          background: "var(--bg-card)",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        🏋 {w.exercises.length} exercice
-                        {w.exercises.length > 1 ? "s" : ""}
-                      </span>
-                    )}
-                    {w.volume > 0 && (
-                      <span
-                        className="rounded-full px-2 py-0.5"
-                        style={{
-                          fontSize: "0.6rem",
-                          background: "var(--bg-card)",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        📦 {formatVolume(w.volume)} kg
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "var(--text-muted)",
-                    flexShrink: 0,
-                  }}
-                >
-                  ›
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }

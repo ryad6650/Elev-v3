@@ -8,7 +8,7 @@ interface Props {
   streakActuel: number;
 }
 
-const JOURS = ["L", "M", "M", "J", "V", "S", "D"];
+const JOURS = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
 const MOIS = [
   "Janvier",
   "Février",
@@ -36,7 +36,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
   const todayStr = today.toISOString().split("T")[0];
 
   const premierJour = new Date(annee, mois, 1);
-  const debutSemaine = (premierJour.getDay() + 6) % 7; // lundi=0
+  const debutSemaine = (premierJour.getDay() + 6) % 7;
   const nbJours = new Date(annee, mois + 1, 0).getDate();
 
   function navMois(dir: -1 | 1) {
@@ -52,67 +52,81 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
   return (
     <div
-      className="rounded-2xl p-4 mb-3"
+      className="rounded-[20px] p-4 mb-2.5"
       style={{
-        background: "var(--bg-secondary)",
+        background: "var(--bg-card)",
         border: "1px solid var(--border)",
       }}
     >
       {/* Navigation mois */}
-      <div className="flex items-center justify-between mb-3.5">
-        <button
-          onClick={() => navMois(-1)}
-          className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-          style={{
-            background: "var(--bg-card)",
-            color: "var(--text-secondary)",
-            fontSize: "0.85rem",
-          }}
-        >
-          ‹
-        </button>
+      <div className="flex items-center justify-between mb-2.5">
         <span
-          className="font-semibold"
-          style={{ fontSize: "0.85rem", color: "var(--text-primary)" }}
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            fontSize: "16px",
+            color: "var(--text-primary)",
+          }}
         >
           {MOIS[mois]} {annee}
         </span>
-        <button
-          onClick={() => navMois(1)}
-          className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-          style={{
-            background: "var(--bg-card)",
-            color: "var(--text-secondary)",
-            fontSize: "0.85rem",
-          }}
-        >
-          ›
-        </button>
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => navMois(-1)}
+            className="flex items-center justify-center transition-colors"
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 8,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              color: "var(--text-secondary)",
+              fontSize: "11px",
+            }}
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => navMois(1)}
+            className="flex items-center justify-center transition-colors"
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 8,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              color: "var(--text-secondary)",
+              fontSize: "11px",
+            }}
+          >
+            ›
+          </button>
+        </div>
       </div>
 
-      {/* Grille calendrier */}
-      <div className="grid grid-cols-7 gap-0.5">
-        {/* Entêtes jours */}
+      {/* Entêtes jours */}
+      <div className="grid grid-cols-7 gap-0.5 mb-1">
         {JOURS.map((j, i) => (
           <div
             key={i}
-            className="text-center pb-2"
+            className="text-center py-0.5"
             style={{
-              fontSize: "0.58rem",
-              fontWeight: 600,
+              fontSize: "8px",
+              fontWeight: 700,
               color: "var(--text-muted)",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              paddingTop: 4,
+              letterSpacing: "0.08em",
             }}
           >
             {j}
           </div>
         ))}
+      </div>
 
-        {/* Jours */}
+      {/* Grille jours */}
+      <div className="grid grid-cols-7 gap-0.5">
         {cells.map((day, i) => {
-          if (day === null) return <div key={`e-${i}`} />;
+          if (day === null)
+            return <div key={`e-${i}`} className="aspect-square" />;
 
           const dateStr = `${annee}-${String(mois + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const hasSession = sessionDates.has(dateStr);
@@ -121,36 +135,24 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
           return (
             <div
               key={dateStr}
-              className="flex flex-col items-center"
-              style={{ gap: 3, padding: "4px 2px", minHeight: 36 }}
+              className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded-lg relative"
+              style={{
+                fontSize: "10px",
+                fontWeight: 500,
+                color: isToday ? "#FAFAF9" : "var(--text-secondary)",
+                background: isToday ? "var(--accent)" : "transparent",
+                border: isToday ? "1px solid rgba(116,191,122,0.25)" : "none",
+                boxShadow: isToday ? "0 2px 10px rgba(27,46,29,0.5)" : "none",
+              }}
             >
-              <div
-                style={{
-                  width: 22,
-                  height: 22,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "50%",
-                  fontSize: "0.72rem",
-                  fontWeight: isToday ? 700 : 500,
-                  background: isToday ? "var(--accent)" : "transparent",
-                  color: isToday
-                    ? "#fff"
-                    : hasSession
-                      ? "var(--text-primary)"
-                      : "var(--text-secondary)",
-                }}
-              >
-                {day}
-              </div>
+              {day}
               {hasSession && (
                 <div
                   style={{
-                    width: 5,
-                    height: 5,
+                    width: 4,
+                    height: 4,
                     borderRadius: "50%",
-                    background: "var(--accent)",
+                    background: isToday ? "#fff" : "#74BF7A",
                   }}
                 />
               )}
@@ -161,18 +163,23 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
       {/* Streak */}
       <div
-        className="flex items-center gap-1.5 mt-3 pt-3"
+        className="flex items-center gap-1.5 mt-2 pt-2"
         style={{
           borderTop: "1px solid var(--border)",
-          fontSize: "0.75rem",
-          color: "var(--text-secondary)",
         }}
       >
-        🔥 Streak actuel :&nbsp;
-        <strong style={{ color: "var(--accent-text)", fontWeight: 700 }}>
+        <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+          🔥 Streak actuel :
+        </span>
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: 700,
+            color: "var(--accent-text)",
+          }}
+        >
           {streakActuel} jour{streakActuel > 1 ? "s" : ""}
-        </strong>
-        &nbsp;consécutif{streakActuel > 1 ? "s" : ""}
+        </span>
       </div>
     </div>
   );

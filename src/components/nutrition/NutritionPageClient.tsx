@@ -3,11 +3,15 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
 import MealSection from "./MealSection";
-import { sumEntries, groupByMeal, nextMealNumber } from "@/lib/nutrition-utils";
-import type { NutritionEntry, NutritionPageData } from "@/lib/nutrition-utils";
+import { sumEntries, groupByMeal } from "@/lib/nutrition-utils";
+import type {
+  Meal,
+  NutritionEntry,
+  NutritionPageData,
+} from "@/lib/nutrition-utils";
 import { useNutritionStore } from "@/store/nutritionStore";
 
 const AddFoodModal = dynamic(() => import("./AddFoodModal"), { ssr: false });
@@ -15,15 +19,14 @@ const EditEntryModal = dynamic(() => import("./EditEntryModal"), {
   ssr: false,
 });
 
-function formatLabel(d: string) {
+function formatDateShort(d: string) {
   const t = new Date();
   const todayStr = t.toISOString().split("T")[0];
   t.setDate(t.getDate() - 1);
   const yesterdayStr = t.toISOString().split("T")[0];
-  if (d === todayStr) return "Aujourd'hui";
+  if (d === todayStr) return "Auj.";
   if (d === yesterdayStr) return "Hier";
   return new Date(d + "T12:00:00").toLocaleDateString("fr-FR", {
-    weekday: "short",
     day: "numeric",
     month: "short",
   });
@@ -52,16 +55,12 @@ export default function NutritionPageClient({ initialData }: Props) {
     setModalMeal(null);
     setModalMealTime(null);
   };
-  const closeEditModal = () => {
-    setViewEntry(null);
-  };
+  const closeEditModal = () => setViewEntry(null);
   const hydratedDateRef = useRef<string | null>(null);
 
-  // Hydrater le store avec les données SSR une seule fois par date
   if (hydratedDateRef.current !== initialData.date) {
     hydratedDateRef.current = initialData.date;
     const store = useNutritionStore.getState();
-
     if (!store.hasFetched || store.date !== initialData.date) {
       useNutritionStore.setState({
         entries: initialData.entries,
@@ -73,16 +72,26 @@ export default function NutritionPageClient({ initialData }: Props) {
     }
   }
 
-  // Re-fetch côté client uniquement si la date change via navigation
   useEffect(() => {
     if (date !== initialData.date) fetchDay(date);
   }, [date, initialData.date, fetchDay]);
 
-  // Utiliser les données SSR tant que le store n'a pas fetchDay
   const displayEntries = hasFetched ? entries : initialData.entries;
   const displayProfile = hasFetched ? profile : initialData.profile;
   const total = useMemo(() => sumEntries(displayEntries), [displayEntries]);
-  const meals = useMemo(() => groupByMeal(displayEntries), [displayEntries]);
+  const mealsFromEntries = useMemo(
+    () => groupByMeal(displayEntries),
+    [displayEntries],
+  );
+
+  // Toujours afficher les 4 repas fixes, même sans entries
+  const FIXED_MEALS = [1, 2, 3, 4] as const;
+  const meals: Meal[] = useMemo(() => {
+    const map = new Map(mealsFromEntries.map((m) => [m.meal_number, m]));
+    return FIXED_MEALS.map(
+      (num) => map.get(num) ?? { meal_number: num, meal_time: "", entries: [] },
+    );
+  }, [mealsFromEntries]);
 
   function navigate(delta: number) {
     const d = new Date(date + "T12:00:00");
@@ -90,15 +99,8 @@ export default function NutritionPageClient({ initialData }: Props) {
     router.push(`/nutrition?date=${d.toISOString().split("T")[0]}`);
   }
 
-  function handleCreateMeal() {
-    const num = nextMealNumber(entries);
-    const now = new Date().toISOString();
-    setModalMealTime(now);
-    setModalMeal(num);
-  }
-
   function handleAddToMeal(mealNumber: number, mealTime: string) {
-    setModalMealTime(mealTime);
+    setModalMealTime(mealTime || new Date().toISOString());
     setModalMeal(mealNumber);
   }
 
@@ -108,9 +110,10 @@ export default function NutritionPageClient({ initialData }: Props) {
         className="px-4 pt-6 pb-28 page-enter"
         style={{ maxWidth: 520, margin: "0 auto" }}
       >
-        <div className="flex items-center justify-between mb-5">
+        {/* Title + date nav */}
+        <div className="flex items-center justify-between mb-0.5 px-1">
           <h1
-            className="text-3xl leading-tight"
+            className="text-[26px] leading-none"
             style={{
               fontFamily: "var(--font-dm-serif)",
               fontStyle: "italic",
@@ -119,49 +122,45 @@ export default function NutritionPageClient({ initialData }: Props) {
           >
             Nutrition
           </h1>
-          <div
-            className="flex items-center rounded-full"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-            }}
-          >
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="p-2"
+              className="w-[26px] h-[26px] rounded-lg flex items-center justify-center"
+              style={{
+                background: "var(--bg-card)",
+                border: "1px solid var(--border)",
+              }}
               aria-label="Jour précédent"
             >
               <ChevronLeft
-                size={14}
+                size={12}
                 style={{ color: "var(--text-secondary)" }}
               />
             </button>
             <span
-              className="text-xs font-medium px-1"
-              style={{ color: "var(--text-primary)" }}
+              className="text-[10px] font-semibold"
+              style={{ color: "var(--text-muted)" }}
             >
-              {formatLabel(date)}
+              {formatDateShort(date)}
             </span>
             <button
               onClick={() => navigate(1)}
-              className="p-2"
+              className="w-[26px] h-[26px] rounded-lg flex items-center justify-center"
+              style={{
+                background: "var(--bg-card)",
+                border: "1px solid var(--border)",
+              }}
               aria-label="Jour suivant"
             >
               <ChevronRight
-                size={14}
+                size={12}
                 style={{ color: "var(--text-secondary)" }}
               />
             </button>
           </div>
         </div>
 
-        <p
-          className="text-xs font-semibold mb-3"
-          style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}
-        >
-          KCALORIES
-        </p>
-
+        {/* Summary header */}
         <NutritionHeader
           totalCalories={total.calories}
           totalProteines={total.proteines}
@@ -170,58 +169,31 @@ export default function NutritionPageClient({ initialData }: Props) {
           profile={displayProfile}
         />
 
-        <p
-          className="text-xs font-semibold mb-3"
-          style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}
-        >
-          REPAS
-        </p>
+        {/* Divider */}
+        <div
+          className="h-px mx-1 mb-3.5"
+          style={{ background: "var(--border)" }}
+        />
 
-        {meals.map((meal) => (
-          <MealSection
-            key={meal.meal_number}
-            meal={meal}
-            onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-            onEntryDeleted={(id) => removeEntry(id)}
-            onFoodClick={(entry) => setViewEntry(entry)}
-          />
-        ))}
-
-        {meals.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-4xl mb-3">🍽️</p>
-            <p
-              className="text-lg"
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
-                color: "var(--text-primary)",
-              }}
-            >
-              Aucun repas
-            </p>
-            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-              Crée ton premier repas de la journée
-            </p>
-          </div>
-        )}
-
-        <button
-          onClick={handleCreateMeal}
-          className="btn-accent w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-semibold text-sm mt-1 transition-all active:scale-[0.97]"
-          style={{
-            boxShadow:
-              "0 4px 20px color-mix(in srgb, var(--accent) 30%, transparent)",
-          }}
-        >
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: "rgba(255,255,255,0.2)" }}
-          >
-            <Plus size={14} />
-          </div>
-          Créer un repas
-        </button>
+        {/* Meals */}
+        <div className="flex flex-col gap-3.5 px-[2px]">
+          {meals.map((meal, i) => (
+            <div key={meal.meal_number}>
+              {i > 0 && (
+                <div
+                  className="h-px mb-3.5"
+                  style={{ background: "var(--border)", opacity: 0.5 }}
+                />
+              )}
+              <MealSection
+                meal={meal}
+                onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
+                onEntryDeleted={(id) => removeEntry(id)}
+                onFoodClick={(entry) => setViewEntry(entry)}
+              />
+            </div>
+          ))}
+        </div>
       </main>
 
       {modalMeal !== null && (

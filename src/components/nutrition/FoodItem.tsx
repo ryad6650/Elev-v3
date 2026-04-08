@@ -1,72 +1,75 @@
 "use client";
 
 import { memo } from "react";
-import { Trash2 } from "lucide-react";
 import { calcNutrients } from "@/lib/nutrition-utils";
 import type { NutritionEntry } from "@/lib/nutrition-utils";
 
+function dominantColor(entry: NutritionEntry): string {
+  const n = calcNutrients(entry.aliment, entry.quantite_g);
+  if (n.proteines >= n.glucides && n.proteines >= n.lipides)
+    return "var(--color-protein)";
+  if (n.lipides >= n.glucides) return "var(--color-fat)";
+  return "var(--color-carbs)";
+}
+
 interface Props {
   entry: NutritionEntry;
-  onDeleted?: (id: string) => void;
+  mealCalories: number;
   onClick?: () => void;
 }
 
-export default memo(function FoodItem({ entry, onDeleted, onClick }: Props) {
+export default memo(function FoodItem({ entry, mealCalories, onClick }: Props) {
   const n = calcNutrients(entry.aliment, entry.quantite_g);
+  const color = dominantColor(entry);
+  const pct = mealCalories > 0 ? (n.calories / mealCalories) * 100 : 0;
 
-  // Afficher en portions si enregistré en mode portion
   const qtyLabel =
     entry.quantite_portion != null
       ? `${entry.quantite_portion} ${entry.aliment.portion_nom ?? "portion"}`
       : `${entry.quantite_g}g`;
 
-  function handleDelete(e: React.MouseEvent) {
-    e.stopPropagation();
-    onDeleted?.(entry.id);
-  }
-
   return (
     <div
-      className="flex items-center gap-2 py-2.5 transition-colors active:bg-[var(--bg-card)]"
-      style={{
-        borderBottom:
-          "1px solid color-mix(in srgb, var(--border) 100%, var(--text-muted) 25%)",
-        cursor: onClick ? "pointer" : undefined,
-      }}
+      className="flex items-center gap-2 active:opacity-70 transition-opacity"
+      style={{ cursor: onClick ? "pointer" : undefined }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
     >
+      <div
+        className="w-[3px] self-stretch rounded-sm shrink-0"
+        style={{ background: color }}
+      />
       <div className="flex-1 min-w-0">
-        <p
-          className="text-sm font-medium truncate"
-          style={{ color: "var(--text-primary)" }}
+        <div className="flex items-baseline justify-between mb-1.5">
+          <span
+            className="text-xs font-semibold truncate mr-2"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {entry.aliment.nom}{" "}
+            <span
+              className="font-normal text-[11px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              · {qtyLabel}
+            </span>
+          </span>
+          <span
+            className="text-[10px] font-bold shrink-0"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {n.calories} kcal
+          </span>
+        </div>
+        <div
+          className="w-full h-1 rounded-sm overflow-hidden"
+          style={{ background: "var(--border)" }}
         >
-          {entry.aliment.nom}
-        </p>
-        <p
-          className="text-xs tabular-nums mt-0.5"
-          style={{ color: "var(--text-muted)" }}
-        >
-          {qtyLabel} · P {n.proteines}g · G {n.glucides}g · L {n.lipides}g
-        </p>
+          <div
+            className="h-full rounded-sm transition-all duration-500"
+            style={{ width: `${pct}%`, background: color, opacity: 0.6 }}
+          />
+        </div>
       </div>
-      <p
-        className="text-xs font-semibold tabular-nums shrink-0"
-        style={{ color: "var(--accent)" }}
-      >
-        {n.calories} kcal
-      </p>
-      <button
-        onClick={handleDelete}
-        className="p-2.5 -mr-1 rounded-xl shrink-0 transition-all active:scale-90"
-        style={{
-          color: "#ef4444",
-          background: "rgba(239, 68, 68, 0.1)",
-        }}
-        aria-label="Supprimer"
-      >
-        <Trash2 size={16} />
-      </button>
     </div>
   );
 });
