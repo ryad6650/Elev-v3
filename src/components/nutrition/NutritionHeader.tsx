@@ -12,20 +12,20 @@ interface MacroRowProps {
 function MacroRow({ label, value, max, color }: MacroRowProps) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div className="flex flex-col gap-[3px]">
+    <div className="flex flex-col gap-1">
       <div className="flex justify-between items-baseline">
         <span
-          className="text-[8px] font-bold uppercase"
+          className="text-[10px] font-bold uppercase"
           style={{ color, letterSpacing: "0.1em" }}
         >
           {label}
         </span>
-        <span className="text-[9px]" style={{ color: "var(--text-muted)" }}>
+        <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
           {Math.round(value)}g / {max}g
         </span>
       </div>
       <div
-        className="w-full h-[3px] rounded-full overflow-hidden"
+        className="w-full h-[5px] rounded-full overflow-hidden"
         style={{ background: "rgba(74,55,40,0.1)" }}
       >
         <div
@@ -56,14 +56,14 @@ export default function NutritionHeader({
   const restantes = Math.max(0, objectif - totalCalories);
 
   return (
-    <div className="flex items-center gap-0" style={{ marginBottom: 16 }}>
+    <div className="flex items-center gap-0" style={{ marginBottom: 20 }}>
       {/* Gauche — calories */}
       <div
-        className="flex flex-col pr-4 shrink-0"
+        className="flex flex-col pr-5 shrink-0"
         style={{ borderRight: "1px solid var(--border)" }}
       >
         <span
-          className="text-[8px] font-bold uppercase mb-1"
+          className="text-[10px] font-bold uppercase mb-1"
           style={{ color: "var(--text-secondary)", letterSpacing: "0.12em" }}
         >
           Aujourd&apos;hui
@@ -72,7 +72,7 @@ export default function NutritionHeader({
           className="leading-none"
           style={{
             fontFamily: "var(--font-dm-serif)",
-            fontSize: 32,
+            fontSize: 40,
             color: "var(--text-primary)",
             letterSpacing: "-0.02em",
           }}
@@ -80,13 +80,13 @@ export default function NutritionHeader({
           {totalCalories.toLocaleString("fr-FR")}
         </div>
         <span
-          className="text-[11px] mt-0.5"
+          className="text-[13px] mt-0.5"
           style={{ color: "var(--text-muted)" }}
         >
           kcal
         </span>
         <span
-          className="text-[10px] font-semibold mt-1.5"
+          className="text-[12px] font-semibold mt-2"
           style={{ color: "var(--accent-text)" }}
         >
           {restantes.toLocaleString("fr-FR")} restantes
@@ -94,7 +94,7 @@ export default function NutritionHeader({
       </div>
 
       {/* Droite — macros */}
-      <div className="flex-1 flex flex-col gap-2 pl-4">
+      <div className="flex-1 flex flex-col gap-2.5 pl-5">
         <MacroRow
           label="Glucides"
           value={totalGlucides}

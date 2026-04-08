@@ -18,7 +18,7 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
   const ratio = objective > 0 ? Math.min(consumed / objective, 1) : 0;
   const remaining = Math.max(objective - consumed, 0);
   const pct = Math.round(ratio * 100);
-  const r = 27;
+  const r = 31;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - ratio);
 
@@ -27,30 +27,30 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
       <p
         className="uppercase"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 600,
           letterSpacing: "0.1em",
           color: C.secondary,
-          marginBottom: 12,
+          marginBottom: 14,
         }}
       >
         Calories du jour
       </p>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
-          <div className="flex items-baseline gap-1.5 mb-3.5">
+          <div className="flex items-baseline gap-2 mb-4">
             <span
               style={{
                 fontFamily: "var(--font-dm-serif)",
-                fontSize: 28,
+                fontSize: 34,
                 color: C.text,
                 letterSpacing: "-0.02em",
               }}
             >
               {consumed.toLocaleString("fr-FR")}
             </span>
-            <span style={{ fontSize: 13, color: C.muted }}>
+            <span style={{ fontSize: 15, color: C.muted }}>
               / {objective.toLocaleString("fr-FR")} kcal
             </span>
           </div>
@@ -59,7 +59,7 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
           <div
             className="overflow-hidden"
             style={{
-              height: 6,
+              height: 8,
               borderRadius: 999,
               background: C.track,
             }}
@@ -75,19 +75,19 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
             />
           </div>
 
-          <div className="flex justify-end mt-2">
-            <span style={{ fontSize: 12, color: C.muted }}>
+          <div className="flex justify-end mt-2.5">
+            <span style={{ fontSize: 13, color: C.muted }}>
               {remaining.toLocaleString("fr-FR")} kcal restantes
             </span>
           </div>
         </div>
 
         {/* Anneau */}
-        <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
+        <div className="relative shrink-0" style={{ width: 74, height: 74 }}>
           <svg
             width="100%"
             height="100%"
-            viewBox="0 0 64 64"
+            viewBox="0 0 74 74"
             style={{ transform: "rotate(-90deg)" }}
           >
             <defs>
@@ -97,20 +97,20 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
               </linearGradient>
             </defs>
             <circle
-              cx="32"
-              cy="32"
+              cx="37"
+              cy="37"
               r={r}
               fill="none"
               stroke={C.track}
-              strokeWidth="5"
+              strokeWidth="6"
             />
             <circle
-              cx="32"
-              cy="32"
+              cx="37"
+              cy="37"
               r={r}
               fill="none"
               stroke="url(#calGrad)"
-              strokeWidth="5"
+              strokeWidth="6"
               strokeLinecap="round"
               strokeDasharray={circ}
               strokeDashoffset={offset}
@@ -121,7 +121,7 @@ export default memo(function CaloriesCard({ consumed, objective }: Props) {
             <span
               style={{
                 fontFamily: "var(--font-dm-serif)",
-                fontSize: 14,
+                fontSize: 16,
                 color: C.text,
                 lineHeight: 1,
               }}

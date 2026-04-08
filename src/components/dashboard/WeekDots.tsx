@@ -17,11 +17,11 @@ export default memo(function WeekDots() {
       <p
         className="uppercase"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 600,
           letterSpacing: "0.1em",
           color: "#A8A29E",
-          marginBottom: 14,
+          marginBottom: 16,
         }}
       >
         Cette semaine
@@ -34,8 +34,8 @@ export default memo(function WeekDots() {
           const isDone = isPast && i < 2;
 
           const dotStyle: React.CSSProperties = {
-            width: 28,
-            height: 28,
+            width: 34,
+            height: 34,
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
@@ -52,10 +52,10 @@ export default memo(function WeekDots() {
           }
 
           return (
-            <div key={jour} className="flex flex-col items-center gap-2">
+            <div key={jour} className="flex flex-col items-center gap-2.5">
               <span
                 style={{
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: 600,
                   color: isToday ? "#4A3728" : "#A8A29E",
                   letterSpacing: "0.02em",
@@ -65,7 +65,7 @@ export default memo(function WeekDots() {
               </span>
               <div style={dotStyle}>
                 {isDone && (
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <svg width="12" height="10" viewBox="0 0 10 8" fill="none">
                     <path
                       d="M1 4L3.5 6.5L9 1"
                       stroke="white"

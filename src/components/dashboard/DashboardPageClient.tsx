@@ -128,20 +128,20 @@ export default function DashboardPageClient({ initialData }: Props) {
           <WeekDots />
 
           {/* Stats inline */}
-          <div className="mt-7 flex flex-col gap-3">
+          <div className="mt-8 flex flex-col gap-4">
             <SleepStat sommeilMinutes={data.sommeilMinutes} />
-            <div className="flex items-baseline gap-2">
-              <span style={{ fontSize: 14 }}>💪</span>
+            <div className="flex items-baseline gap-2.5">
+              <span style={{ fontSize: 18 }}>💪</span>
               <span
                 style={{
                   fontFamily: "var(--font-dm-serif)",
-                  fontSize: 18,
+                  fontSize: 22,
                   color: C.text,
                 }}
               >
                 {data.seancesCetteSemaine}
               </span>
-              <span style={{ fontSize: 13, color: C.muted }}>
+              <span style={{ fontSize: 15, color: C.muted }}>
                 séance{data.seancesCetteSemaine !== 1 ? "s" : ""} ce mois-ci
               </span>
             </div>

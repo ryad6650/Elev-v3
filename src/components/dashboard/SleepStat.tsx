@@ -111,22 +111,22 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
       onClick={() => setEditing(true)}
       className="flex items-baseline gap-2 active:opacity-70 transition-opacity"
     >
-      <span style={{ fontSize: 14 }}>🌙</span>
+      <span style={{ fontSize: 18 }}>🌙</span>
       {saved != null ? (
         <>
           <span
             style={{
               fontFamily: "var(--font-dm-serif)",
-              fontSize: 18,
+              fontSize: 22,
               color: C.text,
             }}
           >
             {formatSleep(saved)}
           </span>
-          <span style={{ fontSize: 13, color: C.muted }}>de sommeil</span>
+          <span style={{ fontSize: 15, color: C.muted }}>de sommeil</span>
         </>
       ) : (
-        <span style={{ fontSize: 13, color: C.muted }}>+ Ajouter sommeil</span>
+        <span style={{ fontSize: 15, color: C.muted }}>+ Ajouter sommeil</span>
       )}
     </button>
   );
