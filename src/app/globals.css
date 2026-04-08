@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* ===== SAFE AREA — PWA iOS ===== */
+html {
+  background: var(--bg-primary);
+}
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* ===== DESIGN SYSTEM — ÉLEV V3 — Crème (défaut) ===== */
 
 :root {
