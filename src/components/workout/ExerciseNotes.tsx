@@ -24,29 +24,27 @@ function ExerciseNotesButton({
     onToggle();
   }, [isOpen, onToggle]);
 
+  const hasContent = !!note || isOpen;
   return (
     <button
       onClick={handleClick}
-      className="flex-1 flex items-center justify-center gap-[5px] py-[9px] text-[10px] font-semibold transition-opacity active:opacity-70"
+      className="text-[8px] font-bold tracking-[0.03em] px-2.5 py-1 rounded-lg flex items-center gap-1 transition-opacity active:opacity-70"
       style={{
-        color: note
-          ? "var(--accent-text)"
-          : isOpen
-            ? "var(--accent-text)"
-            : "var(--text-muted)",
+        background: "rgba(74,55,40,0.06)",
+        color: hasContent ? "var(--bar-to)" : "var(--text-muted)",
       }}
     >
       <PenLine
-        size={12}
+        size={10}
         className={shouldBlink ? "animate-pulse" : ""}
-        style={shouldBlink ? { color: "var(--accent-text)" } : undefined}
+        style={shouldBlink ? { color: "var(--bar-to)" } : undefined}
       />
       <span className={shouldBlink ? "animate-pulse" : ""}>
         Notes
         {shouldBlink && (
           <span
             className="inline-block w-1.5 h-1.5 rounded-full ml-1 align-middle"
-            style={{ background: "var(--accent-text)" }}
+            style={{ background: "var(--bar-to)" }}
           />
         )}
       </span>

@@ -20,11 +20,12 @@ function formatDuree(minutes: number): string {
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr + "T12:00:00");
-  return d.toLocaleDateString("fr-FR", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
+  const weekday =
+    d.toLocaleDateString("fr-FR", { weekday: "long" }).charAt(0).toUpperCase() +
+    d.toLocaleDateString("fr-FR", { weekday: "long" }).slice(1);
+  const day = d.getDate();
+  const month = d.toLocaleDateString("fr-FR", { month: "long" });
+  return `${weekday} · ${day} ${month}`;
 }
 
 export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
@@ -68,105 +69,103 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
   }
 
   return (
-    <div className="mb-2.5">
+    <div
+      className="mb-2.5"
+      style={{
+        borderTop: "1px solid rgba(74,55,40,0.08)",
+        paddingTop: 10,
+        marginTop: 4,
+      }}
+    >
       <SectionLabel />
-      <div
-        className="rounded-2xl"
-        style={{
-          background: "var(--bg-card)",
-          border: "1px solid var(--border)",
-          padding: "14px 16px",
-        }}
-      >
-        {sommeil.map((record) => (
+
+      {sommeil.map((record) => (
+        <div
+          key={record.id}
+          className="flex items-center gap-2"
+          style={{
+            padding: "6px 0",
+            borderBottom: "1px solid rgba(74,55,40,0.05)",
+          }}
+        >
           <div
-            key={record.id}
-            className="flex items-center gap-2.5"
+            className="flex items-center justify-center shrink-0"
             style={{
-              padding: "8px 0",
-              borderBottom: "1px solid var(--border)",
+              width: 26,
+              height: 26,
+              borderRadius: 8,
+              background: "rgba(155,126,200,0.1)",
+              fontSize: "12px",
             }}
           >
-            {/* Icône violet */}
-            <div
-              className="flex items-center justify-center shrink-0"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 10,
-                background: "rgba(138,116,220,0.12)",
-                fontSize: "14px",
-              }}
-            >
-              🌙
-            </div>
-            <div className="flex-1 min-w-0">
-              <div
-                className="font-medium capitalize"
-                style={{ fontSize: "12px", color: "var(--text-primary)" }}
-              >
-                {formatDate(record.date)}
-              </div>
-            </div>
-            <div
-              className="font-bold shrink-0"
-              style={{ fontSize: "15px", color: "var(--text-primary)" }}
-            >
-              {formatDuree(record.duree_minutes)}
-            </div>
-            <button
-              onClick={() => handleDelete(record)}
-              className="p-1 rounded-lg transition-all active:scale-90 shrink-0"
-              style={{
-                background:
-                  deletingId === record.id
-                    ? "rgba(239,68,68,0.15)"
-                    : "transparent",
-              }}
-            >
-              <Trash2
-                size={12}
-                style={{
-                  color:
-                    deletingId === record.id
-                      ? "var(--danger)"
-                      : "var(--text-muted)",
-                }}
-              />
-            </button>
+            🌙
           </div>
-        ))}
+          <div className="flex-1 min-w-0">
+            <div style={{ fontSize: "9px", color: "var(--text-muted)" }}>
+              {formatDate(record.date)}
+            </div>
+          </div>
+          <span
+            className="font-bold shrink-0"
+            style={{ fontSize: "13px", color: "var(--text-primary)" }}
+          >
+            {formatDuree(record.duree_minutes)}
+          </span>
+          <button
+            onClick={() => handleDelete(record)}
+            className="p-1 rounded-lg transition-all active:scale-90 shrink-0"
+            style={{
+              background:
+                deletingId === record.id
+                  ? "rgba(239,68,68,0.15)"
+                  : "transparent",
+            }}
+          >
+            <Trash2
+              size={11}
+              style={{
+                color:
+                  deletingId === record.id
+                    ? "var(--danger)"
+                    : "var(--text-muted)",
+              }}
+            />
+          </button>
+        </div>
+      ))}
 
-        {/* Barre globale */}
+      {/* Barre moyenne */}
+      <div
+        className="mt-2"
+        style={{
+          borderTop: "1px solid rgba(74,55,40,0.08)",
+          paddingTop: 8,
+        }}
+      >
         <div
-          className="overflow-hidden mt-2"
+          className="overflow-hidden mb-1"
           style={{
             height: 4,
-            background: "var(--bg-elevated)",
-            borderRadius: 2,
+            borderRadius: 99,
+            background: "rgba(74,55,40,0.1)",
           }}
         >
           <div
             style={{
               height: "100%",
               width: `${avgPct}%`,
-              borderRadius: 2,
-              background: "linear-gradient(to right, #6B5CA5, #8A74DC)",
+              borderRadius: 99,
+              background: "linear-gradient(90deg, #9B7EC8, #7B5EA8)",
             }}
           />
         </div>
-
-        {/* Moyenne */}
-        <div
-          className="flex items-center justify-between mt-2.5 pt-2"
-          style={{ borderTop: "1px solid var(--border)" }}
-        >
-          <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+        <div className="flex items-center justify-between">
+          <span style={{ fontSize: "9px", color: "var(--text-muted)" }}>
             Moyenne 7 jours
           </span>
           <span
             className="font-bold"
-            style={{ fontSize: "12px", color: "#8A74DC" }}
+            style={{ fontSize: "9px", color: "var(--text-primary)" }}
           >
             {formatDuree(avgMinutes)} / nuit
           </span>
@@ -181,10 +180,9 @@ function SectionLabel() {
     <div
       className="font-bold uppercase mb-2"
       style={{
-        fontSize: "9px",
-        color: "var(--text-muted)",
-        letterSpacing: "0.22em",
-        padding: "2px 2px 0",
+        fontSize: "8px",
+        color: "var(--text-secondary)",
+        letterSpacing: "0.1em",
       }}
     >
       Sommeil

@@ -44,7 +44,7 @@ export default function OnboardingClient() {
   return (
     <main
       className="min-h-dvh flex flex-col"
-      style={{ background: "var(--bg-primary)" }}
+      style={{ background: "var(--bg-gradient)" }}
     >
       {/* Barre de progression */}
       <div className="px-6 pt-12 pb-4">

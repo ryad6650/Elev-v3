@@ -34,42 +34,48 @@ export default function HistoriqueStatsCards({
       {stats.map(({ val, label, barColor }) => (
         <div
           key={label}
-          className="flex-1 relative overflow-hidden rounded-[14px] py-2.5 pl-3.5 pr-2.5"
+          className="flex-1 flex items-center gap-2 rounded-[14px]"
           style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
+            background: "rgba(255,255,255,0.35)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
+            padding: "10px",
           }}
         >
           <div
-            className="absolute left-0 rounded-r-sm"
             style={{
-              width: "2.5px",
-              top: 6,
-              bottom: 6,
+              width: 3,
+              height: 32,
+              borderRadius: 2,
               background: barColor,
+              flexShrink: 0,
             }}
           />
-          <div
-            className="leading-none"
-            style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontSize: "22px",
-              color: "var(--text-primary)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {val}
-          </div>
-          <div
-            className="font-semibold"
-            style={{
-              fontSize: "9px",
-              color: "var(--text-muted)",
-              marginTop: 3,
-              letterSpacing: "0.03em",
-            }}
-          >
-            {label}
+          <div className="flex flex-col">
+            <div
+              className="leading-none"
+              style={{
+                fontFamily: "var(--font-dm-serif)",
+                fontSize: "18px",
+                color: "var(--text-primary)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {val}
+            </div>
+            <div
+              className="font-semibold uppercase"
+              style={{
+                fontSize: "8px",
+                color: "var(--text-muted)",
+                marginTop: 2,
+                letterSpacing: "0.06em",
+              }}
+            >
+              {label}
+            </div>
           </div>
         </div>
       ))}

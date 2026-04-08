@@ -80,7 +80,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-dvh flex flex-col items-center justify-center px-4 page-enter"
-      style={{ background: "var(--bg-primary)" }}
+      style={{ background: "var(--bg-gradient)" }}
     >
       <div className="w-full max-w-sm">
         {/* Logo */}

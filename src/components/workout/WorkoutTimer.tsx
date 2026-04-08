@@ -50,12 +50,10 @@ export default function WorkoutTimer({
     const text = formatDuration(elapsed, true);
     return (
       <span
-        className="text-[28px] font-normal tracking-[0.02em]"
+        className="text-[28px] tracking-[-0.02em] leading-[1.2]"
         style={{
-          fontFamily: "var(--font-dm-sans)",
-          fontWeight: 400,
+          fontFamily: "var(--font-dm-serif)",
           color: "var(--text-primary)",
-          fontVariantNumeric: "tabular-nums",
         }}
       >
         {text}

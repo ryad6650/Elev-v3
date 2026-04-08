@@ -107,11 +107,19 @@ export default function NutritionPageClient({ initialData }: Props) {
   return (
     <>
       <main
-        className="px-4 pt-6 pb-28 page-enter"
-        style={{ maxWidth: 520, margin: "0 auto" }}
+        className="pt-3.5 pb-28 page-enter"
+        style={{
+          maxWidth: 430,
+          margin: "0 auto",
+          paddingLeft: 20,
+          paddingRight: 20,
+        }}
       >
         {/* Title + date nav */}
-        <div className="flex items-center justify-between mb-0.5 px-1">
+        <div
+          className="flex items-center justify-between"
+          style={{ marginBottom: 18 }}
+        >
           <h1
             className="text-[26px] leading-none"
             style={{
@@ -122,39 +130,35 @@ export default function NutritionPageClient({ initialData }: Props) {
           >
             Nutrition
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => navigate(-1)}
-              className="w-[26px] h-[26px] rounded-lg flex items-center justify-center"
-              style={{
-                background: "var(--bg-card)",
-                border: "1px solid var(--border)",
-              }}
+              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+              style={{ background: "rgba(74,55,40,0.07)" }}
               aria-label="Jour précédent"
             >
               <ChevronLeft
-                size={12}
-                style={{ color: "var(--text-secondary)" }}
+                size={14}
+                strokeWidth={2.5}
+                style={{ color: "var(--text-muted)" }}
               />
             </button>
             <span
-              className="text-[10px] font-semibold"
-              style={{ color: "var(--text-muted)" }}
+              className="text-[13px] font-semibold"
+              style={{ color: "var(--text-primary)", letterSpacing: "0.02em" }}
             >
               {formatDateShort(date)}
             </span>
             <button
               onClick={() => navigate(1)}
-              className="w-[26px] h-[26px] rounded-lg flex items-center justify-center"
-              style={{
-                background: "var(--bg-card)",
-                border: "1px solid var(--border)",
-              }}
+              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+              style={{ background: "rgba(74,55,40,0.07)" }}
               aria-label="Jour suivant"
             >
               <ChevronRight
-                size={12}
-                style={{ color: "var(--text-secondary)" }}
+                size={14}
+                strokeWidth={2.5}
+                style={{ color: "var(--text-muted)" }}
               />
             </button>
           </div>
@@ -171,20 +175,14 @@ export default function NutritionPageClient({ initialData }: Props) {
 
         {/* Divider */}
         <div
-          className="h-px mx-1 mb-3.5"
-          style={{ background: "var(--border)" }}
+          className="h-px"
+          style={{ background: "var(--border)", margin: "4px 0 12px" }}
         />
 
         {/* Meals */}
-        <div className="flex flex-col gap-3.5 px-[2px]">
-          {meals.map((meal, i) => (
+        <div className="flex flex-col">
+          {meals.map((meal) => (
             <div key={meal.meal_number}>
-              {i > 0 && (
-                <div
-                  className="h-px mb-3.5"
-                  style={{ background: "var(--border)", opacity: 0.5 }}
-                />
-              )}
               <MealSection
                 meal={meal}
                 onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}

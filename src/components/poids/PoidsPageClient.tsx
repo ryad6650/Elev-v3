@@ -42,7 +42,6 @@ export default function PoidsPageClient({ initialData }: Props) {
       .catch(console.error);
   }, []);
 
-  // Update optimiste : met à jour l'UI immédiatement sans attendre le réseau
   const optimisticUpsert = useCallback(
     (date: string, poids: number) => {
       setData((prev) => {
@@ -60,13 +59,11 @@ export default function PoidsPageClient({ initialData }: Props) {
         }
         return { ...prev, entries };
       });
-      // Sync serveur en arrière-plan
       refreshData();
     },
     [refreshData],
   );
 
-  // Suppression optimiste
   const optimisticDelete = useCallback(
     (id: string) => {
       setData((prev) => ({
@@ -84,47 +81,45 @@ export default function PoidsPageClient({ initialData }: Props) {
 
   return (
     <main
-      className="pt-5 pb-28 page-enter"
-      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 16px 112px" }}
+      className="page-enter"
+      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 20px 112px" }}
     >
       {/* En-tête */}
-      <div className="mb-4" style={{ padding: "0 6px" }}>
+      <div style={{ marginBottom: 16 }}>
         <div
-          className="font-medium"
           style={{
-            fontSize: "11px",
-            color: "var(--accent-text)",
-            opacity: 0.8,
-            letterSpacing: "0.05em",
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+            marginBottom: 4,
           }}
         >
           Suivi
         </div>
         <h1
-          className="leading-tight"
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "2rem",
+            fontSize: 28,
             color: "var(--text-primary)",
-            letterSpacing: "-0.025em",
+            letterSpacing: "-0.01em",
+            lineHeight: 1.1,
           }}
         >
           Poids.
         </h1>
       </div>
 
-      {/* Hero — grand chiffre + saisie inline */}
       <PoidsHero
         poidsActuel={current?.poids ?? null}
         poidsVeille={previous?.poids ?? null}
         onSaved={optimisticUpsert}
       />
 
-      {/* Graphique */}
       <PoidsChart entries={entries} />
 
-      {/* Composition (IMC + masse grasse) */}
       <PoidsComposition
         poids={current?.poids ?? null}
         taille={data.taille}
@@ -132,10 +127,8 @@ export default function PoidsPageClient({ initialData }: Props) {
         mensurationsTaille={data.mensurations?.tour_taille ?? null}
       />
 
-      {/* Mensurations */}
       <MensurationsCard initial={data.mensurations ?? EMPTY_MENSURATIONS} />
 
-      {/* Historique des pesées */}
       <PoidsHistorique
         entries={entries}
         onEdit={(entry) => setModal({ open: true, entry })}

@@ -208,7 +208,9 @@ export default function AddFoodModal({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: isBeige ? "#F2E8D5" : "var(--bg-primary)" }}
+      style={{
+        background: isBeige ? "var(--bg-gradient)" : "var(--bg-primary)",
+      }}
     >
       <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
         <div className="flex flex-col w-full h-full">

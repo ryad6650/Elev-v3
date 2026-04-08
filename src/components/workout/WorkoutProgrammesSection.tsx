@@ -8,8 +8,6 @@ import { getRoutineExercises } from "@/app/actions/routines";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { ProgrammesPageData, Programme } from "@/lib/programmes";
 
-const LETTRES = ["A", "B", "C", "D", "E"];
-
 function getEmoji(nom: string, i: number): string {
   const n = nom.toLowerCase();
   if (n.includes("push") || n.includes("ppl")) return "💪";
@@ -41,122 +39,26 @@ export default function WorkoutProgrammesSection({
     <div>
       {/* Programme actif */}
       {data.programmeActif && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <p
-              className="text-[10px] font-semibold uppercase tracking-widest"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Programme actif
-            </p>
-            <button
-              onClick={() => setSelection(data.programmeActif)}
-              className="text-xs font-semibold"
-              style={{ color: "var(--accent-text)" }}
-            >
-              Tout voir
-            </button>
-          </div>
-
-          <div
-            className="rounded-2xl p-4"
-            style={{
-              background: "var(--bg-secondary)",
-              border:
-                "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
-            }}
-          >
-            <div className="flex items-start justify-between mb-1">
-              <h3
-                className="text-lg font-bold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {data.programmeActif.nom}
-              </h3>
-              <span className="btn-accent text-[11px] font-bold px-3 py-1 rounded-full shrink-0 ml-3">
-                Actif
-              </span>
-            </div>
-            {data.programmeActif.progres && (
-              <p
-                className="text-sm mb-4"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Semaine {data.programmeActif.progres.semaine_actuelle} de{" "}
-                {data.programmeActif.progres.total_semaines} ·{" "}
-                {data.programmeActif.routines.length} séances/sem
-              </p>
-            )}
-
-            <div
-              className="flex gap-3 overflow-x-auto pb-1"
-              style={{ scrollbarWidth: "none" }}
-            >
-              {data.programmeActif.routines.map((r, i) => (
-                <div
-                  key={r.routine_id}
-                  className="shrink-0 rounded-xl p-3 flex flex-col"
-                  style={{
-                    minWidth: 148,
-                    background:
-                      i === 0
-                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                        : "var(--bg-card)",
-                    border: `1px solid ${i === 0 ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "var(--border)"}`,
-                  }}
-                >
-                  <p
-                    className="text-[10px] font-bold uppercase tracking-widest mb-1.5"
-                    style={{
-                      color:
-                        i === 0 ? "var(--accent-text)" : "var(--text-muted)",
-                    }}
-                  >
-                    {i === 0 ? "✦ SUIVANTE" : `SÉANCE ${LETTRES[i]}`}
-                  </p>
-                  <p
-                    className="text-sm font-bold mb-0.5"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {r.nom}
-                  </p>
-                  <p
-                    className="text-xs mb-3"
-                    style={{ color: "var(--text-muted)" }}
-                  >
-                    {r.nbExercices} exercices
-                  </p>
-                  {i === 0 && (
-                    <button
-                      onClick={() => handleDemarrer(r.routine_id, r.nom)}
-                      className="mt-auto w-full py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
-                      style={{
-                        background: `linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, #000) 0%, var(--accent) 40%, var(--accent-text) 100%)`,
-                      }}
-                    >
-                      Démarrer →
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ActiveProgramme
+          programme={data.programmeActif}
+          onView={() => setSelection(data.programmeActif)}
+          onStart={handleDemarrer}
+        />
       )}
 
       {/* Mes programmes */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <p
-            className="text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: "var(--text-muted)" }}
+            className="text-[9px] font-bold tracking-[0.1em] uppercase"
+            style={{ color: "#A8A29E" }}
           >
             Mes programmes
           </p>
           <button
             onClick={() => setCreateOpen(true)}
-            className="text-xs font-semibold"
-            style={{ color: "var(--accent-text)" }}
+            className="text-[9px] font-semibold"
+            style={{ color: "#74bf7a" }}
           >
             + Créer
           </button>
@@ -166,29 +68,23 @@ export default function WorkoutProgrammesSection({
           <button
             key={p.id}
             onClick={() => setSelection(p)}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl mb-2 text-left transition-all active:scale-[0.99]"
-            style={{
-              background: "var(--bg-secondary)",
-              border: "1px solid var(--border)",
-            }}
+            className="w-full flex items-center gap-3.5 py-3 text-left active:opacity-80 transition-opacity"
+            style={{ borderBottom: "1px solid rgba(74,55,40,0.08)" }}
           >
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-xl"
-              style={{ background: "var(--bg-elevated)" }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
+              style={{ background: "rgba(74,55,40,0.06)" }}
             >
               {getEmoji(p.nom, i)}
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="font-semibold text-sm truncate"
-                style={{ color: "var(--text-primary)" }}
+                className="text-[13px] font-semibold truncate"
+                style={{ color: "#4A3728" }}
               >
                 {p.nom}
               </p>
-              <p
-                className="text-xs mt-0.5"
-                style={{ color: "var(--text-secondary)" }}
-              >
+              <p className="text-[10px] mt-0.5" style={{ color: "#78716C" }}>
                 {p.routines.length} séances ·{" "}
                 {p.id === data.programmeActif?.id
                   ? "En cours"
@@ -196,19 +92,18 @@ export default function WorkoutProgrammesSection({
               </p>
             </div>
             <ChevronRight
-              size={16}
-              style={{ color: "var(--text-muted)", flexShrink: 0 }}
+              size={14}
+              style={{ color: "#A8A29E", flexShrink: 0 }}
             />
           </button>
         ))}
 
         <button
           onClick={() => setCreateOpen(true)}
-          className="w-full py-4 rounded-2xl text-sm font-medium transition-all active:opacity-70"
+          className="w-full py-3.5 rounded-2xl text-[11px] font-medium mt-3 active:opacity-70 transition-opacity"
           style={{
-            background: "transparent",
-            border: "1.5px dashed rgba(255,255,255,0.12)",
-            color: "var(--text-muted)",
+            border: "1.5px dashed rgba(74,55,40,0.2)",
+            color: "#78716C",
           }}
         >
           + Créer un nouveau programme
@@ -227,6 +122,106 @@ export default function WorkoutProgrammesSection({
           routinesDisponibles={data.routinesDisponibles}
           onClose={() => setCreateOpen(false)}
         />
+      )}
+    </div>
+  );
+}
+
+function ActiveProgramme({
+  programme,
+  onView,
+  onStart,
+}: {
+  programme: NonNullable<ProgrammesPageData["programmeActif"]>;
+  onView: () => void;
+  onStart: (routineId: string, routineNom: string) => void;
+}) {
+  const nextRoutine = programme.routines[0];
+  const progress = programme.progres;
+  const pct = progress
+    ? Math.round((progress.semaine_actuelle / progress.total_semaines) * 100)
+    : 0;
+
+  return (
+    <div
+      className="mb-[18px] pb-3.5"
+      style={{ borderBottom: "1px solid rgba(74,55,40,0.08)" }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <span
+          className="flex-1 text-[14px]"
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            color: "#4A3728",
+          }}
+        >
+          {programme.nom}
+        </span>
+        <span
+          className="text-[7px] font-extrabold tracking-[0.08em] uppercase px-2 py-[2px] rounded-lg text-white"
+          style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+        >
+          Actif
+        </span>
+      </div>
+
+      {/* Progress */}
+      {progress && (
+        <div className="flex items-center gap-2 mb-2">
+          <div
+            className="flex-1 h-[3px] rounded-full"
+            style={{ background: "rgba(74,55,40,0.1)" }}
+          >
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                background: "linear-gradient(90deg, #c4a882, #a0785c)",
+              }}
+            />
+          </div>
+          <span
+            className="text-[9px] font-semibold shrink-0"
+            style={{ color: "#78716C" }}
+          >
+            Sem. {progress.semaine_actuelle} / {progress.total_semaines}
+          </span>
+        </div>
+      )}
+
+      {/* Next routine CTA */}
+      {nextRoutine && (
+        <button
+          onClick={() => onStart(nextRoutine.routine_id, nextRoutine.nom)}
+          className="w-full rounded-xl p-2.5 px-3 flex items-center justify-between active:scale-[0.98] transition-transform"
+          style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+        >
+          <div className="flex flex-col gap-[2px]">
+            <span className="text-[7px] font-extrabold tracking-[0.1em] uppercase text-white">
+              ✦ Suivante
+            </span>
+            <span
+              className="text-[13px] text-white"
+              style={{
+                fontFamily: "var(--font-dm-serif)",
+                fontStyle: "italic",
+              }}
+            >
+              {nextRoutine.nom}
+            </span>
+            <span
+              className="text-[9px]"
+              style={{ color: "rgba(255,255,255,0.5)" }}
+            >
+              {nextRoutine.nbExercices} exercices
+            </span>
+          </div>
+          <span className="text-[9px] font-bold text-white shrink-0">
+            Démarrer →
+          </span>
+        </button>
       )}
     </div>
   );

@@ -100,7 +100,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     return (
       <div
         className="fixed inset-0 z-[60] flex flex-col"
-        style={{ background: "#F2E8D5" }}
+        style={{ background: "var(--bg-gradient)" }}
       >
         <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
           <div

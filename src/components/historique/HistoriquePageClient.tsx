@@ -59,13 +59,14 @@ export default function HistoriquePageClient({ initialData }: Props) {
       style={{ maxWidth: 520, margin: "0 auto", padding: "20px 16px 112px" }}
     >
       {/* En-tête */}
-      <div style={{ padding: "0 6px", marginBottom: 14 }}>
+      <div style={{ padding: "0 6px", marginBottom: 16 }}>
         <div
-          className="font-medium"
+          className="font-bold uppercase"
           style={{
-            fontSize: "11px",
-            color: "var(--accent-text)",
-            letterSpacing: "0.05em",
+            fontSize: "9px",
+            color: "var(--text-muted)",
+            letterSpacing: "0.12em",
+            marginBottom: 4,
           }}
         >
           Journal
@@ -75,17 +76,15 @@ export default function HistoriquePageClient({ initialData }: Props) {
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "36px",
+            fontSize: "28px",
             color: "var(--text-primary)",
-            letterSpacing: "-0.025em",
-            textShadow: "0 2px 32px rgba(0,0,0,0.7)",
+            letterSpacing: "-0.01em",
           }}
         >
           Historique.
         </h1>
       </div>
 
-      {/* Stats globales */}
       <HistoriqueStatsCards
         workouts={data.workouts}
         totalSeances={data.totalSeances}
@@ -93,27 +92,13 @@ export default function HistoriquePageClient({ initialData }: Props) {
         estTout={true}
       />
 
-      {/* Calendrier mensuel */}
       <HistoriqueCalendar
         workouts={data.workouts}
         streakActuel={data.streakActuel}
       />
 
       {/* Liste des séances */}
-      <div className="mb-2.5">
-        <div
-          className="font-bold uppercase mb-2"
-          style={{
-            fontSize: "9px",
-            color: "var(--text-muted)",
-            letterSpacing: "0.22em",
-            padding: "2px 2px 0",
-          }}
-        >
-          Dernières séances
-        </div>
-        <HistoriqueList workouts={data.workouts} onSelect={handleSelect} />
-      </div>
+      <HistoriqueList workouts={data.workouts} onSelect={handleSelect} />
 
       {/* Sommeil */}
       <SleepHistorySection

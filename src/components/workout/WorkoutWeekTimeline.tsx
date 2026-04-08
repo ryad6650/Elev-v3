@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { WorkoutPageData } from "@/lib/workout";
 import type { ProgrammesPageData } from "@/lib/programmes";
 
-const JOURS = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
+const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 function getDayIndex(): number {
   const d = new Date().getDay();
@@ -34,7 +34,6 @@ export default memo(function WorkoutWeekTimeline({
 }: Props) {
   const todayIdx = getDayIndex();
   const weekDates = getWeekDates();
-
   const doneDates = new Set(historique.map((h) => h.date));
 
   const routineByDay = new Map<number, string>();
@@ -49,104 +48,49 @@ export default memo(function WorkoutWeekTimeline({
   }
 
   return (
-    <div
-      className="rounded-[20px] overflow-hidden p-3.5 px-4"
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid var(--glass-border)",
-      }}
-    >
+    <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2.5">
         <span
-          className="text-[9px] font-bold tracking-[0.22em] uppercase"
-          style={{ color: "var(--text-muted)" }}
+          className="text-[9px] font-bold tracking-[0.1em] uppercase"
+          style={{ color: "#A8A29E" }}
         >
           Cette semaine
         </span>
         <Link
           href="/historique"
-          className="text-[10px] font-semibold"
-          style={{ color: "var(--accent-text)" }}
+          className="text-[9px] font-semibold"
+          style={{ color: "#74bf7a" }}
         >
-          Voir tout &rarr;
+          Historique &rarr;
         </Link>
       </div>
 
       {/* Jours */}
-      <div className="flex gap-1">
+      <div className="flex justify-between">
         {JOURS.map((jour, i) => {
           const isDone = doneDates.has(weekDates[i]);
           const isToday = i === todayIdx;
-          const isPast = i < todayIdx;
-          const isRest = !isDone && !isToday && !routineByDay.has(i);
-          const routineName = routineByDay.get(i);
-
-          let dotStyle: React.CSSProperties = {
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 10,
-            background: "rgba(0,0,0,0.05)",
-            border: "1px solid rgba(0,0,0,0.07)",
-          };
-
-          if (isDone) {
-            dotStyle = {
-              ...dotStyle,
-              background: "rgba(34,197,94,0.12)",
-              borderColor: "rgba(34,197,94,0.2)",
-            };
-          } else if (isToday) {
-            dotStyle = {
-              ...dotStyle,
-              background: "#1B2E1D",
-              borderColor: "#2d4a2f",
-              boxShadow: "0 2px 12px rgba(27,46,29,0.6)",
-            };
-          } else if (isRest || isPast) {
-            dotStyle = { ...dotStyle, opacity: 0.35 };
-          }
-
-          let content: React.ReactNode;
-          if (isDone) {
-            content = (
-              <span style={{ color: "var(--text-primary)" }}>{"\u2713"}</span>
-            );
-          } else if (isToday) {
-            content = <span>{"\uD83D\uDCAA"}</span>;
-          } else if (!isPast && routineName) {
-            content = (
-              <span
-                style={{
-                  fontSize: 9,
-                  color: "var(--text-muted)",
-                  fontWeight: 500,
-                }}
-              >
-                {routineName}
-              </span>
-            );
-          } else {
-            content = (
-              <span style={{ color: "var(--text-muted)" }}>{"\u2014"}</span>
-            );
-          }
+          const isPast = i < todayIdx && !isDone;
+          const routineName =
+            !isDone && !isToday && i > todayIdx
+              ? routineByDay.get(i)
+              : undefined;
 
           return (
-            <div key={jour} className="flex-1 flex flex-col items-center gap-1">
+            <div key={jour} className="flex flex-col items-center gap-[5px]">
               <span
-                className="text-[8px] font-semibold tracking-[0.04em]"
-                style={{ color: "var(--text-muted)" }}
+                className="text-[8px] font-bold tracking-[0.04em] uppercase"
+                style={{ color: isToday ? "#4A3728" : "#A8A29E" }}
               >
                 {jour}
               </span>
-              <div style={dotStyle}>{content}</div>
+              <DayDot
+                isDone={isDone}
+                isToday={isToday}
+                isPast={isPast}
+                routineName={routineName}
+              />
             </div>
           );
         })}
@@ -154,3 +98,62 @@ export default memo(function WorkoutWeekTimeline({
     </div>
   );
 });
+
+function DayDot({
+  isDone,
+  isToday,
+  isPast,
+  routineName,
+}: {
+  isDone: boolean;
+  isToday: boolean;
+  isPast: boolean;
+  routineName?: string;
+}) {
+  const base = "w-[26px] h-[26px] rounded-lg flex items-center justify-center";
+
+  if (isDone) {
+    return (
+      <div
+        className={base}
+        style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+      >
+        <span className="text-[9px] font-bold text-white">✓</span>
+      </div>
+    );
+  }
+  if (isToday) {
+    return (
+      <div
+        className={base}
+        style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+      >
+        <span className="text-[12px]">💪</span>
+      </div>
+    );
+  }
+  if (routineName) {
+    return (
+      <div
+        className={base}
+        style={{
+          border: "1.5px dashed rgba(74,55,40,0.25)",
+          background: "transparent",
+        }}
+      >
+        <span className="text-[7px] font-bold" style={{ color: "#78716C" }}>
+          {routineName}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className={base}
+      style={{
+        background: "rgba(74,55,40,0.06)",
+        opacity: isPast ? 0.35 : 1,
+      }}
+    />
+  );
+}

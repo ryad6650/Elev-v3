@@ -86,7 +86,7 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex flex-col px-4 overflow-y-auto"
-      style={{ background: "var(--bg-primary)" }}
+      style={{ background: "var(--bg-gradient)" }}
     >
       <div className="w-full max-w-sm mx-auto space-y-5 py-10">
         {/* Titre */}

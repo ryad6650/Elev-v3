@@ -1,9 +1,17 @@
 "use client";
 
-import { ChevronDown, MoreVertical, Play, ArrowRight } from "lucide-react";
+import { ChevronDown, MoreVertical, Play } from "lucide-react";
 import type { Routine } from "@/lib/workout";
 import type { RoutineExerciseData } from "@/app/actions/routines";
 import ExerciseGif from "./ExerciseGif";
+
+const ACCENT_GRADIENTS = [
+  "linear-gradient(180deg, #c4a882, #a0785c)",
+  "linear-gradient(180deg, #a0785c, #4A3728)",
+  "linear-gradient(180deg, #74bf7a, #2d6a32)",
+  "linear-gradient(180deg, #6BA3D6, #3b5998)",
+  "linear-gradient(180deg, #c07858, #8b4513)",
+];
 
 interface Props {
   routine: Routine;
@@ -16,16 +24,9 @@ interface Props {
   loadingExpanded: boolean;
 }
 
-function formatDerniereSeance(date: string | null): string {
-  if (!date) return "Jamais effectuée";
-  const jours = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
-  if (jours === 0) return "Aujourd'hui";
-  if (jours === 1) return "Hier";
-  return `il y a ${jours}j`;
-}
-
 export default function RoutineCard({
   routine,
+  index,
   onToggle,
   onOptions,
   onStart,
@@ -33,32 +34,11 @@ export default function RoutineCard({
   exercises,
   loadingExpanded,
 }: Props) {
-  return (
-    <div
-      className="w-full overflow-hidden transition-all relative"
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: expanded
-          ? "1px solid rgba(116,191,122,0.2)"
-          : "1px solid var(--glass-border)",
-        borderRadius: 18,
-      }}
-    >
-      {/* Barre verticale gauche */}
-      <div
-        className="absolute rounded-sm"
-        style={{
-          left: 10,
-          top: 10,
-          bottom: 10,
-          width: 2,
-          background: "#4A3728",
-        }}
-      />
+  const gradient = ACCENT_GRADIENTS[index % ACCENT_GRADIENTS.length];
 
-      {/* Zone principale cliquable */}
+  return (
+    <div style={{ borderBottom: "1px solid rgba(74,55,40,0.08)" }}>
+      {/* Row principale */}
       <div
         role="button"
         tabIndex={0}
@@ -66,34 +46,46 @@ export default function RoutineCard({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") onToggle();
         }}
-        className="flex items-center gap-2.5 text-left transition-all active:scale-[0.98] cursor-pointer"
-        style={{ padding: "13px 14px 13px 22px" }}
+        className="flex items-center gap-2.5 py-2.5 cursor-pointer active:opacity-80 transition-opacity"
       >
-        {/* Contenu */}
+        {/* Barre accent */}
+        <div
+          className="w-1 rounded-sm shrink-0"
+          style={{ background: gradient, height: 42 }}
+        />
+
+        {/* Info */}
         <div className="flex-1 min-w-0">
           <p
-            className="text-[13px] font-bold leading-tight"
-            style={{ color: "var(--text-primary)" }}
+            className="text-[14px] leading-tight mb-[3px]"
+            style={{
+              fontFamily: "var(--font-dm-serif)",
+              fontStyle: "italic",
+              color: "#4A3728",
+            }}
           >
             {routine.nom}
           </p>
-          <p
-            className="text-[10px] mt-0.5"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {routine.exercisesCount} exercice
-            {routine.exercisesCount !== 1 ? "s" : ""}
-            {" \u00B7 ~"}
-            {routine.dureeEstimee} min
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px]" style={{ color: "#78716C" }}>
+              {routine.exercisesCount} exercice
+              {routine.exercisesCount !== 1 ? "s" : ""}
+            </span>
+            <span className="text-[9px]" style={{ color: "#78716C" }}>
+              ·
+            </span>
+            <span className="text-[9px]" style={{ color: "#78716C" }}>
+              ~{routine.dureeEstimee} min
+            </span>
+          </div>
           {routine.groupes.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1.5">
+            <div className="flex flex-wrap gap-1 mt-[5px]">
               {routine.groupes.slice(0, 3).map((g) => (
                 <span
                   key={g}
-                  className="text-[8px] font-semibold uppercase tracking-[0.05em] px-1.5 py-0.5 rounded"
+                  className="text-[7px] font-bold tracking-[0.04em] uppercase px-1.5 py-[2px] rounded-md"
                   style={{
-                    background: "rgba(0,0,0,0.06)",
+                    background: "rgba(74,55,40,0.06)",
                     color: "#78716C",
                   }}
                 >
@@ -110,7 +102,7 @@ export default function RoutineCard({
             size={14}
             className="transition-transform duration-200"
             style={{
-              color: "var(--text-muted)",
+              color: "#78716C",
               transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
             }}
           />
@@ -119,81 +111,69 @@ export default function RoutineCard({
               e.stopPropagation();
               onOptions();
             }}
-            className="p-1 rounded-lg transition-opacity active:opacity-70"
-            style={{ color: "var(--text-muted)" }}
+            className="p-1 active:opacity-70"
+            style={{ color: "#78716C" }}
           >
             <MoreVertical size={16} />
           </button>
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              background: "rgba(0,0,0,0.06)",
-            }}
-          >
-            <ArrowRight
-              size={11}
-              strokeWidth={2.5}
-              style={{ color: "var(--text-secondary)" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Section depliante */}
-      {expanded && (
-        <div
-          className="px-4 pb-4 border-t"
-          style={{ borderColor: "var(--glass-border)" }}
-        >
-          <div className="pt-3 mb-3">
-            {loadingExpanded ? (
-              <p
-                className="text-xs text-center py-2"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Chargement...
-              </p>
-            ) : exercises.length === 0 ? (
-              <p
-                className="text-xs text-center py-2"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Aucun exercice défini
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {exercises.map((ex, i) => (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <ExerciseGif gifUrl={ex.gifUrl} nom={ex.nom} size="sm" />
-                    <span
-                      className="flex-1 text-sm"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {ex.nom}
-                    </span>
-                    <span
-                      className="text-xs font-semibold tabular-nums shrink-0"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      {ex.seriesCible}&times;
-                      {ex.repsCibleMax
-                        ? `${ex.repsCible}-${ex.repsCibleMax}`
-                        : ex.repsCible}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onStart();
             }}
-            className="btn-accent w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold"
+            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+          >
+            <span className="text-[12px] text-white ml-[1px]">▶</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Section dépliante */}
+      {expanded && (
+        <div className="pl-4 pr-2 pb-3 pt-1">
+          {loadingExpanded ? (
+            <p
+              className="text-xs text-center py-2"
+              style={{ color: "#78716C" }}
+            >
+              Chargement...
+            </p>
+          ) : exercises.length === 0 ? (
+            <p
+              className="text-xs text-center py-2"
+              style={{ color: "#78716C" }}
+            >
+              Aucun exercice défini
+            </p>
+          ) : (
+            <div className="space-y-2 mb-3">
+              {exercises.map((ex, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <ExerciseGif gifUrl={ex.gifUrl} nom={ex.nom} size="sm" />
+                  <span className="flex-1 text-sm" style={{ color: "#78716C" }}>
+                    {ex.nom}
+                  </span>
+                  <span
+                    className="text-xs font-semibold tabular-nums shrink-0"
+                    style={{ color: "#A8A29E" }}
+                  >
+                    {ex.seriesCible}&times;
+                    {ex.repsCibleMax
+                      ? `${ex.repsCible}-${ex.repsCibleMax}`
+                      : ex.repsCible}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onStart();
+            }}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white active:scale-[0.98] transition-transform"
+            style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
           >
             <Play size={14} fill="white" />
             Démarrer la séance

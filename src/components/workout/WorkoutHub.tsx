@@ -107,8 +107,8 @@ export default function WorkoutHub({ data }: Props) {
     <div>
       {/* Section label */}
       <div
-        className="text-[9px] font-bold tracking-[0.22em] uppercase mb-3"
-        style={{ color: "var(--text-muted)", padding: "2px 2px 0" }}
+        className="text-[9px] font-bold tracking-[0.1em] uppercase mb-2.5"
+        style={{ color: "#A8A29E" }}
       >
         Mes routines
       </div>
@@ -122,14 +122,16 @@ export default function WorkoutHub({ data }: Props) {
           <button
             key={f}
             onClick={() => setFiltre(f)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${filtre === f ? "btn-accent" : ""}`}
+            className="shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all active:scale-95"
             style={
               filtre === f
-                ? undefined
+                ? {
+                    background: "linear-gradient(135deg, #c4a882, #a0785c)",
+                    color: "#fff",
+                  }
                 : {
-                    background: "rgba(0,0,0,0.06)",
-                    color: "var(--text-secondary)",
-                    border: "1px solid rgba(0,0,0,0.07)",
+                    background: "rgba(74,55,40,0.06)",
+                    color: "#78716C",
                   }
             }
           >
@@ -140,7 +142,7 @@ export default function WorkoutHub({ data }: Props) {
 
       {/* Liste routines */}
       {routinesFiltrees.length > 0 && (
-        <div className="space-y-2.5">
+        <div>
           {routinesFiltrees.map((routine) => (
             <RoutineCard
               key={routine.id}

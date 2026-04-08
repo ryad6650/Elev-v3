@@ -44,9 +44,9 @@ function HistoriqueRow({
 
   const deltaColor =
     delta === null || delta === 0
-      ? "var(--text-muted)"
+      ? "var(--text-secondary)"
       : delta < 0
-        ? "#74BF7A"
+        ? "#74bf7a"
         : "#E87C6A";
 
   const deltaText =
@@ -61,28 +61,28 @@ function HistoriqueRow({
   return (
     <div
       onClick={onEdit}
-      className="transition-opacity"
       style={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        padding: "8px 0",
-        borderBottom: "1px solid var(--border)",
+        padding: "7px 0",
+        borderBottom: "1px solid rgba(74,55,40,0.05)",
         opacity: isPending ? 0.4 : 1,
         cursor: "pointer",
       }}
     >
       <span
         style={{
-          fontSize: 11,
-          fontWeight: 500,
-          color: "var(--text-secondary)",
+          fontSize: 10,
+          color: "var(--text-muted)",
+          width: 55,
+          flexShrink: 0,
         }}
       >
         {formatDateShort(entry.date)}
       </span>
       <span
         style={{
+          flex: 1,
           fontSize: 13,
           fontWeight: 700,
           color: "var(--text-primary)",
@@ -93,7 +93,7 @@ function HistoriqueRow({
       <span
         style={{
           fontSize: 10,
-          fontWeight: 600,
+          fontWeight: 700,
           color: deltaColor,
         }}
       >
@@ -110,22 +110,14 @@ export default function PoidsHistorique({ entries, onEdit, onDeleted }: Props) {
   if (recent.length === 0) return null;
 
   return (
-    <div
-      className="mb-2.5"
-      style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: "14px 16px",
-      }}
-    >
+    <div style={{ padding: "14px 0" }}>
       <div
         style={{
-          fontSize: 9,
+          fontSize: 8,
           fontWeight: 700,
           color: "var(--text-secondary)",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
           marginBottom: 4,
         }}
       >

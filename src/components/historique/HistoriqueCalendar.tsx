@@ -8,7 +8,7 @@ interface Props {
   streakActuel: number;
 }
 
-const JOURS = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
+const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const MOIS = [
   "Janvier",
   "Février",
@@ -23,6 +23,14 @@ const MOIS = [
   "Novembre",
   "Décembre",
 ];
+
+const glassStyle = {
+  background: "rgba(255,255,255,0.35)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  border: "1px solid rgba(255,255,255,0.3)",
+  boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
+} as const;
 
 export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
   const today = new Date();
@@ -52,11 +60,8 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
   return (
     <div
-      className="rounded-[20px] p-4 mb-2.5"
-      style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border)",
-      }}
+      className="rounded-2xl mb-2.5"
+      style={{ ...glassStyle, padding: "12px 14px" }}
     >
       {/* Navigation mois */}
       <div className="flex items-center justify-between mb-2.5">
@@ -64,24 +69,24 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
           style={{
             fontFamily: "var(--font-dm-serif)",
             fontStyle: "italic",
-            fontSize: "16px",
+            fontSize: "14px",
             color: "var(--text-primary)",
           }}
         >
           {MOIS[mois]} {annee}
         </span>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           <button
             onClick={() => navMois(-1)}
             className="flex items-center justify-center transition-colors"
             style={{
               width: 24,
               height: 24,
-              borderRadius: 8,
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              color: "var(--text-secondary)",
+              borderRadius: "50%",
+              background: "rgba(74,55,40,0.07)",
+              color: "var(--text-muted)",
               fontSize: "11px",
+              border: "none",
             }}
           >
             ‹
@@ -92,11 +97,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
             style={{
               width: 24,
               height: 24,
-              borderRadius: 8,
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              color: "var(--text-secondary)",
+              borderRadius: "50%",
+              background: "rgba(74,55,40,0.07)",
+              color: "var(--text-muted)",
               fontSize: "11px",
+              border: "none",
             }}
           >
             ›
@@ -111,10 +116,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
             key={i}
             className="text-center py-0.5"
             style={{
-              fontSize: "8px",
+              fontSize: "7px",
               fontWeight: 700,
-              color: "var(--text-muted)",
-              letterSpacing: "0.08em",
+              color: "var(--text-secondary)",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
             }}
           >
             {j}
@@ -137,18 +143,22 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
               key={dateStr}
               className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded-lg relative"
               style={{
-                fontSize: "10px",
-                fontWeight: 500,
-                color: isToday ? "#FAFAF9" : "var(--text-secondary)",
-                background: isToday ? "var(--accent)" : "transparent",
-                border: isToday ? "1px solid rgba(116,191,122,0.25)" : "none",
-                boxShadow: isToday ? "0 2px 10px rgba(27,46,29,0.5)" : "none",
+                fontSize: "9px",
+                fontWeight: isToday ? 700 : 500,
+                color: isToday ? "#fff" : "var(--text-muted)",
+                background: isToday
+                  ? "linear-gradient(135deg, #c4a882, #a0785c)"
+                  : "transparent",
               }}
             >
               {day}
               {hasSession && (
                 <div
                   style={{
+                    position: "absolute",
+                    bottom: 1,
+                    left: "50%",
+                    transform: "translateX(-50%)",
                     width: 4,
                     height: 4,
                     borderRadius: "50%",
@@ -163,23 +173,14 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
       {/* Streak */}
       <div
-        className="flex items-center gap-1.5 mt-2 pt-2"
+        className="text-center mt-2"
         style={{
-          borderTop: "1px solid var(--border)",
+          fontSize: "10px",
+          fontWeight: 600,
+          color: "var(--text-muted)",
         }}
       >
-        <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>
-          🔥 Streak actuel :
-        </span>
-        <span
-          style={{
-            fontSize: "10px",
-            fontWeight: 700,
-            color: "var(--accent-text)",
-          }}
-        >
-          {streakActuel} jour{streakActuel > 1 ? "s" : ""}
-        </span>
+        🔥 Streak actuel : {streakActuel} jour{streakActuel > 1 ? "s" : ""}
       </div>
     </div>
   );

@@ -40,62 +40,65 @@ export default function PoidsHero({
 
   return (
     <div
-      className="mb-2.5"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
-        borderRadius: 20,
-        padding: "16px 18px",
-        textAlign: "center",
+        padding: "12px 0 18px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        borderBottom: "1px solid rgba(74,55,40,0.08)",
+        marginBottom: 6,
       }}
     >
       {/* Poids actuel — gros chiffre centré */}
-      <div style={{ padding: "4px 0 2px" }}>
-        <div>
-          <span
-            style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontSize: 56,
-              color: "var(--text-primary)",
-              lineHeight: 1,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {poidsActuel ?? "—"}
-          </span>
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 500,
-              color: "var(--text-muted)",
-              marginLeft: 2,
-            }}
-          >
-            kg
-          </span>
-        </div>
-        {delta !== null && (
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              marginTop: 6,
-              fontSize: 12,
-              fontWeight: 700,
-              padding: "3px 10px",
-              borderRadius: 20,
-              color: delta <= 0 ? "#74BF7A" : "#E87C6A",
-              background:
-                delta <= 0
-                  ? "rgba(116,191,122,0.12)"
-                  : "rgba(232,124,106,0.12)",
-            }}
-          >
-            {delta <= 0 ? "↓" : "↑"} {Math.abs(delta)} kg
-          </div>
-        )}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 6,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontSize: 52,
+            color: "var(--text-primary)",
+            letterSpacing: "-0.03em",
+            lineHeight: 1,
+          }}
+        >
+          {poidsActuel ?? "—"}
+        </span>
+        <span
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: "var(--text-muted)",
+          }}
+        >
+          kg
+        </span>
       </div>
+
+      {/* Delta badge */}
+      {delta !== null && (
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 3,
+            padding: "3px 10px",
+            marginTop: 8,
+            borderRadius: 20,
+            fontSize: 11,
+            fontWeight: 700,
+            color: delta <= 0 ? "#74bf7a" : "#E87C6A",
+            background:
+              delta <= 0 ? "rgba(116,191,122,0.12)" : "rgba(232,124,106,0.12)",
+          }}
+        >
+          {delta <= 0 ? "↓" : "↑"} {Math.abs(delta)} kg cette semaine
+        </div>
+      )}
 
       {/* Saisie inline */}
       <div
@@ -103,8 +106,7 @@ export default function PoidsHero({
           display: "flex",
           alignItems: "center",
           gap: 8,
-          marginTop: 12,
-          justifyContent: "center",
+          marginTop: 16,
         }}
       >
         <input
@@ -122,34 +124,40 @@ export default function PoidsHero({
           className="outline-none"
           style={{
             width: 90,
-            height: 36,
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border)",
-            borderRadius: 12,
-            fontFamily: "var(--font-dm-sans)",
-            fontSize: 15,
-            fontWeight: 600,
+            padding: "10px 14px",
+            borderRadius: 14,
+            border: "1px solid rgba(74,55,40,0.12)",
+            background: "rgba(255,255,255,0.5)",
+            fontSize: 18,
+            fontWeight: 700,
             color: "var(--text-primary)",
             textAlign: "center",
+            fontFamily: "var(--font-dm-serif)",
           }}
         />
+        <span
+          style={{
+            fontSize: 13,
+            color: "var(--text-muted)",
+            fontWeight: 600,
+          }}
+        >
+          kg
+        </span>
         <button
           onClick={handleSave}
           disabled={isPending || !value}
           className="active:scale-95 transition-transform"
           style={{
-            height: 36,
-            padding: "0 16px",
-            background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
-            border: "1px solid rgba(116,191,122,0.25)",
-            borderRadius: 12,
+            padding: "10px 18px",
+            borderRadius: 14,
+            background:
+              "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
+            color: "#fff",
             fontSize: 12,
             fontWeight: 700,
-            color: "#FAFAF9",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 2px 12px rgba(27,46,29,0.4)",
+            border: "none",
+            letterSpacing: "0.02em",
             opacity: isPending || !value ? 0.5 : 1,
             cursor: isPending || !value ? "not-allowed" : "pointer",
           }}
@@ -159,13 +167,7 @@ export default function PoidsHero({
       </div>
 
       {error && (
-        <p
-          style={{
-            fontSize: 12,
-            marginTop: 8,
-            color: "var(--danger)",
-          }}
-        >
+        <p style={{ fontSize: 12, marginTop: 8, color: "var(--danger)" }}>
           {error}
         </p>
       )}

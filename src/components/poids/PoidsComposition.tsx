@@ -66,23 +66,21 @@ export default function PoidsComposition({
 
   return (
     <div
-      className="mb-2.5"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: "14px 16px",
+        padding: "14px 0",
+        borderBottom: "1px solid rgba(74,55,40,0.08)",
+        marginBottom: 6,
       }}
     >
       {/* Label */}
       <div
         style={{
-          fontSize: 9,
+          fontSize: 8,
           fontWeight: 700,
           color: "var(--text-secondary)",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
-          marginBottom: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          marginBottom: 8,
         }}
       >
         Indice de masse corporelle
@@ -92,7 +90,7 @@ export default function PoidsComposition({
       <div
         style={{
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "baseline",
           gap: 8,
           marginBottom: 10,
         }}
@@ -100,10 +98,10 @@ export default function PoidsComposition({
         <span
           style={{
             fontFamily: "var(--font-dm-serif)",
-            fontSize: 36,
+            fontSize: 32,
             color: "var(--text-primary)",
-            lineHeight: 1,
             letterSpacing: "-0.02em",
+            lineHeight: 1,
           }}
         >
           {imc}
@@ -112,9 +110,8 @@ export default function PoidsComposition({
           style={{
             fontSize: 9,
             fontWeight: 700,
-            padding: "3px 8px",
-            borderRadius: 10,
-            marginBottom: 5,
+            padding: "2px 8px",
+            borderRadius: 8,
             color: cat.color,
             background: cat.bgColor,
           }}
@@ -123,52 +120,35 @@ export default function PoidsComposition({
         </span>
       </div>
 
-      {/* Barre IMC + dot — même conteneur pour alignement parfait */}
-      <div style={{ position: "relative", height: 6, marginBottom: 16 }}>
-        {/* Segments colorés via gradient linéaire */}
+      {/* Barre IMC gradient continu */}
+      <div style={{ position: "relative", height: 5, marginBottom: 6 }}>
         <div
           style={{
             position: "absolute",
             inset: 0,
-            borderRadius: 3,
-            background: [
-              `linear-gradient(to right,`,
-              `rgba(106,182,220,0.25) 0%,`,
-              `rgba(106,182,220,0.25) ${(2.5 / 24) * 100}%,`,
-              `transparent ${(2.5 / 24) * 100}%,`,
-              `transparent calc(${(2.5 / 24) * 100}% + 1px),`,
-              `rgba(74,155,84,0.3) calc(${(2.5 / 24) * 100}% + 1px),`,
-              `rgba(74,155,84,0.3) ${(9 / 24) * 100}%,`,
-              `transparent ${(9 / 24) * 100}%,`,
-              `transparent calc(${(9 / 24) * 100}% + 1px),`,
-              `rgba(200,160,85,0.25) calc(${(9 / 24) * 100}% + 1px),`,
-              `rgba(200,160,85,0.25) ${(14 / 24) * 100}%,`,
-              `transparent ${(14 / 24) * 100}%,`,
-              `transparent calc(${(14 / 24) * 100}% + 1px),`,
-              `rgba(232,124,106,0.25) calc(${(14 / 24) * 100}% + 1px),`,
-              `rgba(232,124,106,0.25) 100%)`,
-            ].join(" "),
+            borderRadius: 99,
+            background:
+              "linear-gradient(90deg, #6BA3D6 0%, #74BF7A 30%, #C8A055 65%, #E87C6A 100%)",
           }}
         />
-        {/* Dot — positionné dans le même conteneur */}
+        {/* Curseur */}
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: -4,
             left: `${cursorPct}%`,
-            width: 10,
-            height: 10,
+            width: 12,
+            height: 12,
             borderRadius: "50%",
-            background: "#FAFAF9",
-            border: `2px solid ${cat.color}`,
-            boxShadow: `0 0 8px ${cat.color}80`,
-            transform: "translate(-50%, -50%)",
-            zIndex: 1,
+            background: "#fff",
+            border: `2.5px solid ${cat.color}`,
+            boxShadow: `0 0 6px ${cat.color}66`,
+            transform: "translateX(-50%)",
           }}
         />
       </div>
 
-      {/* Bar labels */}
+      {/* Échelle */}
       <div
         style={{
           display: "flex",
@@ -180,9 +160,7 @@ export default function PoidsComposition({
             key={v}
             style={{
               fontSize: 7,
-              fontWeight: 600,
-              color: "var(--text-muted)",
-              letterSpacing: "0.03em",
+              color: "var(--text-secondary)",
             }}
           >
             {v}
@@ -199,7 +177,7 @@ export default function PoidsComposition({
             gap: 8,
             marginTop: 10,
             paddingTop: 10,
-            borderTop: "1px solid var(--border)",
+            borderTop: "1px solid rgba(74,55,40,0.06)",
           }}
         >
           <span
@@ -227,7 +205,7 @@ export default function PoidsComposition({
                 fontWeight: 600,
                 padding: "2px 6px",
                 borderRadius: 4,
-                background: "var(--bg-card)",
+                background: "rgba(74,55,40,0.06)",
                 color: "var(--text-muted)",
               }}
             >

@@ -163,7 +163,7 @@ export default function ExerciseSearch({
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col"
-      style={{ background: "var(--bg-primary)" }}
+      style={{ background: "var(--bg-gradient)" }}
     >
       {/* Header */}
       <div

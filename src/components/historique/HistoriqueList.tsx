@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { ArrowRight } from "lucide-react";
 import type { HistoriqueWorkout } from "@/lib/historique";
 
 interface Props {
@@ -25,10 +24,7 @@ function formatDate(dateStr: string): string {
 }
 
 function formatVolume(v: number): string {
-  if (v >= 1000) {
-    const formatted = new Intl.NumberFormat("fr-FR").format(v);
-    return formatted;
-  }
+  if (v >= 1000) return new Intl.NumberFormat("fr-FR").format(v);
   return String(v);
 }
 
@@ -46,7 +42,7 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
 
   if (workouts.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 mb-2.5">
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           Aucune séance enregistrée.
         </p>
@@ -55,10 +51,31 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
   }
 
   return (
-    <div className="space-y-2.5">
-      {grouped.map(({ items }) =>
-        items.map((w) => <WorkoutItem key={w.id} w={w} onSelect={onSelect} />),
-      )}
+    <div className="mb-2.5">
+      {grouped.map(({ label, items }) => (
+        <div key={label}>
+          <div
+            className="font-bold uppercase"
+            style={{
+              fontSize: "8px",
+              letterSpacing: "0.1em",
+              color: "var(--text-secondary)",
+              marginBottom: 6,
+              marginTop: 4,
+            }}
+          >
+            {label}
+          </div>
+          {items.map((w, idx) => (
+            <WorkoutItem
+              key={w.id}
+              w={w}
+              onSelect={onSelect}
+              isLast={idx === items.length - 1}
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -66,66 +83,73 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
 function WorkoutItem({
   w,
   onSelect,
+  isLast,
 }: {
   w: HistoriqueWorkout;
   onSelect?: (id: string) => void;
+  isLast: boolean;
 }) {
   return (
     <div
-      className="relative flex items-center gap-2.5 cursor-pointer active:scale-[0.98] transition-transform"
+      className="flex items-center gap-2 cursor-pointer active:opacity-70 transition-opacity"
       style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: "12px 14px 12px 18px",
+        padding: "10px 0",
+        borderBottom: isLast ? "none" : "1px solid rgba(74,55,40,0.08)",
       }}
       onClick={() => onSelect?.(w.id)}
     >
-      {/* Barre verte gauche */}
+      {/* Barre accent gradient */}
       <div
-        className="absolute rounded-sm"
         style={{
-          left: 8,
-          top: 10,
-          bottom: 10,
-          width: 2,
-          background: "#74BF7A",
+          width: 3,
+          height: 36,
+          borderRadius: 2,
+          background: "linear-gradient(180deg, #c4a882, #a0785c)",
+          flexShrink: 0,
         }}
       />
 
       <div className="flex-1 min-w-0">
         <div
-          className="font-bold truncate leading-tight"
-          style={{ fontSize: "15px", color: "var(--text-primary)" }}
+          className="truncate"
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            fontSize: "13px",
+            color: "var(--text-primary)",
+            marginBottom: 2,
+          }}
         >
           {w.routineNom ?? "Séance libre"}
         </div>
         <div
-          style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: 2 }}
+          style={{
+            fontSize: "9px",
+            color: "var(--text-muted)",
+            marginBottom: 4,
+          }}
         >
           {formatDate(w.date)}
         </div>
-        <div className="flex gap-1 mt-1.5">
-          {w.duree_minutes != null && <Chip label={`${w.duree_minutes} MIN`} />}
+        <div className="flex gap-1.5">
+          {w.duree_minutes != null && <Chip label={`${w.duree_minutes} min`} />}
           {w.exercises.length > 0 && (
-            <Chip label={`${w.exercises.length} EXOS`} />
+            <Chip label={`${w.exercises.length} exos`} />
           )}
-          {w.volume > 0 && <Chip label={`${formatVolume(w.volume)} KG`} />}
+          {w.volume > 0 && <Chip label={`${formatVolume(w.volume)} kg`} />}
         </div>
       </div>
 
       {/* Flèche */}
-      <div
-        className="flex items-center justify-center shrink-0"
+      <span
         style={{
-          width: 28,
-          height: 28,
-          borderRadius: "50%",
-          background: "var(--bg-card)",
+          fontSize: "12px",
+          color: "var(--text-secondary)",
+          flexShrink: 0,
         }}
       >
-        <ArrowRight size={11} style={{ color: "var(--text-muted)" }} />
-      </div>
+        ›
+      </span>
     </div>
   );
 }
@@ -133,14 +157,14 @@ function WorkoutItem({
 function Chip({ label }: { label: string }) {
   return (
     <span
-      className="font-semibold"
+      className="font-bold uppercase"
       style={{
-        fontSize: "8px",
-        color: "var(--text-secondary)",
-        background: "var(--bg-card)",
-        borderRadius: 4,
-        padding: "2px 6px",
-        letterSpacing: "0.05em",
+        fontSize: "7px",
+        letterSpacing: "0.04em",
+        color: "var(--text-muted)",
+        background: "rgba(74,55,40,0.06)",
+        borderRadius: 6,
+        padding: "2px 7px",
       }}
     >
       {label}

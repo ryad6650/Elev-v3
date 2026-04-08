@@ -30,9 +30,10 @@ export default function ActiveWorkout() {
     (s) => s.activeWorkout?.routineName ?? null,
   );
   const debutAt = useWorkoutStore((s) => s.activeWorkout?.debutAt ?? 0);
-  const exerciseUids = useWorkoutStore(
-    useShallow((s) => s.activeWorkout?.exercises.map((e) => e.uid) ?? []),
+  const exercises = useWorkoutStore(
+    useShallow((s) => s.activeWorkout?.exercises ?? []),
   );
+  const exerciseUids = exercises.map((e) => e.uid);
   const minimizeWorkout = useWorkoutStore((s) => s.minimizeWorkout);
   const replaceExercise = useWorkoutStore((s) => s.replaceExercise);
   const [showSearch, setShowSearch] = useState(false);
@@ -89,7 +90,7 @@ export default function ActiveWorkout() {
     <>
       <div
         className="min-h-dvh flex flex-col"
-        style={{ background: "var(--bg-primary)" }}
+        style={{ background: "var(--bg-gradient)" }}
       >
         {/* Header */}
         <div
@@ -102,27 +103,26 @@ export default function ActiveWorkout() {
           <div className="flex items-center justify-between mb-1">
             <button
               onClick={minimizeWorkout}
-              className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center shrink-0"
+              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
               style={{
-                background: "var(--glass-subtle)",
-                border: "1px solid var(--glass-border)",
+                background: "rgba(74,55,40,0.07)",
               }}
             >
               <ChevronLeft size={14} style={{ color: "var(--text-muted)" }} />
             </button>
             <span
-              className="text-[9px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: "var(--accent-text)", opacity: 0.8 }}
+              className="text-[9px] font-bold uppercase tracking-[0.1em]"
+              style={{ color: "var(--text-muted)" }}
             >
               {routineName ?? "Séance libre"}
             </span>
             <button
               onClick={() => setShowSummary(true)}
-              className="text-[10px] font-bold tracking-[0.02em] rounded-lg px-2.5 py-1.5"
+              className="text-[9px] font-bold tracking-[0.04em] rounded-[20px] px-3 py-[5px] border-none"
               style={{
-                color: "#E87C6A",
-                background: "rgba(232,124,106,0.08)",
-                border: "1px solid rgba(232,124,106,0.15)",
+                background:
+                  "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
+                color: "#fff",
               }}
             >
               Terminer
@@ -131,7 +131,7 @@ export default function ActiveWorkout() {
 
           {/* Titre */}
           <h1
-            className="text-[28px] leading-[1.05] italic tracking-[-0.02em]"
+            className="text-[26px] leading-[1.1] italic tracking-[-0.01em]"
             style={{
               fontFamily: "var(--font-dm-serif)",
               color: "var(--text-primary)",
@@ -148,21 +148,22 @@ export default function ActiveWorkout() {
         >
           {/* Timer card */}
           <div
-            className="flex items-center gap-3.5 px-4 py-3 rounded-2xl"
+            className="flex items-center justify-between px-3.5 py-3 rounded-2xl"
             style={{
-              background: "var(--glass-bg)",
+              background: "rgba(255,255,255,0.35)",
               backdropFilter: "blur(16px)",
               WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid var(--glass-border)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
             }}
           >
-            <div className="flex-1">
-              <p
-                className="text-[9px] font-semibold uppercase tracking-[0.12em] mb-0.5"
-                style={{ color: "var(--text-muted)" }}
+            <div className="flex flex-col">
+              <span
+                className="text-[8px] font-bold uppercase tracking-[0.1em]"
+                style={{ color: "var(--text-secondary)" }}
               >
                 Durée séance
-              </p>
+              </span>
               <WorkoutTimer
                 startedAt={debutAt}
                 pausedAt={pausedAt}
@@ -173,21 +174,20 @@ export default function ActiveWorkout() {
             <div className="flex gap-1.5">
               <button
                 onClick={isPaused ? handleResume : handlePause}
-                className="w-[34px] h-[34px] rounded-xl flex items-center justify-center"
+                className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{
-                  background: "var(--glass-subtle)",
-                  border: "1px solid var(--glass-border)",
+                  background: "rgba(74,55,40,0.08)",
                 }}
               >
                 {isPaused ? (
                   <Play
-                    size={14}
+                    size={13}
                     fill="var(--text-muted)"
                     style={{ color: "var(--text-muted)" }}
                   />
                 ) : (
                   <Pause
-                    size={14}
+                    size={13}
                     fill="var(--text-muted)"
                     style={{ color: "var(--text-muted)" }}
                   />
@@ -195,6 +195,23 @@ export default function ActiveWorkout() {
               </button>
             </div>
           </div>
+
+          {/* Section label */}
+          {exerciseUids.length > 0 && (
+            <p
+              className="text-[8px] font-bold uppercase tracking-[0.1em] mt-1"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              Exercices ·{" "}
+              {(() => {
+                const done = exercises.filter((e) => {
+                  const work = e.sets.filter((s) => !s.isWarmup);
+                  return work.length > 0 && work.every((s) => s.completed);
+                }).length;
+                return `${done}/${exercises.length}`;
+              })()}
+            </p>
+          )}
 
           {/* Exercices */}
           {exerciseUids.length === 0 && (
@@ -226,14 +243,14 @@ export default function ActiveWorkout() {
         {exerciseUids.length > 0 && (
           <button
             onClick={() => setShowSearch(true)}
-            className="fixed bottom-[78px] right-4 z-20 w-11 h-11 rounded-[14px] flex items-center justify-center"
+            className="fixed bottom-[62px] right-6 z-20 w-10 h-10 rounded-full flex items-center justify-center border-none"
             style={{
-              background: "linear-gradient(135deg, #1B2E1D, #2d4a2f)",
-              border: "1px solid rgba(116,191,122,0.3)",
-              boxShadow: "0 4px 20px rgba(27,46,29,0.6)",
+              background:
+                "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
+              boxShadow: "0 4px 16px rgba(160,120,92,0.3)",
             }}
           >
-            <Plus size={20} color="#fff" />
+            <Plus size={20} color="#fff" strokeWidth={1.5} />
           </button>
         )}
 

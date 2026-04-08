@@ -24,7 +24,6 @@ function getDateFr(): string {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
     })
     .replace(/^\w/, (c) => c.toUpperCase());
 }
@@ -49,102 +48,63 @@ export default function WorkoutPageClient({
 
   return (
     <main
-      className="px-4 pt-5 pb-28 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto" }}
+      className="px-5 pt-3.5 pb-28 page-enter"
+      style={{ maxWidth: 430, margin: "0 auto" }}
     >
-      {/* Header — style greeting mockup crème */}
-      <div className="mb-4" style={{ padding: "0 6px" }}>
-        <div className="flex items-center justify-between mb-1">
-          <span
-            className="text-[11px] font-medium tracking-[0.05em]"
-            style={{ color: "var(--accent)", opacity: 0.7 }}
-          >
-            {getDateFr()}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowSearch(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-              style={{
-                background: "rgba(0,0,0,0.06)",
-                border: "1px solid rgba(0,0,0,0.07)",
-              }}
-            >
-              <Search size={15} style={{ color: "var(--text-secondary)" }} />
-            </button>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-              style={{
-                background: "rgba(0,0,0,0.06)",
-                border: "1px solid rgba(0,0,0,0.07)",
-              }}
-            >
-              <Plus
-                size={17}
-                strokeWidth={2.5}
-                style={{ color: "var(--text-primary)" }}
-              />
-            </button>
-          </div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <span
+          className="text-[9px] font-bold tracking-[0.12em] uppercase"
+          style={{ color: "#78716C" }}
+        >
+          {getDateFr()}
+        </span>
+        <div className="flex gap-2">
+          <RoundBtn onClick={() => setShowSearch(true)}>
+            <Search size={13} style={{ color: "#78716C" }} />
+          </RoundBtn>
+          <RoundBtn onClick={() => setShowCreate(true)}>
+            <Plus size={15} strokeWidth={2.5} style={{ color: "#78716C" }} />
+          </RoundBtn>
         </div>
-        <p
-          className="text-sm"
-          style={{ color: "var(--text-secondary)", lineHeight: 1 }}
-        >
-          Mes
-        </p>
-        <h1
-          className="leading-none"
-          style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontSize: 48,
-            color: "var(--text-primary)",
-            letterSpacing: "-0.025em",
-            lineHeight: 1.02,
-          }}
-        >
-          Séances.
-        </h1>
       </div>
+      <h1
+        className="leading-tight mb-[18px]"
+        style={{
+          fontFamily: "var(--font-dm-serif)",
+          fontStyle: "italic",
+          fontSize: 30,
+          color: "#4A3728",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        Mes Séances.
+      </h1>
 
       {/* Timeline semaine */}
-      <div className="mb-2.5">
+      <div className="mb-[18px]">
         <WorkoutWeekTimeline
           historique={initialWorkoutData.historique}
           programmeActif={initialProgrammesData.programmeActif}
         />
       </div>
 
-      {/* CTAs */}
-      <div className="flex gap-2.5 mb-2.5">
-        <button
+      {/* Quick Actions */}
+      <div className="flex gap-2.5 mb-4">
+        <QuickBtn
+          icon="⚡"
+          label="Séance libre"
+          sub="Sans routine"
           onClick={() => startWorkout({ routineId: null, routineName: null })}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-[14px] font-semibold text-[12px] transition-all active:scale-[0.98]"
-          style={{
-            background: "var(--glass-bg)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid var(--glass-border)",
-            color: "var(--accent)",
-          }}
-        >
-          Séance libre
-        </button>
-        <button
+        />
+        <QuickBtn
+          icon="📋"
+          label="Programme"
+          sub={
+            initialProgrammesData.programmeActif?.nom ?? "Voir mes programmes"
+          }
           onClick={() => setShowProgrammes((v) => !v)}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-[14px] font-semibold text-[12px] transition-all active:scale-[0.98]"
-          style={{
-            background: "var(--glass-bg)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid var(--glass-border)",
-            color: "var(--accent)",
-          }}
-        >
-          Programme
-        </button>
+        />
       </div>
 
       {showProgrammes && (
@@ -163,5 +123,57 @@ export default function WorkoutPageClient({
         />
       )}
     </main>
+  );
+}
+
+function RoundBtn({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+      style={{ background: "rgba(74,55,40,0.07)" }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function QuickBtn({
+  icon,
+  label,
+  sub,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  sub: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex-1 py-3.5 px-2.5 rounded-[18px] text-center active:scale-[0.98] transition-transform"
+      style={{
+        background: "rgba(255,255,255,0.35)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(255,255,255,0.3)",
+        boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
+      }}
+    >
+      <div className="text-[18px] mb-1">{icon}</div>
+      <div className="text-[10px] font-bold" style={{ color: "#4A3728" }}>
+        {label}
+      </div>
+      <div className="text-[8px] mt-0.5" style={{ color: "#78716C" }}>
+        {sub}
+      </div>
+    </button>
   );
 }

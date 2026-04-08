@@ -12,7 +12,7 @@ const PERIODES: { key: Periode; label: string; days: number }[] = [
 ];
 
 const W = 240;
-const H = 130;
+const H = 100;
 const PAD = { top: 8, right: 8, bottom: 4, left: 28 };
 const innerW = W - PAD.left - PAD.right;
 const innerH = H - PAD.top - PAD.bottom;
@@ -87,12 +87,11 @@ export default function PoidsChart({ entries }: Props) {
   if (entries.length === 0) {
     return (
       <div
-        className="flex items-center justify-center mb-2.5"
+        className="flex items-center justify-center"
         style={{
-          background: "var(--bg-secondary)",
-          border: "1px solid var(--border)",
-          borderRadius: 20,
-          padding: "16px 18px",
+          padding: "14px 0",
+          borderBottom: "1px solid rgba(74,55,40,0.08)",
+          marginBottom: 6,
           height: 80,
         }}
       >
@@ -105,50 +104,44 @@ export default function PoidsChart({ entries }: Props) {
 
   return (
     <div
-      className="mb-2.5"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
-        borderRadius: 20,
-        padding: "16px 18px",
+        padding: "14px 0",
+        borderBottom: "1px solid rgba(74,55,40,0.08)",
+        marginBottom: 6,
       }}
     >
       {/* Label */}
       <div
         style={{
-          fontSize: 9,
+          fontSize: 8,
           fontWeight: 700,
           color: "var(--text-secondary)",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
-          marginBottom: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          marginBottom: 8,
         }}
       >
         Évolution
       </div>
 
       {/* Period pills */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
         {PERIODES.map((p) => (
           <button
             key={p.key}
             onClick={() => setPeriode(p.key)}
             style={{
-              flex: 1,
-              textAlign: "center",
-              fontSize: 10,
-              fontWeight: 700,
-              color: periode === p.key ? "#FAFAF9" : "var(--text-muted)",
-              padding: "5px 0",
+              padding: "3px 10px",
               borderRadius: 8,
-              background:
-                periode === p.key ? "var(--accent)" : "var(--bg-card)",
-              border:
-                periode === p.key
-                  ? "1px solid rgba(116,191,122,0.2)"
-                  : "1px solid var(--border)",
-              letterSpacing: "0.02em",
+              fontSize: 9,
+              fontWeight: 700,
+              border: "none",
               cursor: "pointer",
+              color: periode === p.key ? "#fff" : "var(--text-muted)",
+              background:
+                periode === p.key
+                  ? "linear-gradient(135deg, var(--bar-from), var(--bar-to))"
+                  : "rgba(74,55,40,0.06)",
             }}
           >
             {p.label}
@@ -157,96 +150,78 @@ export default function PoidsChart({ entries }: Props) {
       </div>
 
       {/* SVG Chart */}
-      <div style={{ position: "relative", height: H, marginBottom: 4 }}>
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
-          style={{ width: "100%", height: "100%" }}
-        >
-          <defs>
-            <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4A9B54" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#4A9B54" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        style={{ width: "100%", height: 100 }}
+      >
+        <defs>
+          <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#a0785c" stopOpacity={0.25} />
+            <stop offset="100%" stopColor="#a0785c" stopOpacity={0} />
+          </linearGradient>
+        </defs>
 
-          {/* Grid lines */}
-          {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-            <line
-              key={t}
-              x1={0}
-              y1={PAD.top + innerH * t}
-              x2={W}
-              y2={PAD.top + innerH * t}
-              stroke="rgba(255,255,255,0.05)"
-              strokeWidth={0.5}
+        {/* Grid lines */}
+        {[0.2, 0.5, 0.8].map((t) => (
+          <line
+            key={t}
+            x1={0}
+            y1={PAD.top + innerH * t}
+            x2={W}
+            y2={PAD.top + innerH * t}
+            stroke="rgba(74,55,40,0.08)"
+            strokeWidth={0.5}
+          />
+        ))}
+
+        {chart ? (
+          <>
+            <path d={chart.areaPath} fill="url(#poidsGrad)" />
+            <path
+              d={chart.maPath}
+              fill="none"
+              stroke="#a0785c"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          ))}
-
-          {chart ? (
-            <>
-              <path d={chart.areaPath} fill="url(#poidsGrad)" />
-              <path
-                d={chart.maPath}
-                fill="none"
-                stroke="#4A9B54"
-                strokeWidth={2}
-                strokeLinecap="round"
-              />
-              {/* Dernier point */}
-              <circle
-                cx={chart.last.x}
-                cy={chart.last.y}
-                r={4}
-                fill="#4A9B54"
-                stroke="var(--bg-secondary)"
-                strokeWidth={2}
-              />
-            </>
-          ) : (
-            <text
-              x={W / 2}
-              y={H / 2}
-              textAnchor="middle"
-              fontSize={10}
-              fill="rgba(255,255,255,0.3)"
-            >
-              Pas assez de données
-            </text>
-          )}
-        </svg>
-
-        {/* Y labels */}
-        {chart && (
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              padding: "2px 0",
-              pointerEvents: "none",
-            }}
+            {/* Dernier point */}
+            <circle
+              cx={chart.last.x}
+              cy={chart.last.y}
+              r={4}
+              fill="#a0785c"
+              stroke="#fff"
+              strokeWidth={2}
+            />
+          </>
+        ) : (
+          <text
+            x={W / 2}
+            y={H / 2}
+            textAnchor="middle"
+            fontSize={10}
+            fill="var(--text-secondary)"
           >
-            {chart.yLabels.map((l) => (
-              <span
-                key={l.value}
-                style={{
-                  fontSize: 8,
-                  fontWeight: 600,
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                {l.value}
-              </span>
-            ))}
-          </div>
+            Pas assez de données
+          </text>
         )}
-      </div>
+
+        {/* Y labels dans le SVG */}
+        {chart?.yLabels.map((l) => (
+          <text
+            key={l.value}
+            x={2}
+            y={l.y + 3}
+            fontSize={7}
+            fill="var(--text-secondary)"
+            fontFamily="var(--font-dm-sans)"
+          >
+            {l.value}
+          </text>
+        ))}
+      </svg>
     </div>
   );
 }

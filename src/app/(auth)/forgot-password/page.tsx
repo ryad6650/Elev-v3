@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
     return (
       <div
         className="min-h-dvh flex flex-col items-center justify-center px-4 page-enter"
-        style={{ background: "var(--bg-primary)" }}
+        style={{ background: "var(--bg-gradient)" }}
       >
         <div className="w-full max-w-sm text-center">
           <div className="text-4xl mb-4">📧</div>
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
   return (
     <div
       className="min-h-dvh flex flex-col items-center justify-center px-4 page-enter"
-      style={{ background: "var(--bg-primary)" }}
+      style={{ background: "var(--bg-gradient)" }}
     >
       <div className="w-full max-w-sm">
         <h1

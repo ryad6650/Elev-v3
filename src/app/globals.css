@@ -2,7 +2,8 @@
 
 /* ===== SAFE AREA — PWA iOS ===== */
 html {
-  background: var(--bg-primary);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
 }
 
 body {
@@ -42,6 +43,10 @@ body {
   --glass-border: rgba(0, 0, 0, 0.07);
   --glass-subtle: rgba(0, 0, 0, 0.05);
 
+  /* Warm bar (workout actif) */
+  --bar-from: #c4a882;
+  --bar-to: #a0785c;
+
   --grad-workout: linear-gradient(135deg, #07100a 0%, #74bf7a 100%);
   --grad-btn-accent: linear-gradient(
     135deg,
@@ -52,6 +57,13 @@ body {
   --grad-sleep: linear-gradient(135deg, #0f1a12 0%, #1c1917 70%);
   --grad-header-line: linear-gradient(to right, #1b2e1d, #74bf7a, transparent);
   --grad-monday: linear-gradient(135deg, #1b2e1d22 0%, #f2e8d5 100%);
+  --bg-gradient: linear-gradient(
+    160deg,
+    #f2e8d5 0%,
+    #e5d8c2 30%,
+    #d5e2d0 65%,
+    #f2e8d5 100%
+  );
 }
 
 /* Contexte sombre (pages avec overlay image : dashboard) */
@@ -114,7 +126,7 @@ html {
 }
 
 body {
-  background: var(--bg-primary);
+  background: transparent;
   color: var(--text-primary);
   font-family: var(--font-dm-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;

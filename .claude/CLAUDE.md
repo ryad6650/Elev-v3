@@ -14,6 +14,10 @@ App mobile-first de suivi de musculation et nutrition. Utilisateur francophone, 
 - Hebergement Vercel
 - PWA manuelle (sw.js dans public/, pas de lib next-pwa)
 
+## Skills disponibles
+
+- Canvas Design : ~/.claude/skills/canvas-design/SKILL.md
+
 ## Structure des dossiers
 
 ```

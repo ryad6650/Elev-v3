@@ -18,10 +18,9 @@ interface Props {
   onClick?: () => void;
 }
 
-export default memo(function FoodItem({ entry, mealCalories, onClick }: Props) {
+export default memo(function FoodItem({ entry, onClick }: Props) {
   const n = calcNutrients(entry.aliment, entry.quantite_g);
   const color = dominantColor(entry);
-  const pct = mealCalories > 0 ? (n.calories / mealCalories) * 100 : 0;
 
   const qtyLabel =
     entry.quantite_portion != null
@@ -31,45 +30,35 @@ export default memo(function FoodItem({ entry, mealCalories, onClick }: Props) {
   return (
     <div
       className="flex items-center gap-2 active:opacity-70 transition-opacity"
-      style={{ cursor: onClick ? "pointer" : undefined }}
+      style={{
+        cursor: onClick ? "pointer" : undefined,
+        borderBottom: "1px solid rgba(74,55,40,0.05)",
+        padding: "6px 0",
+      }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
     >
       <div
-        className="w-[3px] self-stretch rounded-sm shrink-0"
-        style={{ background: color }}
+        className="w-[3px] rounded-sm shrink-0"
+        style={{ background: color, height: 28, alignSelf: "center" }}
       />
       <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between mb-1.5">
-          <span
-            className="text-xs font-semibold truncate mr-2"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {entry.aliment.nom}{" "}
-            <span
-              className="font-normal text-[11px]"
-              style={{ color: "var(--text-muted)" }}
-            >
-              · {qtyLabel}
-            </span>
-          </span>
-          <span
-            className="text-[10px] font-bold shrink-0"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {n.calories} kcal
-          </span>
-        </div>
         <div
-          className="w-full h-1 rounded-sm overflow-hidden"
-          style={{ background: "var(--border)" }}
+          className="text-[11px] font-semibold truncate"
+          style={{ color: "var(--text-primary)", lineHeight: 1.3 }}
         >
-          <div
-            className="h-full rounded-sm transition-all duration-500"
-            style={{ width: `${pct}%`, background: color, opacity: 0.6 }}
-          />
+          {entry.aliment.nom}
+        </div>
+        <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>
+          {qtyLabel}
         </div>
       </div>
+      <span
+        className="text-[10px] font-bold shrink-0"
+        style={{ color: "var(--text-primary)" }}
+      >
+        {n.calories} kcal
+      </span>
     </div>
   );
 });

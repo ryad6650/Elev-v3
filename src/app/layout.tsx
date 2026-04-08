@@ -56,14 +56,8 @@ export default function RootLayout({
           href={process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""}
         />
       </head>
-      <body
-        className="min-h-dvh flex items-start justify-center"
-        style={{ background: "var(--bg-primary)" }}
-      >
-        <div
-          className="relative w-full max-w-[430px] min-h-dvh overflow-x-hidden"
-          style={{ background: "var(--bg-primary)" }}
-        >
+      <body className="min-h-dvh flex items-start justify-center">
+        <div className="relative w-full max-w-[430px] min-h-dvh overflow-x-hidden">
           {children}
         </div>
       </body>

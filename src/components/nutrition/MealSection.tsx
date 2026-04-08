@@ -43,7 +43,7 @@ export default memo(function MealSection({
   onEntryDeleted,
   onFoodClick,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const total = sumEntries(meal.entries);
   const meta = MEAL_META[meal.meal_number] ?? {
     emoji: "🍽️",
@@ -53,114 +53,112 @@ export default memo(function MealSection({
   const pcts = isEmpty ? { g: 0, p: 0, l: 0 } : macroPercents(meal.entries);
 
   return (
-    <div>
+    <div style={{ marginBottom: 14 }}>
       {/* Header */}
       <button
-        className="w-full flex items-center justify-between mb-[7px] select-none"
+        className="w-full flex items-center gap-2 select-none"
+        style={{ marginBottom: 8 }}
         onClick={() => setExpanded((v) => !v)}
       >
-        <div className="flex items-center gap-[5px]">
-          <span className="text-[13px]">{meta.emoji}</span>
-          <span
-            className="text-sm"
-            style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
-              color: isEmpty ? "var(--text-muted)" : "var(--text-primary)",
-            }}
-          >
-            {meta.name}
-          </span>
-        </div>
-        <div className="flex items-center gap-[5px]">
-          <span
-            className="text-[10px] font-bold"
-            style={{
-              color: isEmpty ? "var(--text-muted)" : "var(--text-secondary)",
-            }}
-          >
-            {total.calories} kcal
-          </span>
-          <span
-            className="text-[9px] inline-block transition-transform duration-200"
-            style={{
-              color: "var(--text-muted)",
-              transform: expanded ? "rotate(0deg)" : "rotate(-90deg)",
-            }}
-          >
-            ▾
-          </span>
-        </div>
+        <span className="text-[16px]">{meta.emoji}</span>
+        <span
+          className="text-[15px] flex-1 text-left"
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            color: isEmpty ? "var(--text-muted)" : "var(--text-primary)",
+          }}
+        >
+          {meta.name}
+        </span>
+        <span
+          className="text-[11px] font-semibold"
+          style={{
+            color: "var(--text-muted)",
+          }}
+        >
+          {total.calories} kcal
+        </span>
+        <span
+          className="text-[10px] inline-block transition-transform duration-200"
+          style={{
+            color: "var(--text-secondary)",
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          ▼
+        </span>
       </button>
 
       {/* Macro bar — toujours visible */}
       {isEmpty ? (
         <div
-          className="h-[5px] rounded-[3px] mb-1"
+          className="rounded-full"
           style={{
-            background: "var(--border)",
-            border: "1px dashed var(--text-muted)",
-            opacity: 0.4,
+            height: 4,
+            border: "1px dashed rgba(74,55,40,0.15)",
+            marginBottom: 6,
           }}
         />
       ) : (
         <>
-          <div className="flex h-[5px] rounded-[3px] overflow-hidden mb-1.5">
-            <div style={{ flex: pcts.g, background: "var(--color-carbs)" }} />
+          <div
+            className="flex h-[5px] rounded-full overflow-hidden"
+            style={{
+              marginBottom: 6,
+              background: "rgba(74,55,40,0.1)",
+              gap: 1,
+            }}
+          >
             <div
-              style={{
-                flex: pcts.p,
-                background: "var(--color-protein)",
-                marginLeft: 1,
-              }}
+              className="rounded-full"
+              style={{ flex: pcts.g, background: "var(--color-carbs)" }}
             />
             <div
-              style={{
-                flex: pcts.l,
-                background: "var(--color-fat)",
-                marginLeft: 1,
-              }}
+              className="rounded-full"
+              style={{ flex: pcts.p, background: "var(--color-protein)" }}
+            />
+            <div
+              className="rounded-full"
+              style={{ flex: pcts.l, background: "var(--color-fat)" }}
             />
           </div>
 
           {/* Macro legend */}
-          <div className="flex gap-2.5 mb-2.5">
+          <div className="flex gap-2.5" style={{ marginBottom: 8 }}>
             {[
               {
                 l: "G",
                 v: total.glucides,
-                p: pcts.g,
                 c: "var(--color-carbs)",
               },
               {
                 l: "P",
                 v: total.proteines,
-                p: pcts.p,
                 c: "var(--color-protein)",
               },
               {
                 l: "L",
                 v: total.lipides,
-                p: pcts.l,
                 c: "var(--color-fat)",
               },
             ].map((m) => (
               <div key={m.l} className="flex items-center gap-1">
                 <div
-                  className="w-[7px] h-[7px] rounded-sm shrink-0"
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
                   style={{ background: m.c }}
                 />
                 <span
-                  className="text-[9px]"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {m.l} <b>{Math.round(m.v)}g</b>
-                </span>
-                <span
-                  className="text-[8px]"
+                  className="text-[9px] font-semibold"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  {m.p}%
+                  {m.l}
+                </span>
+                <span
+                  className="text-[9px] font-bold"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {Math.round(m.v)}g
                 </span>
               </div>
             ))}
@@ -171,7 +169,7 @@ export default memo(function MealSection({
       {/* Aliments — dépliés uniquement */}
       {expanded && (
         <>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col">
             {meal.entries.map((e) => (
               <FoodItem
                 key={e.id}
@@ -185,17 +183,23 @@ export default memo(function MealSection({
           {/* Add button */}
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 mt-0.5 active:opacity-60 transition-opacity"
+            className="flex items-center gap-[5px] active:opacity-60 transition-opacity"
+            style={{ padding: "6px 0", marginTop: 2 }}
           >
             <div
-              className="w-[3px] h-5 rounded-sm shrink-0"
-              style={{ background: "var(--border)" }}
-            />
-            <span
-              className="text-[11px] italic"
-              style={{ color: "var(--text-muted)" }}
+              className="w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
+              style={{
+                background: "rgba(116,191,122,0.12)",
+                color: "var(--accent-text)",
+              }}
             >
-              + Ajouter un aliment
+              +
+            </div>
+            <span
+              className="text-[10px] font-semibold"
+              style={{ color: "var(--accent-text)" }}
+            >
+              Ajouter un aliment
             </span>
           </button>
         </>

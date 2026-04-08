@@ -14,8 +14,8 @@ export interface MensurationsData {
 }
 
 const CHAMPS: { key: keyof MensurationsData; label: string }[] = [
-  { key: "cou", label: "Tour de cou" },
-  { key: "tour_taille", label: "Tour de taille" },
+  { key: "cou", label: "Cou" },
+  { key: "tour_taille", label: "Taille" },
   { key: "poitrine", label: "Poitrine" },
   { key: "hanches", label: "Hanches" },
   { key: "bras", label: "Bras" },
@@ -41,39 +41,43 @@ export default function MensurationsCard({ initial }: Props) {
 
   return (
     <div
-      className="mb-2.5"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: "14px 16px",
+        padding: "14px 0",
+        borderBottom: "1px solid rgba(74,55,40,0.08)",
+        marginBottom: 6,
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3.5">
-        <div
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 8,
+        }}
+      >
+        <span
           style={{
-            fontSize: 9,
+            fontSize: 8,
             fontWeight: 700,
             color: "var(--text-secondary)",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase" as const,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
           }}
         >
           Mensurations
-        </div>
+        </span>
         {editing ? (
           <button
             onClick={handleSave}
             disabled={isPending}
-            className="font-semibold rounded-full transition-colors"
             style={{
-              fontSize: "0.68rem",
-              padding: "5px 12px",
-              color: "var(--accent)",
-              background: "var(--accent-bg)",
-              border:
-                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
+              fontSize: 9,
+              fontWeight: 600,
+              color: "var(--accent-text)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
             }}
           >
             {isPending ? "…" : "Sauvegarder"}
@@ -81,14 +85,13 @@ export default function MensurationsCard({ initial }: Props) {
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="font-semibold rounded-full transition-colors"
             style={{
-              fontSize: "0.68rem",
-              padding: "5px 12px",
-              color: "var(--accent)",
-              background: "var(--accent-bg)",
-              border:
-                "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
+              fontSize: 9,
+              fontWeight: 600,
+              color: "var(--accent-text)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
             }}
           >
             Modifier
@@ -97,28 +100,42 @@ export default function MensurationsCard({ initial }: Props) {
       </div>
 
       {/* Grille 2 colonnes */}
-      <div className="grid grid-cols-2 gap-2">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 6,
+        }}
+      >
         {CHAMPS.map(({ key, label }) => (
           <div
             key={key}
-            className="rounded-[10px]"
             style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              padding: "10px 12px",
+              background: "rgba(255,255,255,0.5)",
+              borderRadius: 10,
+              padding: "8px 10px",
             }}
           >
             <div
               style={{
-                fontSize: "0.6rem",
-                color: "var(--text-muted)",
-                marginBottom: 3,
+                fontSize: 7,
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--text-secondary)",
+                marginBottom: 2,
               }}
             >
               {label}
             </div>
             {editing ? (
-              <div className="flex items-center gap-1">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
                 <input
                   type="number"
                   step="0.5"
@@ -131,18 +148,22 @@ export default function MensurationsCard({ initial }: Props) {
                       [key]: e.target.value ? parseFloat(e.target.value) : null,
                     }))
                   }
-                  className="w-full outline-none bg-transparent"
+                  className="outline-none"
                   style={{
-                    fontSize: "0.88rem",
-                    fontWeight: 600,
+                    width: "100%",
+                    background: "transparent",
+                    fontSize: 13,
+                    fontWeight: 700,
                     color: "var(--text-primary)",
+                    border: "none",
                   }}
                   placeholder="—"
                 />
                 <span
                   style={{
-                    fontSize: "0.65rem",
+                    fontSize: 9,
                     color: "var(--text-muted)",
+                    fontWeight: 500,
                     flexShrink: 0,
                   }}
                 >
@@ -150,11 +171,28 @@ export default function MensurationsCard({ initial }: Props) {
                 </span>
               </div>
             ) : (
-              <div
-                className="font-semibold"
-                style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}
-              >
-                {values[key] != null ? `${values[key]} cm` : "—"}
+              <div>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  {values[key] != null ? values[key] : "—"}
+                </span>
+                {values[key] != null && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      color: "var(--text-muted)",
+                      fontWeight: 500,
+                      marginLeft: 3,
+                    }}
+                  >
+                    cm
+                  </span>
+                )}
               </div>
             )}
           </div>

@@ -30,87 +30,87 @@ export default function RestTimer() {
   if (!restTimer?.active) return null;
 
   const progress = restTimer.duration > 0 ? remaining / restTimer.duration : 0;
-  const r = 16;
-  const circumference = 2 * Math.PI * r;
-  const dash = circumference * (1 - progress);
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
+      className="fixed bottom-14 left-5 right-5 z-40 flex items-center gap-3.5 px-4 py-3.5 rounded-[18px]"
       style={{
-        paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px) + 20px)",
+        background: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.5)",
+        boxShadow: "0 8px 32px rgba(74,55,40,0.12)",
       }}
     >
-      <div
-        className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl mx-4 w-full max-w-[390px]"
-        style={{
-          background: "var(--bg-card)",
-          border: "1px solid var(--border)",
-        }}
-      >
-        {/* Anneau SVG compact */}
-        <svg width={40} height={40} viewBox="0 0 40 40" className="shrink-0">
-          <circle
-            cx={20}
-            cy={20}
-            r={r}
-            fill="none"
-            stroke="var(--bg-elevated)"
-            strokeWidth={3.5}
-          />
-          <circle
-            cx={20}
-            cy={20}
-            r={r}
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth={3.5}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={dash}
-            transform="rotate(-90 20 20)"
-            style={{ transition: "stroke-dashoffset 0.25s linear" }}
-          />
-        </svg>
+      {/* Anneau SVG warm */}
+      <svg width={44} height={44} viewBox="0 0 44 44" className="shrink-0">
+        <circle
+          cx={22}
+          cy={22}
+          r={18}
+          fill="none"
+          stroke="rgba(74,55,40,0.08)"
+          strokeWidth={3}
+        />
+        <circle
+          cx={22}
+          cy={22}
+          r={18}
+          fill="none"
+          stroke="var(--bar-to)"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeDasharray={2 * Math.PI * 18}
+          strokeDashoffset={2 * Math.PI * 18 * progress}
+          transform="rotate(-90 22 22)"
+          style={{ transition: "stroke-dashoffset 0.25s linear" }}
+        />
+      </svg>
 
-        {/* Temps + label */}
-        <div className="flex-1 min-w-0">
-          <p
-            className="text-xs font-medium"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Temps de repos
-          </p>
-          <p
-            className="text-2xl font-bold tabular-nums leading-tight"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {mins > 0
-              ? `${mins}:${secs.toString().padStart(2, "0")}`
-              : `${secs}s`}
-          </p>
-        </div>
+      {/* Temps + label */}
+      <div className="flex-1 min-w-0">
+        <p
+          className="text-[8px] font-bold uppercase tracking-[0.08em]"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Temps de repos
+        </p>
+        <p
+          className="text-[22px] leading-[1.2]"
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            color: "var(--text-primary)",
+          }}
+        >
+          {mins > 0
+            ? `${mins}:${secs.toString().padStart(2, "0")}`
+            : `${secs}s`}
+        </p>
+      </div>
 
-        {/* Fermer */}
+      {/* Actions */}
+      <div className="flex gap-1.5">
         <button
           onClick={dismissRestTimer}
-          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
+          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
           style={{
-            background: "var(--bg-elevated)",
+            background: "rgba(74,55,40,0.08)",
             color: "var(--text-muted)",
           }}
         >
-          <X size={15} />
+          <SkipForward size={12} />
         </button>
-
-        {/* Passer */}
         <button
           onClick={dismissRestTimer}
-          className="btn-accent w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
+          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
+          style={{
+            background: "rgba(74,55,40,0.05)",
+            color: "var(--text-secondary)",
+          }}
         >
-          <SkipForward size={15} />
+          <X size={12} />
         </button>
       </div>
     </div>

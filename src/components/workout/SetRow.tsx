@@ -33,39 +33,30 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         : `${set.poidsRef}kg`
       : "—";
 
-  const inputBg = isActive ? "var(--accent-bg)" : "var(--glass-subtle)";
+  const inputBg = isActive ? "rgba(196,168,130,0.08)" : "rgba(255,255,255,0.5)";
   const inputBorder = isActive
-    ? "1px solid rgba(116,191,122,0.3)"
-    : "1px solid var(--glass-border)";
+    ? "1px solid var(--bar-to)"
+    : "1px solid rgba(74,55,40,0.1)";
 
   return (
     <div
       className="grid items-center gap-1 px-3.5 py-1"
       style={{
         gridTemplateColumns: "28px 1fr 1fr 1fr 32px",
-        background: set.completed ? "rgba(116,191,122,0.06)" : "transparent",
+        borderBottom: "1px solid rgba(74,55,40,0.05)",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
-      {/* # ou ✓ */}
+      {/* # */}
       <div className="flex items-center justify-start">
-        {set.completed ? (
-          <span
-            className="text-[11px] font-bold"
-            style={{ color: "var(--accent-text)" }}
-          >
-            ✓
-          </span>
-        ) : (
-          <span
-            className="text-[11px] font-bold"
-            style={{
-              color: set.isWarmup ? "var(--accent-text)" : "var(--text-muted)",
-            }}
-          >
-            {numLabel}
-          </span>
-        )}
+        <span
+          className="text-[10px] font-bold"
+          style={{
+            color: set.isWarmup ? "var(--text-secondary)" : "var(--text-muted)",
+          }}
+        >
+          {numLabel}
+        </span>
       </div>
 
       {/* Poids */}
@@ -84,11 +75,12 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
               e.target.value === "" ? null : Number(e.target.value),
             )
           }
-          className="w-full h-[30px] text-center text-[13px] font-semibold rounded-lg outline-none"
+          className="w-[48px] h-[26px] text-center text-[11px] font-semibold rounded-lg outline-none"
           style={{
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
+            fontFamily: "var(--font-dm-sans)",
           }}
         />
       </div>
@@ -108,18 +100,19 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
               e.target.value === "" ? null : Number(e.target.value),
             )
           }
-          className="w-full h-[30px] text-center text-[13px] font-semibold rounded-lg outline-none"
+          className="w-[48px] h-[26px] text-center text-[11px] font-semibold rounded-lg outline-none mx-auto block"
           style={{
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
+            fontFamily: "var(--font-dm-sans)",
           }}
         />
       </div>
 
       {/* Préc. */}
       <div className="text-center">
-        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+        <span className="text-[9px]" style={{ color: "var(--text-secondary)" }}>
           {precStr}
         </span>
       </div>
@@ -128,13 +121,17 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
       <div className="flex items-center justify-center">
         <button
           onClick={() => onToggle(set)}
-          className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
+          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
           style={{
-            background: set.completed ? "#4A9B54" : "var(--glass-subtle)",
-            border: set.completed ? "none" : "1.5px solid var(--glass-border)",
+            background: set.completed
+              ? "rgba(116,191,122,0.15)"
+              : "transparent",
+            border: set.completed
+              ? "2px solid #74bf7a"
+              : "2px solid rgba(74,55,40,0.15)",
           }}
         >
-          {set.completed && <Check size={10} strokeWidth={3} color="#fff" />}
+          {set.completed && <Check size={10} strokeWidth={3} color="#74bf7a" />}
         </button>
       </div>
     </div>

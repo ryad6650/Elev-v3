@@ -93,69 +93,58 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
   const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
-  // Card fermée
+  // Card fermée — flat row style (maquette)
   if (!isOpen) {
     return (
       <button
         onClick={() => onOpen(uid)}
-        className="w-full rounded-[18px] overflow-hidden transition-opacity"
+        className="w-full flex items-center gap-2.5 py-2.5"
         style={{
-          background: "var(--glass-bg)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          border: "1px solid var(--glass-border)",
+          borderBottom: "1px solid rgba(74,55,40,0.08)",
           opacity: allDone ? 0.6 : 1,
         }}
       >
-        <div className="flex items-center gap-2.5 px-3.5 py-3">
-          <ExerciseGif
-            gifUrl={exercise.gifUrl ?? null}
-            nom={exercise.nom}
-            size="sm"
-          />
-          <div className="flex-1 min-w-0 text-left">
-            <p
-              className="text-[13px] font-bold leading-tight truncate"
-              style={{ color: "var(--text-primary)" }}
-            >
-              {exercise.nom}
-            </p>
-            <p
-              className="text-[9px] font-semibold mt-0.5"
-              style={{ color: "var(--accent-text)", opacity: 0.8 }}
-            >
-              {exercise.groupeMusculaire}
-            </p>
-          </div>
-          {allDone ? (
-            <span
-              className="text-[8px] font-bold tracking-[0.04em] rounded-[10px] px-2 py-1 shrink-0"
-              style={{ color: "#fff", background: "#4A9B54" }}
-            >
-              Terminé
-            </span>
-          ) : (
-            <span
-              className="text-[8px] font-bold tracking-[0.04em] rounded-[10px] px-2 py-1 shrink-0"
-              style={{
-                color: "var(--accent-text)",
-                background: "rgba(116,191,122,0.12)",
-              }}
-            >
-              {completedWork}/{totalSets}
-            </span>
-          )}
-          <ChevronDown
-            size={12}
-            style={{ color: "var(--text-muted)", opacity: 0.5 }}
-            className="shrink-0"
-          />
+        <ExerciseGif
+          gifUrl={exercise.gifUrl ?? null}
+          nom={exercise.nom}
+          size="sm"
+        />
+        <div className="flex-1 min-w-0 text-left">
+          <p
+            className="text-[13px] italic leading-tight truncate"
+            style={{
+              fontFamily: "var(--font-dm-serif)",
+              color: "var(--text-primary)",
+            }}
+          >
+            {exercise.nom}
+          </p>
+          <p
+            className="text-[8px] font-semibold uppercase tracking-[0.04em] mt-0.5"
+            style={{ color: "var(--text-muted)" }}
+          >
+            {exercise.groupeMusculaire}
+          </p>
         </div>
-
-        {/* Warmup résumé si terminé */}
-        {allDone && hasWarmup && (
-          <WarmupCollapsed sets={exercise.sets.filter((s) => s.isWarmup)} />
-        )}
+        <span
+          className="text-[8px] font-bold tracking-[0.04em] rounded-[10px] px-2 py-[3px] shrink-0"
+          style={
+            allDone
+              ? { color: "#74bf7a", background: "rgba(116,191,122,0.12)" }
+              : {
+                  color: "var(--bar-to)",
+                  background: "rgba(196,168,130,0.15)",
+                }
+          }
+        >
+          {completedWork}/{totalSets}
+        </span>
+        <span
+          className="text-xs shrink-0"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          ›
+        </span>
       </button>
     );
   }
@@ -168,11 +157,11 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         background: "var(--glass-bg)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(116,191,122,0.2)",
+        border: "1px solid var(--glass-border)",
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2.5 px-3.5 py-3">
+      <div className="flex items-center gap-2.5 px-3.5 py-2">
         <ExerciseGif
           gifUrl={exercise.gifUrl ?? null}
           nom={exercise.nom}
@@ -180,23 +169,26 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         />
         <div className="flex-1 min-w-0">
           <p
-            className="text-[13px] font-bold leading-tight"
-            style={{ color: "var(--text-primary)" }}
+            className="text-[13px] italic leading-tight"
+            style={{
+              fontFamily: "var(--font-dm-serif)",
+              color: "var(--text-primary)",
+            }}
           >
             {exercise.nom}
           </p>
           <p
-            className="text-[9px] font-semibold mt-0.5"
-            style={{ color: "var(--accent-text)", opacity: 0.8 }}
+            className="text-[8px] font-semibold uppercase tracking-[0.04em] mt-0.5"
+            style={{ color: "var(--text-muted)" }}
           >
             {exercise.groupeMusculaire}
           </p>
         </div>
         <span
-          className="text-[8px] font-bold tracking-[0.04em] rounded-[10px] px-2 py-1 shrink-0"
+          className="text-[8px] font-bold tracking-[0.04em] rounded-[10px] px-2 py-[3px] shrink-0"
           style={{
-            color: "var(--accent-text)",
-            background: "rgba(116,191,122,0.12)",
+            color: "var(--bar-to)",
+            background: "rgba(196,168,130,0.15)",
           }}
         >
           {completedWork}/{totalSets}
@@ -273,26 +265,26 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           style={{ gridTemplateColumns: "28px 1fr 1fr 1fr 32px" }}
         >
           <span
-            className="text-[8px] font-bold uppercase tracking-[0.1em] text-left"
-            style={{ color: "var(--text-muted)" }}
+            className="text-[7px] font-bold uppercase tracking-[0.06em] text-left"
+            style={{ color: "var(--text-secondary)" }}
           >
             #
           </span>
           <span
-            className="text-[8px] font-bold uppercase tracking-[0.1em] text-center"
-            style={{ color: "var(--text-muted)" }}
+            className="text-[7px] font-bold uppercase tracking-[0.06em] text-center"
+            style={{ color: "var(--text-secondary)" }}
           >
             Poids
           </span>
           <span
-            className="text-[8px] font-bold uppercase tracking-[0.1em] text-center"
-            style={{ color: "var(--text-muted)" }}
+            className="text-[7px] font-bold uppercase tracking-[0.06em] text-center"
+            style={{ color: "var(--text-secondary)" }}
           >
             Reps
           </span>
           <span
-            className="text-[8px] font-bold uppercase tracking-[0.1em] text-center"
-            style={{ color: "var(--text-muted)" }}
+            className="text-[7px] font-bold uppercase tracking-[0.06em] text-center"
+            style={{ color: "var(--text-secondary)" }}
           >
             Préc.
           </span>
@@ -343,21 +335,20 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         })()}
       </div>
 
-      {/* Actions : + Série | Notes | Échauff. */}
+      {/* Actions : + Série | Notes | Échauff. | Repos */}
       <div
-        className="flex"
+        className="flex gap-1.5 px-3.5 py-2"
         style={{ borderTop: "1px solid var(--glass-border)" }}
       >
         <button
           onClick={() => addSet(uid)}
-          className="flex-1 flex items-center justify-center gap-[5px] py-[9px] text-[10px] font-semibold transition-opacity active:opacity-70"
+          className="text-[8px] font-bold tracking-[0.03em] px-2.5 py-1 rounded-lg transition-opacity active:opacity-70"
           style={{
+            background: "rgba(74,55,40,0.06)",
             color: "var(--text-muted)",
-            borderRight: "1px solid var(--glass-border)",
           }}
         >
-          <Plus size={12} strokeWidth={2.5} />
-          Série
+          + Série
         </button>
         <ExerciseNotesButton
           note={exercise.notes ?? ""}
@@ -367,13 +358,12 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         />
         <button
           onClick={() => addWarmupSets(uid)}
-          className="flex-1 flex items-center justify-center gap-[5px] py-[9px] text-[10px] font-semibold transition-opacity active:opacity-70"
+          className="text-[8px] font-bold tracking-[0.03em] px-2.5 py-1 rounded-lg transition-opacity active:opacity-70"
           style={{
-            color: hasWarmup ? "var(--accent-text)" : "var(--text-muted)",
-            borderLeft: "1px solid var(--glass-border)",
+            background: "rgba(74,55,40,0.06)",
+            color: hasWarmup ? "var(--bar-to)" : "var(--text-muted)",
           }}
         >
-          <Flame size={12} />
           Échauff.
         </button>
       </div>
@@ -397,10 +387,10 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         >
           <button
             onClick={() => setShowPicker(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-semibold transition-opacity active:opacity-70"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-bold tracking-[0.03em] transition-opacity active:opacity-70"
             style={{
-              background: "var(--glass-subtle)",
-              color: "var(--accent-text)",
+              background: "rgba(74,55,40,0.06)",
+              color: "var(--bar-to)",
             }}
           >
             <Timer size={10} />

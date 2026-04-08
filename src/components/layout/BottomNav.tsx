@@ -1,18 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useUiStore } from "@/store/uiStore";
 
 const navItems = [
-  { href: "/workout", emoji: "💪", label: "Séances" },
-  { href: "/poids", emoji: "⚖️", label: "Poids" },
-  { href: "/dashboard", emoji: "🏠", label: "Accueil" },
-  { href: "/nutrition", emoji: "🥗", label: "Nutrition" },
-  { href: "/historique", emoji: "📊", label: "Historique" },
+  { href: "/workout", icon: "/icons/nav-seances.png", label: "Séances" },
+  { href: "/poids", icon: "/icons/nav-poids.png", label: "Poids" },
+  { href: "/dashboard", icon: "/icons/nav-accueil.png", label: "Accueil" },
+  { href: "/nutrition", icon: "/icons/nav-nutrition.png", label: "Nutrition" },
+  {
+    href: "/historique",
+    icon: "/icons/nav-historique.png",
+    label: "Historique",
+  },
 ];
 
 const CREAM_PAGES = new Set([
+  "/dashboard",
   "/workout",
   "/poids",
   "/nutrition",
@@ -28,38 +34,41 @@ export default function BottomNav() {
   const isCream = CREAM_PAGES.has(pathname);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none h-[72px]">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <nav
-        className="pointer-events-auto flex items-center px-2 py-2 gap-0.5 h-[56px]"
+        className="pointer-events-auto flex items-center justify-around w-full py-3 px-8"
         style={{
-          background: isCream ? "rgba(235,228,215,0.92)" : "rgba(20,14,8,0.82)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          border: isCream
-            ? "1px solid rgba(0,0,0,0.08)"
-            : "1px solid rgba(255,255,255,0.09)",
-          borderRadius: "32px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-          width: "min(96vw, 460px)",
+          maxWidth: 430,
+          paddingBottom: "max(12px, env(safe-area-inset-bottom))",
         }}
       >
-        {navItems.map(({ href, emoji, label }) => {
+        {navItems.map(({ href, icon, label }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
               prefetch={true}
-              className="flex flex-1 items-center justify-center transition-colors"
+              className="flex items-center justify-center"
+              style={{ width: 24, height: 24 }}
+              aria-label={label}
             >
-              <div
-                className="flex items-center justify-center px-3.5 py-2 rounded-[20px]"
+              <Image
+                src={icon}
+                alt={label}
+                width={22}
+                height={22}
+                className="object-contain"
                 style={{
-                  background: active ? "var(--accent)" : "transparent",
+                  opacity: active ? 1 : 0.5,
+                  filter:
+                    !isCream && !active
+                      ? "invert(1) brightness(0.6)"
+                      : !isCream && active
+                        ? "invert(1)"
+                        : undefined,
                 }}
-              >
-                <span className="text-lg leading-none">{emoji}</span>
-              </div>
+              />
             </Link>
           );
         })}
