@@ -12,21 +12,32 @@ const navItems = [
   { href: "/historique", emoji: "📊", label: "Historique" },
 ];
 
+const CREAM_PAGES = new Set([
+  "/workout",
+  "/poids",
+  "/nutrition",
+  "/historique",
+]);
+
 export default function BottomNav() {
   const pathname = usePathname();
   const hidden = useUiStore((s) => s.fullscreenModal);
 
   if (hidden) return null;
 
+  const isCream = CREAM_PAGES.has(pathname);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 pointer-events-none h-[72px]">
       <nav
         className="pointer-events-auto flex items-center px-2 py-2 gap-0.5 h-[56px]"
         style={{
-          background: "rgba(20,14,8,0.82)",
+          background: isCream ? "rgba(235,228,215,0.92)" : "rgba(20,14,8,0.82)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.09)",
+          border: isCream
+            ? "1px solid rgba(0,0,0,0.08)"
+            : "1px solid rgba(255,255,255,0.09)",
           borderRadius: "32px",
           boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
           width: "min(96vw, 460px)",
