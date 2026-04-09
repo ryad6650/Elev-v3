@@ -43,7 +43,7 @@ export default memo(function MealSection({
   onEntryDeleted,
   onFoodClick,
 }: Props) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const total = sumEntries(meal.entries);
   const meta = MEAL_META[meal.meal_number] ?? {
     emoji: "🍽️",
@@ -52,37 +52,51 @@ export default memo(function MealSection({
   const isEmpty = meal.entries.length === 0;
   const pcts = isEmpty ? { g: 0, p: 0, l: 0 } : macroPercents(meal.entries);
 
+  // Suppress unused var warning
+  void onEntryDeleted;
+
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: "18px 20px",
+      }}
+    >
       {/* Header */}
       <button
-        className="w-full flex items-center gap-2 select-none"
-        style={{ marginBottom: 8 }}
+        className="w-full flex items-center gap-2.5 select-none"
         onClick={() => setExpanded((v) => !v)}
       >
-        <span className="text-[16px]">{meta.emoji}</span>
+        <span className="text-[20px]">{meta.emoji}</span>
         <span
-          className="text-[15px] flex-1 text-left"
+          className="flex-1 text-left"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 16,
+            fontWeight: 600,
             color: isEmpty ? "var(--text-muted)" : "var(--text-primary)",
           }}
         >
           {meta.name}
         </span>
         <span
-          className="text-[11px] font-semibold"
           style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
             color: "var(--text-muted)",
           }}
         >
           {total.calories} kcal
         </span>
         <span
-          className="text-[10px] inline-block transition-transform duration-200"
+          className="text-[12px] inline-block transition-transform duration-200"
           style={{
-            color: "var(--text-secondary)",
+            color: "var(--text-muted)",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
           }}
         >
@@ -90,85 +104,84 @@ export default memo(function MealSection({
         </span>
       </button>
 
-      {/* Macro bar — toujours visible */}
-      {isEmpty ? (
-        <div
-          className="rounded-full"
-          style={{
-            height: 4,
-            border: "1px dashed rgba(74,55,40,0.15)",
-            marginBottom: 6,
-          }}
-        />
-      ) : (
+      {/* Content — expanded only */}
+      {expanded && !isEmpty && (
         <>
+          {/* Split bar */}
           <div
-            className="flex h-[5px] rounded-full overflow-hidden"
+            className="flex overflow-hidden"
             style={{
-              marginBottom: 6,
-              background: "rgba(74,55,40,0.1)",
-              gap: 1,
+              height: 5,
+              borderRadius: 99,
+              background: "rgba(0,0,0,0.04)",
+              gap: 2,
+              margin: "12px 0 10px",
             }}
           >
             <div
               className="rounded-full"
-              style={{ flex: pcts.g, background: "var(--color-carbs)" }}
+              style={{
+                flex: pcts.g,
+                background: "var(--color-carbs)",
+              }}
             />
             <div
               className="rounded-full"
-              style={{ flex: pcts.p, background: "var(--color-protein)" }}
+              style={{
+                flex: pcts.p,
+                background: "var(--color-protein)",
+              }}
             />
             <div
               className="rounded-full"
-              style={{ flex: pcts.l, background: "var(--color-fat)" }}
+              style={{
+                flex: pcts.l,
+                background: "var(--color-fat)",
+              }}
             />
           </div>
 
           {/* Macro legend */}
-          <div className="flex gap-2.5" style={{ marginBottom: 8 }}>
+          <div className="flex gap-3.5" style={{ marginBottom: 12 }}>
             {[
-              {
-                l: "G",
-                v: total.glucides,
-                c: "var(--color-carbs)",
-              },
-              {
-                l: "P",
-                v: total.proteines,
-                c: "var(--color-protein)",
-              },
-              {
-                l: "L",
-                v: total.lipides,
-                c: "var(--color-fat)",
-              },
+              { l: "G", v: total.glucides, c: "var(--color-carbs)" },
+              { l: "P", v: total.proteines, c: "var(--color-protein)" },
+              { l: "L", v: total.lipides, c: "var(--color-fat)" },
             ].map((m) => (
-              <div key={m.l} className="flex items-center gap-1">
+              <div key={m.l} className="flex items-center gap-[5px]">
                 <div
-                  className="w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ background: m.c }}
+                  className="rounded-full shrink-0"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    background: m.c,
+                  }}
                 />
                 <span
-                  className="text-[9px] font-semibold"
-                  style={{ color: "var(--text-muted)" }}
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "var(--text-muted)",
+                  }}
                 >
                   {m.l}
                 </span>
                 <span
-                  className="text-[9px] font-bold"
-                  style={{ color: "var(--text-primary)" }}
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "var(--text-primary)",
+                  }}
                 >
                   {Math.round(m.v)}g
                 </span>
               </div>
             ))}
           </div>
-        </>
-      )}
 
-      {/* Aliments — dépliés uniquement */}
-      {expanded && (
-        <>
+          {/* Food items */}
           <div className="flex flex-col">
             {meal.entries.map((e) => (
               <FoodItem
@@ -179,30 +192,44 @@ export default memo(function MealSection({
               />
             ))}
           </div>
-
-          {/* Add button */}
-          <button
-            onClick={onAdd}
-            className="flex items-center gap-[5px] active:opacity-60 transition-opacity"
-            style={{ padding: "6px 0", marginTop: 2 }}
-          >
-            <div
-              className="w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
-              style={{
-                background: "rgba(116,191,122,0.12)",
-                color: "var(--accent-text)",
-              }}
-            >
-              +
-            </div>
-            <span
-              className="text-[10px] font-semibold"
-              style={{ color: "var(--accent-text)" }}
-            >
-              Ajouter un aliment
-            </span>
-          </button>
         </>
+      )}
+
+      {/* Add button — always visible when expanded */}
+      {expanded && (
+        <button
+          onClick={onAdd}
+          className="flex items-center gap-2 active:opacity-60 transition-opacity"
+          style={{
+            padding: "10px 0 2px",
+            marginTop: isEmpty ? 10 : 4,
+          }}
+        >
+          <div
+            className="flex items-center justify-center rounded-full shrink-0"
+            style={{
+              width: 22,
+              height: 22,
+              background: "var(--green-dim)",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 14,
+              fontWeight: 700,
+              color: "var(--green)",
+            }}
+          >
+            +
+          </div>
+          <span
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--green)",
+            }}
+          >
+            Ajouter un aliment
+          </span>
+        </button>
       )}
     </div>
   );

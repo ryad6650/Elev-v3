@@ -28,23 +28,23 @@ function ExerciseNotesButton({
   return (
     <button
       onClick={handleClick}
-      className="text-[8px] font-bold tracking-[0.03em] px-2.5 py-1 rounded-lg flex items-center gap-1 transition-opacity active:opacity-70"
+      className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] flex items-center justify-center gap-1.5 transition-opacity active:opacity-70"
       style={{
-        background: "rgba(74,55,40,0.06)",
-        color: hasContent ? "var(--bar-to)" : "var(--text-muted)",
+        background: "rgba(0,0,0,0.04)",
+        color: hasContent ? "var(--green)" : "var(--text-muted)",
       }}
     >
       <PenLine
-        size={10}
+        size={13}
         className={shouldBlink ? "animate-pulse" : ""}
-        style={shouldBlink ? { color: "var(--bar-to)" } : undefined}
+        style={shouldBlink ? { color: "var(--green)" } : undefined}
       />
       <span className={shouldBlink ? "animate-pulse" : ""}>
         Notes
         {shouldBlink && (
           <span
             className="inline-block w-1.5 h-1.5 rounded-full ml-1 align-middle"
-            style={{ background: "var(--bar-to)" }}
+            style={{ background: "var(--green)" }}
           />
         )}
       </span>

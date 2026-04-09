@@ -33,26 +33,26 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         : `${set.poidsRef}kg`
       : "—";
 
-  const inputBg = isActive ? "rgba(196,168,130,0.08)" : "rgba(255,255,255,0.5)";
-  const inputBorder = isActive
-    ? "1px solid var(--bar-to)"
-    : "1px solid rgba(74,55,40,0.1)";
+  const inputBg = isActive ? "rgba(42,157,110,0.08)" : "rgba(0,0,0,0.03)";
+  const inputBorder = isActive ? "1.5px solid var(--green)" : "none";
 
   return (
     <div
-      className="grid items-center gap-1 px-3.5 py-1"
+      className="grid items-center px-[18px] py-1"
       style={{
-        gridTemplateColumns: "28px 1fr 1fr 1fr 32px",
-        borderBottom: "1px solid rgba(74,55,40,0.05)",
+        gridTemplateColumns: "32px 1fr 1fr 1fr 36px",
+        gap: "4px 6px",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
       {/* # */}
-      <div className="flex items-center justify-start">
+      <div className="flex items-center justify-center">
         <span
-          className="text-[10px] font-bold"
+          className="text-[12px] font-bold"
           style={{
-            color: set.isWarmup ? "var(--text-secondary)" : "var(--text-muted)",
+            fontFamily: "var(--font-inter), sans-serif",
+            color: isActive ? "var(--green)" : "var(--text-muted)",
+            fontWeight: isActive ? 800 : 700,
           }}
         >
           {numLabel}
@@ -75,12 +75,13 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
               e.target.value === "" ? null : Number(e.target.value),
             )
           }
-          className="w-[48px] h-[26px] text-center text-[11px] font-semibold rounded-lg outline-none"
+          className="w-full text-center text-[14px] font-bold rounded-[8px] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
           style={{
+            padding: "8px 4px",
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
-            fontFamily: "var(--font-dm-sans)",
+            fontFamily: "var(--font-inter), sans-serif",
           }}
         />
       </div>
@@ -100,19 +101,26 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
               e.target.value === "" ? null : Number(e.target.value),
             )
           }
-          className="w-[48px] h-[26px] text-center text-[11px] font-semibold rounded-lg outline-none mx-auto block"
+          className="w-full text-center text-[14px] font-bold rounded-[8px] outline-none block [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
           style={{
+            padding: "8px 4px",
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
-            fontFamily: "var(--font-dm-sans)",
+            fontFamily: "var(--font-inter), sans-serif",
           }}
         />
       </div>
 
       {/* Préc. */}
       <div className="text-center">
-        <span className="text-[9px]" style={{ color: "var(--text-secondary)" }}>
+        <span
+          className="text-[11px] font-medium"
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            color: "var(--text-muted)",
+          }}
+        >
           {precStr}
         </span>
       </div>
@@ -121,17 +129,19 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
       <div className="flex items-center justify-center">
         <button
           onClick={() => onToggle(set)}
-          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
+          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
           style={{
-            background: set.completed
-              ? "rgba(116,191,122,0.15)"
-              : "transparent",
-            border: set.completed
-              ? "2px solid #74bf7a"
-              : "2px solid rgba(74,55,40,0.15)",
+            background: set.completed ? "var(--green)" : "rgba(0,0,0,0.06)",
           }}
         >
-          {set.completed && <Check size={10} strokeWidth={3} color="#74bf7a" />}
+          {set.completed ? (
+            <Check size={14} strokeWidth={3} color="#fff" />
+          ) : (
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ border: "2px solid var(--text-muted)" }}
+            />
+          )}
         </button>
       </div>
     </div>

@@ -101,27 +101,38 @@ export default function ActiveWorkout() {
         >
           {/* Back row : retour + label routine + Terminer */}
           <div className="flex items-center justify-between mb-1">
-            <button
-              onClick={minimizeWorkout}
-              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-              style={{
-                background: "rgba(74,55,40,0.07)",
-              }}
-            >
-              <ChevronLeft size={14} style={{ color: "var(--text-muted)" }} />
-            </button>
-            <span
-              className="text-[9px] font-bold uppercase tracking-[0.1em]"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {routineName ?? "Séance libre"}
-            </span>
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={minimizeWorkout}
+                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                style={{
+                  background: "rgba(255,255,255,0.55)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255,255,255,0.35)",
+                }}
+              >
+                <ChevronLeft
+                  size={16}
+                  style={{ color: "var(--text-secondary)" }}
+                />
+              </button>
+              <span
+                className="text-[12px] font-semibold uppercase tracking-[0.08em]"
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  color: "var(--text-muted)",
+                }}
+              >
+                {routineName ?? "Séance libre"}
+              </span>
+            </div>
             <button
               onClick={() => setShowSummary(true)}
-              className="text-[9px] font-bold tracking-[0.04em] rounded-[20px] px-3 py-[5px] border-none"
+              className="text-[12px] font-semibold tracking-[0.02em] rounded-full px-[18px] py-2 border-none"
               style={{
-                background:
-                  "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
+                fontFamily: "var(--font-inter), sans-serif",
+                background: "var(--green)",
                 color: "#fff",
               }}
             >
@@ -131,9 +142,9 @@ export default function ActiveWorkout() {
 
           {/* Titre */}
           <h1
-            className="text-[26px] leading-[1.1] italic tracking-[-0.01em]"
+            className="text-[28px] leading-[1.1] font-medium tracking-[-0.5px] mt-3 mb-3"
             style={{
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-inter), sans-serif",
               color: "var(--text-primary)",
             }}
           >
@@ -143,24 +154,26 @@ export default function ActiveWorkout() {
 
         {/* Contenu scrollable */}
         <div
-          className="flex-1 overflow-y-auto px-4 pt-3.5 pb-36 flex flex-col gap-2.5"
-          style={{ scrollbarWidth: "none" }}
+          className="flex-1 overflow-y-auto pt-2 pb-36 flex flex-col gap-2.5"
+          style={{ scrollbarWidth: "none", padding: "8px 28px 144px" }}
         >
           {/* Timer card */}
           <div
-            className="flex items-center justify-between px-3.5 py-3 rounded-2xl"
+            className="flex items-center justify-between px-5 py-4 rounded-[20px]"
             style={{
-              background: "rgba(255,255,255,0.35)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
+              background: "var(--glass-bg)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid var(--glass-border)",
             }}
           >
             <div className="flex flex-col">
               <span
-                className="text-[8px] font-bold uppercase tracking-[0.1em]"
-                style={{ color: "var(--text-secondary)" }}
+                className="text-[10px] font-semibold uppercase tracking-[0.08em]"
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  color: "var(--text-muted)",
+                }}
               >
                 Durée séance
               </span>
@@ -171,23 +184,21 @@ export default function ActiveWorkout() {
                 large
               />
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex gap-2">
               <button
                 onClick={isPaused ? handleResume : handlePause}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{
-                  background: "rgba(74,55,40,0.08)",
-                }}
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(0,0,0,0.04)" }}
               >
                 {isPaused ? (
                   <Play
-                    size={13}
+                    size={14}
                     fill="var(--text-muted)"
                     style={{ color: "var(--text-muted)" }}
                   />
                 ) : (
                   <Pause
-                    size={13}
+                    size={14}
                     fill="var(--text-muted)"
                     style={{ color: "var(--text-muted)" }}
                   />
@@ -199,8 +210,11 @@ export default function ActiveWorkout() {
           {/* Section label */}
           {exerciseUids.length > 0 && (
             <p
-              className="text-[8px] font-bold uppercase tracking-[0.1em] mt-1"
-              style={{ color: "var(--text-secondary)" }}
+              className="text-[11px] font-semibold uppercase tracking-[0.08em] mt-1 mb-1"
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                color: "var(--text-muted)",
+              }}
             >
               Exercices ·{" "}
               {(() => {
@@ -221,7 +235,8 @@ export default function ActiveWorkout() {
               </p>
               <button
                 onClick={() => setShowSearch(true)}
-                className="btn-accent px-6 py-3 rounded-2xl text-sm font-semibold"
+                className="px-6 py-3 rounded-2xl text-sm font-semibold"
+                style={{ background: "var(--green)", color: "#fff" }}
               >
                 Ajouter un exercice
               </button>
@@ -243,52 +258,46 @@ export default function ActiveWorkout() {
         {exerciseUids.length > 0 && (
           <button
             onClick={() => setShowSearch(true)}
-            className="fixed bottom-[62px] right-6 z-20 w-10 h-10 rounded-full flex items-center justify-center border-none"
+            className="fixed w-[52px] h-[52px] rounded-full flex items-center justify-center border-none"
             style={{
-              background:
-                "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
-              boxShadow: "0 4px 16px rgba(160,120,92,0.3)",
+              bottom: 28,
+              right: 28,
+              zIndex: 50,
+              background: "var(--green)",
+              boxShadow: "0 4px 16px rgba(42,157,110,0.3)",
             }}
           >
-            <Plus size={20} color="#fff" strokeWidth={1.5} />
+            <Plus size={22} color="#fff" strokeWidth={2.5} />
           </button>
         )}
 
         {/* Bannière PR */}
         {prNotif && (
           <div
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-2 px-4 py-3 rounded-[12px]"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(234,179,8,0.2) 0%, rgba(217,119,6,0.15) 100%)",
-              border: "1px solid rgba(234,179,8,0.4)",
-              backdropFilter: "blur(12px)",
+              background: "rgba(42,157,110,0.12)",
+              border: "1px solid rgba(42,157,110,0.25)",
               animation: "prSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1)",
             }}
           >
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl"
-              style={{ background: "rgba(234,179,8,0.25)" }}
+            <span className="text-base shrink-0">🏆</span>
+            <p
+              className="flex-1 text-xs font-semibold truncate"
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                color: "var(--green)",
+              }}
             >
-              🏆
-            </div>
-            <div className="flex-1 min-w-0">
-              <p
-                className="text-sm font-bold truncate"
-                style={{ color: "#FDE68A" }}
-              >
-                Nouveau record !
-              </p>
-              <p className="text-xs" style={{ color: "#CA8A04" }}>
-                {prNotif.exerciseName} — {prNotif.poids}kg × {prNotif.reps}
-              </p>
-            </div>
+              Record ! {prNotif.exerciseName} — {prNotif.poids}kg ×{" "}
+              {prNotif.reps}
+            </p>
             <button
               onClick={() => setPrNotif(null)}
               className="p-1 shrink-0"
-              style={{ color: "#CA8A04" }}
+              style={{ color: "var(--green)" }}
             >
-              <X size={16} />
+              <X size={14} />
             </button>
           </div>
         )}

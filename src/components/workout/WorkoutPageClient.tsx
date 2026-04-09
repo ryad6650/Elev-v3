@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Search } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import WorkoutHub from "./WorkoutHub";
 import ActiveWorkout from "./ActiveWorkout";
-import WorkoutProgrammesSection from "./WorkoutProgrammesSection";
 import WorkoutWeekTimeline from "./WorkoutWeekTimeline";
+import ProgrammeActiveView from "@/components/programmes/ProgrammeActiveView";
+import { getRoutineExercises } from "@/app/actions/routines";
 import type { WorkoutPageData } from "@/lib/workout";
 import type { ProgrammesPageData } from "@/lib/programmes";
 
@@ -44,45 +44,92 @@ export default function WorkoutPageClient({
   const [showSearch, setShowSearch] = useState(false);
   const [showProgrammes, setShowProgrammes] = useState(false);
 
+  const handleStartRoutine = async (routineId: string, routineNom: string) => {
+    try {
+      const exercises = await getRoutineExercises(routineId);
+      startWorkout({ routineId, routineName: routineNom, exercises });
+    } catch {
+      startWorkout({ routineId, routineName: routineNom });
+    }
+    setShowProgrammes(false);
+  };
+
   if (activeWorkout && !isMinimized) return <ActiveWorkout />;
+
+  if (showProgrammes && initialProgrammesData.programmeActif) {
+    return (
+      <ProgrammeActiveView
+        programme={initialProgrammesData.programmeActif}
+        onBack={() => setShowProgrammes(false)}
+        onStartRoutine={handleStartRoutine}
+      />
+    );
+  }
 
   return (
     <main
-      className="px-5 pt-3.5 pb-28 page-enter"
-      style={{ maxWidth: 430, margin: "0 auto" }}
+      className="page-enter"
+      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 28px 112px" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-1.5">
         <span
-          className="text-[11px] font-bold tracking-[0.12em] uppercase"
-          style={{ color: "#78716C" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+          }}
         >
           {getDateFr()}
         </span>
         <div className="flex gap-2.5">
           <RoundBtn onClick={() => setShowSearch(true)}>
-            <Search size={15} style={{ color: "#78716C" }} />
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--text-muted)"
+              strokeWidth="2.5"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
           </RoundBtn>
           <RoundBtn onClick={() => setShowCreate(true)}>
-            <Plus size={17} strokeWidth={2.5} style={{ color: "#78716C" }} />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--text-muted)"
+              strokeWidth="2.5"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
           </RoundBtn>
         </div>
       </div>
       <h1
-        className="leading-tight mb-5"
         style={{
-          fontFamily: "var(--font-dm-serif)",
-          fontStyle: "italic",
-          fontSize: 34,
-          color: "#4A3728",
-          letterSpacing: "-0.01em",
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 32,
+          fontWeight: 500,
+          color: "var(--text-primary)",
+          letterSpacing: "-0.5px",
+          lineHeight: 1.1,
+          marginBottom: 20,
         }}
       >
-        Mes Séances.
+        Mes Séances
       </h1>
 
       {/* Timeline semaine */}
-      <div className="mb-[18px]">
+      <div style={{ marginBottom: 18 }}>
         <WorkoutWeekTimeline
           historique={initialWorkoutData.historique}
           programmeActif={initialProgrammesData.programmeActif}
@@ -90,7 +137,7 @@ export default function WorkoutPageClient({
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3 mb-5">
+      <div className="flex gap-3" style={{ marginBottom: 20 }}>
         <QuickBtn
           icon="⚡"
           label="Séance libre"
@@ -106,10 +153,6 @@ export default function WorkoutPageClient({
           onClick={() => setShowProgrammes((v) => !v)}
         />
       </div>
-
-      {showProgrammes && (
-        <WorkoutProgrammesSection data={initialProgrammesData} />
-      )}
 
       <WorkoutHub data={initialWorkoutData} />
 
@@ -136,8 +179,13 @@ function RoundBtn({
   return (
     <button
       onClick={onClick}
-      className="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-      style={{ background: "rgba(74,55,40,0.07)" }}
+      className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur-sm)",
+        WebkitBackdropFilter: "var(--glass-blur-sm)",
+        border: "1px solid var(--glass-border)",
+      }}
     >
       {children}
     </button>
@@ -158,20 +206,34 @@ function QuickBtn({
   return (
     <button
       onClick={onClick}
-      className="flex-1 py-4 px-3 rounded-[18px] text-center active:scale-[0.98] transition-transform"
+      className="flex-1 py-5 px-3 text-center active:scale-[0.98] transition-transform"
       style={{
-        background: "rgba(255,255,255,0.35)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(255,255,255,0.3)",
-        boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
       }}
     >
-      <div className="text-[22px] mb-1.5">{icon}</div>
-      <div className="text-[12px] font-bold" style={{ color: "#4A3728" }}>
+      <div style={{ fontSize: 26, marginBottom: 6 }}>{icon}</div>
+      <div
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 14,
+          fontWeight: 600,
+          color: "var(--text-primary)",
+        }}
+      >
         {label}
       </div>
-      <div className="text-[10px] mt-0.5" style={{ color: "#78716C" }}>
+      <div
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 11,
+          color: "var(--text-muted)",
+          marginTop: 3,
+        }}
+      >
         {sub}
       </div>
     </button>
