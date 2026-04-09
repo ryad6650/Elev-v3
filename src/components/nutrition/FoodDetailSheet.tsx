@@ -74,7 +74,7 @@ export default function FoodDetailSheet({
   const prot = Math.round((aliment.proteines ?? 0) * scale * 10) / 10;
   const gluc = Math.round((aliment.glucides ?? 0) * scale * 10) / 10;
   const lip = Math.round((aliment.lipides ?? 0) * scale * 10) / 10;
-  const F = "var(--font-inter), sans-serif";
+  const F = "var(--font-nunito), sans-serif";
 
   return (
     <div
@@ -226,7 +226,7 @@ function TopBar({
       <span
         className="text-[12px] font-semibold uppercase tracking-[0.1em]"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           color: "var(--text-muted)",
         }}
       >
@@ -263,7 +263,7 @@ function MacrosCard({
   prot: number;
   lip: number;
 }) {
-  const F = "var(--font-inter), sans-serif";
+  const F = "var(--font-nunito), sans-serif";
   const items = [
     { val: cal, label: "kcal", color: "var(--text-primary)" },
     { val: gluc, label: "Glucides", color: "var(--color-carbs)" },
@@ -369,7 +369,7 @@ function BottomBar({
   mealLabel: string;
   onConfirm: () => void;
 }) {
-  const F = "var(--font-inter), sans-serif";
+  const F = "var(--font-nunito), sans-serif";
   return (
     <div
       className="shrink-0 flex flex-col gap-3 px-6 pt-[14px]"

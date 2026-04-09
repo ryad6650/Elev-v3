@@ -30,7 +30,7 @@ export default function StepBienvenue({ data, update, onNext }: Props) {
         <h1
           className="text-5xl leading-tight mb-4"
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-lora)",
             fontStyle: "italic",
             color: "var(--text-primary)",
           }}

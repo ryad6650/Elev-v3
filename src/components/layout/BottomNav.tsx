@@ -127,7 +127,7 @@ export default function BottomNav() {
               {icon}
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 11,
                   fontWeight: 500,
                 }}

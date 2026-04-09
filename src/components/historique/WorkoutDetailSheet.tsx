@@ -104,7 +104,7 @@ export default function WorkoutDetailSheet({
           <h2
             className="text-lg truncate"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontWeight: 600,
               color: "var(--text-primary)",
             }}
@@ -123,7 +123,7 @@ export default function WorkoutDetailSheet({
         <p
           className="text-xs mb-4 capitalize"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-muted)",
           }}
         >
@@ -152,7 +152,7 @@ export default function WorkoutDetailSheet({
                   <span
                     className="text-sm font-semibold truncate"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-primary)",
                     }}
                   >
@@ -164,7 +164,7 @@ export default function WorkoutDetailSheet({
                   <span
                     className="text-[10px] uppercase"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-muted)",
                     }}
                   >
@@ -173,7 +173,7 @@ export default function WorkoutDetailSheet({
                   <span
                     className="text-[10px] uppercase"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-muted)",
                     }}
                   >
@@ -182,7 +182,7 @@ export default function WorkoutDetailSheet({
                   <span
                     className="text-[10px] uppercase"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-muted)",
                     }}
                   >
@@ -217,7 +217,7 @@ export default function WorkoutDetailSheet({
                 background: "var(--green)",
                 color: "#fff",
                 border: "none",
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
               }}
             >
               <Check size={16} />
@@ -231,7 +231,7 @@ export default function WorkoutDetailSheet({
                 background: "rgba(255,255,255,0.5)",
                 color: "var(--text-primary)",
                 border: "1px solid rgba(0,0,0,0.06)",
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
               }}
             >
               <Pencil size={16} />
@@ -246,7 +246,7 @@ export default function WorkoutDetailSheet({
               background: confirmDelete ? "#c94444" : "rgba(201,68,68,0.1)",
               color: confirmDelete ? "#fff" : "#c94444",
               border: "none",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
             }}
           >
             <Trash2 size={16} />
@@ -286,7 +286,7 @@ function SetRow({
 }) {
   const muted = !s.completed;
   const style = {
-    fontFamily: "var(--font-inter), sans-serif",
+    fontFamily: "var(--font-nunito), sans-serif",
     fontSize: "0.8rem",
     color: muted ? "var(--text-muted)" : "var(--text-primary)",
   };
@@ -312,7 +312,7 @@ function SetRow({
         className="w-full text-center rounded-lg px-1 py-0.5 outline-none"
         style={{
           fontSize: "0.8rem",
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           background: "rgba(255,255,255,0.5)",
           color: "var(--text-primary)",
           border: "1px solid rgba(0,0,0,0.06)",
@@ -325,7 +325,7 @@ function SetRow({
         className="w-full text-center rounded-lg px-1 py-0.5 outline-none"
         style={{
           fontSize: "0.8rem",
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           background: "rgba(255,255,255,0.5)",
           color: "var(--text-primary)",
           border: "1px solid rgba(0,0,0,0.06)",

@@ -125,7 +125,7 @@ export default function PoidsChart({ entries }: Props) {
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -147,7 +147,7 @@ export default function PoidsChart({ entries }: Props) {
                 fontWeight: 600,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 color: periode === p.key ? "#fff" : "var(--text-muted)",
                 background:
                   periode === p.key ? "var(--green)" : "rgba(0,0,0,0.04)",
@@ -234,7 +234,7 @@ export default function PoidsChart({ entries }: Props) {
             >
               <div
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 17,
                   fontWeight: 700,
                   color: s.isGreen ? "var(--green)" : "var(--text-primary)",
@@ -254,7 +254,7 @@ export default function PoidsChart({ entries }: Props) {
               </div>
               <div
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 10,
                   fontWeight: 600,
                   color: "var(--text-muted)",

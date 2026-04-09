@@ -75,7 +75,7 @@ export default memo(function MealSection({
         <span
           className="flex-1 text-left"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 16,
             fontWeight: 600,
             color: isEmpty ? "var(--text-muted)" : "var(--text-primary)",
@@ -85,7 +85,7 @@ export default memo(function MealSection({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             color: "var(--text-muted)",
@@ -159,7 +159,7 @@ export default memo(function MealSection({
                 />
                 <span
                   style={{
-                    fontFamily: "var(--font-inter), sans-serif",
+                    fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 11,
                     fontWeight: 600,
                     color: "var(--text-muted)",
@@ -169,7 +169,7 @@ export default memo(function MealSection({
                 </span>
                 <span
                   style={{
-                    fontFamily: "var(--font-inter), sans-serif",
+                    fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 11,
                     fontWeight: 700,
                     color: "var(--text-primary)",
@@ -211,7 +211,7 @@ export default memo(function MealSection({
               width: 22,
               height: 22,
               background: "var(--green-dim)",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 14,
               fontWeight: 700,
               color: "var(--green)",
@@ -221,7 +221,7 @@ export default memo(function MealSection({
           </div>
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 13,
               fontWeight: 600,
               color: "var(--green)",

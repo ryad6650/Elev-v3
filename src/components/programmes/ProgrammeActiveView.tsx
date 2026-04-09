@@ -60,7 +60,7 @@ export default function ProgrammeActiveView({
           <div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 11,
                 fontWeight: 600,
                 letterSpacing: "0.1em",
@@ -72,7 +72,7 @@ export default function ProgrammeActiveView({
             </div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 28,
                 fontWeight: 500,
                 color: "var(--text-primary)",
@@ -103,7 +103,7 @@ export default function ProgrammeActiveView({
         {/* Cette semaine */}
         <div
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             letterSpacing: "0.08em",
@@ -180,7 +180,7 @@ function ProgressCard({
       <div className="flex justify-between items-center mb-3">
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             color: "var(--text-secondary)",
@@ -190,7 +190,7 @@ function ProgressCard({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             color: "var(--green)",
@@ -257,7 +257,7 @@ function DoneDayCard({
         <div className="flex-1">
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 15,
               fontWeight: 600,
               color: "var(--text-primary)",
@@ -267,7 +267,7 @@ function DoneDayCard({
           </div>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               color: "var(--text-muted)",
               marginTop: 2,
@@ -317,7 +317,7 @@ function TodayDayCard({
           <div className="flex items-center gap-2">
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 15,
                 fontWeight: 600,
                 color: "var(--text-primary)",
@@ -327,7 +327,7 @@ function TodayDayCard({
             </span>
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 10,
                 fontWeight: 600,
                 color: "var(--green)",
@@ -341,7 +341,7 @@ function TodayDayCard({
           </div>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               color: "var(--text-muted)",
               marginTop: 2,
@@ -359,7 +359,7 @@ function TodayDayCard({
           borderRadius: "var(--radius-sm)",
           background: "var(--green)",
           color: "#fff",
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 14,
           fontWeight: 600,
           border: "none",
@@ -401,7 +401,7 @@ function RestDayCard({ jour, isToday }: { jour: string; isToday: boolean }) {
         <div className="flex-1">
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 15,
               fontWeight: 600,
               color: "var(--text-muted)",
@@ -411,7 +411,7 @@ function RestDayCard({ jour, isToday }: { jour: string; isToday: boolean }) {
           </div>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               color: "var(--text-muted)",
               marginTop: 2,
@@ -457,7 +457,7 @@ function FutureDayCard({
         >
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 13,
               fontWeight: 700,
               color: "var(--text-muted)",
@@ -469,7 +469,7 @@ function FutureDayCard({
         <div className="flex-1">
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 15,
               fontWeight: 600,
               color: "var(--text-secondary)",
@@ -479,7 +479,7 @@ function FutureDayCard({
           </div>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               color: "var(--text-muted)",
               marginTop: 2,

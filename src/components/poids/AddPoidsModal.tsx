@@ -59,7 +59,7 @@ export default function AddPoidsModal({
         <div className="flex items-center justify-between mb-6">
           <h2
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 20,
               fontWeight: 600,
               color: "var(--text-primary)",
@@ -80,7 +80,7 @@ export default function AddPoidsModal({
           <span
             className="text-xs font-semibold uppercase tracking-wider"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: "var(--text-muted)",
             }}
           >
@@ -96,7 +96,7 @@ export default function AddPoidsModal({
               background: "rgba(255,255,255,0.5)",
               border: "1px solid rgba(0,0,0,0.06)",
               color: "var(--text-primary)",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
             }}
           />
         </label>
@@ -105,7 +105,7 @@ export default function AddPoidsModal({
           <span
             className="text-xs font-semibold uppercase tracking-wider"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: "var(--text-muted)",
             }}
           >
@@ -124,7 +124,7 @@ export default function AddPoidsModal({
               background: "rgba(255,255,255,0.5)",
               border: "1px solid rgba(0,0,0,0.06)",
               color: "var(--text-primary)",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
             }}
             autoFocus
           />
@@ -141,7 +141,7 @@ export default function AddPoidsModal({
           disabled={isPending || !poids}
           className="w-full py-4 rounded-xl text-base font-semibold transition-all active:scale-95"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             background:
               isPending || !poids ? "rgba(0,0,0,0.06)" : "var(--green)",
             color: isPending || !poids ? "var(--text-muted)" : "#fff",

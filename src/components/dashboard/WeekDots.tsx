@@ -30,7 +30,7 @@ export default memo(function WeekDots() {
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -42,7 +42,7 @@ export default memo(function WeekDots() {
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             color: "var(--green)",
@@ -80,7 +80,7 @@ export default memo(function WeekDots() {
             <div key={jour} className="flex flex-col items-center gap-2">
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 13,
                   fontWeight: 500,
                   color: isToday ? "var(--text-primary)" : "var(--text-muted)",

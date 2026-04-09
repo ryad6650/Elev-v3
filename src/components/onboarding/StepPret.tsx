@@ -68,7 +68,7 @@ export default function StepPret({ data, onBack }: Props) {
         <h2
           className="text-4xl mb-3"
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-lora)",
             fontStyle: "italic",
             color: "var(--text-primary)",
           }}

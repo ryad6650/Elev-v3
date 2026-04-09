@@ -206,7 +206,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
           placeholder="Nom de la routine"
           className="w-full bg-transparent outline-none mb-3"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontWeight: 700,
             color: "var(--text-primary)",
             fontSize: "24px",

@@ -58,7 +58,7 @@ export default function RoutineCard({
         <div className="flex-1 min-w-0">
           <p
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 17,
               fontWeight: 600,
               color: "var(--text-primary)",
@@ -71,7 +71,7 @@ export default function RoutineCard({
           <div className="flex items-center gap-2">
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 12,
                 color: "var(--text-muted)",
               }}
@@ -87,7 +87,7 @@ export default function RoutineCard({
                 <span
                   key={g}
                   style={{
-                    fontFamily: "var(--font-inter), sans-serif",
+                    fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 10,
                     fontWeight: 600,
                     letterSpacing: "0.04em",
@@ -163,7 +163,7 @@ export default function RoutineCard({
                   <span
                     className="flex-1 text-sm"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-secondary)",
                     }}
                   >
@@ -172,7 +172,7 @@ export default function RoutineCard({
                   <span
                     className="text-xs font-semibold tabular-nums shrink-0"
                     style={{
-                      fontFamily: "var(--font-inter), sans-serif",
+                      fontFamily: "var(--font-nunito), sans-serif",
                       color: "var(--text-muted)",
                     }}
                   >
@@ -193,7 +193,7 @@ export default function RoutineCard({
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white active:scale-[0.98] transition-transform"
             style={{
               background: "var(--green)",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
             }}
           >
             <Play size={14} fill="white" />

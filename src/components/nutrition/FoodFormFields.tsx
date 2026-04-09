@@ -1,5 +1,5 @@
 const labelStyle: React.CSSProperties = {
-  fontFamily: "var(--font-inter), sans-serif",
+  fontFamily: "var(--font-nunito), sans-serif",
   fontSize: 11,
   fontWeight: 600,
   letterSpacing: "0.06em",
@@ -14,7 +14,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: "var(--radius-sm)",
   background: "rgba(255,255,255,0.5)",
   border: "1px solid rgba(0,0,0,0.06)",
-  fontFamily: "var(--font-inter), sans-serif",
+  fontFamily: "var(--font-nunito), sans-serif",
   fontSize: 15,
   fontWeight: 600,
   color: "var(--text-primary)",
@@ -79,7 +79,7 @@ export function MacroField({
         <span
           className="shrink-0 text-[13px] font-semibold"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-muted)",
           }}
         >

@@ -239,7 +239,7 @@ export default function AddFoodModal({
               <p
                 className="text-xl leading-none"
                 style={{
-                  fontFamily: "var(--font-dm-serif)",
+                  fontFamily: "var(--font-lora)",
                   fontStyle: "italic",
                   color: isBeige ? "#2C1E14" : "var(--text-primary)",
                 }}

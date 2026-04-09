@@ -1,5 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Serif_Display, Inter } from "next/font/google";
+import {
+  DM_Sans,
+  DM_Serif_Display,
+  Inter,
+  Geist,
+  Geist_Mono,
+  Plus_Jakarta_Sans,
+  Playfair_Display,
+  Sora,
+  IBM_Plex_Mono,
+  Nunito,
+  Lora,
+} from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -21,6 +33,62 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const geist = Geist({
+  variable: "--font-geist",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const nunito = Nunito({
+  variable: "--font-nunito",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -54,7 +122,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable}`}
+      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${geist.variable} ${geistMono.variable} ${plusJakarta.variable} ${playfair.variable} ${sora.variable} ${ibmPlexMono.variable} ${nunito.variable} ${lora.variable}`}
     >
       <head>
         <link

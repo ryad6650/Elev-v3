@@ -51,7 +51,7 @@ export default function WorkoutProgrammesSection({
         <div className="flex items-center justify-between mb-3">
           <p
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               fontWeight: 600,
               letterSpacing: "0.08em",
@@ -64,7 +64,7 @@ export default function WorkoutProgrammesSection({
           <button
             onClick={() => setCreateOpen(true)}
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               fontWeight: 600,
               color: "var(--green)",
@@ -101,7 +101,7 @@ export default function WorkoutProgrammesSection({
               <p
                 className="truncate"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 14,
                   fontWeight: 600,
                   color: "var(--text-primary)",
@@ -111,7 +111,7 @@ export default function WorkoutProgrammesSection({
               </p>
               <p
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 11,
                   color: "var(--text-muted)",
                   marginTop: 2,
@@ -134,7 +134,7 @@ export default function WorkoutProgrammesSection({
           onClick={() => setCreateOpen(true)}
           className="w-full py-3.5 rounded-2xl mt-3 active:opacity-70 transition-opacity"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 500,
             border: "1.5px dashed rgba(0,0,0,0.12)",
@@ -187,7 +187,7 @@ function ActiveProgramme({
         <span
           className="flex-1"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 15,
             fontWeight: 600,
             color: "var(--text-primary)",
@@ -197,7 +197,7 @@ function ActiveProgramme({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: "0.06em",
@@ -234,7 +234,7 @@ function ActiveProgramme({
           </div>
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               fontWeight: 600,
               color: "var(--text-muted)",
@@ -260,7 +260,7 @@ function ActiveProgramme({
           <div className="flex flex-col gap-[2px]">
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: "0.1em",
@@ -272,7 +272,7 @@ function ActiveProgramme({
             </span>
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 14,
                 fontWeight: 600,
                 color: "#fff",
@@ -282,7 +282,7 @@ function ActiveProgramme({
             </span>
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 10,
                 color: "rgba(255,255,255,0.5)",
               }}
@@ -292,7 +292,7 @@ function ActiveProgramme({
           </div>
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               fontWeight: 700,
               color: "#fff",

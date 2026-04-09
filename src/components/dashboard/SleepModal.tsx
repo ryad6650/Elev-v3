@@ -255,8 +255,9 @@ export default function SleepModal({
             <h2
               className="text-lg font-bold"
               style={{
-                fontFamily: "var(--font-dm-serif)",
+                fontFamily: "var(--font-lora), serif",
                 fontStyle: "italic",
+                fontWeight: 700,
                 color: "var(--text-primary)",
               }}
             >

@@ -64,7 +64,7 @@ export default function HistoriqueStatsCards({
           <div className="flex flex-col">
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 22,
                 fontWeight: 600,
                 color: "var(--text-primary)",
@@ -76,7 +76,7 @@ export default function HistoriqueStatsCards({
             </div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 10,
                 fontWeight: 600,
                 color: "var(--text-muted)",

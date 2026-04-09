@@ -100,7 +100,7 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
           <h2
             className="text-2xl leading-tight"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontWeight: 700,
               color: "var(--text-primary)",
             }}

@@ -124,7 +124,7 @@ export default function WeeklyReportClient({ data }: Props) {
       </p>
       <h1
         style={{
-          fontFamily: "var(--font-dm-serif)",
+          fontFamily: "var(--font-lora)",
           fontStyle: "italic",
           fontSize: 28,
           color: "var(--text-primary)",

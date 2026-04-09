@@ -90,7 +90,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >
@@ -242,7 +242,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >
@@ -299,7 +299,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >

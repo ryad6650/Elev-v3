@@ -80,7 +80,7 @@ export default function RestTimer() {
         <p
           className="text-[22px] leading-[1.2]"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontWeight: 700,
             color: "var(--text-primary)",
           }}

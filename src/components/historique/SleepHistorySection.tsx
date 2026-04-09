@@ -106,7 +106,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
           <div className="flex-1 min-w-0">
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 12,
                 color: "var(--text-muted)",
               }}
@@ -117,7 +117,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
           <span
             className="shrink-0"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 15,
               fontWeight: 700,
               color: "var(--text-primary)",
@@ -174,7 +174,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
         <div className="flex items-center justify-between">
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               color: "var(--text-muted)",
             }}
@@ -183,7 +183,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
           </span>
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               fontWeight: 700,
               color: "var(--text-primary)",
@@ -201,7 +201,7 @@ function SectionLabel() {
   return (
     <div
       style={{
-        fontFamily: "var(--font-inter), sans-serif",
+        fontFamily: "var(--font-nunito), sans-serif",
         fontSize: 13,
         fontWeight: 600,
         letterSpacing: "0.1em",

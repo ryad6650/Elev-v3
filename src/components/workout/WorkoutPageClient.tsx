@@ -75,7 +75,7 @@ export default function WorkoutPageClient({
       <div className="flex items-center justify-between mb-1.5">
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -116,7 +116,7 @@ export default function WorkoutPageClient({
       </div>
       <h1
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 32,
           fontWeight: 500,
           color: "var(--text-primary)",
@@ -218,7 +218,7 @@ function QuickBtn({
       <div style={{ fontSize: 26, marginBottom: 6 }}>{icon}</div>
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 14,
           fontWeight: 600,
           color: "var(--text-primary)",
@@ -228,7 +228,7 @@ function QuickBtn({
       </div>
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 11,
           color: "var(--text-muted)",
           marginTop: 3,

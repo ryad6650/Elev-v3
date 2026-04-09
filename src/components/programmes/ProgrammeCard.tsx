@@ -37,7 +37,7 @@ export default function ProgrammeCard({ programme, estActif, onClick }: Props) {
         <h3
           className="text-xl leading-tight"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-primary)",
           }}
         >

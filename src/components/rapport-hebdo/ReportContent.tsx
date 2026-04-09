@@ -214,7 +214,7 @@ export default function ReportContent({ data }: Props) {
             className="text-lg font-bold"
             style={{
               color: "var(--text-primary)",
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-lora)",
               fontStyle: "italic",
             }}
           >
@@ -236,7 +236,7 @@ export default function ReportContent({ data }: Props) {
             className="text-lg font-bold"
             style={{
               color: "var(--text-primary)",
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-lora)",
               fontStyle: "italic",
             }}
           >
@@ -258,7 +258,7 @@ export default function ReportContent({ data }: Props) {
             className="text-lg font-bold"
             style={{
               color: "var(--text-primary)",
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-lora)",
               fontStyle: "italic",
             }}
           >
@@ -316,7 +316,7 @@ export default function ReportContent({ data }: Props) {
             <span
               className="text-2xl font-bold"
               style={{
-                fontFamily: "var(--font-dm-serif)",
+                fontFamily: "var(--font-lora)",
                 fontStyle: "italic",
                 color: "var(--text-primary)",
               }}

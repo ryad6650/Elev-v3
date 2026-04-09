@@ -79,7 +79,7 @@ export default function PoidsComposition({
       {/* Label */}
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 13,
           fontWeight: 600,
           letterSpacing: "0.1em",
@@ -102,7 +102,7 @@ export default function PoidsComposition({
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 32,
             fontWeight: 500,
             color: "var(--text-primary)",
@@ -114,7 +114,7 @@ export default function PoidsComposition({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 11,
             fontWeight: 700,
             padding: "3px 10px",
@@ -160,7 +160,7 @@ export default function PoidsComposition({
           <span
             key={v}
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 9,
               color: "var(--text-muted)",
             }}
@@ -184,7 +184,7 @@ export default function PoidsComposition({
         >
           <span
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 22,
               fontWeight: 700,
               color: "var(--text-primary)",
@@ -195,7 +195,7 @@ export default function PoidsComposition({
           <div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 11,
                 color: "var(--text-muted)",
                 marginBottom: 2,
@@ -205,7 +205,7 @@ export default function PoidsComposition({
             </div>
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 9,
                 fontWeight: 600,
                 padding: "2px 8px",

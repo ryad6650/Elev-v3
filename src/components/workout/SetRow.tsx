@@ -50,7 +50,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         <span
           className="text-[12px] font-bold"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: isActive ? "var(--green)" : "var(--text-muted)",
             fontWeight: isActive ? 800 : 700,
           }}
@@ -81,7 +81,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
           }}
         />
       </div>
@@ -107,7 +107,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
             background: inputBg,
             color: "var(--text-primary)",
             border: inputBorder,
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
           }}
         />
       </div>
@@ -117,7 +117,7 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
         <span
           className="text-[11px] font-medium"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-muted)",
           }}
         >

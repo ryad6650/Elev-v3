@@ -30,9 +30,10 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
           <span
             className="leading-none"
             style={{
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-lora), serif",
               fontStyle: "italic",
               fontSize: 54,
+              fontWeight: 600,
               color: "var(--accent-text)",
               letterSpacing: "-0.02em",
             }}

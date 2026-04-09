@@ -1,5 +1,5 @@
 const hdrStyle: React.CSSProperties = {
-  fontFamily: "var(--font-inter), sans-serif",
+  fontFamily: "var(--font-nunito), sans-serif",
   color: "var(--text-muted)",
 };
 

@@ -31,7 +31,7 @@ export default function ProgrammeActifCard({ programme, onClick }: Props) {
         </p>
         <h2
           className="text-2xl leading-tight text-white mb-1 truncate"
-          style={{ fontFamily: "var(--font-inter), sans-serif" }}
+          style={{ fontFamily: "var(--font-nunito), sans-serif" }}
         >
           {programme.nom}
         </h2>

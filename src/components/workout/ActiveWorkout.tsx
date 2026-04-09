@@ -120,7 +120,7 @@ export default function ActiveWorkout() {
               <span
                 className="text-[12px] font-semibold uppercase tracking-[0.08em]"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-muted)",
                 }}
               >
@@ -131,7 +131,7 @@ export default function ActiveWorkout() {
               onClick={() => setShowSummary(true)}
               className="text-[12px] font-semibold tracking-[0.02em] rounded-full px-[18px] py-2 border-none"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 background: "var(--green)",
                 color: "#fff",
               }}
@@ -144,7 +144,7 @@ export default function ActiveWorkout() {
           <h1
             className="text-[28px] leading-[1.1] font-medium tracking-[-0.5px] mt-3 mb-3"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: "var(--text-primary)",
             }}
           >
@@ -171,7 +171,7 @@ export default function ActiveWorkout() {
               <span
                 className="text-[10px] font-semibold uppercase tracking-[0.08em]"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-muted)",
                 }}
               >
@@ -212,7 +212,7 @@ export default function ActiveWorkout() {
             <p
               className="text-[11px] font-semibold uppercase tracking-[0.08em] mt-1 mb-1"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 color: "var(--text-muted)",
               }}
             >
@@ -285,7 +285,7 @@ export default function ActiveWorkout() {
             <p
               className="flex-1 text-xs font-semibold truncate"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 color: "var(--green)",
               }}
             >

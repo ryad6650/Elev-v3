@@ -62,7 +62,7 @@ export default function MensurationsCard({ initial }: Props) {
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -76,7 +76,7 @@ export default function MensurationsCard({ initial }: Props) {
           onClick={editing ? handleSave : () => setEditing(true)}
           disabled={editing && isPending}
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             color: "var(--green)",
@@ -108,7 +108,7 @@ export default function MensurationsCard({ initial }: Props) {
           >
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 9,
                 fontWeight: 600,
                 letterSpacing: "0.06em",
@@ -137,7 +137,7 @@ export default function MensurationsCard({ initial }: Props) {
                   style={{
                     width: "100%",
                     background: "transparent",
-                    fontFamily: "var(--font-inter), sans-serif",
+                    fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 15,
                     fontWeight: 700,
                     color: "var(--text-primary)",
@@ -160,7 +160,7 @@ export default function MensurationsCard({ initial }: Props) {
               <div>
                 <span
                   style={{
-                    fontFamily: "var(--font-inter), sans-serif",
+                    fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 15,
                     fontWeight: 700,
                     color: "var(--text-primary)",

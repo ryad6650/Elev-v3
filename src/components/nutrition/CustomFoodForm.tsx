@@ -38,7 +38,7 @@ type ValKey =
   | "codeBarres";
 
 const sectionLabel: React.CSSProperties = {
-  fontFamily: "var(--font-inter), sans-serif",
+  fontFamily: "var(--font-nunito), sans-serif",
   fontSize: 11,
   fontWeight: 600,
   letterSpacing: "0.08em",
@@ -301,7 +301,7 @@ export default function CustomFoodForm({
           borderRadius: "var(--radius-sm)",
           border: "none",
           opacity: disabled ? 0.5 : 1,
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           cursor: "pointer",
         }}
       >
@@ -325,7 +325,7 @@ export default function CustomFoodForm({
             background: "none",
             border: "none",
             color: "#c94444",
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             cursor: "pointer",
           }}
         >

@@ -53,7 +53,7 @@ export default memo(function WorkoutWeekTimeline({
       <div className="flex items-center justify-between mb-3">
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             letterSpacing: "0.08em",
@@ -66,7 +66,7 @@ export default memo(function WorkoutWeekTimeline({
         <Link
           href="/historique"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             color: "var(--green)",
@@ -91,7 +91,7 @@ export default memo(function WorkoutWeekTimeline({
             <div key={jour} className="flex flex-col items-center gap-1.5">
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 11,
                   fontWeight: isToday ? 700 : 500,
                   letterSpacing: "0.04em",
@@ -159,7 +159,7 @@ function DayDot({
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 8,
             fontWeight: 700,
             color: "var(--text-muted)",

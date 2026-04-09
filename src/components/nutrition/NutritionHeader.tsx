@@ -16,7 +16,7 @@ function MacroRow({ label, value, max, color }: MacroRowProps) {
       <div className="flex justify-between items-baseline">
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: "0.08em",
@@ -28,7 +28,7 @@ function MacroRow({ label, value, max, color }: MacroRowProps) {
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 500,
             color: "var(--text-muted)",
@@ -87,7 +87,7 @@ export default function NutritionHeader({
       {/* Calories */}
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 11,
           fontWeight: 600,
           letterSpacing: "0.1em",
@@ -100,7 +100,7 @@ export default function NutritionHeader({
       </div>
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 42,
           fontWeight: 500,
           color: "var(--text-primary)",

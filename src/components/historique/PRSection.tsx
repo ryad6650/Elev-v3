@@ -22,7 +22,7 @@ export default function PRSection({ prs }: Props) {
     >
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 13,
           fontWeight: 600,
           letterSpacing: "0.1em",
@@ -49,7 +49,7 @@ export default function PRSection({ prs }: Props) {
             <div
               className="truncate"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 11,
                 color: "var(--text-muted)",
                 marginBottom: 4,
@@ -60,7 +60,7 @@ export default function PRSection({ prs }: Props) {
             <div>
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 20,
                   fontWeight: 700,
                   color: "var(--green)",
@@ -71,7 +71,7 @@ export default function PRSection({ prs }: Props) {
               </span>
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 11,
                   color: "var(--text-muted)",
                   marginLeft: 3,

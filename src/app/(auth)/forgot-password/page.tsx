@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
         <h1
           className="text-3xl mb-1"
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-lora)",
             fontStyle: "italic",
             color: "var(--text-primary)",
           }}

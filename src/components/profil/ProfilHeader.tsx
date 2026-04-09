@@ -112,7 +112,7 @@ export default function ProfilHeader({ profil }: Props) {
         <h1
           className="text-2xl leading-tight truncate"
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-lora)",
             fontStyle: "italic",
             color: "var(--text-primary)",
           }}

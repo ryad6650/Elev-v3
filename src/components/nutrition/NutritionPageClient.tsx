@@ -121,7 +121,7 @@ export default function NutritionPageClient({ initialData }: Props) {
         >
           <h1
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 32,
               fontWeight: 500,
               color: "var(--text-primary)",
@@ -152,7 +152,7 @@ export default function NutritionPageClient({ initialData }: Props) {
             </button>
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 15,
                 fontWeight: 600,
                 color: "var(--text-primary)",

@@ -89,7 +89,7 @@ export default memo(function FoodSearchResults({
               style={{
                 background: av.bg,
                 color: av.color,
-                fontFamily: "var(--font-dm-serif)",
+                fontFamily: "var(--font-lora)",
                 fontStyle: "italic",
               }}
             >

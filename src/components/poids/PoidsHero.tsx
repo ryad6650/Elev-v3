@@ -57,7 +57,7 @@ export default function PoidsHero({
       <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 52,
             fontWeight: 500,
             color: "var(--text-primary)",
@@ -69,7 +69,7 @@ export default function PoidsHero({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 16,
             fontWeight: 600,
             color: "var(--text-muted)",
@@ -91,7 +91,7 @@ export default function PoidsHero({
             borderRadius: 9999,
             fontSize: 12,
             fontWeight: 700,
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: delta <= 0 ? "var(--green)" : "#c94444",
             background: delta <= 0 ? "var(--green-dim)" : "rgba(201,68,68,0.1)",
           }}
@@ -132,7 +132,7 @@ export default function PoidsHero({
             fontWeight: 700,
             color: "var(--text-primary)",
             textAlign: "center",
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
           }}
         />
         <span
@@ -156,7 +156,7 @@ export default function PoidsHero({
             fontSize: 13,
             fontWeight: 600,
             border: "none",
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             opacity: isPending || !value ? 0.5 : 1,
             cursor: isPending || !value ? "not-allowed" : "pointer",
           }}

@@ -108,7 +108,7 @@ export default function WorkoutHub({ data }: Props) {
       {/* Section label */}
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 12,
           fontWeight: 600,
           letterSpacing: "0.08em",
@@ -131,7 +131,7 @@ export default function WorkoutHub({ data }: Props) {
             onClick={() => setFiltre(f)}
             className="shrink-0 active:scale-95 transition-all"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 13,
               fontWeight: 600,
               padding: "8px 16px",
@@ -203,7 +203,7 @@ export default function WorkoutHub({ data }: Props) {
             <p
               className="text-center font-semibold mb-4 truncate px-4"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 color: "var(--text-primary)",
               }}
             >
@@ -214,7 +214,7 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={() => handleStartRoutine(menuRoutine)}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   background: "var(--green)",
                   color: "white",
                   border: "none",
@@ -227,7 +227,7 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={handleOpenEdit}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   background: "rgba(255,255,255,0.5)",
                   color: "var(--text-primary)",
                   border: "none",
@@ -241,7 +241,7 @@ export default function WorkoutHub({ data }: Props) {
                 disabled={deleting}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm disabled:opacity-50"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   background: "rgba(255,255,255,0.5)",
                   color: "#c94444",
                   border: "none",
@@ -254,7 +254,7 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={() => setMenuRoutine(null)}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl text-sm"
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   color: "var(--text-muted)",
                   background: "none",
                   border: "none",

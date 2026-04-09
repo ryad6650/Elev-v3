@@ -52,7 +52,7 @@ export default memo(function FoodItem({ entry, onClick }: Props) {
         <div
           className="truncate"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 14,
             fontWeight: 600,
             color: "var(--text-primary)",
@@ -74,7 +74,7 @@ export default memo(function FoodItem({ entry, onClick }: Props) {
       <span
         className="shrink-0"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 13,
           fontWeight: 700,
           color: "var(--text-primary)",

@@ -140,7 +140,8 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
         <>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-lora), serif",
+              fontStyle: "italic",
               fontSize: 28,
               fontWeight: 600,
               color: "var(--text-primary)",

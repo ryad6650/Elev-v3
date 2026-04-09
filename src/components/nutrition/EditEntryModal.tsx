@@ -120,7 +120,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
             <p
               className="text-xl leading-none"
               style={{
-                fontFamily: "var(--font-dm-serif)",
+                fontFamily: "var(--font-lora)",
                 fontStyle: "italic",
                 color: "#2C1E14",
               }}

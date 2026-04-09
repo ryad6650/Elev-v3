@@ -72,7 +72,7 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
               <p
                 className="text-center text-xl leading-snug"
                 style={{
-                  fontFamily: "var(--font-dm-serif)",
+                  fontFamily: "var(--font-lora)",
                   fontStyle: "italic",
                   color: "var(--text-primary)",
                 }}

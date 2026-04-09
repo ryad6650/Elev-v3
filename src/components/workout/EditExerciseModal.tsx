@@ -148,7 +148,7 @@ export default function EditExerciseModal({
           <h3
             className="text-lg"
             style={{
-              fontFamily: "var(--font-dm-serif)",
+              fontFamily: "var(--font-lora)",
               fontStyle: "italic",
               color: "var(--text-primary)",
             }}

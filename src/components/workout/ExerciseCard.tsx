@@ -132,7 +132,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         <span
           className="flex-1 min-w-0 text-[15px] font-semibold leading-tight truncate"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-primary)",
           }}
         >
@@ -193,7 +193,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           onClick={() => addSet(uid)}
           className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] text-center transition-opacity active:opacity-70"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             background: "rgba(0,0,0,0.03)",
             color: "var(--text-muted)",
           }}
@@ -210,7 +210,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           onClick={() => addWarmupSets(uid)}
           className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] text-center transition-opacity active:opacity-70"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             background: "rgba(0,0,0,0.03)",
             color: hasWarmup ? "var(--green)" : "var(--text-muted)",
           }}
@@ -294,7 +294,7 @@ function ClosedCard({
       <span
         className="flex-1 text-left text-[15px] font-semibold truncate"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           color: "var(--text-primary)",
           opacity: allDone ? 0.7 : 1,
         }}

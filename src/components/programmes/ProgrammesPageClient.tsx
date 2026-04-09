@@ -48,7 +48,7 @@ export default function ProgrammesPageClient({ data }: Props) {
         <h1
           className="text-3xl leading-tight"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             color: "var(--text-primary)",
           }}
         >
@@ -124,7 +124,7 @@ export default function ProgrammesPageClient({ data }: Props) {
           <h2
             className="text-xl mb-2"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: "var(--text-secondary)",
             }}
           >

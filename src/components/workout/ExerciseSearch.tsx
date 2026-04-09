@@ -199,7 +199,7 @@ export default function ExerciseSearch({
         <h2
           className="text-2xl mb-1"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontWeight: 700,
             color: "var(--text-primary)",
           }}

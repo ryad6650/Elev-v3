@@ -88,7 +88,7 @@ export default function PoidsPageClient({ initialData }: Props) {
       <div style={{ marginBottom: 20 }}>
         <div
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -101,7 +101,7 @@ export default function PoidsPageClient({ initialData }: Props) {
         </div>
         <h1
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 32,
             fontWeight: 500,
             color: "var(--text-primary)",

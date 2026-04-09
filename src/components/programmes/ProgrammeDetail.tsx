@@ -82,7 +82,7 @@ export default function ProgrammeDetail({
           <h2
             className="text-3xl leading-tight mb-2"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: "var(--text-primary)",
             }}
           >

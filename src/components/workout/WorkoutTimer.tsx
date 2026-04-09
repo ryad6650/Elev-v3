@@ -52,7 +52,7 @@ export default function WorkoutTimer({
       <span
         className="text-[28px] tracking-[-0.02em] leading-[1.2]"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontWeight: 700,
           color: "var(--text-primary)",
         }}

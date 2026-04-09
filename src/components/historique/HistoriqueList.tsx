@@ -56,7 +56,7 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
         <div key={label}>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 11,
               fontWeight: 600,
               letterSpacing: "0.08em",
@@ -115,7 +115,7 @@ function WorkoutItem({
         <div
           className="truncate"
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 15,
             fontWeight: 600,
             color: "var(--text-primary)",
@@ -126,7 +126,7 @@ function WorkoutItem({
         </div>
         <div
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 11,
             color: "var(--text-muted)",
             marginBottom: 6,
@@ -160,7 +160,7 @@ function Chip({ label }: { label: string }) {
   return (
     <span
       style={{
-        fontFamily: "var(--font-inter), sans-serif",
+        fontFamily: "var(--font-nunito), sans-serif",
         fontSize: 10,
         fontWeight: 600,
         letterSpacing: "0.04em",

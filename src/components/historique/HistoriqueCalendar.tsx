@@ -66,7 +66,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
       <div className="flex items-center justify-between mb-3">
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 15,
             fontWeight: 600,
             color: "var(--text-primary)",
@@ -104,7 +104,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
             key={i}
             className="text-center py-0.5"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 9,
               fontWeight: 600,
               color: "var(--text-muted)",
@@ -132,7 +132,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
               key={dateStr}
               className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded-lg relative"
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 10,
                 fontWeight: isToday ? 700 : 500,
                 color: isToday ? "#fff" : "var(--text-muted)",
@@ -163,7 +163,7 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
       <div
         className="text-center mt-3"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 11,
           fontWeight: 600,
           color: "var(--text-muted)",

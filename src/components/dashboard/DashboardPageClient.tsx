@@ -46,7 +46,7 @@ export default function DashboardPageClient({ initialData }: Props) {
           <div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 14,
                 fontWeight: 500,
                 color: "var(--text-muted)",
@@ -59,9 +59,10 @@ export default function DashboardPageClient({ initialData }: Props) {
             </div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-lora), serif",
+                fontStyle: "italic",
                 fontSize: 38,
-                fontWeight: 500,
+                fontWeight: 600,
                 color: "var(--text-primary)",
                 letterSpacing: "-0.5px",
                 lineHeight: 1.1,
@@ -91,7 +92,7 @@ export default function DashboardPageClient({ initialData }: Props) {
             ) : (
               <span
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 18,
                   fontWeight: 600,
                   color: "var(--green)",
@@ -138,7 +139,8 @@ export default function DashboardPageClient({ initialData }: Props) {
             <div style={{ fontSize: 24, marginBottom: 8 }}>⚖️</div>
             <div
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-lora), serif",
+                fontStyle: "italic",
                 fontSize: 28,
                 fontWeight: 600,
                 color: "var(--text-primary)",
@@ -173,7 +175,7 @@ export default function DashboardPageClient({ initialData }: Props) {
               borderRadius: "var(--radius-pill)",
               background: "var(--cta-bg)",
               color: "var(--cta-text)",
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 16,
               fontWeight: 600,
               letterSpacing: "0.02em",

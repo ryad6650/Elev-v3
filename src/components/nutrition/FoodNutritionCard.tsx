@@ -59,7 +59,7 @@ export default memo(function FoodNutritionCard({
       <p
         className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-3"
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           color: "var(--text-muted)",
         }}
       >
@@ -78,7 +78,7 @@ export default memo(function FoodNutritionCard({
           <span
             className="text-[15px]"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: r.sub ? "var(--text-muted)" : "var(--text-secondary)",
             }}
           >
@@ -87,7 +87,7 @@ export default memo(function FoodNutritionCard({
           <span
             className="text-[15px] font-bold"
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-nunito), sans-serif",
               color: r.color ?? "var(--text-primary)",
             }}
           >

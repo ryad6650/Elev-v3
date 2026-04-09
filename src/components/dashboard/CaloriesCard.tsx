@@ -72,7 +72,7 @@ export default memo(function CaloriesCard({
       >
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
             letterSpacing: "0.1em",
@@ -84,7 +84,7 @@ export default memo(function CaloriesCard({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-inter), sans-serif",
+            fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
             color: "var(--green)",
@@ -130,7 +130,8 @@ export default memo(function CaloriesCard({
           <div className="absolute inset-0 flex items-center justify-center">
             <span
               style={{
-                fontFamily: "var(--font-inter), sans-serif",
+                fontFamily: "var(--font-lora), serif",
+                fontStyle: "italic",
                 fontSize: 24,
                 fontWeight: 600,
                 color: "var(--text-primary)",
@@ -145,7 +146,8 @@ export default memo(function CaloriesCard({
         <div>
           <div
             style={{
-              fontFamily: "var(--font-inter), sans-serif",
+              fontFamily: "var(--font-lora), serif",
+              fontStyle: "italic",
               fontSize: 42,
               fontWeight: 500,
               color: "var(--text-primary)",
@@ -195,7 +197,7 @@ export default memo(function CaloriesCard({
             >
               <div
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.1em",
@@ -208,7 +210,8 @@ export default memo(function CaloriesCard({
               </div>
               <div
                 style={{
-                  fontFamily: "var(--font-inter), sans-serif",
+                  fontFamily: "var(--font-lora), serif",
+                  fontStyle: "italic",
                   fontSize: 22,
                   fontWeight: 600,
                   color: "var(--text-primary)",

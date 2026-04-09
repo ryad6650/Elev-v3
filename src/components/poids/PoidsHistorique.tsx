@@ -74,7 +74,7 @@ function HistoriqueRow({
     >
       <span
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 12,
           color: "var(--text-muted)",
           width: 60,
@@ -86,7 +86,7 @@ function HistoriqueRow({
       <span
         style={{
           flex: 1,
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 15,
           fontWeight: 700,
           color: "var(--text-primary)",
@@ -96,7 +96,7 @@ function HistoriqueRow({
       </span>
       <span
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 12,
           fontWeight: 700,
           color: deltaColor,
@@ -127,7 +127,7 @@ export default function PoidsHistorique({ entries, onEdit, onDeleted }: Props) {
     >
       <div
         style={{
-          fontFamily: "var(--font-inter), sans-serif",
+          fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 13,
           fontWeight: 600,
           letterSpacing: "0.1em",
