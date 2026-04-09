@@ -41,26 +41,25 @@ export default function PoidsHero({
   return (
     <div
       style={{
-        padding: "12px 0 18px",
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: "24px 20px",
+        marginBottom: 14,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        borderBottom: "1px solid rgba(74,55,40,0.08)",
-        marginBottom: 6,
       }}
     >
-      {/* Poids actuel — gros chiffre centré */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          gap: 6,
-        }}
-      >
+      {/* Poids actuel */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
         <span
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-inter), sans-serif",
             fontSize: 52,
+            fontWeight: 500,
             color: "var(--text-primary)",
             letterSpacing: "-0.03em",
             lineHeight: 1,
@@ -70,6 +69,7 @@ export default function PoidsHero({
         </span>
         <span
           style={{
+            fontFamily: "var(--font-inter), sans-serif",
             fontSize: 16,
             fontWeight: 600,
             color: "var(--text-muted)",
@@ -86,14 +86,14 @@ export default function PoidsHero({
             display: "inline-flex",
             alignItems: "center",
             gap: 3,
-            padding: "3px 10px",
-            marginTop: 8,
-            borderRadius: 20,
-            fontSize: 11,
+            padding: "4px 12px",
+            marginTop: 10,
+            borderRadius: 9999,
+            fontSize: 12,
             fontWeight: 700,
-            color: delta <= 0 ? "#74bf7a" : "#E87C6A",
-            background:
-              delta <= 0 ? "rgba(116,191,122,0.12)" : "rgba(232,124,106,0.12)",
+            fontFamily: "var(--font-inter), sans-serif",
+            color: delta <= 0 ? "var(--green)" : "#c94444",
+            background: delta <= 0 ? "var(--green-dim)" : "rgba(201,68,68,0.1)",
           }}
         >
           {delta <= 0 ? "↓" : "↑"} {Math.abs(delta)} kg cette semaine
@@ -106,7 +106,7 @@ export default function PoidsHero({
           display: "flex",
           alignItems: "center",
           gap: 8,
-          marginTop: 16,
+          marginTop: 18,
         }}
       >
         <input
@@ -125,14 +125,14 @@ export default function PoidsHero({
           style={{
             width: 90,
             padding: "10px 14px",
-            borderRadius: 14,
-            border: "1px solid rgba(74,55,40,0.12)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid rgba(0,0,0,0.08)",
             background: "rgba(255,255,255,0.5)",
             fontSize: 18,
             fontWeight: 700,
             color: "var(--text-primary)",
             textAlign: "center",
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-inter), sans-serif",
           }}
         />
         <span
@@ -150,14 +150,13 @@ export default function PoidsHero({
           className="active:scale-95 transition-transform"
           style={{
             padding: "10px 18px",
-            borderRadius: 14,
-            background:
-              "linear-gradient(135deg, var(--bar-from), var(--bar-to))",
+            borderRadius: "var(--radius-sm)",
+            background: "var(--green)",
             color: "#fff",
-            fontSize: 12,
-            fontWeight: 700,
+            fontSize: 13,
+            fontWeight: 600,
             border: "none",
-            letterSpacing: "0.02em",
+            fontFamily: "var(--font-inter), sans-serif",
             opacity: isPending || !value ? 0.5 : 1,
             cursor: isPending || !value ? "not-allowed" : "pointer",
           }}

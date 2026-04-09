@@ -55,33 +55,35 @@ export default function HistoriquePageClient({ initialData }: Props) {
 
   return (
     <main
-      className="pt-5 pb-28 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto", padding: "20px 16px 112px" }}
+      className="page-enter"
+      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 28px 112px" }}
     >
-      {/* En-tête */}
-      <div style={{ padding: "0 6px", marginBottom: 16 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 20 }}>
         <div
-          className="font-bold uppercase"
           style={{
-            fontSize: "9px",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
             color: "var(--text-muted)",
-            letterSpacing: "0.12em",
             marginBottom: 4,
           }}
         >
           Journal
         </div>
         <h1
-          className="leading-none"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontSize: "28px",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 32,
+            fontWeight: 500,
             color: "var(--text-primary)",
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.5px",
+            lineHeight: 1.1,
           }}
         >
-          Historique.
+          Historique
         </h1>
       </div>
 
@@ -97,10 +99,8 @@ export default function HistoriquePageClient({ initialData }: Props) {
         streakActuel={data.streakActuel}
       />
 
-      {/* Liste des séances */}
       <HistoriqueList workouts={data.workouts} onSelect={handleSelect} />
 
-      {/* Sommeil */}
       <SleepHistorySection
         sommeil={data.sommeil}
         onDeleted={(id) => {
@@ -111,10 +111,8 @@ export default function HistoriquePageClient({ initialData }: Props) {
         }}
       />
 
-      {/* Records personnels */}
       <PRSection prs={data.prsRecents} />
 
-      {/* Détail séance */}
       {selectedWorkout && (
         <WorkoutDetailSheet
           workout={selectedWorkout}

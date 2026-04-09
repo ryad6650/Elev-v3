@@ -4,13 +4,13 @@ import { ChevronRight } from "lucide-react";
 import type { Programme } from "@/lib/programmes";
 
 const DIFFICULTE_STYLE = {
-  debutant: { bg: "rgba(34,197,94,0.15)", text: "#22C55E", label: "Débutant" },
+  debutant: { bg: "var(--green-dim)", text: "var(--green)", label: "Débutant" },
   intermediaire: {
-    bg: "var(--accent-bg)",
-    text: "var(--accent-text)",
+    bg: "var(--green-dim)",
+    text: "var(--green)",
     label: "Intermédiaire",
   },
-  avance: { bg: "rgba(239,68,68,0.15)", text: "#EF4444", label: "Avancé" },
+  avance: { bg: "rgba(201,68,68,0.1)", text: "#c94444", label: "Avancé" },
 };
 
 interface Props {
@@ -29,16 +29,15 @@ export default function ProgrammeCard({ programme, estActif, onClick }: Props) {
       onClick={onClick}
       className="w-full text-left rounded-2xl border p-4 mb-3 transition-all active:scale-[0.99]"
       style={{
-        background: "var(--bg-secondary)",
-        borderColor: estActif ? "var(--accent)" : "var(--border)",
+        background: "rgba(255,255,255,0.5)",
+        borderColor: estActif ? "var(--green)" : "rgba(0,0,0,0.06)",
       }}
     >
       <div className="flex items-start justify-between mb-1">
         <h3
           className="text-xl leading-tight"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
+            fontFamily: "var(--font-inter), sans-serif",
             color: "var(--text-primary)",
           }}
         >
@@ -78,7 +77,7 @@ export default function ProgrammeCard({ programme, estActif, onClick }: Props) {
         {estActif && (
           <span
             className="text-[11px] font-semibold px-2 py-0.5 rounded-md ml-auto"
-            style={{ background: "var(--accent-bg)", color: "var(--accent)" }}
+            style={{ background: "var(--green-dim)", color: "var(--green)" }}
           >
             En cours
           </span>
@@ -99,12 +98,12 @@ export default function ProgrammeCard({ programme, estActif, onClick }: Props) {
           </div>
           <div
             className="h-1 rounded-full overflow-hidden"
-            style={{ background: "var(--bg-elevated)" }}
+            style={{ background: "rgba(255,255,255,0.5)" }}
           >
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
-                background: "var(--accent)",
+                background: "var(--green)",
                 width: `${Math.round(((programme.progres.semaine_actuelle - 1) / programme.progres.total_semaines) * 100)}%`,
               }}
             />

@@ -24,9 +24,17 @@ export default function HistoriqueStatsCards({
   const volume = workouts.reduce((sum, w) => sum + w.volume, 0);
 
   const stats = [
-    { val: String(seances), label: "Séances", barColor: "#74BF7A" },
-    { val: `🔥 ${streakActuel}`, label: "Streak", barColor: "#C8A055" },
-    { val: formatVolume(volume), label: "Volume kg", barColor: "#6BA3D6" },
+    { val: String(seances), label: "Séances", barColor: "var(--green)" },
+    {
+      val: `🔥 ${streakActuel}`,
+      label: "Streak",
+      barColor: "var(--color-carbs)",
+    },
+    {
+      val: formatVolume(volume),
+      label: "Volume kg",
+      barColor: "var(--color-protein)",
+    },
   ];
 
   return (
@@ -34,14 +42,14 @@ export default function HistoriqueStatsCards({
       {stats.map(({ val, label, barColor }) => (
         <div
           key={label}
-          className="flex-1 flex items-center gap-2.5 rounded-[16px]"
+          className="flex-1 flex items-center gap-2.5"
           style={{
-            background: "rgba(255,255,255,0.35)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(255,255,255,0.3)",
-            boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
-            padding: "12px",
+            background: "var(--glass-bg)",
+            backdropFilter: "var(--glass-blur)",
+            WebkitBackdropFilter: "var(--glass-blur)",
+            borderRadius: "var(--radius-card)",
+            border: "1px solid var(--glass-border)",
+            padding: 12,
           }}
         >
           <div
@@ -55,23 +63,26 @@ export default function HistoriqueStatsCards({
           />
           <div className="flex flex-col">
             <div
-              className="leading-none"
               style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontSize: "22px",
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 22,
+                fontWeight: 600,
                 color: "var(--text-primary)",
                 letterSpacing: "-0.02em",
+                lineHeight: 1,
               }}
             >
               {val}
             </div>
             <div
-              className="font-semibold uppercase"
               style={{
-                fontSize: "10px",
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 10,
+                fontWeight: 600,
                 color: "var(--text-muted)",
                 marginTop: 3,
                 letterSpacing: "0.06em",
+                textTransform: "uppercase",
               }}
             >
               {label}

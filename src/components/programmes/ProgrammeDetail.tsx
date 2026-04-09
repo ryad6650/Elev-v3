@@ -7,13 +7,13 @@ import { activerProgramme, deleteProgramme } from "@/app/actions/programmes";
 import type { Programme } from "@/lib/programmes";
 
 const DIFFICULTE_STYLE = {
-  debutant: { bg: "rgba(34,197,94,0.15)", text: "#22C55E", label: "Débutant" },
+  debutant: { bg: "var(--green-dim)", text: "var(--green)", label: "Débutant" },
   intermediaire: {
-    bg: "var(--accent-bg)",
-    text: "var(--accent-text)",
+    bg: "var(--green-dim)",
+    text: "var(--green)",
     label: "Intermédiaire",
   },
-  avance: { bg: "rgba(239,68,68,0.15)", text: "#EF4444", label: "Avancé" },
+  avance: { bg: "rgba(201,68,68,0.1)", text: "#c94444", label: "Avancé" },
 };
 
 interface Props {
@@ -53,18 +53,21 @@ export default function ProgrammeDetail({
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col justify-end"
-      style={{ background: "rgba(0,0,0,0.65)" }}
+      style={{ background: "rgba(0,0,0,0.4)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className="rounded-t-3xl overflow-y-auto"
-        style={{ background: "var(--bg-secondary)", maxHeight: "88vh" }}
+        style={{
+          background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
+          maxHeight: "88vh",
+        }}
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div
             className="w-10 h-1 rounded-full"
-            style={{ background: "var(--bg-elevated)" }}
+            style={{ background: "rgba(255,255,255,0.5)" }}
           />
         </div>
 
@@ -79,8 +82,7 @@ export default function ProgrammeDetail({
           <h2
             className="text-3xl leading-tight mb-2"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
               color: "var(--text-primary)",
             }}
           >
@@ -106,7 +108,7 @@ export default function ProgrammeDetail({
             <span
               className="text-[11px] font-medium px-2.5 py-1 rounded-lg"
               style={{
-                background: "var(--bg-card)",
+                background: "rgba(0,0,0,0.04)",
                 color: "var(--text-secondary)",
               }}
             >
@@ -116,7 +118,7 @@ export default function ProgrammeDetail({
               <span
                 className="text-[11px] font-medium px-2.5 py-1 rounded-lg"
                 style={{
-                  background: "var(--bg-card)",
+                  background: "rgba(0,0,0,0.04)",
                   color: "var(--text-secondary)",
                 }}
               >
@@ -160,8 +162,8 @@ export default function ProgrammeDetail({
                     key={r.jour}
                     className="flex items-center justify-between rounded-xl p-3"
                     style={{
-                      background: "var(--bg-card)",
-                      border: "1px solid var(--border)",
+                      background: "rgba(0,0,0,0.04)",
+                      border: "1px solid rgba(0,0,0,0.06)",
                     }}
                   >
                     <div>
@@ -196,7 +198,7 @@ export default function ProgrammeDetail({
               <div
                 className="w-full py-3.5 rounded-xl text-center text-sm font-semibold"
                 style={{
-                  background: "var(--bg-elevated)",
+                  background: "rgba(255,255,255,0.5)",
                   color: "var(--text-muted)",
                 }}
               >
@@ -208,7 +210,7 @@ export default function ProgrammeDetail({
                 disabled={pending}
                 className="w-full py-3.5 rounded-xl text-sm font-semibold text-white transition-opacity"
                 style={{
-                  background: "var(--accent)",
+                  background: "var(--green)",
                   opacity: pending ? 0.6 : 1,
                 }}
               >
@@ -219,7 +221,7 @@ export default function ProgrammeDetail({
               onClick={onClose}
               className="w-full py-3.5 rounded-xl text-sm font-medium transition-colors"
               style={{
-                border: "1px solid var(--border)",
+                border: "1px solid rgba(0,0,0,0.06)",
                 color: "var(--text-primary)",
                 background: "transparent",
               }}
@@ -230,7 +232,7 @@ export default function ProgrammeDetail({
               onClick={handleSupprimer}
               disabled={pending}
               className="w-full py-2 text-xs transition-opacity"
-              style={{ color: "var(--danger)", opacity: pending ? 0.5 : 1 }}
+              style={{ color: "#c94444", opacity: pending ? 0.5 : 1 }}
             >
               Supprimer ce programme
             </button>

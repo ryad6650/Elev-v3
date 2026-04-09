@@ -169,7 +169,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
       <div
         className="px-4 pb-4 border-b"
         style={{
-          borderColor: "var(--border)",
+          borderColor: "rgba(0,0,0,0.06)",
           paddingTop: "max(1.25rem, env(safe-area-inset-top))",
         }}
       >
@@ -206,15 +206,15 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
           placeholder="Nom de la routine"
           className="w-full bg-transparent outline-none mb-3"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontWeight: 700,
             color: "var(--text-primary)",
             fontSize: "24px",
             lineHeight: "1.2",
           }}
         />
         {erreur && (
-          <p className="text-xs mt-1 mb-2" style={{ color: "var(--danger)" }}>
+          <p className="text-xs mt-1 mb-2" style={{ color: "#c94444" }}>
             {erreur}
           </p>
         )}

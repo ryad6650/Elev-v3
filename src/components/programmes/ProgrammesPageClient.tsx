@@ -48,8 +48,7 @@ export default function ProgrammesPageClient({ data }: Props) {
         <h1
           className="text-3xl leading-tight"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
+            fontFamily: "var(--font-inter), sans-serif",
             color: "var(--text-primary)",
           }}
         >
@@ -58,7 +57,7 @@ export default function ProgrammesPageClient({ data }: Props) {
         <button
           onClick={() => setCreateOpen(true)}
           className="flex items-center justify-center rounded-full transition-transform active:scale-95"
-          style={{ width: 40, height: 40, background: "var(--accent)" }}
+          style={{ width: 40, height: 40, background: "var(--green)" }}
           aria-label="Créer un programme"
         >
           <Plus size={18} color="#fff" />
@@ -90,7 +89,7 @@ export default function ProgrammesPageClient({ data }: Props) {
                   : {
                       background: "transparent",
                       color: "var(--text-secondary)",
-                      border: "1px solid var(--border)",
+                      border: "1px solid rgba(0,0,0,0.06)",
                     }
               }
             >
@@ -125,8 +124,7 @@ export default function ProgrammesPageClient({ data }: Props) {
           <h2
             className="text-xl mb-2"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
               color: "var(--text-secondary)",
             }}
           >
@@ -138,7 +136,7 @@ export default function ProgrammesPageClient({ data }: Props) {
           <button
             onClick={() => setCreateOpen(true)}
             className="px-6 py-3 rounded-xl text-sm font-semibold text-white"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--green)" }}
           >
             Créer un programme
           </button>

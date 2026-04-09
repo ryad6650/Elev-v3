@@ -42,7 +42,7 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
 
   if (workouts.length === 0) {
     return (
-      <div className="text-center py-12 mb-2.5">
+      <div className="text-center py-12 mb-3">
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           Aucune séance enregistrée.
         </p>
@@ -51,17 +51,19 @@ export default function HistoriqueList({ workouts, onSelect }: Props) {
   }
 
   return (
-    <div className="mb-2.5">
+    <div className="mb-3">
       {grouped.map(({ label, items }) => (
         <div key={label}>
           <div
-            className="font-bold uppercase"
             style={{
-              fontSize: "10px",
-              letterSpacing: "0.1em",
-              color: "var(--text-secondary)",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--text-muted)",
               marginBottom: 8,
-              marginTop: 6,
+              marginTop: 8,
             }}
           >
             {label}
@@ -91,20 +93,20 @@ function WorkoutItem({
 }) {
   return (
     <div
-      className="flex items-center gap-2 cursor-pointer active:opacity-70 transition-opacity"
+      className="flex items-center gap-2.5 cursor-pointer active:opacity-70 transition-opacity"
       style={{
         padding: "12px 0",
-        borderBottom: isLast ? "none" : "1px solid rgba(74,55,40,0.08)",
+        borderBottom: isLast ? "none" : "1px solid rgba(0,0,0,0.04)",
       }}
       onClick={() => onSelect?.(w.id)}
     >
-      {/* Barre accent gradient */}
+      {/* Barre accent */}
       <div
         style={{
-          width: 3,
-          height: 42,
+          width: 4,
+          height: 44,
           borderRadius: 2,
-          background: "linear-gradient(180deg, #c4a882, #a0785c)",
+          background: "var(--green)",
           flexShrink: 0,
         }}
       />
@@ -113,9 +115,9 @@ function WorkoutItem({
         <div
           className="truncate"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontSize: "15px",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 15,
+            fontWeight: 600,
             color: "var(--text-primary)",
             marginBottom: 3,
           }}
@@ -124,9 +126,10 @@ function WorkoutItem({
         </div>
         <div
           style={{
-            fontSize: "11px",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 11,
             color: "var(--text-muted)",
-            marginBottom: 5,
+            marginBottom: 6,
           }}
         >
           {formatDate(w.date)}
@@ -140,11 +143,10 @@ function WorkoutItem({
         </div>
       </div>
 
-      {/* Flèche */}
       <span
         style={{
-          fontSize: "14px",
-          color: "var(--text-secondary)",
+          fontSize: 16,
+          color: "var(--text-muted)",
           flexShrink: 0,
         }}
       >
@@ -157,13 +159,14 @@ function WorkoutItem({
 function Chip({ label }: { label: string }) {
   return (
     <span
-      className="font-bold uppercase"
       style={{
-        fontSize: "9px",
+        fontFamily: "var(--font-inter), sans-serif",
+        fontSize: 10,
+        fontWeight: 600,
         letterSpacing: "0.04em",
         color: "var(--text-muted)",
-        background: "rgba(74,55,40,0.06)",
-        borderRadius: 6,
+        background: "rgba(0,0,0,0.04)",
+        borderRadius: 8,
         padding: "3px 8px",
       }}
     >

@@ -60,12 +60,15 @@ export default function CreateProgrammeModal({
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col justify-end"
-      style={{ background: "rgba(0,0,0,0.65)" }}
+      style={{ background: "rgba(0,0,0,0.4)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className="rounded-t-3xl flex flex-col"
-        style={{ background: "var(--bg-secondary)", maxHeight: "88vh" }}
+        style={{
+          background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
+          maxHeight: "88vh",
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-4 pb-3 shrink-0">
@@ -87,8 +90,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-inter), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >
@@ -108,9 +110,9 @@ export default function CreateProgrammeModal({
                   placeholder="Ex : PPL Printemps"
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none"
                   style={{
-                    background: "var(--bg-elevated)",
+                    background: "rgba(255,255,255,0.5)",
                     color: "var(--text-primary)",
-                    border: "1px solid var(--border)",
+                    border: "1px solid rgba(0,0,0,0.06)",
                   }}
                 />
               </div>
@@ -131,13 +133,13 @@ export default function CreateProgrammeModal({
                       style={
                         difficulte === value
                           ? {
-                              border: "1.5px solid var(--accent)",
+                              border: "1.5px solid var(--green)",
                               background:
-                                "color-mix(in srgb, var(--accent) 10%, transparent)",
-                              color: "var(--accent-text)",
+                                "color-mix(in srgb, var(--green) 10%, transparent)",
+                              color: "var(--green)",
                             }
                           : {
-                              border: "1px solid var(--border)",
+                              border: "1px solid rgba(0,0,0,0.06)",
                               background: "transparent",
                               color: "var(--text-secondary)",
                             }
@@ -159,15 +161,15 @@ export default function CreateProgrammeModal({
                   <div
                     className="flex-1 px-4 py-3 rounded-xl text-sm"
                     style={{
-                      background: "var(--bg-elevated)",
+                      background: "rgba(255,255,255,0.5)",
                       color:
                         durée === null
                           ? "var(--text-primary)"
                           : "var(--text-muted)",
                       border:
                         durée === null
-                          ? "1.5px solid var(--accent)"
-                          : "1px solid var(--border)",
+                          ? "1.5px solid var(--green)"
+                          : "1px solid rgba(0,0,0,0.06)",
                     }}
                   >
                     {durée === null
@@ -180,9 +182,9 @@ export default function CreateProgrammeModal({
                       onClick={() => setDuree(8)}
                       className="px-3 py-3 rounded-xl text-xs font-medium whitespace-nowrap"
                       style={{
-                        background: "var(--bg-elevated)",
-                        color: "var(--accent-text)",
-                        border: "1px solid var(--border)",
+                        background: "rgba(255,255,255,0.5)",
+                        color: "var(--green)",
+                        border: "1px solid rgba(0,0,0,0.06)",
                       }}
                     >
                       + Ajouter une durée
@@ -199,9 +201,9 @@ export default function CreateProgrammeModal({
                         }
                         className="w-16 px-3 py-3 rounded-xl text-sm outline-none text-center"
                         style={{
-                          background: "var(--bg-elevated)",
+                          background: "rgba(255,255,255,0.5)",
                           color: "var(--text-primary)",
-                          border: "1px solid var(--accent)",
+                          border: "1px solid var(--green)",
                         }}
                       />
                       <button
@@ -209,9 +211,9 @@ export default function CreateProgrammeModal({
                         onClick={() => setDuree(null)}
                         className="px-3 py-3 rounded-xl text-xs font-medium whitespace-nowrap"
                         style={{
-                          background: "var(--bg-elevated)",
+                          background: "rgba(255,255,255,0.5)",
                           color: "var(--text-muted)",
-                          border: "1px solid var(--border)",
+                          border: "1px solid rgba(0,0,0,0.06)",
                         }}
                       >
                         Retirer
@@ -225,7 +227,7 @@ export default function CreateProgrammeModal({
                 disabled={!nom.trim()}
                 className="w-full py-3.5 rounded-xl text-sm font-semibold text-white transition-opacity"
                 style={{
-                  background: "var(--accent)",
+                  background: "var(--green)",
                   opacity: nom.trim() ? 1 : 0.4,
                 }}
               >
@@ -240,8 +242,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-inter), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >
@@ -270,7 +271,7 @@ export default function CreateProgrammeModal({
                   onClick={() => setStep(1)}
                   className="flex-1 py-3.5 rounded-xl text-sm font-medium"
                   style={{
-                    border: "1px solid var(--border)",
+                    border: "1px solid rgba(0,0,0,0.06)",
                     color: "var(--text-primary)",
                     background: "transparent",
                   }}
@@ -282,7 +283,7 @@ export default function CreateProgrammeModal({
                   disabled={jours.length === 0}
                   className="flex-[2] py-3.5 rounded-xl text-sm font-semibold text-white transition-opacity"
                   style={{
-                    background: "var(--accent)",
+                    background: "var(--green)",
                     opacity: jours.length > 0 ? 1 : 0.4,
                   }}
                 >
@@ -298,8 +299,7 @@ export default function CreateProgrammeModal({
               <h3
                 className="text-2xl"
                 style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-inter), sans-serif",
                   color: "var(--text-primary)",
                 }}
               >
@@ -320,8 +320,8 @@ export default function CreateProgrammeModal({
                     key={jour}
                     className="rounded-xl p-3"
                     style={{
-                      background: "var(--bg-card)",
-                      border: "1px solid var(--border)",
+                      background: "rgba(0,0,0,0.04)",
+                      border: "1px solid rgba(0,0,0,0.06)",
                     }}
                   >
                     <p
@@ -340,9 +340,9 @@ export default function CreateProgrammeModal({
                       }
                       className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                       style={{
-                        background: "var(--bg-elevated)",
+                        background: "rgba(255,255,255,0.5)",
                         color: "var(--text-primary)",
-                        border: "1px solid var(--border)",
+                        border: "1px solid rgba(0,0,0,0.06)",
                       }}
                     >
                       <option value="">— Choisir une routine —</option>
@@ -360,7 +360,7 @@ export default function CreateProgrammeModal({
                   onClick={() => setStep(2)}
                   className="flex-1 py-3.5 rounded-xl text-sm font-medium"
                   style={{
-                    border: "1px solid var(--border)",
+                    border: "1px solid rgba(0,0,0,0.06)",
                     color: "var(--text-primary)",
                     background: "transparent",
                   }}
@@ -372,7 +372,7 @@ export default function CreateProgrammeModal({
                   disabled={pending}
                   className="flex-[2] py-3.5 rounded-xl text-sm font-semibold text-white transition-opacity"
                   style={{
-                    background: "var(--accent)",
+                    background: "var(--green)",
                     opacity: pending ? 0.6 : 1,
                   }}
                 >

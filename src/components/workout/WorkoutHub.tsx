@@ -107,8 +107,15 @@ export default function WorkoutHub({ data }: Props) {
     <div>
       {/* Section label */}
       <div
-        className="text-[11px] font-bold tracking-[0.1em] uppercase mb-3"
-        style={{ color: "#A8A29E" }}
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "var(--text-muted)",
+          marginBottom: 12,
+        }}
       >
         Mes routines
       </div>
@@ -122,18 +129,18 @@ export default function WorkoutHub({ data }: Props) {
           <button
             key={f}
             onClick={() => setFiltre(f)}
-            className="shrink-0 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
-            style={
-              filtre === f
-                ? {
-                    background: "linear-gradient(135deg, #c4a882, #a0785c)",
-                    color: "#fff",
-                  }
-                : {
-                    background: "rgba(74,55,40,0.06)",
-                    color: "#78716C",
-                  }
-            }
+            className="shrink-0 active:scale-95 transition-all"
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              padding: "8px 16px",
+              borderRadius: 9999,
+              border: "none",
+              cursor: "pointer",
+              background: filtre === f ? "var(--green)" : "rgba(0,0,0,0.04)",
+              color: filtre === f ? "#fff" : "var(--text-muted)",
+            }}
           >
             {f}
           </button>
@@ -179,21 +186,26 @@ export default function WorkoutHub({ data }: Props) {
       {menuRoutine && (
         <div
           className="fixed inset-0 z-40 flex items-end justify-center pb-[88px] px-4"
-          style={{ background: "rgba(0,0,0,0.6)" }}
+          style={{ background: "rgba(0,0,0,0.4)" }}
           onClick={() => setMenuRoutine(null)}
         >
           <div
-            className="w-full max-w-[420px] px-4 pb-6 pt-4"
-            style={{ background: "var(--bg-card)", borderRadius: "20px" }}
+            className="w-full max-w-[420px] px-4 pb-6 pt-4 rounded-[20px]"
+            style={{
+              background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div
               className="w-10 h-1 rounded-full mx-auto mb-4"
-              style={{ background: "var(--bg-elevated)" }}
+              style={{ background: "rgba(0,0,0,0.08)" }}
             />
             <p
               className="text-center font-semibold mb-4 truncate px-4"
-              style={{ color: "var(--text-primary)" }}
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                color: "var(--text-primary)",
+              }}
             >
               {menuRoutine.nom}
             </p>
@@ -202,8 +214,10 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={() => handleStartRoutine(menuRoutine)}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
-                  background: `linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, #000) 0%, var(--accent) 40%, var(--accent-text) 100%)`,
+                  fontFamily: "var(--font-inter), sans-serif",
+                  background: "var(--green)",
                   color: "white",
+                  border: "none",
                 }}
               >
                 <Play size={16} fill="white" />
@@ -213,8 +227,10 @@ export default function WorkoutHub({ data }: Props) {
                 onClick={handleOpenEdit}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
-                  background: "var(--bg-elevated)",
+                  fontFamily: "var(--font-inter), sans-serif",
+                  background: "rgba(255,255,255,0.5)",
                   color: "var(--text-primary)",
+                  border: "none",
                 }}
               >
                 <Pencil size={16} />
@@ -225,8 +241,10 @@ export default function WorkoutHub({ data }: Props) {
                 disabled={deleting}
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm disabled:opacity-50"
                 style={{
-                  background: "var(--bg-elevated)",
-                  color: "var(--danger)",
+                  fontFamily: "var(--font-inter), sans-serif",
+                  background: "rgba(255,255,255,0.5)",
+                  color: "#c94444",
+                  border: "none",
                 }}
               >
                 <Trash2 size={16} />
@@ -235,7 +253,12 @@ export default function WorkoutHub({ data }: Props) {
               <button
                 onClick={() => setMenuRoutine(null)}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl text-sm"
-                style={{ color: "var(--text-muted)" }}
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  color: "var(--text-muted)",
+                  background: "none",
+                  border: "none",
+                }}
               >
                 <X size={15} />
                 Annuler

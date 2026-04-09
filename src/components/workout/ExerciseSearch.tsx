@@ -62,7 +62,7 @@ const EQUIPEMENT_COLOR: Record<string, string> = {
   "Poulie / Câble": "#06B6D4",
   "Poids du corps": "#22C55E",
   Corde: "#F59E0B",
-  Kettlebell: "#EF4444",
+  Kettlebell: "#c94444",
   "Smith machine": "#EC4899",
   "Bande élastique": "#14B8A6",
 };
@@ -169,7 +169,7 @@ export default function ExerciseSearch({
       <div
         className="px-4 pb-4 border-b"
         style={{
-          borderColor: "var(--border)",
+          borderColor: "rgba(0,0,0,0.06)",
           paddingTop: "max(1.5rem, env(safe-area-inset-top))",
           background:
             "linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 100%)",
@@ -179,7 +179,7 @@ export default function ExerciseSearch({
           <button
             onClick={onClose}
             className="p-2 rounded-xl"
-            style={{ background: "var(--bg-elevated)" }}
+            style={{ background: "rgba(255,255,255,0.5)" }}
           >
             <X size={18} style={{ color: "var(--text-primary)" }} />
           </button>
@@ -199,8 +199,8 @@ export default function ExerciseSearch({
         <h2
           className="text-2xl mb-1"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontWeight: 700,
             color: "var(--text-primary)",
           }}
         >
@@ -213,7 +213,7 @@ export default function ExerciseSearch({
         <div
           className="flex items-center gap-2 px-4 py-3 rounded-xl"
           style={{
-            background: "var(--bg-elevated)",
+            background: "rgba(255,255,255,0.5)",
             border: "1px solid var(--border)",
           }}
         >
@@ -246,7 +246,7 @@ export default function ExerciseSearch({
             style={{
               background: groupe
                 ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                : "var(--bg-elevated)",
+                : "rgba(255,255,255,0.5)",
               border: groupe
                 ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
                 : "1px solid var(--border)",
@@ -274,7 +274,7 @@ export default function ExerciseSearch({
             style={{
               background: equipement
                 ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                : "var(--bg-elevated)",
+                : "rgba(255,255,255,0.5)",
               border: equipement
                 ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
                 : "1px solid var(--border)",
@@ -309,7 +309,9 @@ export default function ExerciseSearch({
                   }}
                   className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
-                    background: active ? "var(--accent)" : "var(--bg-elevated)",
+                    background: active
+                      ? "var(--accent)"
+                      : "rgba(255,255,255,0.5)",
                     color: active ? "white" : "var(--text-secondary)",
                   }}
                 >
@@ -335,7 +337,7 @@ export default function ExerciseSearch({
                   }}
                   className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
-                    background: active ? color : "var(--bg-elevated)",
+                    background: active ? color : "rgba(255,255,255,0.5)",
                     color: active ? "white" : "var(--text-secondary)",
                     border: active ? "none" : `1px solid ${color}40`,
                   }}
@@ -394,7 +396,7 @@ export default function ExerciseSearch({
               onClick={() => handleAdd(ex)}
               className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-opacity active:opacity-70"
               style={{
-                background: "var(--bg-secondary)",
+                background: "rgba(0,0,0,0.04)",
                 border: "1px solid var(--border)",
               }}
             >

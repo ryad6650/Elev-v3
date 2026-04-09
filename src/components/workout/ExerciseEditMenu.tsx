@@ -47,8 +47,8 @@ export default function ExerciseEditMenu({
               style={{
                 top: pos.top,
                 right: pos.right,
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border)",
+                background: "rgba(255,255,255,0.5)",
+                border: "1px solid rgba(0,0,0,0.06)",
               }}
             >
               <button

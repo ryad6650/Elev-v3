@@ -56,7 +56,7 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
 
   if (sommeil.length === 0) {
     return (
-      <div className="mb-2.5">
+      <div className="mb-3">
         <SectionLabel />
         <div className="text-center py-8">
           <p className="text-3xl mb-2">🌙</p>
@@ -70,11 +70,14 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
 
   return (
     <div
-      className="mb-2.5"
       style={{
-        borderTop: "1px solid rgba(74,55,40,0.08)",
-        paddingTop: 10,
-        marginTop: 4,
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 20,
+        marginBottom: 14,
       }}
     >
       <SectionLabel />
@@ -84,30 +87,41 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
           key={record.id}
           className="flex items-center gap-2.5"
           style={{
-            padding: "8px 0",
-            borderBottom: "1px solid rgba(74,55,40,0.05)",
+            padding: "10px 0",
+            borderBottom: "1px solid rgba(0,0,0,0.04)",
           }}
         >
           <div
             className="flex items-center justify-center shrink-0"
             style={{
-              width: 30,
-              height: 30,
+              width: 32,
+              height: 32,
               borderRadius: 10,
               background: "rgba(155,126,200,0.1)",
-              fontSize: "14px",
+              fontSize: 15,
             }}
           >
             🌙
           </div>
           <div className="flex-1 min-w-0">
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 12,
+                color: "var(--text-muted)",
+              }}
+            >
               {formatDate(record.date)}
             </div>
           </div>
           <span
-            className="font-bold shrink-0"
-            style={{ fontSize: "15px", color: "var(--text-primary)" }}
+            className="shrink-0"
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 15,
+              fontWeight: 700,
+              color: "var(--text-primary)",
+            }}
           >
             {formatDuree(record.duree_minutes)}
           </span>
@@ -117,17 +131,15 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
             style={{
               background:
                 deletingId === record.id
-                  ? "rgba(239,68,68,0.15)"
+                  ? "rgba(201,68,68,0.12)"
                   : "transparent",
             }}
           >
             <Trash2
-              size={13}
+              size={14}
               style={{
                 color:
-                  deletingId === record.id
-                    ? "var(--danger)"
-                    : "var(--text-muted)",
+                  deletingId === record.id ? "#c94444" : "var(--text-muted)",
               }}
             />
           </button>
@@ -136,18 +148,18 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
 
       {/* Barre moyenne */}
       <div
-        className="mt-2"
         style={{
-          borderTop: "1px solid rgba(74,55,40,0.08)",
-          paddingTop: 8,
+          borderTop: "1px solid rgba(0,0,0,0.04)",
+          paddingTop: 10,
+          marginTop: 4,
         }}
       >
         <div
           className="overflow-hidden mb-1.5"
           style={{
-            height: 6,
+            height: 5,
             borderRadius: 99,
-            background: "rgba(74,55,40,0.1)",
+            background: "rgba(0,0,0,0.06)",
           }}
         >
           <div
@@ -160,12 +172,22 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
           />
         </div>
         <div className="flex items-center justify-between">
-          <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+          <span
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              color: "var(--text-muted)",
+            }}
+          >
             Moyenne 7 jours
           </span>
           <span
-            className="font-bold"
-            style={{ fontSize: "11px", color: "var(--text-primary)" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--text-primary)",
+            }}
           >
             {formatDuree(avgMinutes)} / nuit
           </span>
@@ -178,11 +200,14 @@ export default function SleepHistorySection({ sommeil, onDeleted }: Props) {
 function SectionLabel() {
   return (
     <div
-      className="font-bold uppercase mb-2.5"
       style={{
-        fontSize: "10px",
-        color: "var(--text-secondary)",
+        fontFamily: "var(--font-inter), sans-serif",
+        fontSize: 13,
+        fontWeight: 600,
         letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "var(--text-muted)",
+        marginBottom: 12,
       }}
     >
       Sommeil

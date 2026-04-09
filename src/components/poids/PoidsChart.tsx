@@ -3,19 +3,16 @@
 import { useState, useMemo } from "react";
 import type { PoidsEntry } from "@/lib/poids";
 
-type Periode = "7j" | "30j" | "3m" | "1an";
+type Periode = "1S" | "1M" | "3M" | "6M";
 const PERIODES: { key: Periode; label: string; days: number }[] = [
-  { key: "7j", label: "7j", days: 7 },
-  { key: "30j", label: "30j", days: 30 },
-  { key: "3m", label: "3m", days: 90 },
-  { key: "1an", label: "1an", days: 365 },
+  { key: "1S", label: "1S", days: 7 },
+  { key: "1M", label: "1M", days: 30 },
+  { key: "3M", label: "3M", days: 90 },
+  { key: "6M", label: "6M", days: 180 },
 ];
 
-const W = 240;
-const H = 100;
-const PAD = { top: 8, right: 8, bottom: 4, left: 28 };
-const innerW = W - PAD.left - PAD.right;
-const innerH = H - PAD.top - PAD.bottom;
+const W = 300;
+const H = 60;
 
 function filterByPeriode(entries: PoidsEntry[], days: number): PoidsEntry[] {
   const cutoff = new Date();
@@ -37,7 +34,7 @@ interface Props {
 }
 
 export default function PoidsChart({ entries }: Props) {
-  const [periode, setPeriode] = useState<Periode>("30j");
+  const [periode, setPeriode] = useState<Periode>("1M");
   const periodeConfig = PERIODES.find((p) => p.key === periode)!;
 
   const filtered = useMemo(
@@ -45,43 +42,42 @@ export default function PoidsChart({ entries }: Props) {
     [entries, periodeConfig.days],
   );
 
+  const stats = useMemo(() => {
+    if (filtered.length === 0) return null;
+    const vals = filtered.map((e) => e.poids);
+    const max = Math.max(...vals);
+    const min = Math.min(...vals);
+    const avg =
+      Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+    const delta = Math.round((vals[vals.length - 1] - vals[0]) * 10) / 10;
+    return { max, min, avg, delta };
+  }, [filtered]);
+
   const chart = useMemo(() => {
     if (filtered.length < 2) return null;
     const vals = filtered.map((e) => e.poids);
-    const minP = Math.min(...vals);
-    const maxP = Math.max(...vals);
-    const rawRange = maxP - minP || 1;
-    const pad = rawRange * 0.15;
-    const yMin = minP - pad;
-    const yMax = maxP + pad;
+    const maVals = calcMovingAvg(vals);
+    const minV = Math.min(...maVals);
+    const maxV = Math.max(...maVals);
+    const range = maxV - minV || 1;
+    const pad = range * 0.15;
+    const yMin = minV - pad;
+    const yMax = maxV + pad;
     const yRange = yMax - yMin;
 
-    const toX = (i: number) => PAD.left + (i / (filtered.length - 1)) * innerW;
-    const toY = (v: number) => PAD.top + ((yMax - v) / yRange) * innerH;
+    const toX = (i: number) => (i / (maVals.length - 1)) * W;
+    const toY = (v: number) => ((yMax - v) / yRange) * H;
 
-    const maVals = calcMovingAvg(vals);
-    const maPoints = maVals.map((v, i) => ({
-      date: filtered[i].date,
-      x: toX(i),
-      y: toY(v),
-    }));
-    const maPath = maPoints
+    const points = maVals.map((v, i) => ({ x: toX(i), y: toY(v) }));
+    const linePath = points
       .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`)
       .join(" ");
     const areaPath =
-      `M ${maPoints[0].x},${PAD.top + innerH} ` +
-      maPoints.map((p) => `L ${p.x},${p.y}`).join(" ") +
-      ` L ${maPoints[maPoints.length - 1].x},${PAD.top + innerH} Z`;
-
-    const mid = Math.round(((minP + maxP) / 2) * 10) / 10;
-    const yLabels = [
-      { value: Math.round(maxP * 10) / 10, y: toY(maxP) },
-      { value: mid, y: toY(mid) },
-      { value: Math.round(minP * 10) / 10, y: toY(minP) },
-    ];
-
-    const last = maPoints[maPoints.length - 1];
-    return { maPoints, maPath, areaPath, yLabels, last };
+      `M ${points[0].x},${H} ` +
+      points.map((p) => `L ${p.x},${p.y}`).join(" ") +
+      ` L ${points[points.length - 1].x},${H} Z`;
+    const last = points[points.length - 1];
+    return { linePath, areaPath, last };
   }, [filtered]);
 
   if (entries.length === 0) {
@@ -89,9 +85,13 @@ export default function PoidsChart({ entries }: Props) {
       <div
         className="flex items-center justify-center"
         style={{
-          padding: "14px 0",
-          borderBottom: "1px solid rgba(74,55,40,0.08)",
-          marginBottom: 6,
+          background: "var(--glass-bg)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          borderRadius: "var(--radius-card)",
+          border: "1px solid var(--glass-border)",
+          padding: 20,
+          marginBottom: 14,
           height: 80,
         }}
       >
@@ -105,123 +105,170 @@ export default function PoidsChart({ entries }: Props) {
   return (
     <div
       style={{
-        padding: "14px 0",
-        borderBottom: "1px solid rgba(74,55,40,0.08)",
-        marginBottom: 6,
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 20,
+        marginBottom: 14,
       }}
     >
-      {/* Label */}
+      {/* Header + pills */}
       <div
         style={{
-          fontSize: 8,
-          fontWeight: 700,
-          color: "var(--text-secondary)",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          marginBottom: 8,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
         }}
       >
-        Évolution
+        <span
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+          }}
+        >
+          Évolution
+        </span>
+        <div style={{ display: "flex", gap: 4 }}>
+          {PERIODES.map((p) => (
+            <button
+              key={p.key}
+              onClick={() => setPeriode(p.key)}
+              style={{
+                padding: "4px 10px",
+                borderRadius: 9999,
+                fontSize: 11,
+                fontWeight: 600,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-inter), sans-serif",
+                color: periode === p.key ? "#fff" : "var(--text-muted)",
+                background:
+                  periode === p.key ? "var(--green)" : "rgba(0,0,0,0.04)",
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Period pills */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-        {PERIODES.map((p) => (
-          <button
-            key={p.key}
-            onClick={() => setPeriode(p.key)}
-            style={{
-              padding: "3px 10px",
-              borderRadius: 8,
-              fontSize: 9,
-              fontWeight: 700,
-              border: "none",
-              cursor: "pointer",
-              color: periode === p.key ? "#fff" : "var(--text-muted)",
-              background:
-                periode === p.key
-                  ? "linear-gradient(135deg, var(--bar-from), var(--bar-to))"
-                  : "rgba(74,55,40,0.06)",
-            }}
-          >
-            {p.label}
-          </button>
-        ))}
+      {/* Sparkline */}
+      <div style={{ height: 64, marginBottom: 18 }}>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          style={{ width: "100%", height: "100%" }}
+        >
+          <defs>
+            <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2a9d6e" stopOpacity={0.15} />
+              <stop offset="100%" stopColor="#2a9d6e" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          {chart ? (
+            <>
+              <path d={chart.areaPath} fill="url(#poidsGrad)" />
+              <path
+                d={chart.linePath}
+                fill="none"
+                stroke="var(--green)"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx={chart.last.x}
+                cy={chart.last.y}
+                r={4}
+                fill="var(--green)"
+              />
+              <circle
+                cx={chart.last.x}
+                cy={chart.last.y}
+                r={8}
+                fill="var(--green)"
+                opacity={0.15}
+              />
+            </>
+          ) : (
+            <text
+              x={W / 2}
+              y={H / 2}
+              textAnchor="middle"
+              fontSize={11}
+              fill="var(--text-muted)"
+            >
+              Pas assez de données
+            </text>
+          )}
+        </svg>
       </div>
 
-      {/* SVG Chart */}
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
-        style={{ width: "100%", height: 100 }}
-      >
-        <defs>
-          <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a0785c" stopOpacity={0.25} />
-            <stop offset="100%" stopColor="#a0785c" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        {[0.2, 0.5, 0.8].map((t) => (
-          <line
-            key={t}
-            x1={0}
-            y1={PAD.top + innerH * t}
-            x2={W}
-            y2={PAD.top + innerH * t}
-            stroke="rgba(74,55,40,0.08)"
-            strokeWidth={0.5}
-          />
-        ))}
-
-        {chart ? (
-          <>
-            <path d={chart.areaPath} fill="url(#poidsGrad)" />
-            <path
-              d={chart.maPath}
-              fill="none"
-              stroke="#a0785c"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {/* Dernier point */}
-            <circle
-              cx={chart.last.x}
-              cy={chart.last.y}
-              r={4}
-              fill="#a0785c"
-              stroke="#fff"
-              strokeWidth={2}
-            />
-          </>
-        ) : (
-          <text
-            x={W / 2}
-            y={H / 2}
-            textAnchor="middle"
-            fontSize={10}
-            fill="var(--text-secondary)"
-          >
-            Pas assez de données
-          </text>
-        )}
-
-        {/* Y labels dans le SVG */}
-        {chart?.yLabels.map((l) => (
-          <text
-            key={l.value}
-            x={2}
-            y={l.y + 3}
-            fontSize={7}
-            fill="var(--text-secondary)"
-            fontFamily="var(--font-dm-sans)"
-          >
-            {l.value}
-          </text>
-        ))}
-      </svg>
+      {/* Stats row */}
+      {stats && (
+        <div
+          style={{ display: "flex", justifyContent: "space-between", gap: 8 }}
+        >
+          {[
+            { value: stats.max, label: "Max" },
+            { value: stats.avg, label: "Moyenne" },
+            { value: stats.min, label: "Min" },
+            { value: stats.delta, label: "Delta", isGreen: true },
+          ].map((s) => (
+            <div
+              key={s.label}
+              style={{
+                flex: 1,
+                textAlign: "center",
+                padding: "10px 0",
+                background: "rgba(0,0,0,0.03)",
+                borderRadius: "var(--radius-sm)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 17,
+                  fontWeight: 700,
+                  color: s.isGreen ? "var(--green)" : "var(--text-primary)",
+                  lineHeight: 1.2,
+                }}
+              >
+                {s.isGreen && s.value <= 0
+                  ? ""
+                  : s.isGreen && s.value > 0
+                    ? "+"
+                    : ""}
+                {s.isGreen
+                  ? s.value <= 0
+                    ? `−${Math.abs(s.value)}`
+                    : s.value
+                  : s.value}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  marginTop: 2,
+                }}
+              >
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

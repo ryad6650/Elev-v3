@@ -42,12 +42,14 @@ function HistoriqueRow({
     });
   };
 
+  void handleLongPress;
+
   const deltaColor =
     delta === null || delta === 0
-      ? "var(--text-secondary)"
+      ? "var(--text-muted)"
       : delta < 0
-        ? "#74bf7a"
-        : "#E87C6A";
+        ? "var(--green)"
+        : "#c94444";
 
   const deltaText =
     delta === null
@@ -64,17 +66,18 @@ function HistoriqueRow({
       style={{
         display: "flex",
         alignItems: "center",
-        padding: "7px 0",
-        borderBottom: "1px solid rgba(74,55,40,0.05)",
+        padding: "10px 0",
+        borderBottom: "1px solid rgba(0,0,0,0.04)",
         opacity: isPending ? 0.4 : 1,
         cursor: "pointer",
       }}
     >
       <span
         style={{
-          fontSize: 10,
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 12,
           color: "var(--text-muted)",
-          width: 55,
+          width: 60,
           flexShrink: 0,
         }}
       >
@@ -83,7 +86,8 @@ function HistoriqueRow({
       <span
         style={{
           flex: 1,
-          fontSize: 13,
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 15,
           fontWeight: 700,
           color: "var(--text-primary)",
         }}
@@ -92,7 +96,8 @@ function HistoriqueRow({
       </span>
       <span
         style={{
-          fontSize: 10,
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 12,
           fontWeight: 700,
           color: deltaColor,
         }}
@@ -110,18 +115,28 @@ export default function PoidsHistorique({ entries, onEdit, onDeleted }: Props) {
   if (recent.length === 0) return null;
 
   return (
-    <div style={{ padding: "14px 0" }}>
+    <div
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 20,
+      }}
+    >
       <div
         style={{
-          fontSize: 8,
-          fontWeight: 700,
-          color: "var(--text-secondary)",
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 13,
+          fontWeight: 600,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
-          marginBottom: 4,
+          color: "var(--text-muted)",
+          marginBottom: 8,
         }}
       >
-        Historique récent
+        Historique
       </div>
       {recent.map((entry, i) => {
         const next = sorted[i + 1];

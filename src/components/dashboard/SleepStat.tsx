@@ -3,8 +3,6 @@
 import { memo, useState, useCallback } from "react";
 import { saveSommeil } from "@/app/actions/sommeil";
 
-const C = { text: "#4A3728", muted: "#78716C" } as const;
-
 function formatSleep(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -44,8 +42,18 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
 
   if (editing) {
     return (
-      <div className="flex items-center gap-2">
-        <span style={{ fontSize: 14 }}>🌙</span>
+      <div
+        className="flex items-center gap-2"
+        style={{
+          background: "var(--glass-bg)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          borderRadius: "var(--radius-card)",
+          border: "1px solid var(--glass-border)",
+          padding: 20,
+        }}
+      >
+        <span style={{ fontSize: 24 }}>💤</span>
         <input
           type="text"
           inputMode="numeric"
@@ -58,13 +66,21 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
           }}
           className="w-8 text-center text-sm font-bold rounded outline-none"
           style={{
-            background: "rgba(74,55,40,0.08)",
-            border: "1px solid rgba(74,55,40,0.15)",
-            color: C.text,
+            background: "rgba(0,0,0,0.06)",
+            border: "1px solid rgba(0,0,0,0.08)",
+            color: "var(--text-primary)",
             padding: "2px 0",
           }}
         />
-        <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>h</span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: "var(--text-primary)",
+          }}
+        >
+          h
+        </span>
         <input
           type="text"
           inputMode="numeric"
@@ -77,9 +93,9 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
           }}
           className="w-8 text-center text-sm font-bold rounded outline-none"
           style={{
-            background: "rgba(74,55,40,0.08)",
-            border: "1px solid rgba(74,55,40,0.15)",
-            color: C.text,
+            background: "rgba(0,0,0,0.06)",
+            border: "1px solid rgba(0,0,0,0.08)",
+            color: "var(--text-primary)",
             padding: "2px 0",
           }}
         />
@@ -88,7 +104,7 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
           disabled={saving}
           className="text-xs font-semibold px-2 py-1 rounded active:scale-95"
           style={{
-            background: "linear-gradient(135deg, #c4a882, #a0785c)",
+            background: "var(--green)",
             color: "white",
             opacity: saving ? 0.5 : 1,
           }}
@@ -98,7 +114,7 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
         <button
           onClick={() => setEditing(false)}
           className="text-xs px-1"
-          style={{ color: C.muted }}
+          style={{ color: "var(--text-muted)" }}
         >
           ✕
         </button>
@@ -109,24 +125,51 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
   return (
     <button
       onClick={() => setEditing(true)}
-      className="flex items-baseline gap-2 active:opacity-70 transition-opacity"
+      className="flex-1 text-center active:opacity-70 transition-opacity"
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 20,
+      }}
     >
-      <span style={{ fontSize: 18 }}>🌙</span>
+      <div style={{ fontSize: 24, marginBottom: 8 }}>💤</div>
       {saved != null ? (
         <>
-          <span
+          <div
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontSize: 22,
-              color: C.text,
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 28,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+              lineHeight: 1,
             }}
           >
             {formatSleep(saved)}
-          </span>
-          <span style={{ fontSize: 15, color: C.muted }}>de sommeil</span>
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: "var(--text-muted)",
+              marginTop: 6,
+            }}
+          >
+            sommeil
+          </div>
         </>
       ) : (
-        <span style={{ fontSize: 15, color: C.muted }}>+ Ajouter sommeil</span>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: "var(--text-muted)",
+          }}
+        >
+          + Ajouter sommeil
+        </div>
       )}
     </button>
   );

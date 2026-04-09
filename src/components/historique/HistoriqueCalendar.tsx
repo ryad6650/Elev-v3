@@ -24,14 +24,6 @@ const MOIS = [
   "Décembre",
 ];
 
-const glassStyle = {
-  background: "rgba(255,255,255,0.35)",
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
-  border: "1px solid rgba(255,255,255,0.3)",
-  boxShadow: "0 2px 8px rgba(74,55,40,0.04)",
-} as const;
-
 export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
   const today = new Date();
   const [annee, setAnnee] = useState(today.getFullYear());
@@ -60,52 +52,48 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
   return (
     <div
-      className="rounded-2xl mb-2.5"
-      style={{ ...glassStyle, padding: "12px 14px" }}
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: "16px 18px",
+        marginBottom: 14,
+      }}
     >
       {/* Navigation mois */}
-      <div className="flex items-center justify-between mb-2.5">
+      <div className="flex items-center justify-between mb-3">
         <span
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontSize: "14px",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 15,
+            fontWeight: 600,
             color: "var(--text-primary)",
           }}
         >
           {MOIS[mois]} {annee}
         </span>
         <div className="flex gap-2">
-          <button
-            onClick={() => navMois(-1)}
-            className="flex items-center justify-center transition-colors"
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "rgba(74,55,40,0.07)",
-              color: "var(--text-muted)",
-              fontSize: "11px",
-              border: "none",
-            }}
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => navMois(1)}
-            className="flex items-center justify-center transition-colors"
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "rgba(74,55,40,0.07)",
-              color: "var(--text-muted)",
-              fontSize: "11px",
-              border: "none",
-            }}
-          >
-            ›
-          </button>
+          {[-1, 1].map((dir) => (
+            <button
+              key={dir}
+              onClick={() => navMois(dir as -1 | 1)}
+              className="flex items-center justify-center transition-opacity active:opacity-60"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.04)",
+                color: "var(--text-muted)",
+                fontSize: 13,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              {dir === -1 ? "‹" : "›"}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -116,9 +104,10 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
             key={i}
             className="text-center py-0.5"
             style={{
-              fontSize: "7px",
-              fontWeight: 700,
-              color: "var(--text-secondary)",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 9,
+              fontWeight: 600,
+              color: "var(--text-muted)",
               letterSpacing: "0.04em",
               textTransform: "uppercase",
             }}
@@ -143,12 +132,11 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
               key={dateStr}
               className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded-lg relative"
               style={{
-                fontSize: "9px",
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 10,
                 fontWeight: isToday ? 700 : 500,
                 color: isToday ? "#fff" : "var(--text-muted)",
-                background: isToday
-                  ? "linear-gradient(135deg, #c4a882, #a0785c)"
-                  : "transparent",
+                background: isToday ? "var(--green)" : "transparent",
               }}
             >
               {day}
@@ -156,13 +144,13 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
                 <div
                   style={{
                     position: "absolute",
-                    bottom: 1,
+                    bottom: 2,
                     left: "50%",
                     transform: "translateX(-50%)",
                     width: 4,
                     height: 4,
                     borderRadius: "50%",
-                    background: isToday ? "#fff" : "#74BF7A",
+                    background: isToday ? "#fff" : "var(--green)",
                   }}
                 />
               )}
@@ -173,9 +161,10 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
       {/* Streak */}
       <div
-        className="text-center mt-2"
+        className="text-center mt-3"
         style={{
-          fontSize: "10px",
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 11,
           fontWeight: 600,
           color: "var(--text-muted)",
         }}

@@ -9,15 +9,6 @@ import CaloriesCard from "@/components/dashboard/CaloriesCard";
 import WeekDots from "@/components/dashboard/WeekDots";
 import SleepStat from "@/components/dashboard/SleepStat";
 
-const C = {
-  text: "#4A3728",
-  muted: "#78716C",
-  secondary: "#A8A29E",
-  avatarBg: "#e8dcc8",
-  avatarBorder: "rgba(74,55,40,0.1)",
-  bg: "var(--bg-gradient)",
-} as const;
-
 function formatDateFr(): string {
   return new Date()
     .toLocaleDateString("fr-FR", {
@@ -42,112 +33,166 @@ export default function DashboardPageClient({ initialData }: Props) {
   const prenom = data.prenom ?? "toi";
 
   return (
-    <>
-      <main
-        className="relative flex flex-col min-h-dvh pb-24"
-        style={{ maxWidth: 430, margin: "0 auto" }}
-      >
-        <div className="px-6 pt-4 flex flex-col">
-          {/* Date + Profil — même ligne */}
-          <div
-            className="flex items-start justify-between"
-            style={{ marginBottom: 16 }}
-          >
-            <p
-              className="uppercase"
+    <main
+      className="relative flex flex-col min-h-dvh pb-24"
+      style={{ maxWidth: 430, margin: "0 auto" }}
+    >
+      <div className="flex flex-col" style={{ padding: "20px 28px 0" }}>
+        {/* Header row — date + avatar */}
+        <div
+          className="flex items-center justify-between"
+          style={{ marginBottom: 32 }}
+        >
+          <div>
+            <div
               style={{
-                fontSize: 11,
-                fontWeight: 600,
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 14,
+                fontWeight: 500,
+                color: "var(--text-muted)",
                 letterSpacing: "0.08em",
-                color: C.muted,
+                textTransform: "uppercase" as const,
+                marginBottom: 6,
               }}
             >
               {formatDateFr()}
-            </p>
-            <Link
-              href="/profil"
-              className="flex items-center justify-center rounded-full shrink-0"
+            </div>
+            <div
               style={{
-                width: 36,
-                height: 36,
-                background: C.avatarBg,
-                border: `1px solid ${C.avatarBorder}`,
-              }}
-            >
-              {data.photoUrl ? (
-                <Image
-                  src={data.photoUrl}
-                  alt="Profil"
-                  width={36}
-                  height={36}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              ) : (
-                <span
-                  style={{
-                    fontFamily: "var(--font-dm-serif)",
-                    fontStyle: "italic",
-                    fontSize: 16,
-                    color: C.text,
-                  }}
-                >
-                  {prenom[0]?.toUpperCase() ?? "?"}
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* Greeting */}
-          <div>
-            <h1
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
+                fontFamily: "var(--font-inter), sans-serif",
                 fontSize: 38,
-                lineHeight: 1.15,
-                color: C.text,
-                letterSpacing: "-0.01em",
+                fontWeight: 500,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.5px",
+                lineHeight: 1.1,
               }}
             >
-              Bonjour,
-              <br />
-              {prenom}
-            </h1>
-            <p style={{ fontSize: 15, color: C.muted, marginTop: 10 }}>
-              Prêt pour une belle journée ?
-            </p>
-          </div>
-
-          <div style={{ marginTop: 28 }}>
-            <CaloriesCard
-              consumed={data.caloriesConsommees}
-              objective={data.objectifCalories}
-            />
-          </div>
-
-          <WeekDots />
-
-          {/* Stats inline */}
-          <div className="mt-8 flex flex-col gap-4">
-            <SleepStat sommeilMinutes={data.sommeilMinutes} />
-            <div className="flex items-baseline gap-2.5">
-              <span style={{ fontSize: 18 }}>💪</span>
-              <span
-                style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontSize: 22,
-                  color: C.text,
-                }}
-              >
-                {data.seancesCetteSemaine}
-              </span>
-              <span style={{ fontSize: 15, color: C.muted }}>
-                séance{data.seancesCetteSemaine !== 1 ? "s" : ""} ce mois-ci
-              </span>
+              Bonjour, {prenom}
             </div>
           </div>
+
+          <Link
+            href="/profil"
+            className="flex items-center justify-center rounded-full shrink-0"
+            style={{
+              width: 44,
+              height: 44,
+              background: "var(--green-dim)",
+            }}
+          >
+            {data.photoUrl ? (
+              <Image
+                src={data.photoUrl}
+                alt="Profil"
+                width={44}
+                height={44}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <span
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: "var(--green)",
+                }}
+              >
+                {prenom[0]?.toUpperCase() ?? "?"}
+              </span>
+            )}
+          </Link>
         </div>
-      </main>
-    </>
+
+        {/* Calories card */}
+        <div style={{ marginBottom: 16 }}>
+          <CaloriesCard
+            consumed={data.caloriesConsommees}
+            objective={data.objectifCalories}
+            glucides={data.glucidesConsommees}
+            proteines={data.proteinesConsommees}
+            lipides={data.lipidesConsommees}
+            objectifGlucides={data.objectifGlucides}
+            objectifProteines={data.objectifProteines}
+            objectifLipides={data.objectifLipides}
+          />
+        </div>
+
+        {/* Week streak */}
+        <div style={{ marginBottom: 16 }}>
+          <WeekDots />
+        </div>
+
+        {/* Stats row — poids + sommeil */}
+        <div className="flex gap-3" style={{ marginBottom: 16 }}>
+          <button
+            className="flex-1 text-center active:opacity-70 transition-opacity"
+            style={{
+              background: "var(--glass-bg)",
+              backdropFilter: "var(--glass-blur)",
+              WebkitBackdropFilter: "var(--glass-blur)",
+              borderRadius: "var(--radius-card)",
+              border: "1px solid var(--glass-border)",
+              padding: 20,
+            }}
+          >
+            <div style={{ fontSize: 24, marginBottom: 8 }}>⚖️</div>
+            <div
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 28,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                lineHeight: 1,
+              }}
+            >
+              {data.poidsActuel ?? "—"}
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--text-muted)",
+                marginTop: 6,
+              }}
+            >
+              kg
+            </div>
+          </button>
+
+          <SleepStat sommeilMinutes={data.sommeilMinutes} />
+        </div>
+
+        {/* CTA — Demarrer une seance */}
+        <div style={{ marginBottom: 20 }}>
+          <Link
+            href="/workout"
+            className="flex items-center justify-center gap-2.5 active:opacity-85 transition-opacity"
+            style={{
+              width: "100%",
+              padding: "18px 32px",
+              borderRadius: "var(--radius-pill)",
+              background: "var(--cta-bg)",
+              color: "var(--cta-text)",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 16,
+              fontWeight: 600,
+              letterSpacing: "0.02em",
+            }}
+          >
+            <svg
+              width={18}
+              height={18}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--cta-text)"
+              strokeWidth={2.5}
+            >
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+            Démarrer une séance
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }

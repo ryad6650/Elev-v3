@@ -29,33 +29,56 @@ export default memo(function FoodItem({ entry, onClick }: Props) {
 
   return (
     <div
-      className="flex items-center gap-2 active:opacity-70 transition-opacity"
+      className="flex items-center gap-2.5 active:opacity-70 transition-opacity"
       style={{
         cursor: onClick ? "pointer" : undefined,
-        borderBottom: "1px solid rgba(74,55,40,0.05)",
-        padding: "6px 0",
+        borderBottom: "1px solid rgba(0,0,0,0.04)",
+        padding: "8px 0",
       }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
     >
       <div
-        className="w-[3px] rounded-sm shrink-0"
-        style={{ background: color, height: 28, alignSelf: "center" }}
+        className="shrink-0"
+        style={{
+          width: 4,
+          height: 32,
+          borderRadius: 2,
+          background: color,
+          alignSelf: "center",
+        }}
       />
       <div className="flex-1 min-w-0">
         <div
-          className="text-[11px] font-semibold truncate"
-          style={{ color: "var(--text-primary)", lineHeight: 1.3 }}
+          className="truncate"
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 14,
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            lineHeight: 1.3,
+          }}
         >
           {entry.aliment.nom}
         </div>
-        <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--text-muted)",
+            marginTop: 2,
+          }}
+        >
           {qtyLabel}
         </div>
       </div>
       <span
-        className="text-[10px] font-bold shrink-0"
-        style={{ color: "var(--text-primary)" }}
+        className="shrink-0"
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 13,
+          fontWeight: 700,
+          color: "var(--text-primary)",
+        }}
       >
         {n.calories} kcal
       </span>

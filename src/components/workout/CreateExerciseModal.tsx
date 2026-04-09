@@ -108,12 +108,12 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
-      style={{ background: "rgba(0,0,0,0.6)" }}
+      style={{ background: "rgba(0,0,0,0.4)" }}
       onClick={onClose}
     >
       <div
         className="w-full max-w-[430px] rounded-t-2xl px-4 pt-5 pb-8 space-y-5 max-h-[85dvh] overflow-y-auto"
-        style={{ background: "var(--bg-secondary)" }}
+        style={{ background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -127,7 +127,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg"
-            style={{ background: "var(--bg-elevated)" }}
+            style={{ background: "rgba(255,255,255,0.5)" }}
           >
             <X size={16} style={{ color: "var(--text-secondary)" }} />
           </button>
@@ -172,8 +172,8 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
               onClick={() => fileRef.current?.click()}
               className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95"
               style={{
-                background: "var(--bg-elevated)",
-                border: "2px dashed var(--border)",
+                background: "rgba(255,255,255,0.5)",
+                border: "2px dashed rgba(0,0,0,0.06)",
               }}
             >
               <ImagePlus size={20} style={{ color: "var(--text-muted)" }} />
@@ -203,8 +203,8 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
             onChange={(e) => setNom(e.target.value)}
             className="w-full px-4 py-3 rounded-xl text-sm outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.5)",
+              border: "1px solid rgba(0,0,0,0.06)",
               color: "var(--text-primary)",
             }}
           />
@@ -226,7 +226,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                 style={{
                   background:
-                    groupe === g ? "var(--accent)" : "var(--bg-elevated)",
+                    groupe === g ? "var(--accent)" : "rgba(255,255,255,0.5)",
                   color: groupe === g ? "white" : "var(--text-secondary)",
                 }}
               >
@@ -255,7 +255,9 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                 style={{
                   background:
-                    equipement === eq ? "var(--accent)" : "var(--bg-elevated)",
+                    equipement === eq
+                      ? "var(--accent)"
+                      : "rgba(255,255,255,0.5)",
                   color: equipement === eq ? "white" : "var(--text-secondary)",
                 }}
               >
@@ -266,7 +268,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
         </div>
 
         {error && (
-          <p className="text-xs" style={{ color: "var(--danger)" }}>
+          <p className="text-xs" style={{ color: "#c94444" }}>
             {error}
           </p>
         )}
@@ -278,7 +280,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all"
           style={{
             background:
-              canSubmit && !loading ? "var(--accent)" : "var(--bg-elevated)",
+              canSubmit && !loading ? "var(--accent)" : "rgba(255,255,255,0.5)",
             color: canSubmit && !loading ? "white" : "var(--text-muted)",
             cursor: canSubmit && !loading ? "pointer" : "not-allowed",
           }}

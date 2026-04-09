@@ -82,15 +82,16 @@ export default function PoidsPageClient({ initialData }: Props) {
   return (
     <main
       className="page-enter"
-      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 20px 112px" }}
+      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 28px 112px" }}
     >
-      {/* En-tête */}
-      <div style={{ marginBottom: 16 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 20 }}>
         <div
           style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "0.12em",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
             textTransform: "uppercase",
             color: "var(--text-muted)",
             marginBottom: 4,
@@ -100,15 +101,15 @@ export default function PoidsPageClient({ initialData }: Props) {
         </div>
         <h1
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontSize: 28,
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 32,
+            fontWeight: 500,
             color: "var(--text-primary)",
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.5px",
             lineHeight: 1.1,
           }}
         >
-          Poids.
+          Poids
         </h1>
       </div>
 

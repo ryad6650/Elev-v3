@@ -52,15 +52,25 @@ export default memo(function WorkoutWeekTimeline({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <span
-          className="text-[11px] font-bold tracking-[0.1em] uppercase"
-          style={{ color: "#A8A29E" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+          }}
         >
           Cette semaine
         </span>
         <Link
           href="/historique"
-          className="text-[11px] font-semibold"
-          style={{ color: "#74bf7a" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "var(--green)",
+          }}
         >
           Historique &rarr;
         </Link>
@@ -80,8 +90,14 @@ export default memo(function WorkoutWeekTimeline({
           return (
             <div key={jour} className="flex flex-col items-center gap-1.5">
               <span
-                className="text-[10px] font-bold tracking-[0.04em] uppercase"
-                style={{ color: isToday ? "#4A3728" : "#A8A29E" }}
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 11,
+                  fontWeight: isToday ? 700 : 500,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  color: isToday ? "var(--text-primary)" : "var(--text-muted)",
+                }}
               >
                 {jour}
               </span>
@@ -110,15 +126,12 @@ function DayDot({
   isPast: boolean;
   routineName?: string;
 }) {
-  const base = "w-[32px] h-[32px] rounded-lg flex items-center justify-center";
+  const base = "w-[36px] h-[36px] rounded-xl flex items-center justify-center";
 
   if (isDone) {
     return (
-      <div
-        className={base}
-        style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
-      >
-        <span className="text-[11px] font-bold text-white">✓</span>
+      <div className={base} style={{ background: "var(--green)" }}>
+        <span className="text-[12px] font-bold text-white">✓</span>
       </div>
     );
   }
@@ -126,9 +139,12 @@ function DayDot({
     return (
       <div
         className={base}
-        style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+        style={{
+          border: "2px solid var(--green)",
+          background: "var(--green-dim)",
+        }}
       >
-        <span className="text-[14px]">💪</span>
+        <span className="text-[15px]">💪</span>
       </div>
     );
   }
@@ -137,11 +153,18 @@ function DayDot({
       <div
         className={base}
         style={{
-          border: "1.5px dashed rgba(74,55,40,0.25)",
+          border: "1.5px dashed rgba(0,0,0,0.12)",
           background: "transparent",
         }}
       >
-        <span className="text-[8px] font-bold" style={{ color: "#78716C" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 8,
+            fontWeight: 700,
+            color: "var(--text-muted)",
+          }}
+        >
           {routineName}
         </span>
       </div>
@@ -151,7 +174,7 @@ function DayDot({
     <div
       className={base}
       style={{
-        background: "rgba(74,55,40,0.06)",
+        background: "rgba(0,0,0,0.04)",
         opacity: isPast ? 0.35 : 1,
       }}
     />

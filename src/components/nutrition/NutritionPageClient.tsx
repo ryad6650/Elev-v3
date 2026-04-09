@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
 import MealSection from "./MealSection";
 import { sumEntries, groupByMeal } from "@/lib/nutrition-utils";
@@ -84,7 +83,6 @@ export default function NutritionPageClient({ initialData }: Props) {
     [displayEntries],
   );
 
-  // Toujours afficher les 4 repas fixes, même sans entries
   const FIXED_MEALS = [1, 2, 3, 4] as const;
   const meals: Meal[] = useMemo(() => {
     const map = new Map(mealsFromEntries.map((m) => [m.meal_number, m]));
@@ -92,6 +90,8 @@ export default function NutritionPageClient({ initialData }: Props) {
       (num) => map.get(num) ?? { meal_number: num, meal_time: "", entries: [] },
     );
   }, [mealsFromEntries]);
+
+  const isToday = date === today;
 
   function navigate(delta: number) {
     const d = new Date(date + "T12:00:00");
@@ -107,59 +107,79 @@ export default function NutritionPageClient({ initialData }: Props) {
   return (
     <>
       <main
-        className="pt-3.5 pb-28 page-enter"
+        className="pb-28 page-enter"
         style={{
           maxWidth: 430,
           margin: "0 auto",
-          paddingLeft: 20,
-          paddingRight: 20,
+          padding: "20px 28px 0",
         }}
       >
         {/* Title + date nav */}
         <div
           className="flex items-center justify-between"
-          style={{ marginBottom: 18 }}
+          style={{ marginBottom: 24 }}
         >
           <h1
-            className="text-[26px] leading-none"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 32,
+              fontWeight: 500,
               color: "var(--text-primary)",
+              letterSpacing: "-0.5px",
             }}
           >
             Nutrition
           </h1>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-              style={{ background: "rgba(74,55,40,0.07)" }}
+              className="flex items-center justify-center active:scale-95 transition-transform"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "var(--glass-bg)",
+                backdropFilter: "var(--glass-blur-sm)",
+                WebkitBackdropFilter: "var(--glass-blur-sm)",
+                border: "1px solid var(--glass-border)",
+                color: "var(--text-secondary)",
+                fontSize: 18,
+                fontWeight: 600,
+              }}
               aria-label="Jour précédent"
             >
-              <ChevronLeft
-                size={14}
-                strokeWidth={2.5}
-                style={{ color: "var(--text-muted)" }}
-              />
+              ‹
             </button>
             <span
-              className="text-[13px] font-semibold"
-              style={{ color: "var(--text-primary)", letterSpacing: "0.02em" }}
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 15,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+              }}
             >
               {formatDateShort(date)}
             </span>
             <button
               onClick={() => navigate(1)}
-              className="w-7 h-7 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-              style={{ background: "rgba(74,55,40,0.07)" }}
+              className="flex items-center justify-center active:scale-95 transition-transform"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "var(--glass-bg)",
+                backdropFilter: "var(--glass-blur-sm)",
+                WebkitBackdropFilter: "var(--glass-blur-sm)",
+                border: "1px solid var(--glass-border)",
+                color: "var(--text-secondary)",
+                fontSize: 18,
+                fontWeight: 600,
+                opacity: isToday ? 0.3 : 1,
+              }}
               aria-label="Jour suivant"
+              disabled={isToday}
             >
-              <ChevronRight
-                size={14}
-                strokeWidth={2.5}
-                style={{ color: "var(--text-muted)" }}
-              />
+              ›
             </button>
           </div>
         </div>
@@ -173,23 +193,16 @@ export default function NutritionPageClient({ initialData }: Props) {
           profile={displayProfile}
         />
 
-        {/* Divider */}
-        <div
-          className="h-px"
-          style={{ background: "var(--border)", margin: "4px 0 12px" }}
-        />
-
         {/* Meals */}
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-3">
           {meals.map((meal) => (
-            <div key={meal.meal_number}>
-              <MealSection
-                meal={meal}
-                onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-                onEntryDeleted={(id) => removeEntry(id)}
-                onFoodClick={(entry) => setViewEntry(entry)}
-              />
-            </div>
+            <MealSection
+              key={meal.meal_number}
+              meal={meal}
+              onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
+              onEntryDeleted={(id) => removeEntry(id)}
+              onFoodClick={(entry) => setViewEntry(entry)}
+            />
           ))}
         </div>
       </main>

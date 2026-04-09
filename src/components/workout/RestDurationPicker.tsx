@@ -50,19 +50,19 @@ export default function RestDurationPicker({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
-      style={{ background: "rgba(0,0,0,0.6)", paddingBottom: "88px" }}
+      style={{ background: "rgba(0,0,0,0.4)", paddingBottom: "88px" }}
       onClick={onClose}
     >
       <div
         className="w-full max-w-[430px] rounded-3xl mx-4"
-        style={{ background: "var(--bg-card)" }}
+        style={{ background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-3">
           <div
             className="w-10 h-1 rounded-full"
-            style={{ background: "var(--border)" }}
+            style={{ background: "rgba(0,0,0,0.06)" }}
           />
         </div>
 
@@ -98,7 +98,7 @@ export default function RestDurationPicker({
                 style={{
                   background: isSelected
                     ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                    : "var(--bg-elevated)",
+                    : "rgba(255,255,255,0.5)",
                   color: isSelected ? "var(--accent)" : "var(--text-primary)",
                   border: isSelected
                     ? "1.5px solid var(--accent)"
@@ -125,7 +125,7 @@ export default function RestDurationPicker({
             style={{
               background: showCustom
                 ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                : "var(--bg-elevated)",
+                : "rgba(255,255,255,0.5)",
               color: showCustom ? "var(--accent)" : "var(--text-primary)",
               border: showCustom
                 ? "1.5px solid var(--accent)"
@@ -150,7 +150,7 @@ export default function RestDurationPicker({
             <div
               className="flex items-center gap-3 p-3 rounded-2xl"
               style={{
-                background: "var(--bg-elevated)",
+                background: "rgba(255,255,255,0.5)",
                 border: "1px solid var(--border)",
               }}
             >
@@ -166,7 +166,7 @@ export default function RestDurationPicker({
                   onChange={(e) => setCustomMins(e.target.value)}
                   className="w-full text-center text-2xl font-bold rounded-xl py-2 outline-none"
                   style={{
-                    background: "var(--bg-card)",
+                    background: "rgba(255,255,255,0.5)",
                     color: "var(--text-primary)",
                     border: "1.5px solid var(--border)",
                   }}
@@ -198,7 +198,7 @@ export default function RestDurationPicker({
                   onChange={(e) => setCustomSecs(e.target.value)}
                   className="w-full text-center text-2xl font-bold rounded-xl py-2 outline-none"
                   style={{
-                    background: "var(--bg-card)",
+                    background: "rgba(255,255,255,0.5)",
                     color: "var(--text-primary)",
                     border: "1.5px solid var(--border)",
                   }}
@@ -214,7 +214,8 @@ export default function RestDurationPicker({
               {/* Valider */}
               <button
                 onClick={handleCustomConfirm}
-                className="btn-accent w-11 h-11 rounded-xl flex items-center justify-center shrink-0 self-start mt-0.5"
+                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 self-start mt-0.5"
+                style={{ background: "var(--green)", color: "white" }}
               >
                 <Check size={18} strokeWidth={2.5} />
               </button>

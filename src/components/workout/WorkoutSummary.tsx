@@ -100,8 +100,8 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
           <h2
             className="text-2xl leading-tight"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontWeight: 700,
               color: "var(--text-primary)",
             }}
           >
@@ -119,8 +119,8 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
           <div
             className="p-4 rounded-2xl border text-center"
             style={{
-              background: "var(--bg-secondary)",
-              borderColor: "var(--border)",
+              background: "rgba(255,255,255,0.5)",
+              borderColor: "rgba(0,0,0,0.06)",
             }}
           >
             <Clock
@@ -144,8 +144,8 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
           <div
             className="p-4 rounded-2xl border text-center"
             style={{
-              background: "var(--bg-secondary)",
-              borderColor: "var(--border)",
+              background: "rgba(255,255,255,0.5)",
+              borderColor: "rgba(0,0,0,0.06)",
             }}
           >
             <Zap
@@ -228,10 +228,10 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
                   key={ex.uid}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border"
                   style={{
-                    background: "var(--bg-secondary)",
+                    background: "rgba(255,255,255,0.5)",
                     borderColor: isPR
                       ? "rgba(234,179,8,0.35)"
-                      : "var(--border)",
+                      : "rgba(0,0,0,0.06)",
                   }}
                 >
                   <div className="min-w-0 flex-1">
@@ -308,12 +308,14 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
       {showCancel && (
         <div
           className="fixed inset-0 z-10 flex items-center justify-center px-4"
-          style={{ background: "rgba(0,0,0,0.7)" }}
+          style={{ background: "rgba(0,0,0,0.4)" }}
           onClick={() => setShowCancel(false)}
         >
           <div
             className="w-full max-w-sm p-6 rounded-2xl space-y-4"
-            style={{ background: "var(--bg-card)" }}
+            style={{
+              background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <p
@@ -330,9 +332,9 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
                 onClick={() => setShowCancel(false)}
                 className="flex-1 py-3 rounded-xl text-sm font-semibold border"
                 style={{
-                  background: "var(--bg-elevated)",
+                  background: "rgba(255,255,255,0.5)",
                   color: "var(--text-primary)",
-                  borderColor: "var(--border)",
+                  borderColor: "rgba(0,0,0,0.06)",
                 }}
               >
                 Retour
@@ -343,7 +345,7 @@ export default function WorkoutSummary({ workout, totalPausedMs = 0 }: Props) {
                   setShowCancel(false);
                 }}
                 className="flex-1 py-3 rounded-xl text-sm font-semibold"
-                style={{ background: "var(--danger)", color: "white" }}
+                style={{ background: "#c94444", color: "white" }}
               >
                 Annuler quand même
               </button>

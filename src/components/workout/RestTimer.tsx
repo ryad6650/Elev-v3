@@ -41,7 +41,7 @@ export default function RestTimer() {
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         border: "1px solid rgba(255,255,255,0.5)",
-        boxShadow: "0 8px 32px rgba(74,55,40,0.12)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
       }}
     >
       {/* Anneau SVG warm */}
@@ -51,7 +51,7 @@ export default function RestTimer() {
           cy={22}
           r={18}
           fill="none"
-          stroke="rgba(74,55,40,0.08)"
+          stroke="rgba(0,0,0,0.06)"
           strokeWidth={3}
         />
         <circle
@@ -59,7 +59,7 @@ export default function RestTimer() {
           cy={22}
           r={18}
           fill="none"
-          stroke="var(--bar-to)"
+          stroke="var(--green)"
           strokeWidth={3}
           strokeLinecap="round"
           strokeDasharray={2 * Math.PI * 18}
@@ -80,7 +80,8 @@ export default function RestTimer() {
         <p
           className="text-[22px] leading-[1.2]"
           style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontWeight: 700,
             color: "var(--text-primary)",
           }}
         >
@@ -96,7 +97,7 @@ export default function RestTimer() {
           onClick={dismissRestTimer}
           className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
           style={{
-            background: "rgba(74,55,40,0.08)",
+            background: "rgba(0,0,0,0.06)",
             color: "var(--text-muted)",
           }}
         >
@@ -106,7 +107,7 @@ export default function RestTimer() {
           onClick={dismissRestTimer}
           className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-opacity active:opacity-60"
           style={{
-            background: "rgba(74,55,40,0.05)",
+            background: "rgba(0,0,0,0.04)",
             color: "var(--text-secondary)",
           }}
         >

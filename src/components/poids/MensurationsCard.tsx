@@ -42,9 +42,13 @@ export default function MensurationsCard({ initial }: Props) {
   return (
     <div
       style={{
-        padding: "14px 0",
-        borderBottom: "1px solid rgba(74,55,40,0.08)",
-        marginBottom: 6,
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 20,
+        marginBottom: 14,
       }}
     >
       {/* Header */}
@@ -53,50 +57,36 @@ export default function MensurationsCard({ initial }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: 8,
+          marginBottom: 12,
         }}
       >
         <span
           style={{
-            fontSize: 8,
-            fontWeight: 700,
-            color: "var(--text-secondary)",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
+            color: "var(--text-muted)",
           }}
         >
           Mensurations
         </span>
-        {editing ? (
-          <button
-            onClick={handleSave}
-            disabled={isPending}
-            style={{
-              fontSize: 9,
-              fontWeight: 600,
-              color: "var(--accent-text)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {isPending ? "…" : "Sauvegarder"}
-          </button>
-        ) : (
-          <button
-            onClick={() => setEditing(true)}
-            style={{
-              fontSize: 9,
-              fontWeight: 600,
-              color: "var(--accent-text)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Modifier
-          </button>
-        )}
+        <button
+          onClick={editing ? handleSave : () => setEditing(true)}
+          disabled={editing && isPending}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "var(--green)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          {editing ? (isPending ? "…" : "Sauvegarder") : "Modifier"}
+        </button>
       </div>
 
       {/* Grille 2 colonnes */}
@@ -104,38 +94,33 @@ export default function MensurationsCard({ initial }: Props) {
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: 6,
+          gap: 8,
         }}
       >
         {CHAMPS.map(({ key, label }) => (
           <div
             key={key}
             style={{
-              background: "rgba(255,255,255,0.5)",
-              borderRadius: 10,
-              padding: "8px 10px",
+              background: "rgba(0,0,0,0.03)",
+              borderRadius: "var(--radius-sm)",
+              padding: "10px 12px",
             }}
           >
             <div
               style={{
-                fontSize: 7,
-                fontWeight: 700,
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 9,
+                fontWeight: 600,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                color: "var(--text-secondary)",
-                marginBottom: 2,
+                color: "var(--text-muted)",
+                marginBottom: 4,
               }}
             >
               {label}
             </div>
             {editing ? (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
+              <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <input
                   type="number"
                   step="0.5"
@@ -152,7 +137,8 @@ export default function MensurationsCard({ initial }: Props) {
                   style={{
                     width: "100%",
                     background: "transparent",
-                    fontSize: 13,
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 15,
                     fontWeight: 700,
                     color: "var(--text-primary)",
                     border: "none",
@@ -161,7 +147,7 @@ export default function MensurationsCard({ initial }: Props) {
                 />
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     color: "var(--text-muted)",
                     fontWeight: 500,
                     flexShrink: 0,
@@ -174,7 +160,8 @@ export default function MensurationsCard({ initial }: Props) {
               <div>
                 <span
                   style={{
-                    fontSize: 13,
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 15,
                     fontWeight: 700,
                     color: "var(--text-primary)",
                   }}
@@ -184,7 +171,7 @@ export default function MensurationsCard({ initial }: Props) {
                 {values[key] != null && (
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,
                       color: "var(--text-muted)",
                       fontWeight: 500,
                       marginLeft: 3,

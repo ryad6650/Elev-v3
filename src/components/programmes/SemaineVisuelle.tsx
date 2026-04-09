@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 const JOURS = [
-  { lettre: 'L', label: 'Lun' },
-  { lettre: 'M', label: 'Mar' },
-  { lettre: 'M', label: 'Mer' },
-  { lettre: 'J', label: 'Jeu' },
-  { lettre: 'V', label: 'Ven' },
-  { lettre: 'S', label: 'Sam' },
-  { lettre: 'D', label: 'Dim' },
+  { lettre: "L", label: "Lun" },
+  { lettre: "M", label: "Mar" },
+  { lettre: "M", label: "Mer" },
+  { lettre: "J", label: "Jeu" },
+  { lettre: "V", label: "Ven" },
+  { lettre: "S", label: "Sam" },
+  { lettre: "D", label: "Dim" },
 ];
 
 interface Props {
@@ -16,7 +16,11 @@ interface Props {
   onToggle?: (jour: number) => void;
 }
 
-export default function SemaineVisuelle({ joursActifs, interactive = false, onToggle }: Props) {
+export default function SemaineVisuelle({
+  joursActifs,
+  interactive = false,
+  onToggle,
+}: Props) {
   return (
     <div className="flex justify-between gap-1.5">
       {JOURS.map(({ lettre, label }, index) => {
@@ -29,15 +33,20 @@ export default function SemaineVisuelle({ joursActifs, interactive = false, onTo
               onClick={() => interactive && onToggle?.(index)}
               className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all"
               style={{
-                background: actif ? 'var(--accent)' : 'var(--bg-elevated)',
-                color: actif ? '#fff' : 'var(--text-muted)',
-                cursor: interactive ? 'pointer' : 'default',
-                transform: 'scale(1)',
+                background: actif ? "var(--green)" : "rgba(255,255,255,0.5)",
+                color: actif ? "#fff" : "var(--text-muted)",
+                cursor: interactive ? "pointer" : "default",
+                transform: "scale(1)",
               }}
             >
               {lettre}
             </button>
-            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{label}</span>
+            <span
+              className="text-[10px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {label}
+            </span>
           </div>
         );
       })}

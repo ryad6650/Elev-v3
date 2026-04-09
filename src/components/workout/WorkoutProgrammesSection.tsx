@@ -47,18 +47,31 @@ export default function WorkoutProgrammesSection({
       )}
 
       {/* Mes programmes */}
-      <div className="mb-6">
+      <div style={{ marginBottom: 24 }}>
         <div className="flex items-center justify-between mb-3">
           <p
-            className="text-[9px] font-bold tracking-[0.1em] uppercase"
-            style={{ color: "#A8A29E" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--text-muted)",
+            }}
           >
             Mes programmes
           </p>
           <button
             onClick={() => setCreateOpen(true)}
-            className="text-[9px] font-semibold"
-            style={{ color: "#74bf7a" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--green)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             + Créer
           </button>
@@ -69,22 +82,41 @@ export default function WorkoutProgrammesSection({
             key={p.id}
             onClick={() => setSelection(p)}
             className="w-full flex items-center gap-3.5 py-3 text-left active:opacity-80 transition-opacity"
-            style={{ borderBottom: "1px solid rgba(74,55,40,0.08)" }}
+            style={{
+              borderBottom: "1px solid rgba(0,0,0,0.04)",
+              background: "none",
+              border: "none",
+              borderBottomWidth: 1,
+              borderBottomStyle: "solid",
+              borderBottomColor: "rgba(0,0,0,0.04)",
+            }}
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
-              style={{ background: "rgba(74,55,40,0.06)" }}
+              style={{ background: "rgba(0,0,0,0.04)" }}
             >
               {getEmoji(p.nom, i)}
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="text-[13px] font-semibold truncate"
-                style={{ color: "#4A3728" }}
+                className="truncate"
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
+                }}
               >
                 {p.nom}
               </p>
-              <p className="text-[10px] mt-0.5" style={{ color: "#78716C" }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 11,
+                  color: "var(--text-muted)",
+                  marginTop: 2,
+                }}
+              >
                 {p.routines.length} séances ·{" "}
                 {p.id === data.programmeActif?.id
                   ? "En cours"
@@ -93,17 +125,22 @@ export default function WorkoutProgrammesSection({
             </div>
             <ChevronRight
               size={14}
-              style={{ color: "#A8A29E", flexShrink: 0 }}
+              style={{ color: "var(--text-muted)", flexShrink: 0 }}
             />
           </button>
         ))}
 
         <button
           onClick={() => setCreateOpen(true)}
-          className="w-full py-3.5 rounded-2xl text-[11px] font-medium mt-3 active:opacity-70 transition-opacity"
+          className="w-full py-3.5 rounded-2xl mt-3 active:opacity-70 transition-opacity"
           style={{
-            border: "1.5px dashed rgba(74,55,40,0.2)",
-            color: "#78716C",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 12,
+            fontWeight: 500,
+            border: "1.5px dashed rgba(0,0,0,0.12)",
+            color: "var(--text-muted)",
+            background: "none",
+            cursor: "pointer",
           }}
         >
           + Créer un nouveau programme
@@ -136,6 +173,7 @@ function ActiveProgramme({
   onView: () => void;
   onStart: (routineId: string, routineNom: string) => void;
 }) {
+  void onView;
   const nextRoutine = programme.routines[0];
   const progress = programme.progres;
   const pct = progress
@@ -143,25 +181,32 @@ function ActiveProgramme({
     : 0;
 
   return (
-    <div
-      className="mb-[18px] pb-3.5"
-      style={{ borderBottom: "1px solid rgba(74,55,40,0.08)" }}
-    >
+    <div style={{ marginBottom: 18 }}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <span
-          className="flex-1 text-[14px]"
+          className="flex-1"
           style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            color: "#4A3728",
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 15,
+            fontWeight: 600,
+            color: "var(--text-primary)",
           }}
         >
           {programme.nom}
         </span>
         <span
-          className="text-[7px] font-extrabold tracking-[0.08em] uppercase px-2 py-[2px] rounded-lg text-white"
-          style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            padding: "3px 10px",
+            borderRadius: 9999,
+            background: "var(--green)",
+            color: "#fff",
+          }}
         >
           Actif
         </span>
@@ -169,22 +214,32 @@ function ActiveProgramme({
 
       {/* Progress */}
       {progress && (
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-3">
           <div
-            className="flex-1 h-[3px] rounded-full"
-            style={{ background: "rgba(74,55,40,0.1)" }}
+            className="flex-1 overflow-hidden"
+            style={{
+              height: 5,
+              borderRadius: 99,
+              background: "rgba(0,0,0,0.06)",
+            }}
           >
             <div
-              className="h-full rounded-full"
               style={{
+                height: "100%",
                 width: `${pct}%`,
-                background: "linear-gradient(90deg, #c4a882, #a0785c)",
+                borderRadius: 99,
+                background: "var(--green)",
               }}
             />
           </div>
           <span
-            className="text-[9px] font-semibold shrink-0"
-            style={{ color: "#78716C" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--text-muted)",
+              flexShrink: 0,
+            }}
           >
             Sem. {progress.semaine_actuelle} / {progress.total_semaines}
           </span>
@@ -195,30 +250,55 @@ function ActiveProgramme({
       {nextRoutine && (
         <button
           onClick={() => onStart(nextRoutine.routine_id, nextRoutine.nom)}
-          className="w-full rounded-xl p-2.5 px-3 flex items-center justify-between active:scale-[0.98] transition-transform"
-          style={{ background: "linear-gradient(135deg, #c4a882, #a0785c)" }}
+          className="w-full rounded-xl p-3 flex items-center justify-between active:scale-[0.98] transition-transform"
+          style={{
+            background: "var(--green)",
+            border: "none",
+            cursor: "pointer",
+          }}
         >
           <div className="flex flex-col gap-[2px]">
-            <span className="text-[7px] font-extrabold tracking-[0.1em] uppercase text-white">
-              ✦ Suivante
+            <span
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.7)",
+              }}
+            >
+              Suivante
             </span>
             <span
-              className="text-[13px] text-white"
               style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 14,
+                fontWeight: 600,
+                color: "#fff",
               }}
             >
               {nextRoutine.nom}
             </span>
             <span
-              className="text-[9px]"
-              style={{ color: "rgba(255,255,255,0.5)" }}
+              style={{
+                fontFamily: "var(--font-inter), sans-serif",
+                fontSize: 10,
+                color: "rgba(255,255,255,0.5)",
+              }}
             >
               {nextRoutine.nbExercices} exercices
             </span>
           </div>
-          <span className="text-[9px] font-bold text-white shrink-0">
+          <span
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#fff",
+              flexShrink: 0,
+            }}
+          >
             Démarrer →
           </span>
         </button>

@@ -44,24 +44,24 @@ export default function AddPoidsModal({
   return (
     <div
       className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 flex items-end"
-      style={{ background: "rgba(0,0,0,0.6)" }}
+      style={{ background: "rgba(0,0,0,0.4)" }}
       onClick={onClose}
     >
       <div
         className="w-full rounded-t-3xl p-6"
         style={{
-          background: "var(--bg-secondary)",
-          maxWidth: 520,
+          background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
+          maxWidth: 430,
           margin: "0 auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <h2
-            className="text-xl font-bold"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 20,
+              fontWeight: 600,
               color: "var(--text-primary)",
             }}
           >
@@ -70,7 +70,7 @@ export default function AddPoidsModal({
           <button
             onClick={onClose}
             className="p-2 rounded-full"
-            style={{ background: "var(--bg-card)" }}
+            style={{ background: "rgba(0,0,0,0.04)" }}
           >
             <X size={18} style={{ color: "var(--text-secondary)" }} />
           </button>
@@ -79,7 +79,10 @@ export default function AddPoidsModal({
         <label className="block mb-4">
           <span
             className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: "var(--text-muted)" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              color: "var(--text-muted)",
+            }}
           >
             Date
           </span>
@@ -88,11 +91,12 @@ export default function AddPoidsModal({
             value={date}
             max={today}
             onChange={(e) => setDate(e.target.value)}
-            className="block w-full mt-1.5 px-4 py-3 rounded-xl text-base"
+            className="block w-full mt-1.5 px-4 py-3 rounded-xl text-base outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.5)",
+              border: "1px solid rgba(0,0,0,0.06)",
               color: "var(--text-primary)",
+              fontFamily: "var(--font-inter), sans-serif",
             }}
           />
         </label>
@@ -100,7 +104,10 @@ export default function AddPoidsModal({
         <label className="block mb-6">
           <span
             className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: "var(--text-muted)" }}
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              color: "var(--text-muted)",
+            }}
           >
             Poids (kg)
           </span>
@@ -112,18 +119,19 @@ export default function AddPoidsModal({
             placeholder="78.5"
             value={poids}
             onChange={(e) => setPoids(e.target.value)}
-            className="block w-full mt-1.5 px-4 py-3 rounded-xl text-3xl font-bold text-center"
+            className="block w-full mt-1.5 px-4 py-3 rounded-xl text-3xl font-bold text-center outline-none"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
-              color: "var(--accent-text)",
+              background: "rgba(255,255,255,0.5)",
+              border: "1px solid rgba(0,0,0,0.06)",
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-inter), sans-serif",
             }}
             autoFocus
           />
         </label>
 
         {error && (
-          <p className="text-sm mb-4" style={{ color: "var(--danger)" }}>
+          <p className="text-sm mb-4" style={{ color: "#c94444" }}>
             {error}
           </p>
         )}
@@ -133,9 +141,12 @@ export default function AddPoidsModal({
           disabled={isPending || !poids}
           className="w-full py-4 rounded-xl text-base font-semibold transition-all active:scale-95"
           style={{
+            fontFamily: "var(--font-inter), sans-serif",
             background:
-              isPending || !poids ? "var(--bg-elevated)" : "var(--accent)",
+              isPending || !poids ? "rgba(0,0,0,0.06)" : "var(--green)",
             color: isPending || !poids ? "var(--text-muted)" : "#fff",
+            border: "none",
+            cursor: isPending || !poids ? "not-allowed" : "pointer",
           }}
         >
           {isPending ? "Sauvegarde…" : "Enregistrer"}

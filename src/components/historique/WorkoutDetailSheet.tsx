@@ -68,7 +68,6 @@ export default function WorkoutDetailSheet({
 
   const handleSave = () => {
     startTransition(async () => {
-      // Sauvegarder chaque set modifié
       for (let ei = 0; ei < draft.exercises.length; ei++) {
         for (let si = 0; si < draft.exercises[ei].sets.length; si++) {
           const orig = workout.exercises[ei]?.sets[si];
@@ -89,13 +88,13 @@ export default function WorkoutDetailSheet({
   const sheet = (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center px-4"
-      style={{ background: "rgba(0,0,0,0.6)" }}
+      style={{ background: "rgba(0,0,0,0.4)" }}
       onClick={onClose}
     >
       <div
         className="w-full max-w-[400px] rounded-3xl p-5 overflow-y-auto"
         style={{
-          background: "var(--bg-secondary)",
+          background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
           maxHeight: "80vh",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -103,10 +102,10 @@ export default function WorkoutDetailSheet({
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
           <h2
-            className="text-lg font-bold truncate"
+            className="text-lg truncate"
             style={{
-              fontFamily: "var(--font-dm-serif)",
-              fontStyle: "italic",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontWeight: 600,
               color: "var(--text-primary)",
             }}
           >
@@ -115,7 +114,7 @@ export default function WorkoutDetailSheet({
           <button
             onClick={onClose}
             className="p-2 rounded-full shrink-0"
-            style={{ background: "var(--bg-card)" }}
+            style={{ background: "rgba(0,0,0,0.04)" }}
           >
             <X size={18} style={{ color: "var(--text-secondary)" }} />
           </button>
@@ -123,7 +122,10 @@ export default function WorkoutDetailSheet({
 
         <p
           className="text-xs mb-4 capitalize"
-          style={{ color: "var(--text-muted)" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            color: "var(--text-muted)",
+          }}
         >
           {formatDate(workout.date)}
           {workout.duree_minutes != null && ` · ${workout.duree_minutes} min`}
@@ -138,8 +140,8 @@ export default function WorkoutDetailSheet({
                 key={ex.exerciseId}
                 className="rounded-2xl p-3"
                 style={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
+                  background: "rgba(255,255,255,0.5)",
+                  border: "1px solid rgba(0,0,0,0.04)",
                 }}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -149,29 +151,40 @@ export default function WorkoutDetailSheet({
                   />
                   <span
                     className="text-sm font-semibold truncate"
-                    style={{ color: "var(--text-primary)" }}
+                    style={{
+                      fontFamily: "var(--font-inter), sans-serif",
+                      color: "var(--text-primary)",
+                    }}
                   >
                     {ex.nom}
                   </span>
                 </div>
 
-                {/* Tableau séries */}
                 <div className="grid grid-cols-3 gap-1 text-center">
                   <span
                     className="text-[10px] uppercase"
-                    style={{ color: "var(--text-muted)" }}
+                    style={{
+                      fontFamily: "var(--font-inter), sans-serif",
+                      color: "var(--text-muted)",
+                    }}
                   >
                     Série
                   </span>
                   <span
                     className="text-[10px] uppercase"
-                    style={{ color: "var(--text-muted)" }}
+                    style={{
+                      fontFamily: "var(--font-inter), sans-serif",
+                      color: "var(--text-muted)",
+                    }}
                   >
                     Poids
                   </span>
                   <span
                     className="text-[10px] uppercase"
-                    style={{ color: "var(--text-muted)" }}
+                    style={{
+                      fontFamily: "var(--font-inter), sans-serif",
+                      color: "var(--text-muted)",
+                    }}
                   >
                     Reps
                   </span>
@@ -199,7 +212,13 @@ export default function WorkoutDetailSheet({
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="btn-accent flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
+              style={{
+                background: "var(--green)",
+                color: "#fff",
+                border: "none",
+                fontFamily: "var(--font-inter), sans-serif",
+              }}
             >
               <Check size={16} />
               {isPending ? "Sauvegarde…" : "Enregistrer"}
@@ -209,9 +228,10 @@ export default function WorkoutDetailSheet({
               onClick={() => setEditing(true)}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
               style={{
-                background: "var(--bg-card)",
+                background: "rgba(255,255,255,0.5)",
                 color: "var(--text-primary)",
-                border: "1px solid var(--border)",
+                border: "1px solid rgba(0,0,0,0.06)",
+                fontFamily: "var(--font-inter), sans-serif",
               }}
             >
               <Pencil size={16} />
@@ -223,10 +243,10 @@ export default function WorkoutDetailSheet({
             disabled={isPending}
             className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-sm active:scale-95 transition-all"
             style={{
-              background: confirmDelete
-                ? "var(--danger, #EF4444)"
-                : "rgba(239,68,68,0.1)",
-              color: confirmDelete ? "#fff" : "#EF4444",
+              background: confirmDelete ? "#c94444" : "rgba(201,68,68,0.1)",
+              color: confirmDelete ? "#fff" : "#c94444",
+              border: "none",
+              fontFamily: "var(--font-inter), sans-serif",
             }}
           >
             <Trash2 size={16} />
@@ -266,6 +286,7 @@ function SetRow({
 }) {
   const muted = !s.completed;
   const style = {
+    fontFamily: "var(--font-inter), sans-serif",
     fontSize: "0.8rem",
     color: muted ? "var(--text-muted)" : "var(--text-primary)",
   };
@@ -288,24 +309,26 @@ function SetRow({
         step="0.5"
         value={s.poids ?? ""}
         onChange={(e) => onChange(exIdx, si, "poids", e.target.value)}
-        className="w-full text-center rounded-lg px-1 py-0.5"
+        className="w-full text-center rounded-lg px-1 py-0.5 outline-none"
         style={{
           fontSize: "0.8rem",
-          background: "var(--bg-elevated)",
+          fontFamily: "var(--font-inter), sans-serif",
+          background: "rgba(255,255,255,0.5)",
           color: "var(--text-primary)",
-          border: "1px solid var(--border)",
+          border: "1px solid rgba(0,0,0,0.06)",
         }}
       />
       <input
         type="number"
         value={s.reps ?? ""}
         onChange={(e) => onChange(exIdx, si, "reps", e.target.value)}
-        className="w-full text-center rounded-lg px-1 py-0.5"
+        className="w-full text-center rounded-lg px-1 py-0.5 outline-none"
         style={{
           fontSize: "0.8rem",
-          background: "var(--bg-elevated)",
+          fontFamily: "var(--font-inter), sans-serif",
+          background: "rgba(255,255,255,0.5)",
           color: "var(--text-primary)",
-          border: "1px solid var(--border)",
+          border: "1px solid rgba(0,0,0,0.06)",
         }}
       />
     </>

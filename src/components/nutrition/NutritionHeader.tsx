@@ -12,21 +12,38 @@ interface MacroRowProps {
 function MacroRow({ label, value, max, color }: MacroRowProps) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-[5px]">
       <div className="flex justify-between items-baseline">
         <span
-          className="text-[10px] font-bold uppercase"
-          style={{ color, letterSpacing: "0.1em" }}
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase" as const,
+            color,
+          }}
         >
           {label}
         </span>
-        <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-inter), sans-serif",
+            fontSize: 12,
+            fontWeight: 500,
+            color: "var(--text-muted)",
+          }}
+        >
           {Math.round(value)}g / {max}g
         </span>
       </div>
       <div
-        className="w-full h-[5px] rounded-full overflow-hidden"
-        style={{ background: "rgba(74,55,40,0.1)" }}
+        className="w-full overflow-hidden"
+        style={{
+          height: 5,
+          borderRadius: 99,
+          background: "rgba(0,0,0,0.06)",
+        }}
       >
         <div
           className="h-full rounded-full transition-all duration-700"
@@ -56,45 +73,66 @@ export default function NutritionHeader({
   const restantes = Math.max(0, objectif - totalCalories);
 
   return (
-    <div className="flex items-center gap-0" style={{ marginBottom: 20 }}>
-      {/* Gauche — calories */}
+    <div
+      style={{
+        background: "var(--glass-bg)",
+        backdropFilter: "var(--glass-blur)",
+        WebkitBackdropFilter: "var(--glass-blur)",
+        borderRadius: "var(--radius-card)",
+        border: "1px solid var(--glass-border)",
+        padding: 24,
+        marginBottom: 16,
+      }}
+    >
+      {/* Calories */}
       <div
-        className="flex flex-col pr-5 shrink-0"
-        style={{ borderRight: "1px solid var(--border)" }}
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase" as const,
+          color: "var(--text-muted)",
+          marginBottom: 6,
+        }}
       >
-        <span
-          className="text-[10px] font-bold uppercase mb-1"
-          style={{ color: "var(--text-secondary)", letterSpacing: "0.12em" }}
-        >
-          Aujourd&apos;hui
-        </span>
-        <div
-          className="leading-none"
-          style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontSize: 40,
-            color: "var(--text-primary)",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {totalCalories.toLocaleString("fr-FR")}
-        </div>
-        <span
-          className="text-[13px] mt-0.5"
-          style={{ color: "var(--text-muted)" }}
-        >
-          kcal
-        </span>
-        <span
-          className="text-[12px] font-semibold mt-2"
-          style={{ color: "var(--accent-text)" }}
-        >
-          {restantes.toLocaleString("fr-FR")} restantes
-        </span>
+        Aujourd&apos;hui
+      </div>
+      <div
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          fontSize: 42,
+          fontWeight: 500,
+          color: "var(--text-primary)",
+          letterSpacing: "-0.5px",
+          lineHeight: 1,
+        }}
+      >
+        {totalCalories.toLocaleString("fr-FR")}
+      </div>
+      <div
+        style={{
+          fontSize: 14,
+          color: "var(--text-muted)",
+          marginTop: 4,
+        }}
+      >
+        / {objectif.toLocaleString("fr-FR")} kcal
+      </div>
+      <div
+        style={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: "var(--green)",
+          marginTop: 8,
+          marginBottom: 20,
+        }}
+      >
+        {restantes.toLocaleString("fr-FR")} restantes
       </div>
 
-      {/* Droite — macros */}
-      <div className="flex-1 flex flex-col gap-2.5 pl-5">
+      {/* Macros bars */}
+      <div className="flex flex-col gap-3">
         <MacroRow
           label="Glucides"
           value={totalGlucides}
