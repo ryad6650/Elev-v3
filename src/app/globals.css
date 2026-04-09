@@ -4,7 +4,6 @@
 html {
   background: var(--bg-gradient);
   background-attachment: fixed;
-  background-size: 100% 100vh;
 }
 
 body {
