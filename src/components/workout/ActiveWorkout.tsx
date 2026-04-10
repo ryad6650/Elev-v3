@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { ChevronLeft, Plus, Pause, Play, X } from "lucide-react";
+import { ChevronDown, AlarmClock, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useShallow } from "zustand/react/shallow";
 import {
@@ -26,9 +26,6 @@ interface PRNotif {
 
 export default function ActiveWorkout() {
   const isActive = useWorkoutStore((s) => s.activeWorkout !== null);
-  const routineName = useWorkoutStore(
-    (s) => s.activeWorkout?.routineName ?? null,
-  );
   const debutAt = useWorkoutStore((s) => s.activeWorkout?.debutAt ?? 0);
   const exercises = useWorkoutStore(
     useShallow((s) => s.activeWorkout?.exercises ?? []),
@@ -39,16 +36,16 @@ export default function ActiveWorkout() {
   const [showSearch, setShowSearch] = useState(false);
   const [replacingUid, setReplacingUid] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-  const [pausedAt, setPausedAt] = useState<number | null>(null);
-  const [totalPausedMs, setTotalPausedMs] = useState(0);
   const [prNotif, setPrNotif] = useState<PRNotif | null>(null);
   const prTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [openUids, setOpenUids] = useState<Set<string>>(
+    () => new Set(exerciseUids),
+  );
 
   useEffect(() => {
     if (!prNotif) return;
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
+    if (typeof navigator !== "undefined" && navigator.vibrate)
       navigator.vibrate([100, 50, 100]);
-    }
     if (prTimerRef.current) clearTimeout(prTimerRef.current);
     prTimerRef.current = setTimeout(() => setPrNotif(null), 4000);
     return () => {
@@ -56,11 +53,22 @@ export default function ActiveWorkout() {
     };
   }, [prNotif]);
 
-  const [openUid, setOpenUid] = useState<string | null>(
-    () => exerciseUids[0] ?? null,
-  );
+  useEffect(() => {
+    setOpenUids((prev) => {
+      const next = new Set(prev);
+      exerciseUids.forEach((uid) => next.add(uid));
+      return next;
+    });
+  }, [exerciseUids.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleOpen = useCallback((uid: string) => setOpenUid(uid), []);
+  const handleOpen = useCallback((uid: string) => {
+    setOpenUids((prev) => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid);
+      else next.add(uid);
+      return next;
+    });
+  }, []);
   const handlePR = useCallback(
     (name: string, poids: number, reps: number) =>
       setPrNotif({ exerciseName: name, poids, reps }),
@@ -71,172 +79,199 @@ export default function ActiveWorkout() {
     setShowSearch(true);
   }, []);
 
+  const volume = exercises.reduce(
+    (sum, ex) =>
+      sum +
+      ex.sets
+        .filter((s) => s.completed && !s.isWarmup)
+        .reduce((s2, set) => s2 + (set.poids ?? 0) * (set.reps ?? 0), 0),
+    0,
+  );
+  const totalSeries = exercises.reduce(
+    (sum, ex) => sum + ex.sets.filter((s) => s.completed && !s.isWarmup).length,
+    0,
+  );
+
   if (!isActive) return null;
   if (showSummary) {
     const workout = useWorkoutStore.getState().activeWorkout;
     if (!workout) return null;
-    return <WorkoutSummary workout={workout} totalPausedMs={totalPausedMs} />;
+    return <WorkoutSummary workout={workout} totalPausedMs={0} />;
   }
-
-  const isPaused = pausedAt !== null;
-  const handlePause = () => setPausedAt(Date.now());
-  const handleResume = () => {
-    if (!pausedAt) return;
-    setTotalPausedMs((prev) => prev + Date.now() - pausedAt);
-    setPausedAt(null);
-  };
 
   return (
     <>
-      <div
-        className="min-h-dvh flex flex-col"
-        style={{ background: "var(--bg-gradient)" }}
-      >
+      <div className="min-h-dvh flex flex-col" style={{ background: "#000" }}>
         {/* Header */}
         <div
-          className="shrink-0"
+          className="shrink-0 flex items-center justify-between px-4"
           style={{
-            padding: "max(1rem, env(safe-area-inset-top)) 20px 0",
+            paddingTop: "max(1rem, env(safe-area-inset-top))",
+            paddingBottom: 12,
+            background: "#1C1C1E",
           }}
         >
-          {/* Back row : retour + label routine + Terminer */}
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={minimizeWorkout}
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                style={{
-                  background: "rgba(255,255,255,0.55)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,255,255,0.35)",
-                }}
-              >
-                <ChevronLeft
-                  size={16}
-                  style={{ color: "var(--text-secondary)" }}
-                />
-              </button>
-              <span
-                className="text-[12px] font-semibold uppercase tracking-[0.08em]"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  color: "var(--text-muted)",
-                }}
-              >
-                {routineName ?? "Séance libre"}
-              </span>
-            </div>
+          <button
+            onClick={minimizeWorkout}
+            className="flex items-center gap-2 active:opacity-70"
+          >
+            <ChevronDown size={22} style={{ color: "var(--text-primary)" }} />
+            <span
+              style={{
+                fontFamily: "var(--font-nunito),sans-serif",
+                fontSize: 20,
+                fontWeight: 700,
+                color: "var(--text-primary)",
+              }}
+            >
+              Entraînement
+            </span>
+          </button>
+          <div className="flex items-center gap-3">
+            <AlarmClock size={22} style={{ color: "var(--text-primary)" }} />
             <button
               onClick={() => setShowSummary(true)}
-              className="text-[12px] font-semibold tracking-[0.02em] rounded-full px-[18px] py-2 border-none"
+              className="px-5 py-2 rounded-full font-semibold text-[15px] active:scale-[0.97] transition-transform"
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                background: "var(--green)",
+                background: "var(--accent)",
                 color: "#fff",
+                fontFamily: "var(--font-nunito),sans-serif",
               }}
             >
               Terminer
             </button>
           </div>
+        </div>
 
-          {/* Titre */}
-          <h1
-            className="text-[28px] leading-[1.1] font-medium tracking-[-0.5px] mt-3 mb-3"
+        {/* Sync bar */}
+        <div
+          className="flex items-center gap-2 px-4 py-2"
+          style={{
+            borderTop: "1.5px solid #2C2C2E",
+            borderBottom: "1.5px solid #2C2C2E",
+          }}
+        >
+          <div
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ background: "#22C55E" }}
+          />
+          <span
             style={{
-              fontFamily: "var(--font-nunito), sans-serif",
+              fontFamily: "var(--font-nunito),sans-serif",
+              fontSize: 13,
               color: "var(--text-primary)",
             }}
           >
-            En cours...
-          </h1>
+            Synchronisation en direct active
+          </span>
         </div>
 
-        {/* Contenu scrollable */}
+        {/* Stats row */}
         <div
-          className="flex-1 overflow-y-auto pt-2 pb-36 flex flex-col gap-2.5"
-          style={{ scrollbarWidth: "none", padding: "8px 28px 144px" }}
+          className="flex items-center px-4 py-3"
+          style={{ borderBottom: "0.5px solid #2C2C2E" }}
         >
-          {/* Timer card */}
-          <div
-            className="flex items-center justify-between px-5 py-4 rounded-[20px]"
-            style={{
-              background: "var(--glass-bg)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              border: "1px solid var(--glass-border)",
-            }}
-          >
-            <div className="flex flex-col">
-              <span
-                className="text-[10px] font-semibold uppercase tracking-[0.08em]"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  color: "var(--text-muted)",
-                }}
-              >
-                Durée séance
-              </span>
-              <WorkoutTimer
-                startedAt={debutAt}
-                pausedAt={pausedAt}
-                totalPausedMs={totalPausedMs}
-                large
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={isPaused ? handleResume : handlePause}
-                className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ background: "rgba(0,0,0,0.04)" }}
-              >
-                {isPaused ? (
-                  <Play
-                    size={14}
-                    fill="var(--text-muted)"
-                    style={{ color: "var(--text-muted)" }}
-                  />
-                ) : (
-                  <Pause
-                    size={14}
-                    fill="var(--text-muted)"
-                    style={{ color: "var(--text-muted)" }}
-                  />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Section label */}
-          {exerciseUids.length > 0 && (
-            <p
-              className="text-[11px] font-semibold uppercase tracking-[0.08em] mt-1 mb-1"
+          <div className="flex-1">
+            <div
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
+                fontSize: 11,
                 color: "var(--text-muted)",
+                fontFamily: "var(--font-nunito),sans-serif",
+                marginBottom: 2,
               }}
             >
-              Exercices ·{" "}
-              {(() => {
-                const done = exercises.filter((e) => {
-                  const work = e.sets.filter((s) => !s.isWarmup);
-                  return work.length > 0 && work.every((s) => s.completed);
-                }).length;
-                return `${done}/${exercises.length}`;
-              })()}
-            </p>
-          )}
+              Durée
+            </div>
+            <WorkoutTimer startedAt={debutAt} compact />
+          </div>
+          <div className="flex-1">
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-nunito),sans-serif",
+                marginBottom: 2,
+              }}
+            >
+              Volume
+            </div>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-nunito),sans-serif",
+              }}
+            >
+              {volume > 0 ? `${volume} kg` : "0 kg"}
+            </span>
+          </div>
+          <div className="flex-1">
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-nunito),sans-serif",
+                marginBottom: 2,
+              }}
+            >
+              Séries
+            </div>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-nunito),sans-serif",
+              }}
+            >
+              {totalSeries}
+            </span>
+          </div>
+          {/* Silhouettes corps */}
+          <div className="flex gap-1 opacity-30">
+            <svg
+              width="18"
+              height="30"
+              viewBox="0 0 18 30"
+              fill="var(--text-muted)"
+            >
+              <ellipse cx="9" cy="3.5" rx="3.5" ry="3.5" />
+              <rect x="6" y="8" width="6" height="11" rx="3" />
+              <rect x="3" y="19" width="4.5" height="9" rx="2.25" />
+              <rect x="10.5" y="19" width="4.5" height="9" rx="2.25" />
+            </svg>
+            <svg
+              width="18"
+              height="30"
+              viewBox="0 0 18 30"
+              fill="var(--text-muted)"
+            >
+              <ellipse cx="9" cy="3.5" rx="3.5" ry="3.5" />
+              <rect x="6" y="8" width="6" height="11" rx="3" />
+              <rect x="3" y="19" width="4.5" height="9" rx="2.25" />
+              <rect x="10.5" y="19" width="4.5" height="9" rx="2.25" />
+            </svg>
+          </div>
+        </div>
 
-          {/* Exercices */}
+        {/* Liste exercices */}
+        <div
+          className="flex-1 overflow-y-auto pb-24"
+          style={{ scrollbarWidth: "none" }}
+        >
           {exerciseUids.length === 0 && (
-            <div className="text-center py-16 space-y-4">
-              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                Aucun exercice pour le moment.
+            <div className="text-center py-16">
+              <p
+                className="text-sm mb-4"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Aucun exercice.
               </p>
               <button
                 onClick={() => setShowSearch(true)}
                 className="px-6 py-3 rounded-2xl text-sm font-semibold"
-                style={{ background: "var(--green)", color: "#fff" }}
+                style={{ background: "var(--accent)", color: "#fff" }}
               >
                 Ajouter un exercice
               </button>
@@ -246,7 +281,7 @@ export default function ActiveWorkout() {
             <ExerciseCard
               key={uid}
               uid={uid}
-              isOpen={openUid === uid}
+              isOpen={openUids.has(uid)}
               onOpen={handleOpen}
               onPR={handlePR}
               onReplace={handleReplace}
@@ -254,50 +289,28 @@ export default function ActiveWorkout() {
           ))}
         </div>
 
-        {/* FAB ajouter exercice */}
-        {exerciseUids.length > 0 && (
-          <button
-            onClick={() => setShowSearch(true)}
-            className="fixed w-[52px] h-[52px] rounded-full flex items-center justify-center border-none"
-            style={{
-              bottom: 28,
-              right: 28,
-              zIndex: 50,
-              background: "var(--green)",
-              boxShadow: "0 4px 16px rgba(42,157,110,0.3)",
-            }}
-          >
-            <Plus size={22} color="#fff" strokeWidth={2.5} />
-          </button>
-        )}
-
-        {/* Bannière PR */}
+        {/* PR notification */}
         {prNotif && (
           <div
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-2 px-4 py-3 rounded-[12px]"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-2 px-4 py-3 rounded-xl"
             style={{
-              background: "rgba(42,157,110,0.12)",
-              border: "1px solid rgba(42,157,110,0.25)",
-              animation: "prSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1)",
+              background: "rgba(5,137,214,0.12)",
+              border: "1px solid rgba(5,137,214,0.25)",
             }}
           >
-            <span className="text-base shrink-0">🏆</span>
+            <span className="shrink-0">🏆</span>
             <p
               className="flex-1 text-xs font-semibold truncate"
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                color: "var(--green)",
+                color: "var(--accent)",
+                fontFamily: "var(--font-nunito),sans-serif",
               }}
             >
               Record ! {prNotif.exerciseName} — {prNotif.poids}kg ×{" "}
               {prNotif.reps}
             </p>
-            <button
-              onClick={() => setPrNotif(null)}
-              className="p-1 shrink-0"
-              style={{ color: "var(--green)" }}
-            >
-              <X size={14} />
+            <button onClick={() => setPrNotif(null)}>
+              <X size={14} style={{ color: "var(--accent)" }} />
             </button>
           </div>
         )}
@@ -313,7 +326,7 @@ export default function ActiveWorkout() {
           onSelect={
             replacingUid
               ? async (ex) => {
-                  const [settingsMap, refsMap] = await Promise.all([
+                  const [settingsMap] = await Promise.all([
                     getUserExerciseSettings([ex.id]),
                     getExerciseLastRefs([ex.id]),
                   ]);

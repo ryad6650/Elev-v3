@@ -12,6 +12,10 @@ import {
   Pencil,
   Play,
 } from "lucide-react";
+
+const RoutineDetailView = dynamic(() => import("./RoutineDetailView"), {
+  ssr: false,
+});
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useRouter } from "next/navigation";
 import RoutineCard from "./RoutineCard";
@@ -33,6 +37,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
   const [mesRoutinesOpen, setMesRoutinesOpen] = useState(true);
   const [menuRoutine, setMenuRoutine] = useState<Routine | null>(null);
   const [editRoutine, setEditRoutine] = useState<Routine | null>(null);
+  const [viewRoutine, setViewRoutine] = useState<Routine | null>(null);
   const [deleting, setDeleting] = useState(false);
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
 
@@ -165,6 +170,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
             <RoutineCard
               key={routine.id}
               routine={routine}
+              onView={() => setViewRoutine(routine)}
               onOptions={() => setMenuRoutine(routine)}
               onStart={() => handleStartRoutine(routine)}
             />
@@ -276,6 +282,23 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
         <EditRoutineModal
           routine={editRoutine}
           onClose={() => setEditRoutine(null)}
+        />
+      )}
+
+      {viewRoutine && (
+        <RoutineDetailView
+          routine={viewRoutine}
+          userName={data.prenom ?? "toi"}
+          onBack={() => setViewRoutine(null)}
+          onStart={() => {
+            setViewRoutine(null);
+            handleStartRoutine(viewRoutine);
+          }}
+          onEdit={() => {
+            const r = viewRoutine;
+            setViewRoutine(null);
+            setEditRoutine(r);
+          }}
         />
       )}
     </div>

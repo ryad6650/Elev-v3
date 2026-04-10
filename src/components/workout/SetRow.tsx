@@ -1,12 +1,13 @@
 "use client";
 
-import { memo, useCallback } from "react";
-import { Check, Trash2 } from "lucide-react";
+import { memo } from "react";
+import { Check } from "lucide-react";
 import type { WorkoutSet } from "@/store/workoutStore";
 
 interface Props {
   set: WorkoutSet;
   isActive: boolean;
+  index?: number;
   onUpdate: (
     setId: string,
     field: "reps" | "poids",
@@ -16,7 +17,7 @@ interface Props {
   onRemove: (setId: string) => void;
 }
 
-function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
+function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
   const repsPlaceholder =
     set.repsCible > 0
       ? set.repsCibleMax
@@ -27,121 +28,107 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
   const numLabel = set.isWarmup ? `W${set.numSerie}` : `${set.numSerie}`;
 
   const precStr =
-    set.poidsRef != null
-      ? set.repsRef != null
-        ? `${set.poidsRef}×${set.repsRef}`
-        : `${set.poidsRef}kg`
-      : "—";
+    set.poidsRef != null && set.repsRef != null
+      ? `${set.poidsRef}kg x ${set.repsRef}`
+      : set.poidsRef != null
+        ? `${set.poidsRef}kg`
+        : "—";
 
-  const inputBg = isActive ? "rgba(42,157,110,0.08)" : "rgba(0,0,0,0.03)";
-  const inputBorder = isActive ? "1.5px solid var(--green)" : "none";
+  const inputBase: React.CSSProperties = {
+    padding: "8px 4px",
+    color: "var(--text-primary)",
+    fontFamily: "var(--font-nunito), sans-serif",
+    fontSize: 15,
+    fontWeight: 400,
+    background: "transparent",
+    border: "none",
+    borderRadius: 8,
+    outline: "none",
+    width: "100%",
+    textAlign: "center" as const,
+  };
 
   return (
     <div
-      className="grid items-center px-[18px] py-1"
+      className="grid items-center px-4 py-2"
       style={{
-        gridTemplateColumns: "32px 1fr 1fr 1fr 36px",
-        gap: "4px 6px",
+        gridTemplateColumns: "40px 1fr 80px 70px 40px",
+        gap: "0 8px",
+        borderTop: "none",
+        background: index % 2 === 1 ? "#1C1C1E" : "transparent",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
-      {/* # */}
-      <div className="flex items-center justify-center">
-        <span
-          className="text-[12px] font-bold"
-          style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            color: isActive ? "var(--green)" : "var(--text-muted)",
-            fontWeight: isActive ? 800 : 700,
-          }}
-        >
-          {numLabel}
-        </span>
-      </div>
+      {/* Série # */}
+      <span
+        className="text-center text-[17px] font-bold"
+        style={{
+          fontFamily: "var(--font-nunito), sans-serif",
+          color: "var(--text-primary)",
+        }}
+      >
+        {numLabel}
+      </span>
 
-      {/* Poids */}
-      <div className="relative">
-        <input
-          type="number"
-          inputMode="decimal"
-          min={0}
-          step={0.5}
-          placeholder={set.poidsRef != null ? `${set.poidsRef}` : "0"}
-          value={set.poids ?? ""}
-          onChange={(e) =>
-            onUpdate(
-              set.id,
-              "poids",
-              e.target.value === "" ? null : Number(e.target.value),
-            )
-          }
-          className="w-full text-center text-[14px] font-bold rounded-[8px] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-          style={{
-            padding: "8px 4px",
-            background: inputBg,
-            color: "var(--text-primary)",
-            border: inputBorder,
-            fontFamily: "var(--font-nunito), sans-serif",
-          }}
-        />
-      </div>
+      {/* Précédent */}
+      <span
+        className="text-[15px] truncate text-center"
+        style={{
+          fontFamily: "var(--font-nunito), sans-serif",
+          color: "var(--text-muted)",
+        }}
+      >
+        {precStr}
+      </span>
 
-      {/* Reps */}
-      <div>
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          placeholder={repsPlaceholder}
-          value={set.reps ?? ""}
-          onChange={(e) =>
-            onUpdate(
-              set.id,
-              "reps",
-              e.target.value === "" ? null : Number(e.target.value),
-            )
-          }
-          className="w-full text-center text-[14px] font-bold rounded-[8px] outline-none block [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-          style={{
-            padding: "8px 4px",
-            background: inputBg,
-            color: "var(--text-primary)",
-            border: inputBorder,
-            fontFamily: "var(--font-nunito), sans-serif",
-          }}
-        />
-      </div>
+      {/* KG input */}
+      <input
+        type="number"
+        inputMode="decimal"
+        min={0}
+        step={0.5}
+        placeholder={set.poidsRef != null ? `${set.poidsRef}` : "0"}
+        value={set.poids ?? ""}
+        onChange={(e) =>
+          onUpdate(
+            set.id,
+            "poids",
+            e.target.value === "" ? null : Number(e.target.value),
+          )
+        }
+        className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        style={inputBase}
+      />
 
-      {/* Préc. */}
-      <div className="text-center">
-        <span
-          className="text-[11px] font-medium"
-          style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            color: "var(--text-muted)",
-          }}
-        >
-          {precStr}
-        </span>
-      </div>
+      {/* Réps input */}
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        placeholder={repsPlaceholder}
+        value={set.reps ?? ""}
+        onChange={(e) =>
+          onUpdate(
+            set.id,
+            "reps",
+            e.target.value === "" ? null : Number(e.target.value),
+          )
+        }
+        className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        style={inputBase}
+      />
 
-      {/* Check */}
+      {/* Checkbox carré */}
       <div className="flex items-center justify-center">
         <button
           onClick={() => onToggle(set)}
-          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
+          className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-all duration-200"
           style={{
-            background: set.completed ? "var(--green)" : "rgba(0,0,0,0.06)",
+            background: set.completed ? "#3A3A3C" : "#2C2C2E",
+            border: set.completed ? "none" : "1.5px solid #48484A",
           }}
         >
-          {set.completed ? (
-            <Check size={14} strokeWidth={3} color="#fff" />
-          ) : (
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ border: "2px solid var(--text-muted)" }}
-            />
-          )}
+          {set.completed && <Check size={11} strokeWidth={3} color="#fff" />}
         </button>
       </div>
     </div>
@@ -150,5 +137,8 @@ function SetRow({ set, isActive, onUpdate, onToggle, onRemove }: Props) {
 
 export default memo(
   SetRow,
-  (prev, next) => prev.set === next.set && prev.isActive === next.isActive,
+  (prev, next) =>
+    prev.set === next.set &&
+    prev.isActive === next.isActive &&
+    prev.index === next.index,
 );

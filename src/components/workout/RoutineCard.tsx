@@ -7,18 +7,26 @@ interface Props {
   routine: Routine;
   onOptions: () => void;
   onStart: () => void;
+  onView: () => void;
 }
 
-export default function RoutineCard({ routine, onOptions, onStart }: Props) {
+export default function RoutineCard({
+  routine,
+  onOptions,
+  onStart,
+  onView,
+}: Props) {
   const exerciceText = routine.exerciceNoms.join(", ");
 
   return (
     <div
+      onClick={onView}
       style={{
         background: "#1C1C1E",
         border: "1px solid var(--border)",
         borderRadius: 16,
         padding: "16px",
+        cursor: "pointer",
       }}
     >
       {/* Header: titre + menu */}
@@ -68,7 +76,10 @@ export default function RoutineCard({ routine, onOptions, onStart }: Props) {
 
       {/* Bouton Commencer */}
       <button
-        onClick={onStart}
+        onClick={(e) => {
+          e.stopPropagation();
+          onStart();
+        }}
         className="w-full py-3.5 rounded-2xl font-semibold active:scale-[0.98] transition-transform"
         style={{
           background: "var(--accent)",

@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import { ChevronDown, ChevronUp, Flame, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { WorkoutSet } from "@/store/workoutStore";
 import { saveExerciseRest, saveExerciseNote } from "@/app/actions/routines";
@@ -9,28 +9,12 @@ import SetRow from "./SetRow";
 import SetsHeader from "./SetsHeader";
 import RestDurationPicker from "./RestDurationPicker";
 import ExerciseMenu from "./ExerciseMenu";
-import { ExerciseNotesButton, ExerciseNotesArea } from "./ExerciseNotes";
+import ExerciseGif from "./ExerciseGif";
 
 function formatRest(s: number): string {
   if (s < 60) return `${s}s`;
   const m = Math.floor(s / 60);
-  const r = s % 60;
-  return r === 0 ? `${m} min` : `${m} min ${r}s`;
-}
-
-const GROUP_COLORS: Record<string, string> = {
-  pectoraux: "var(--color-protein)",
-  dos: "var(--color-carbs)",
-  épaules: "var(--color-fat)",
-  biceps: "var(--color-protein)",
-  triceps: "var(--color-carbs)",
-  jambes: "var(--color-fat)",
-  abdominaux: "var(--color-protein)",
-  mollets: "var(--color-carbs)",
-};
-
-function dotColor(group: string): string {
-  return GROUP_COLORS[group.toLowerCase()] ?? "var(--text-muted)";
+  return s % 60 === 0 ? `${m} min` : `${m} min ${s % 60}s`;
 }
 
 interface Props {
@@ -46,7 +30,6 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
     s.activeWorkout?.exercises.find((e) => e.uid === uid),
   );
   const addSet = useWorkoutStore((s) => s.addSet);
-  const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const removeSet = useWorkoutStore((s) => s.removeSet);
   const removeExercise = useWorkoutStore((s) => s.removeExercise);
   const updateSet = useWorkoutStore((s) => s.updateSet);
@@ -56,7 +39,6 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   );
   const setExerciseNote = useWorkoutStore((s) => s.setExerciseNote);
   const [showPicker, setShowPicker] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
 
   const handleToggle = useCallback(
     (set: WorkoutSet) => {
@@ -87,19 +69,17 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
 
   if (!exercise) return null;
 
-  const totalSets = exercise.sets.filter((s) => !s.isWarmup).length;
-  const completedWork = exercise.sets.filter(
-    (s) => s.completed && !s.isWarmup,
-  ).length;
+  const workingSets = exercise.sets.filter((s) => !s.isWarmup);
+  const totalSets = workingSets.length;
+  const completedWork = workingSets.filter((s) => s.completed).length;
   const allDone = totalSets > 0 && completedWork === totalSets;
   const firstIncompleteIdx = exercise.sets.findIndex((s) => !s.completed);
-  const hasWarmup = exercise.sets.some((s) => s.isWarmup);
 
   if (!isOpen) {
     return (
       <ClosedCard
         nom={exercise.nom}
-        groupe={exercise.groupeMusculaire}
+        gifUrl={exercise.gifUrl ?? null}
         completedWork={completedWork}
         totalSets={totalSets}
         allDone={allDone}
@@ -108,143 +88,104 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
     );
   }
 
-  const warmupSets = exercise.sets.filter((s) => s.isWarmup);
-  const workingSets = exercise.sets.filter((s) => !s.isWarmup);
-  const allWarmupDone =
-    warmupSets.length > 0 && warmupSets.every((s) => s.completed);
-
   return (
     <div
-      className="rounded-[20px] overflow-hidden"
       style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        border: "1.5px solid var(--green)",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
+        paddingBottom: 4,
       }}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2.5 px-[18px] py-3">
-        <div
-          className="w-2.5 h-2.5 rounded-full shrink-0"
-          style={{ background: dotColor(exercise.groupeMusculaire) }}
+      {/* Header : thumbnail + nom + menu */}
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <ExerciseGif
+          gifUrl={exercise.gifUrl ?? null}
+          nom={exercise.nom}
+          size="sm"
+          circle
+          priority
         />
         <span
-          className="flex-1 min-w-0 text-[15px] font-semibold leading-tight truncate"
+          className="flex-1 min-w-0 text-[17px] font-bold truncate"
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
-            color: "var(--text-primary)",
+            color: "var(--accent)",
           }}
         >
           {exercise.nom}
-        </span>
-        <span
-          className="text-[10px] font-bold tracking-[0.02em] rounded-full px-2 py-[3px] shrink-0"
-          style={{ background: "var(--green-dim)", color: "var(--green)" }}
-        >
-          {completedWork}/{totalSets}
         </span>
         <ExerciseMenu
           onReplace={() => onReplace?.(uid)}
           onDelete={() => removeExercise(uid)}
         />
-        <ChevronUp
-          size={12}
-          style={{ color: "var(--text-muted)", opacity: 0.5 }}
-          className="shrink-0"
-        />
       </div>
 
-      {/* Sets */}
-      <div style={{ borderTop: "1px solid var(--glass-border)" }}>
-        <SetsHeader />
-        {allWarmupDone ? (
-          <WarmupCollapsed sets={warmupSets} />
-        ) : (
-          warmupSets.map((set) => (
-            <SetRow
-              key={set.id}
-              set={set}
-              isActive={exercise.sets.indexOf(set) === firstIncompleteIdx}
-              onUpdate={handleUpdateSet}
-              onToggle={handleToggle}
-              onRemove={handleRemoveSet}
-            />
-          ))
-        )}
-        {workingSets.map((set) => (
-          <SetRow
-            key={set.id}
-            set={set}
-            isActive={exercise.sets.indexOf(set) === firstIncompleteIdx}
-            onUpdate={handleUpdateSet}
-            onToggle={handleToggle}
-            onRemove={handleRemoveSet}
-          />
-        ))}
-      </div>
+      {/* Notes */}
+      <input
+        type="text"
+        placeholder="Ajouter des notes ici..."
+        value={exercise.notes ?? ""}
+        onChange={(e) => setExerciseNote(uid, e.target.value)}
+        onBlur={(e) =>
+          saveExerciseNote(exercise.exerciseId, e.target.value.trim())
+        }
+        className="w-full bg-transparent border-none outline-none text-[14px] px-4 pb-1"
+        style={{
+          color: "var(--text-muted)",
+          fontFamily: "var(--font-nunito), sans-serif",
+        }}
+      />
 
-      {/* Actions */}
-      <div
-        className="flex gap-2 px-[18px] py-2.5"
-        style={{ borderTop: "1px solid var(--glass-border)" }}
+      {/* Repos */}
+      <button
+        onClick={() => setShowPicker(true)}
+        className="flex items-center gap-2 px-4 pb-3 active:opacity-70"
       >
+        <Timer size={14} style={{ color: "var(--accent)" }} />
+        <span
+          style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 14,
+            fontWeight: 600,
+            color: "var(--accent)",
+          }}
+        >
+          Repos:{" "}
+          {exercise.restDuration != null
+            ? formatRest(exercise.restDuration)
+            : "DÉSACTIVÉ"}
+        </span>
+      </button>
+
+      {/* Tableau séries */}
+      <SetsHeader />
+      {exercise.sets.map((set, i) => (
+        <SetRow
+          key={set.id}
+          set={set}
+          index={i}
+          isActive={exercise.sets.indexOf(set) === firstIncompleteIdx}
+          onUpdate={handleUpdateSet}
+          onToggle={handleToggle}
+          onRemove={handleRemoveSet}
+        />
+      ))}
+
+      {/* Ajouter une Série */}
+      <div className="px-4 pt-3 pb-4">
         <button
           onClick={() => addSet(uid)}
-          className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] text-center transition-opacity active:opacity-70"
+          className="w-full py-1.5 rounded-xl flex items-center justify-center gap-2 font-semibold active:scale-[0.98] transition-transform"
           style={{
+            background: "#1C1C1E",
             fontFamily: "var(--font-nunito), sans-serif",
-            background: "rgba(0,0,0,0.03)",
-            color: "var(--text-muted)",
+            fontSize: 15,
+            color: "var(--text-primary)",
+            border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          + Série
-        </button>
-        <ExerciseNotesButton
-          note={exercise.notes ?? ""}
-          isOpen={showNotes}
-          onToggle={() => setShowNotes((v) => !v)}
-          hasInitialNote={!!exercise.notes}
-        />
-        <button
-          onClick={() => addWarmupSets(uid)}
-          className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] text-center transition-opacity active:opacity-70"
-          style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            background: "rgba(0,0,0,0.03)",
-            color: hasWarmup ? "var(--green)" : "var(--text-muted)",
-          }}
-        >
-          Échauffement
+          + Ajouter une Série
         </button>
       </div>
-
-      {showNotes && (
-        <ExerciseNotesArea
-          note={exercise.notes ?? ""}
-          onChange={(n) => {
-            setExerciseNote(uid, n);
-            saveExerciseNote(exercise.exerciseId, n);
-          }}
-        />
-      )}
-
-      {exercise.restDuration != null && (
-        <div
-          className="px-[18px] py-2"
-          style={{ borderTop: "1px solid var(--glass-border)" }}
-        >
-          <button
-            onClick={() => setShowPicker(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-bold tracking-[0.03em] transition-opacity active:opacity-70"
-            style={{ background: "rgba(0,0,0,0.04)", color: "var(--green)" }}
-          >
-            <Timer size={10} />
-            {formatRest(exercise.restDuration)}
-            <ChevronDown size={9} />
-          </button>
-        </div>
-      )}
 
       {showPicker && (
         <RestDurationPicker
@@ -262,14 +203,14 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
 
 function ClosedCard({
   nom,
-  groupe,
+  gifUrl,
   completedWork,
   totalSets,
   allDone,
   onOpen,
 }: {
   nom: string;
-  groupe: string;
+  gifUrl: string | null;
   completedWork: number;
   totalSets: number;
   allDone: boolean;
@@ -278,67 +219,29 @@ function ClosedCard({
   return (
     <button
       onClick={onOpen}
-      className="w-full flex items-center gap-2.5 rounded-[20px] px-[18px] py-4"
+      className="w-full flex items-center gap-3 px-4 py-3 active:opacity-80"
       style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        border: "1px solid var(--glass-border)",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
         opacity: allDone ? 0.6 : 1,
       }}
     >
-      <div
-        className="w-2.5 h-2.5 rounded-full shrink-0"
-        style={{ background: allDone ? "var(--green)" : dotColor(groupe) }}
-      />
+      <ExerciseGif gifUrl={gifUrl} nom={nom} size="sm" circle />
       <span
-        className="flex-1 text-left text-[15px] font-semibold truncate"
+        className="flex-1 text-left text-[16px] font-bold truncate"
         style={{
           fontFamily: "var(--font-nunito), sans-serif",
-          color: "var(--text-primary)",
-          opacity: allDone ? 0.7 : 1,
+          color: "var(--accent)",
         }}
       >
         {nom}
       </span>
       <span
-        className="text-[10px] font-bold tracking-[0.02em] rounded-full px-2 py-[3px] shrink-0"
-        style={{ background: "var(--green-dim)", color: "var(--green)" }}
+        className="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0"
+        style={{ background: "var(--accent-bg)", color: "var(--accent)" }}
       >
         {completedWork}/{totalSets}
       </span>
-      <span className="text-sm shrink-0" style={{ color: "var(--text-muted)" }}>
-        ›
-      </span>
     </button>
-  );
-}
-
-function WarmupCollapsed({ sets }: { sets: WorkoutSet[] }) {
-  return (
-    <div
-      className="px-[18px] py-1.5"
-      style={{ borderTop: "1px solid var(--glass-border)" }}
-    >
-      <div
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[9px] font-semibold"
-        style={{
-          background: "var(--glass-subtle)",
-          color: "var(--text-muted)",
-        }}
-      >
-        <Flame size={11} />
-        <span>
-          Échauff:{" "}
-          {sets.map((s, i) => (
-            <span key={s.id}>
-              {i > 0 && " · "}
-              {s.poids != null ? `${s.poids}kg` : "—"}×{s.reps ?? "—"}
-            </span>
-          ))}
-        </span>
-      </div>
-    </div>
   );
 }
 

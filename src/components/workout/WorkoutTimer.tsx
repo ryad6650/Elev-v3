@@ -8,6 +8,7 @@ interface Props {
   pausedAt?: number | null;
   totalPausedMs?: number;
   large?: boolean;
+  compact?: boolean;
 }
 
 function formatDuration(ms: number, alwaysHours = false): string {
@@ -18,6 +19,16 @@ function formatDuration(ms: number, alwaysHours = false): string {
   if (alwaysHours || h > 0)
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+function formatCompact(ms: number): string {
+  const secs = Math.floor(Math.max(0, ms) / 1000);
+  if (secs < 60) return `${secs}s`;
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  return remMins > 0 ? `${hrs}h ${remMins}m` : `${hrs}h`;
 }
 
 function calcElapsed(
@@ -34,6 +45,7 @@ export default function WorkoutTimer({
   pausedAt = null,
   totalPausedMs = 0,
   large = false,
+  compact = false,
 }: Props) {
   const [elapsed, setElapsed] = useState(() =>
     calcElapsed(startedAt, pausedAt, totalPausedMs),
@@ -46,8 +58,22 @@ export default function WorkoutTimer({
     );
   }, [startedAt, pausedAt, totalPausedMs]);
 
+  if (compact) {
+    return (
+      <span
+        style={{
+          fontFamily: "var(--font-nunito), sans-serif",
+          fontSize: 16,
+          fontWeight: 700,
+          color: "var(--accent)",
+        }}
+      >
+        {formatCompact(elapsed)}
+      </span>
+    );
+  }
+
   if (large) {
-    const text = formatDuration(elapsed, true);
     return (
       <span
         className="text-[28px] tracking-[-0.02em] leading-[1.2]"
@@ -57,18 +83,17 @@ export default function WorkoutTimer({
           color: "var(--text-primary)",
         }}
       >
-        {text}
+        {formatDuration(elapsed, true)}
       </span>
     );
   }
 
-  const text = formatDuration(elapsed);
   return (
     <span
       className="text-sm font-mono font-bold"
       style={{ color: "var(--accent-text)" }}
     >
-      {text}
+      {formatDuration(elapsed)}
     </span>
   );
 }

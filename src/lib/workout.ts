@@ -23,6 +23,7 @@ export interface WorkoutHistoryItem {
 export interface WorkoutPageData {
   routines: Routine[];
   historique: WorkoutHistoryItem[];
+  prenom: string | null;
 }
 
 type RoutineExerciseWithEx = {
@@ -66,32 +67,34 @@ export async function fetchWorkoutPageData(
     uid = user.id;
   }
 
-  const [routinesRes, workoutsRes, lastWorkoutsRes] = await Promise.all([
-    supabase
-      .from("routines")
-      .select(
-        "id, nom, routine_exercises(id, series_cible, exercises(nom, groupe_musculaire))",
-      )
-      .eq("user_id", uid)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("workouts")
-      .select(
-        `id, date, duree_minutes,
+  const [routinesRes, workoutsRes, lastWorkoutsRes, profileRes] =
+    await Promise.all([
+      supabase
+        .from("routines")
+        .select(
+          "id, nom, routine_exercises(id, series_cible, exercises(nom, groupe_musculaire))",
+        )
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("workouts")
+        .select(
+          `id, date, duree_minutes,
         routines(nom),
         workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
-      )
-      .eq("user_id", uid)
-      .order("date", { ascending: false })
-      .limit(5),
-    supabase
-      .from("workouts")
-      .select("routine_id, date")
-      .eq("user_id", uid)
-      .not("routine_id", "is", null)
-      .order("date", { ascending: false })
-      .limit(100),
-  ]);
+        )
+        .eq("user_id", uid)
+        .order("date", { ascending: false })
+        .limit(5),
+      supabase
+        .from("workouts")
+        .select("routine_id, date")
+        .eq("user_id", uid)
+        .not("routine_id", "is", null)
+        .order("date", { ascending: false })
+        .limit(100),
+      supabase.from("profiles").select("prenom").eq("id", uid).single(),
+    ]);
 
   if (routinesRes.error) throw new Error(routinesRes.error.message);
   if (workoutsRes.error) throw new Error(workoutsRes.error.message);
@@ -157,5 +160,5 @@ export async function fetchWorkoutPageData(
     };
   });
 
-  return { routines, historique };
+  return { routines, historique, prenom: profileRes.data?.prenom ?? null };
 }

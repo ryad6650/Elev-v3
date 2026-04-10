@@ -11,6 +11,7 @@ interface Props {
   className?: string;
   /** Charger en priorité (au-dessus du fold) */
   priority?: boolean;
+  circle?: boolean;
 }
 
 const SIZES = {
@@ -25,14 +26,16 @@ export default function ExerciseGif({
   size = "md",
   className = "",
   priority = false,
+  circle = false,
 }: Props) {
   const [error, setError] = useState(false);
   const s = SIZES[size];
+  const radius = circle ? "rounded-full" : s.radius;
 
   if (!gifUrl || error) {
     return (
       <div
-        className={`${s.container} ${s.radius} flex items-center justify-center shrink-0 ${className}`}
+        className={`${s.container} ${radius} flex items-center justify-center shrink-0 ${className}`}
         style={{ background: "var(--bg-elevated)" }}
       >
         <Dumbbell size={s.icon} style={{ color: "var(--text-muted)" }} />
@@ -45,7 +48,7 @@ export default function ExerciseGif({
 
   return (
     <div
-      className={`${s.container} ${s.radius} overflow-hidden shrink-0 relative ${className}`}
+      className={`${s.container} ${radius} overflow-hidden shrink-0 relative ${className}`}
       style={{ background: "var(--bg-elevated)" }}
     >
       <Image
