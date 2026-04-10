@@ -11,6 +11,7 @@ import {
   IBM_Plex_Mono,
   Nunito,
   Lora,
+  Comfortaa,
 } from "next/font/google";
 import "./globals.css";
 
@@ -32,7 +33,7 @@ const dmSerifDisplay = DM_Serif_Display({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -80,7 +81,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -89,6 +90,13 @@ const lora = Lora({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+const comfortaa = Comfortaa({
+  variable: "--font-comfortaa",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -122,7 +130,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${geist.variable} ${geistMono.variable} ${plusJakarta.variable} ${playfair.variable} ${sora.variable} ${ibmPlexMono.variable} ${nunito.variable} ${lora.variable}`}
+      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${geist.variable} ${geistMono.variable} ${plusJakarta.variable} ${playfair.variable} ${sora.variable} ${ibmPlexMono.variable} ${nunito.variable} ${lora.variable} ${comfortaa.variable}`}
     >
       <head>
         <link

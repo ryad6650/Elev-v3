@@ -99,11 +99,11 @@ export default function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <nav
-        className="pointer-events-auto flex items-center justify-around w-full"
+        className="pointer-events-auto flex items-center w-full"
         style={{
           maxWidth: 430,
           borderTop: "1px solid rgba(0,0,0,0.05)",
-          background: "rgba(243,240,234,0.92)",
+          background: "rgba(10,10,10,0.92)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           padding: "14px 32px 0",
@@ -117,11 +117,11 @@ export default function BottomNav() {
               key={href}
               href={href}
               prefetch={true}
-              className="flex flex-col items-center gap-[5px]"
+              className="flex flex-col items-center justify-center gap-[5px] flex-1"
               aria-label={label}
               style={{
-                color: active ? "var(--text-primary)" : "var(--text-muted)",
-                stroke: active ? "var(--text-primary)" : "var(--text-muted)",
+                color: active ? "var(--accent)" : "var(--text-muted)",
+                stroke: active ? "var(--accent)" : "var(--text-muted)",
               }}
             >
               {icon}

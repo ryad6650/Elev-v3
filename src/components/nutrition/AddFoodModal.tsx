@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
-import { X } from "lucide-react";
+import { X, Camera, Search } from "lucide-react";
 import {
   getRecentAliments,
   getFavoriteAliments,
@@ -26,23 +26,43 @@ interface Props {
   mealNumber: number;
   mealTime: string;
   date: string;
+  initialFrequents?: NutritionAliment[];
   onClose: () => void;
 }
+
+const MEAL_NAMES: Record<number, string> = {
+  1: "Petit-déjeuner",
+  2: "Déjeuner",
+  3: "Collation",
+  4: "Dîner",
+};
+const MEAL_PLACEHOLDERS: Record<number, string> = {
+  1: "Qu'avez-vous mangé ce matin ?",
+  2: "Qu'avez-vous mangé à midi ?",
+  3: "Quelle collation avez-vous prise ?",
+  4: "Qu'avez-vous mangé ce soir ?",
+};
 
 export default function AddFoodModal({
   mealNumber,
   mealTime,
   date,
+  initialFrequents = [],
   onClose,
 }: Props) {
   const addEntry = useNutritionStore((s) => s.addEntry);
+
   const [step, setStep] = useState<Step>("search");
+  const [isClosing, setIsClosing] = useState(false);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [lastUsed, setLastUsed] = useState<Record<string, number>>({});
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NutritionAliment[]>([]);
   const [recents, setRecents] = useState<NutritionAliment[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<NutritionAliment | null>(null);
-  const [populaires, setPopulaires] = useState<NutritionAliment[]>([]);
+  const [populaires, setPopulaires] =
+    useState<NutritionAliment[]>(initialFrequents);
   const [favoris, setFavoris] = useState<NutritionAliment[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loadingInitial, setLoadingInitial] = useState(true);
@@ -62,17 +82,12 @@ export default function AddFoodModal({
   useEffect(() => {
     Promise.all([
       getRecentAliments().catch(() => [] as NutritionAliment[]),
-      fetch("/api/aliments?q=")
-        .then((r) => r.json())
-        .then((d) => (Array.isArray(d) ? d : []))
-        .catch(() => []),
       getFavoriteAliments().catch(() => [] as NutritionAliment[]),
-    ]).then(([r, pop, favAliments]) => {
+    ]).then(([r, favAliments]) => {
       setRecents(r as NutritionAliment[]);
-      setPopulaires(pop);
       const aliments = favAliments as NutritionAliment[];
       setFavoris(aliments);
-      setFavoriteIds(new Set(aliments.map((a: NutritionAliment) => a.id)));
+      setFavoriteIds(new Set(aliments.map((a) => a.id)));
       setLoadingInitial(false);
     });
   }, []);
@@ -119,21 +134,30 @@ export default function AddFoodModal({
     setStep("quantity");
   }
 
+  async function handleQuickAdd(aliment: NutritionAliment) {
+    const qty = lastUsed[aliment.id] ?? aliment.taille_portion_g ?? 100;
+    let alimentId = aliment.id;
+    if (!alimentId && aliment.source === "openfoodfacts") {
+      const { id } = await upsertExternalAliment(aliment);
+      alimentId = id;
+    }
+    addEntry(mealNumber, aliment, alimentId, qty, date, mealTime, null);
+    setLastUsed((prev) => ({ ...prev, [alimentId]: qty }));
+    setSessionCount((c) => c + 1);
+  }
+
   async function handleConfirm(
     quantite: number,
     quantitePortion: number | null,
   ) {
     if (!selected || pending) return;
     setPending(true);
-
     try {
       let alimentId = selected.id;
       if (!alimentId && selected.source === "openfoodfacts") {
         const { id } = await upsertExternalAliment(selected);
         alimentId = id;
       }
-
-      // Lancer l'optimistic update (immédiat dans le store) + sync Supabase en arrière-plan
       addEntry(
         mealNumber,
         selected,
@@ -143,7 +167,8 @@ export default function AddFoodModal({
         mealTime,
         quantitePortion,
       );
-      // Fermer immédiatement — l'entrée est déjà visible via l'optimistic update
+      setLastUsed((prev) => ({ ...prev, [alimentId]: quantite }));
+      setSessionCount((c) => c + 1);
       onClose();
     } finally {
       setPending(false);
@@ -158,173 +183,232 @@ export default function AddFoodModal({
   function handleEdited(updated: NutritionAliment) {
     setSelected(updated);
     setStep("quantity");
-    // Mise à jour instantanée de l'aliment dans le store
     useNutritionStore.getState().updateAlimentInEntries(updated.id, updated);
   }
 
   async function handleToggleFavorite(aliment: NutritionAliment) {
     if (!aliment.id) return;
     const isFav = favoriteIds.has(aliment.id);
-    // Optimiste
     const next = new Set(favoriteIds);
     if (isFav) {
       next.delete(aliment.id);
-      setFavoris((prev) => prev.filter((f) => f.id !== aliment.id));
+      setFavoris((p) => p.filter((f) => f.id !== aliment.id));
     } else {
       next.add(aliment.id);
-      setFavoris((prev) => [aliment, ...prev]);
+      setFavoris((p) => [aliment, ...p]);
     }
     setFavoriteIds(next);
     try {
       await toggleFavoriteAliment(aliment.id);
     } catch {
-      // Rollback
       setFavoriteIds(favoriteIds);
-      if (isFav) setFavoris((prev) => [aliment, ...prev]);
-      else setFavoris((prev) => prev.filter((f) => f.id !== aliment.id));
+      if (isFav) setFavoris((p) => [aliment, ...p]);
+      else setFavoris((p) => p.filter((f) => f.id !== aliment.id));
     }
   }
 
+  function handleClose() {
+    setIsClosing(true);
+    setTimeout(onClose, 320);
+  }
+
   const isCustom = selected?.is_global === false && !!selected?.id;
-  const MEAL_NAMES: Record<number, string> = {
-    1: "Petit-déjeuner",
-    2: "Déjeuner",
-    3: "Collation",
-    4: "Dîner",
-  };
   const mealLabel = MEAL_NAMES[mealNumber] ?? `Repas ${mealNumber}`;
-
-  const today = new Date().toISOString().split("T")[0];
-  const dateLabel =
-    date === today
-      ? "Aujourd'hui"
-      : new Date(date + "T12:00:00").toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "short",
-        });
-
   const isBeige = step === "custom" || step === "edit";
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
       style={{
-        background: isBeige ? "var(--bg-gradient)" : "var(--bg-primary)",
+        background: isBeige ? "var(--bg-gradient)" : "#111927",
+        transform: isClosing ? "translateY(100%)" : "translateY(0)",
+        opacity: isClosing ? 0 : 1,
+        transition:
+          "transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease",
       }}
     >
-      <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
-        <div className="flex flex-col w-full h-full">
-          {step !== "quantity" && (
+      <div className="w-full h-full max-w-[430px] mx-auto flex flex-col relative">
+        {/* En-tête */}
+        {step !== "quantity" && (
+          <div
+            className="flex items-center justify-between px-5 shrink-0 pb-3"
+            style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+          >
             <div
-              className="flex items-center justify-between px-5 pb-3.5 shrink-0"
-              style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+              className="w-9 h-9 rounded-full flex items-center justify-center"
+              style={{ background: "transparent", border: "2px solid #3B82F6" }}
+            >
+              <span
+                className="text-sm font-bold"
+                style={{ color: "#3B82F6", fontFamily: "var(--font-sans)" }}
+              >
+                {sessionCount}
+              </span>
+            </div>
+            <p
+              className="text-[17px] font-bold"
+              style={{
+                color: isBeige ? "#2C1E14" : "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              {step === "custom"
+                ? "Aliment personnalisé"
+                : step === "edit"
+                  ? isCustom
+                    ? "Modifier"
+                    : "Corriger"
+                  : mealLabel}
+            </p>
+            <button
+              onClick={isBeige ? () => setStep("search") : handleClose}
+              className="w-9 h-9 flex items-center justify-center active:opacity-70 transition-opacity"
+            >
+              <X
+                size={20}
+                style={{ color: isBeige ? "#78716C" : "var(--text-secondary)" }}
+              />
+            </button>
+          </div>
+        )}
+
+        {/* Étapes */}
+        {step === "scan" && (
+          <div className="px-4 pb-6 flex-1">
+            <BarcodeScanner
+              onDetected={handleBarcode}
+              onClose={() => setStep("search")}
+            />
+          </div>
+        )}
+        {step === "search" && (
+          <FoodSearchStep
+            query={query}
+            setQuery={setQuery}
+            results={results}
+            recents={recents}
+            populaires={populaires}
+            favoris={favoris}
+            favoriteIds={favoriteIds}
+            loading={loading}
+            loadingInitial={loadingInitial}
+            placeholder={MEAL_PLACEHOLDERS[mealNumber]}
+            onSelect={handleSelect}
+            onQuickAdd={handleQuickAdd}
+            onToggleFavorite={handleToggleFavorite}
+            onScan={() => setStep("scan")}
+            onCustom={() => setStep("custom")}
+          />
+        )}
+        {step === "quantity" && selected && (
+          <FoodDetailSheet
+            aliment={selected}
+            mealLabel={mealLabel}
+            onBack={() => setStep("search")}
+            onConfirm={handleConfirm}
+            onEdit={() => setStep("edit")}
+            pending={pending}
+            isFavorite={!!selected.id && favoriteIds.has(selected.id)}
+            onToggleFavorite={
+              selected.id ? () => handleToggleFavorite(selected) : undefined
+            }
+          />
+        )}
+        {step === "custom" && (
+          <CustomFoodForm onCreated={handleCustomCreated} />
+        )}
+        {step === "edit" && selected && (
+          <CustomFoodForm
+            editAliment={isCustom ? selected : { ...selected, id: "" }}
+            isForking={!isCustom}
+            onEdited={handleEdited}
+            onCreated={handleCustomCreated}
+          />
+        )}
+
+        {/* Bouton Terminé + barre bas — flottant au-dessus de la liste */}
+        {(step === "search" || step === "scan") && (
+          <>
+            {/* Bouton Terminé flottant */}
+            <div
+              className="absolute left-0 right-0 px-4"
+              style={{
+                bottom: "calc(max(1.5rem, env(safe-area-inset-bottom)) + 64px)",
+              }}
             >
               <button
-                onClick={isBeige ? () => setStep("search") : onClose}
-                className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
+                onClick={handleClose}
+                className="w-full py-4 rounded-full font-bold text-[17px] active:scale-[0.98] transition-transform"
                 style={{
-                  background: isBeige ? "rgba(0,0,0,0.05)" : "var(--bg-card)",
-                  border: isBeige
-                    ? "1px solid rgba(0,0,0,0.08)"
-                    : "1px solid var(--border)",
+                  background: "#3B82F6",
+                  color: "white",
+                  fontFamily: "var(--font-sans)",
                 }}
               >
-                <X
-                  size={14}
-                  style={{
-                    color: isBeige ? "#78716C" : "var(--text-secondary)",
-                  }}
-                />
+                Terminé
               </button>
-              <p
-                className="text-xl leading-none"
-                style={{
-                  fontFamily: "var(--font-lora)",
-                  fontStyle: "italic",
-                  color: isBeige ? "#2C1E14" : "var(--text-primary)",
-                }}
-              >
-                {step === "custom"
-                  ? "Aliment personnalisé"
-                  : step === "edit"
-                    ? isCustom
-                      ? "Modifier"
-                      : "Corriger"
-                    : "Ajouter un aliment"}
-              </p>
-              {step === "search" ? (
-                <span
-                  className="text-[9px] font-bold rounded-lg px-2.5 py-1"
-                  style={{
-                    background: "var(--accent-bg)",
-                    border: "1px solid var(--accent)",
-                    color: "var(--accent-text)",
-                    letterSpacing: "0.05em",
-                  }}
+            </div>
+
+            {/* Barre de navigation bas */}
+            <div
+              className="absolute bottom-0 left-0 right-0"
+              style={{
+                background: "#181B1B",
+                paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+                paddingTop: 8,
+              }}
+            >
+              <div className="flex justify-around">
+                <button
+                  onClick={() => setStep("scan")}
+                  className="flex flex-col items-center gap-1 py-1 px-6 active:opacity-70 transition-opacity"
                 >
-                  {mealLabel}
-                </span>
-              ) : (
-                <div className="w-[30px]" />
-              )}
+                  <Camera
+                    size={22}
+                    style={{
+                      color: step === "scan" ? "#3B82F6" : "var(--text-muted)",
+                    }}
+                  />
+                  <span
+                    className="text-[11px] font-medium"
+                    style={{
+                      color: step === "scan" ? "#3B82F6" : "var(--text-muted)",
+                      fontFamily: "var(--font-sans)",
+                    }}
+                  >
+                    Appareil photo IA
+                  </span>
+                </button>
+                <button
+                  onClick={() => setStep("search")}
+                  className="flex flex-col items-center gap-1 py-1 px-6 active:opacity-70 transition-opacity"
+                >
+                  <Search
+                    size={22}
+                    style={{
+                      color:
+                        step === "search"
+                          ? "var(--accent-text)"
+                          : "var(--text-muted)",
+                    }}
+                  />
+                  <span
+                    className="text-[11px] font-medium"
+                    style={{
+                      color:
+                        step === "search"
+                          ? "var(--accent-text)"
+                          : "var(--text-muted)",
+                      fontFamily: "var(--font-sans)",
+                    }}
+                  >
+                    Recherche
+                  </span>
+                </button>
+              </div>
             </div>
-          )}
-
-          {step === "scan" && (
-            <div className="px-4 pb-6">
-              <BarcodeScanner
-                onDetected={handleBarcode}
-                onClose={() => setStep("search")}
-              />
-            </div>
-          )}
-
-          {step === "search" && (
-            <FoodSearchStep
-              query={query}
-              setQuery={setQuery}
-              results={results}
-              recents={recents}
-              populaires={populaires}
-              favoris={favoris}
-              favoriteIds={favoriteIds}
-              loading={loading}
-              loadingInitial={loadingInitial}
-              onSelect={handleSelect}
-              onToggleFavorite={handleToggleFavorite}
-              onScan={() => setStep("scan")}
-              onCustom={() => setStep("custom")}
-            />
-          )}
-
-          {step === "quantity" && selected && (
-            <FoodDetailSheet
-              aliment={selected}
-              mealLabel={mealLabel}
-              onBack={() => setStep("search")}
-              onConfirm={handleConfirm}
-              onEdit={() => setStep("edit")}
-              pending={pending}
-              isFavorite={!!selected.id && favoriteIds.has(selected.id)}
-              onToggleFavorite={
-                selected.id ? () => handleToggleFavorite(selected) : undefined
-              }
-            />
-          )}
-
-          {step === "custom" && (
-            <CustomFoodForm onCreated={handleCustomCreated} />
-          )}
-
-          {step === "edit" && selected && (
-            <CustomFoodForm
-              editAliment={isCustom ? selected : { ...selected, id: "" }}
-              isForking={!isCustom}
-              onEdited={handleEdited}
-              onCreated={handleCustomCreated}
-            />
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

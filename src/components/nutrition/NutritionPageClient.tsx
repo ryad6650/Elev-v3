@@ -3,8 +3,10 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Calendar } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
 import MealSection from "./MealSection";
+import MealDetailView from "./MealDetailView";
 import { sumEntries, groupByMeal } from "@/lib/nutrition-utils";
 import type {
   Meal,
@@ -18,17 +20,14 @@ const EditEntryModal = dynamic(() => import("./EditEntryModal"), {
   ssr: false,
 });
 
-function formatDateShort(d: string) {
-  const t = new Date();
-  const todayStr = t.toISOString().split("T")[0];
-  t.setDate(t.getDate() - 1);
-  const yesterdayStr = t.toISOString().split("T")[0];
-  if (d === todayStr) return "Auj.";
-  if (d === yesterdayStr) return "Hier";
-  return new Date(d + "T12:00:00").toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "short",
-  });
+function getWeekNum(date: Date) {
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
 interface Props {
@@ -45,18 +44,12 @@ export default function NutritionPageClient({ initialData }: Props) {
   const profile = useNutritionStore((s) => s.profile);
   const hasFetched = useNutritionStore((s) => s.hasFetched);
   const fetchDay = useNutritionStore((s) => s.fetchDay);
-  const removeEntry = useNutritionStore((s) => s.removeEntry);
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
+  const [viewMeal, setViewMeal] = useState<Meal | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
 
-  const closeAddModal = () => {
-    setModalMeal(null);
-    setModalMealTime(null);
-  };
-  const closeEditModal = () => setViewEntry(null);
   const hydratedDateRef = useRef<string | null>(null);
-
   if (hydratedDateRef.current !== initialData.date) {
     hydratedDateRef.current = initialData.date;
     const store = useNutritionStore.getState();
@@ -82,7 +75,6 @@ export default function NutritionPageClient({ initialData }: Props) {
     () => groupByMeal(displayEntries),
     [displayEntries],
   );
-
   const FIXED_MEALS = [1, 2, 3, 4] as const;
   const meals: Meal[] = useMemo(() => {
     const map = new Map(mealsFromEntries.map((m) => [m.meal_number, m]));
@@ -92,6 +84,15 @@ export default function NutritionPageClient({ initialData }: Props) {
   }, [mealsFromEntries]);
 
   const isToday = date === today;
+  const dateTitle = isToday
+    ? "Aujourd'hui"
+    : new Date(date + "T12:00:00").toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+  const weekNum = getWeekNum(new Date(date + "T12:00:00"));
+  const streak = initialData.streak ?? 0;
 
   function navigate(delta: number) {
     const d = new Date(date + "T12:00:00");
@@ -99,111 +100,201 @@ export default function NutritionPageClient({ initialData }: Props) {
     router.push(`/nutrition?date=${d.toISOString().split("T")[0]}`);
   }
 
-  function handleAddToMeal(mealNumber: number, mealTime: string) {
-    setModalMealTime(mealTime || new Date().toISOString());
-    setModalMeal(mealNumber);
-  }
-
   return (
     <>
       <main
-        className="pb-28 page-enter"
+        className="page-enter"
         style={{
           maxWidth: 430,
           margin: "0 auto",
-          padding: "20px 28px 0",
+          padding: "20px 20px 0",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 40px)",
         }}
       >
-        {/* Title + date nav */}
+        {/* Stats en haut à droite */}
         <div
-          className="flex items-center justify-between"
-          style={{ marginBottom: 24 }}
+          className="flex justify-end items-center gap-4"
+          style={{ marginBottom: 12 }}
         >
-          <h1
-            style={{
-              fontFamily: "var(--font-nunito), sans-serif",
-              fontSize: 32,
-              fontWeight: 500,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Nutrition
-          </h1>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center justify-center active:scale-95 transition-transform"
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "var(--glass-bg)",
-                backdropFilter: "var(--glass-blur-sm)",
-                WebkitBackdropFilter: "var(--glass-blur-sm)",
-                border: "1px solid var(--glass-border)",
-                color: "var(--text-secondary)",
-                fontSize: 18,
-                fontWeight: 600,
-              }}
-              aria-label="Jour précédent"
-            >
-              ‹
-            </button>
+          <div className="flex items-center gap-1.5">
+            <span style={{ fontSize: 18 }}>🔥</span>
             <span
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 15,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
               }}
             >
-              {formatDateShort(date)}
+              0
             </span>
-            <button
-              onClick={() => navigate(1)}
-              className="flex items-center justify-center active:scale-95 transition-transform"
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "var(--glass-bg)",
-                backdropFilter: "var(--glass-blur-sm)",
-                WebkitBackdropFilter: "var(--glass-blur-sm)",
-                border: "1px solid var(--glass-border)",
-                color: "var(--text-secondary)",
-                fontSize: 18,
-                fontWeight: 600,
-                opacity: isToday ? 0.3 : 1,
-              }}
-              aria-label="Jour suivant"
-              disabled={isToday}
-            >
-              ›
-            </button>
+          </div>
+          <Calendar size={22} color="var(--text-secondary)" />
+        </div>
+
+        {/* En-tête date */}
+        <div style={{ marginBottom: 24 }}>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1
+                style={{
+                  fontSize: 40,
+                  fontWeight: 800,
+                  lineHeight: 1.1,
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-nunito)",
+                  fontStyle: "normal",
+                  textShadow:
+                    "0 0 20px rgba(255,255,255,0.18), 0 0 40px rgba(255,255,255,0.07)",
+                }}
+              >
+                {dateTitle}
+              </h1>
+              <p
+                style={{
+                  fontSize: 16,
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                Semaine {weekNum}
+              </p>
+            </div>
+            <div className="flex items-center gap-2" style={{ marginTop: 8 }}>
+              <button
+                onClick={() => navigate(-1)}
+                className="active:scale-95 transition-transform flex items-center justify-center"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: "var(--bg-secondary)",
+                  fontSize: 18,
+                  color: "var(--text-secondary)",
+                }}
+                aria-label="Jour précédent"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => navigate(1)}
+                disabled={isToday}
+                className="active:scale-95 transition-transform flex items-center justify-center"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: "var(--bg-secondary)",
+                  fontSize: 18,
+                  color: "var(--text-secondary)",
+                  opacity: isToday ? 0.3 : 1,
+                }}
+                aria-label="Jour suivant"
+              >
+                ›
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Summary header */}
-        <NutritionHeader
-          totalCalories={total.calories}
-          totalProteines={total.proteines}
-          totalGlucides={total.glucides}
-          totalLipides={total.lipides}
-          profile={displayProfile}
-        />
+        {/* Section Résumé */}
+        <div style={{ marginBottom: 24 }}>
+          <div
+            className="flex items-center justify-between"
+            style={{ marginBottom: 12 }}
+          >
+            <h2
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              Résumé
+            </h2>
+            <button
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: "var(--accent-text)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              Détails
+            </button>
+          </div>
+          <NutritionHeader
+            totalCalories={total.calories}
+            totalProteines={total.proteines}
+            totalGlucides={total.glucides}
+            totalLipides={total.lipides}
+            caloriesBrulees={0}
+            profile={displayProfile}
+          />
+        </div>
 
-        {/* Meals */}
-        <div className="flex flex-col gap-3">
-          {meals.map((meal) => (
-            <MealSection
-              key={meal.meal_number}
-              meal={meal}
-              onAdd={() => handleAddToMeal(meal.meal_number, meal.meal_time)}
-              onEntryDeleted={(id) => removeEntry(id)}
-              onFoodClick={(entry) => setViewEntry(entry)}
-            />
-          ))}
+        {/* Section Alimentation */}
+        <div>
+          <div
+            className="flex items-center justify-between"
+            style={{ marginBottom: 12 }}
+          >
+            <h2
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              Alimentation
+            </h2>
+            <button
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: "var(--accent-text)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              Plus
+            </button>
+          </div>
+          <div
+            style={{
+              background: "#1C1C1E",
+              borderRadius: 16,
+              overflow: "hidden",
+              border: "2px solid #595F60",
+            }}
+          >
+            {meals.map((meal, i) => (
+              <div key={meal.meal_number}>
+                {i > 0 && (
+                  <div
+                    style={{
+                      height: 1,
+                      background: "var(--border)",
+                      marginLeft: 74,
+                    }}
+                  />
+                )}
+                <MealSection
+                  meal={meal}
+                  calorieObjectif={displayProfile.objectif_calories ?? 2000}
+                  onAdd={() => {
+                    setModalMealTime(
+                      meal.meal_time || new Date().toISOString(),
+                    );
+                    setModalMeal(meal.meal_number);
+                  }}
+                  onMealClick={() => setViewMeal(meal)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </main>
 
@@ -212,12 +303,27 @@ export default function NutritionPageClient({ initialData }: Props) {
           mealNumber={modalMeal}
           mealTime={modalMealTime ?? new Date().toISOString()}
           date={date}
-          onClose={closeAddModal}
+          initialFrequents={initialData.frequents}
+          onClose={() => {
+            setModalMeal(null);
+            setModalMealTime(null);
+          }}
         />
       )}
-
+      {viewMeal && (
+        <MealDetailView
+          meal={viewMeal}
+          profile={displayProfile}
+          onClose={() => setViewMeal(null)}
+          onFoodClick={(entry) => setViewEntry(entry)}
+          onAdd={() => {
+            setModalMealTime(viewMeal.meal_time || new Date().toISOString());
+            setModalMeal(viewMeal.meal_number);
+          }}
+        />
+      )}
       {viewEntry && (
-        <EditEntryModal entry={viewEntry} onClose={closeEditModal} />
+        <EditEntryModal entry={viewEntry} onClose={() => setViewEntry(null)} />
       )}
     </>
   );

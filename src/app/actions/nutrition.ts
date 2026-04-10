@@ -295,6 +295,38 @@ export async function getRecentAliments() {
   return recents;
 }
 
+export async function getFrequentAliments() {
+  const [supabase, user] = await Promise.all([
+    createClient(),
+    getUserFromMiddleware(),
+  ]);
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("nutrition_entries")
+    .select(
+      "aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
+    )
+    .eq("user_id", user.id)
+    .limit(200);
+
+  if (!data) return [];
+
+  const counts = new Map<string, number>();
+  const alimentMap = new Map<string, EntryWithAliment["aliments"]>();
+  for (const e of data as EntryWithAliment[]) {
+    if (!e.aliments) continue;
+    counts.set(e.aliment_id, (counts.get(e.aliment_id) ?? 0) + 1);
+    alimentMap.set(e.aliment_id, e.aliments);
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20)
+    .map(([id]) => alimentMap.get(id)!)
+    .filter(Boolean);
+}
+
 export async function getFavoriteAliments(): Promise<
   EntryWithAliment["aliments"][]
 > {

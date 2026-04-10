@@ -45,6 +45,8 @@ export interface NutritionPageData {
   entries: NutritionEntry[];
   profile: NutritionProfile;
   date: string;
+  streak?: number;
+  frequents: NutritionAliment[];
 }
 
 export function calcNutrients(aliment: NutritionAliment, quantite_g: number) {

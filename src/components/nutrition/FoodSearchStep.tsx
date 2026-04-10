@@ -5,117 +5,19 @@ import { Search, ScanBarcode, X, Plus } from "lucide-react";
 import FoodSearchResults from "./FoodSearchResults";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
-const CATS = [
-  { id: "all", emoji: "✦", label: "Tous", mots: [] as string[] },
-  {
-    id: "legumes",
-    emoji: "🥬",
-    label: "Légumes",
-    mots: [
-      "carotte",
-      "brocoli",
-      "épinard",
-      "tomate",
-      "courgette",
-      "haricot",
-      "salade",
-      "poivron",
-      "oignon",
-      "champignon",
-      "concombre",
-      "poireau",
-    ],
-  },
-  {
-    id: "fruits",
-    emoji: "🍎",
-    label: "Fruits",
-    mots: [
-      "pomme",
-      "banane",
-      "orange",
-      "fraise",
-      "raisin",
-      "pêche",
-      "poire",
-      "abricot",
-      "cerise",
-      "citron",
-      "ananas",
-      "mangue",
-      "kiwi",
-    ],
-  },
-  {
-    id: "viandes",
-    emoji: "🥩",
-    label: "Viandes",
-    mots: [
-      "boeuf",
-      "poulet",
-      "porc",
-      "veau",
-      "agneau",
-      "dinde",
-      "canard",
-      "jambon",
-      "lardons",
-      "saucisse",
-      "steak",
-    ],
-  },
-  {
-    id: "poissons",
-    emoji: "🐟",
-    label: "Poissons",
-    mots: [
-      "saumon",
-      "thon",
-      "cabillaud",
-      "sole",
-      "sardine",
-      "maquereau",
-      "dorade",
-      "truite",
-      "crevette",
-    ],
-  },
-  {
-    id: "laitiers",
-    emoji: "🧀",
-    label: "Laitiers",
-    mots: [
-      "lait",
-      "yaourt",
-      "fromage",
-      "beurre",
-      "crème",
-      "cottage",
-      "ricotta",
-      "mozzarella",
-      "skyr",
-    ],
-  },
-  {
-    id: "feculents",
-    emoji: "🌾",
-    label: "Féculents",
-    mots: [
-      "riz",
-      "pâtes",
-      "pain",
-      "pomme de terre",
-      "quinoa",
-      "lentille",
-      "pois chiche",
-      "avoine",
-      "semoule",
-    ],
-  },
-] as const;
+type TabId = "frequents" | "recents" | "favoris";
 
-type TabId = "resultats" | "recents" | "favoris";
-type CatId = (typeof CATS)[number]["id"];
+const TILES = [
+  { emoji: "🥕", label: "Aliments" },
+  { emoji: "🍱", label: "Repas" },
+  { emoji: "👨‍🍳", label: "Recettes" },
+];
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "frequents", label: "Fréquents" },
+  { id: "recents", label: "Récents" },
+  { id: "favoris", label: "Favoris" },
+];
 
 interface Props {
   query: string;
@@ -127,19 +29,12 @@ interface Props {
   favoriteIds: Set<string>;
   loading: boolean;
   loadingInitial: boolean;
+  placeholder?: string;
   onSelect: (a: NutritionAliment) => void;
+  onQuickAdd: (a: NutritionAliment) => void;
   onToggleFavorite: (a: NutritionAliment) => void;
   onScan: () => void;
   onCustom: () => void;
-}
-
-function filterByCat(items: NutritionAliment[], catId: CatId) {
-  if (catId === "all") return items;
-  const cat = CATS.find((c) => c.id === catId);
-  if (!cat || cat.mots.length === 0) return items;
-  return items.filter((a) =>
-    cat.mots.some((m) => a.nom.toLowerCase().includes(m)),
-  );
 }
 
 export default function FoodSearchStep({
@@ -152,217 +47,201 @@ export default function FoodSearchStep({
   favoriteIds,
   loading,
   loadingInitial,
+  placeholder,
   onSelect,
+  onQuickAdd,
   onToggleFavorite,
   onScan,
   onCustom,
 }: Props) {
-  const [tab, setTab] = useState<TabId>(query ? "resultats" : "recents");
-  const [cat, setCat] = useState<CatId>("all");
-
-  function handleQueryChange(val: string) {
-    setQuery(val);
-    setTab(val.trim().length >= 1 ? "resultats" : "recents");
-  }
-
-  const recentsOrPop = recents.length > 0 ? recents : populaires;
-  const recentsLabel = recents.length > 0 ? "Récents" : "Populaires";
-
+  const [tab, setTab] = useState<TabId>("frequents");
+  const [tile, setTile] = useState("Aliments");
   const q = query.trim().toLowerCase();
-  const instant: NutritionAliment[] =
-    q.length >= 1
-      ? [...recents, ...populaires]
-          .filter(
-            (a, i, arr) =>
-              arr.findIndex((x) => x.id === a.id && x.id !== "") === i,
-          )
-          .filter((a) => a.nom.toLowerCase().includes(q))
-          .slice(0, 8)
-      : [];
+
+  const frequentsList = q ? results : populaires;
+  const recentsList = q
+    ? recents.filter((a) => a.nom.toLowerCase().includes(q))
+    : recents;
+  const favorisList = q
+    ? favoris.filter((a) => a.nom.toLowerCase().includes(q))
+    : favoris;
 
   const list =
-    tab === "resultats"
-      ? results.length > 0
-        ? results
-        : instant
+    tab === "frequents"
+      ? frequentsList
       : tab === "recents"
-        ? recentsOrPop
-        : favoris;
-  const display = filterByCat(list, cat);
+        ? recentsList
+        : favorisList;
   const emptyMsg =
     tab === "favoris"
       ? "Aucun favori"
       : tab === "recents"
         ? loadingInitial
-          ? "Chargement..."
-          : "Aucun aliment récent"
+          ? "Chargement…"
+          : "Aucun récent"
         : "Aucun résultat";
-
-  const TABS: { id: TabId; label: string }[] = [
-    { id: "resultats", label: "Résultats" },
-    { id: "recents", label: recentsLabel },
-    { id: "favoris", label: "Favoris" },
-  ];
+  const isSearchLoading =
+    loading && tab === "frequents" && !!q && results.length === 0;
 
   return (
-    <div
-      className="flex flex-col gap-2.5 px-4 pb-6 overflow-y-auto"
-      style={
-        {
-          overscrollBehavior: "contain",
-          WebkitOverflowScrolling: "touch",
-        } as React.CSSProperties
-      }
-    >
-      {/* Search bar */}
-      <div className="flex gap-2">
+    <div className="flex flex-col flex-1 overflow-hidden">
+      {/* Barre de recherche */}
+      <div className="px-4 pb-4">
         <div
-          className="flex-1 flex items-center gap-2 rounded-[14px] h-[42px] px-3"
+          className="flex items-center gap-3 rounded-2xl px-4 h-[50px]"
           style={{
-            background: "var(--bg-card)",
-            border: query
-              ? "1px solid var(--accent)"
-              : "1px solid var(--border)",
-            boxShadow: query ? "0 0 0 3px var(--accent-bg)" : "none",
-            transition: "border-color 0.2s, box-shadow 0.2s",
+            background: "#262828",
+            border: "2px solid #3B82F6",
+            boxShadow: q ? "0 0 0 3px rgba(59,130,246,0.12)" : "none",
+            transition: "box-shadow 0.2s",
           }}
         >
-          <Search size={14} style={{ color: "#3B82F6", flexShrink: 0 }} />
+          <Search size={17} color="#3B82F6" style={{ flexShrink: 0 }} />
           <input
             value={query}
-            onChange={(e) => handleQueryChange(e.target.value)}
-            placeholder="Rechercher un aliment…"
-            className="bg-transparent flex-1 text-[13px] outline-none min-w-0"
-            style={{ color: "var(--text-primary)" }}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={placeholder ?? "Rechercher un aliment…"}
+            autoFocus
+            className="flex-1 bg-transparent outline-none"
+            style={{
+              color: "var(--text-primary)",
+              fontSize: 16,
+              fontFamily: "var(--font-sans)",
+            }}
           />
-          {query && (
+          {q ? (
             <button
-              onClick={() => {
-                handleQueryChange("");
-                setTab("recents");
-              }}
-              className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-              style={{ background: "var(--border)" }}
+              onClick={() => setQuery("")}
+              className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: "var(--bg-elevated)" }}
             >
-              <X size={10} style={{ color: "var(--text-muted)" }} />
+              <X size={12} style={{ color: "var(--text-muted)" }} />
+            </button>
+          ) : (
+            <button
+              onClick={onScan}
+              className="shrink-0 active:opacity-60 transition-opacity"
+            >
+              <ScanBarcode size={20} style={{ color: "var(--text-muted)" }} />
             </button>
           )}
         </div>
-        <button
-          onClick={onScan}
-          className="w-[42px] h-[42px] rounded-[14px] flex items-center justify-center shrink-0"
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <ScanBarcode size={16} style={{ color: "var(--text-secondary)" }} />
-        </button>
       </div>
 
-      {/* Segmented tabs */}
-      <div
-        className="flex rounded-[10px] p-[3px]"
-        style={{ background: "var(--border)" }}
-      >
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className="flex-1 text-center text-[10px] font-semibold py-1.5 rounded-lg transition-colors"
-            style={{
-              background: tab === t.id ? "var(--bg-card)" : "transparent",
-              color: tab === t.id ? "var(--text-primary)" : "var(--text-muted)",
-              boxShadow: tab === t.id ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Category chips */}
-      <div
-        className="flex gap-1.5 overflow-x-auto"
-        style={{ scrollbarWidth: "none" } as React.CSSProperties}
-      >
-        {CATS.map(({ id, emoji, label }) => (
-          <button
-            key={id}
-            onClick={() => setCat(id as CatId)}
-            className="flex items-center gap-1 px-2.5 py-[5px] rounded-full whitespace-nowrap text-[10px] font-semibold shrink-0 transition-colors"
-            style={{
-              background: cat === id ? "var(--accent-bg)" : "var(--bg-card)",
-              color:
-                cat === id ? "var(--accent-text)" : "var(--text-secondary)",
-              border:
-                cat === id
-                  ? "1px solid var(--accent)"
-                  : "1px solid var(--border)",
-            }}
-          >
-            <span className="text-[11px]">{emoji}</span>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Count */}
-      {!loading && display.length > 0 && (
-        <p
-          className="text-[9px] font-bold uppercase px-0.5"
-          style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}
-        >
-          {display.length} {tab === "favoris" ? "favori" : "résultat"}
-          {display.length > 1 ? "s" : ""}
-        </p>
+      {/* Tuiles catégories — masquées en cours de saisie */}
+      {!q && (
+        <div className="px-4 pb-4 flex gap-3">
+          {TILES.map((tile_item) => (
+            <div
+              key={tile_item.label}
+              onClick={() => setTile(tile_item.label)}
+              className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl py-5 active:scale-95 transition-transform"
+              style={{
+                background: tile === tile_item.label ? "#384250" : "#262828",
+                border: "1px solid var(--border)",
+                cursor: "pointer",
+                aspectRatio: "1",
+              }}
+            >
+              <span style={{ fontSize: 28 }}>{tile_item.emoji}</span>
+              <span
+                className="text-[12px] font-medium"
+                style={{
+                  color: "var(--text-secondary)",
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                {tile_item.label}
+              </span>
+            </div>
+          ))}
+        </div>
       )}
 
-      <FoodSearchResults
-        results={display}
-        onSelect={onSelect}
-        onToggleFavorite={onToggleFavorite}
-        favoriteIds={favoriteIds}
-        loading={
-          loading &&
-          tab === "resultats" &&
-          instant.length === 0 &&
-          results.length === 0
-        }
-        emptyMessage={emptyMsg}
-      />
-
-      {/* Custom food button */}
-      <button
-        onClick={onCustom}
-        className="flex items-center gap-2.5 rounded-[14px] active:opacity-70 transition-opacity"
-        style={{
-          background: "var(--bg-card)",
-          border: "1px dashed var(--border)",
-          padding: "12px 14px",
-        }}
-      >
+      {/* Onglets */}
+      <div className="px-4 pb-3">
         <div
-          className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0"
-          style={{
-            background: "var(--accent-bg)",
-            border: "1px solid var(--accent)",
-          }}
+          className="flex rounded-xl p-1 gap-0.5"
+          style={{ background: "#1F2A37" }}
         >
-          <Plus size={16} style={{ color: "var(--accent-text)" }} />
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className="flex-1 py-2 rounded-[10px] text-[12px] font-semibold transition-colors"
+              style={{
+                background: tab === t.id ? "#384250" : "#1F2A37",
+                color:
+                  tab === t.id ? "var(--text-primary)" : "var(--text-muted)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
-        <div>
-          <p
-            className="text-[11px] font-semibold"
-            style={{ color: "var(--text-secondary)" }}
+      </div>
+
+      {/* Liste aliments */}
+      <div
+        className="flex-1 overflow-y-auto px-4"
+        style={
+          {
+            overscrollBehavior: "contain",
+            WebkitOverflowScrolling: "touch",
+            paddingBottom: 160,
+          } as React.CSSProperties
+        }
+      >
+        <FoodSearchResults
+          results={list}
+          onSelect={onSelect}
+          onQuickAdd={onQuickAdd}
+          onToggleFavorite={onToggleFavorite}
+          favoriteIds={favoriteIds}
+          loading={isSearchLoading}
+          emptyMessage={emptyMsg}
+        />
+
+        {/* Créer aliment personnalisé */}
+        <button
+          onClick={onCustom}
+          className="w-full flex items-center gap-3 py-4 active:opacity-70 transition-opacity"
+          style={{ borderTop: "1px solid var(--border)", marginTop: 4 }}
+        >
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+            }}
           >
-            Créer un aliment personnalisé
-          </p>
-          <p className="text-[9px]" style={{ color: "var(--text-muted)" }}>
-            {query ? `Pas trouvé « ${query} » ?` : "Ajouter vos propres macros"}
-          </p>
-        </div>
-      </button>
+            <Plus size={15} style={{ color: "var(--text-secondary)" }} />
+          </div>
+          <div className="text-left">
+            <p
+              className="text-sm font-semibold"
+              style={{
+                color: "var(--text-secondary)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              Créer un aliment personnalisé
+            </p>
+            <p
+              className="text-xs"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              {query
+                ? `"${query}" introuvable ?`
+                : "Ajouter vos propres macros"}
+            </p>
+          </div>
+        </button>
+      </div>
     </div>
   );
 }

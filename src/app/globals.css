@@ -16,41 +16,41 @@ body {
 /* ===== DESIGN SYSTEM — ÉLEV V3 — Revolut Fitness ===== */
 
 :root {
-  /* Fond & surfaces */
-  --bg-primary: #f3f0ea;
-  --bg-secondary: #ede8df;
-  --bg-card: rgba(255, 255, 255, 0.55);
-  --bg-inner: rgba(255, 255, 255, 0.4);
-  --bg-elevated: #e4ead8;
-  --border: rgba(0, 0, 0, 0.04);
+  /* Fond & surfaces — dark */
+  --bg-primary: #111927;
+  --bg-secondary: #1a2235;
+  --bg-card: #222d42;
+  --bg-inner: rgba(255, 255, 255, 0.04);
+  --bg-elevated: #2d3a52;
+  --border: rgba(255, 255, 255, 0.08);
 
   /* Texte */
-  --text-primary: #1e1e1e;
-  --text-secondary: #5c5a57;
-  --text-muted: #908d88;
+  --text-primary: #ffffff;
+  --text-secondary: #9a9a9a;
+  --text-muted: #666666;
 
   /* Accents fitness */
-  --green: #2a9d6e;
-  --green-dim: rgba(42, 157, 110, 0.1);
-  --accent: #2a9d6e;
-  --accent-hover: #238a5f;
-  --accent-bg: rgba(42, 157, 110, 0.1);
-  --accent-text: #2a9d6e;
-  --accent-secondary: #3a5a42;
+  --green: #00ffc3;
+  --green-dim: rgba(0, 255, 195, 0.1);
+  --accent: #00ffc3;
+  --accent-hover: #00e6b0;
+  --accent-bg: rgba(0, 255, 195, 0.1);
+  --accent-text: #00ffc3;
+  --accent-secondary: #00bf93;
 
   /* Macros */
-  --color-protein: #3872c4;
-  --color-carbs: #b08a1a;
-  --color-fat: #c94444;
+  --color-protein: #00ffc3;
+  --color-carbs: #00ffc3;
+  --color-fat: #00ffc3;
 
   --success: #2a9d6e;
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.12);
 
   /* Glass morphism */
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.35);
-  --glass-subtle: rgba(0, 0, 0, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-subtle: rgba(255, 255, 255, 0.04);
   --glass-blur: blur(12px);
   --glass-blur-sm: blur(8px);
 
@@ -60,32 +60,25 @@ body {
   --radius-sm: 12px;
 
   /* CTA */
-  --cta-bg: #dce8d8;
-  --cta-text: #3a5a42;
+  --cta-bg: #1b2e1d;
+  --cta-text: #2a9d6e;
 
   /* Gradients */
-  --bg-gradient: linear-gradient(
-    to bottom,
-    #e6dbd0 0%,
-    #ebe1d6 20%,
-    #f0e7dd 45%,
-    #f4ede5 70%,
-    #f8f3ee 100%
-  );
-  --grad-workout: linear-gradient(135deg, #07100a 0%, #2a9d6e 100%);
+  --bg-gradient: #111927;
+  --grad-workout: linear-gradient(135deg, #001a14 0%, #00ffc3 100%);
   --grad-btn-accent: linear-gradient(
     135deg,
-    #07100a 0%,
-    #1b2e1d 40%,
-    #2a9d6e 100%
+    #001a14 0%,
+    #004d3a 40%,
+    #00ffc3 100%
   );
-  --grad-sleep: linear-gradient(135deg, #0f1a12 0%, #1c1917 70%);
-  --grad-header-line: linear-gradient(to right, #1b2e1d, #2a9d6e, transparent);
-  --grad-monday: linear-gradient(135deg, #1b2e1d22 0%, #f3f0ea 100%);
+  --grad-sleep: linear-gradient(135deg, #001a14 0%, #111111 70%);
+  --grad-header-line: linear-gradient(to right, #004d3a, #00ffc3, transparent);
+  --grad-monday: linear-gradient(135deg, #00ffc322 0%, #000000 100%);
 
   /* Bar warm (workout actif) */
-  --bar-from: #2a9d6e;
-  --bar-to: #238a5f;
+  --bar-from: #00ffc3;
+  --bar-to: #00e6b0;
 }
 
 @theme inline {
@@ -104,12 +97,13 @@ body {
   --color-fat: var(--color-fat);
   --color-success: var(--success);
   --color-danger: var(--danger);
-  --font-sans: var(--font-nunito);
+  --font-sans: var(--font-inter);
   --font-display: var(--font-lora);
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
+  background: #0d0d0d;
 }
 
 /* Gradients pilotes par JS (apply-accent.ts) via --grad-* */

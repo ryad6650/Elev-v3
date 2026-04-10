@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
 import FoodDetailSheet from "./FoodDetailSheet";
-import CustomFoodForm from "./CustomFoodForm";
+import NutriInfoForm from "./NutriInfoForm";
 import { useNutritionStore } from "@/store/nutritionStore";
 import { useUiStore } from "@/store/uiStore";
 import {
@@ -98,55 +97,14 @@ export default function EditEntryModal({ entry, onClose }: Props) {
 
   if (step === "edit") {
     return (
-      <div
-        className="fixed inset-0 z-[60] flex flex-col"
-        style={{ background: "var(--bg-gradient)" }}
-      >
-        <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
-          <div
-            className="flex items-center justify-between px-5 pb-3 shrink-0"
-            style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
-          >
-            <button
-              onClick={() => setStep("detail")}
-              className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center"
-              style={{
-                background: "rgba(0,0,0,0.05)",
-                border: "1px solid rgba(0,0,0,0.08)",
-              }}
-            >
-              <ChevronLeft size={14} style={{ color: "#78716C" }} />
-            </button>
-            <p
-              className="text-xl leading-none"
-              style={{
-                fontFamily: "var(--font-lora)",
-                fontStyle: "italic",
-                color: "#2C1E14",
-              }}
-            >
-              {isCustom ? "Modifier" : "Corriger"}
-            </p>
-            <div className="w-[30px]" />
-          </div>
-          <div
-            className="flex-1 overflow-y-auto min-h-0"
-            style={
-              {
-                scrollbarWidth: "none",
-                WebkitOverflowScrolling: "touch",
-              } as React.CSSProperties
-            }
-          >
-            <CustomFoodForm
-              editAliment={isCustom ? aliment : { ...aliment, id: "" }}
-              isForking={!isCustom}
-              onEdited={handleEdited}
-              onCreated={handleCreated}
-            />
-          </div>
-        </div>
-      </div>
+      <NutriInfoForm
+        editAliment={isCustom ? aliment : { ...aliment, id: "" }}
+        isForking={!isCustom}
+        onEdited={handleEdited}
+        onCreated={handleCreated}
+        onBack={() => setStep("detail")}
+        onClose={onClose}
+      />
     );
   }
 

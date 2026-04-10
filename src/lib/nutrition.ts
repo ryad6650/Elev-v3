@@ -28,7 +28,7 @@ export async function fetchNutritionData(
     uid = user.id;
   }
 
-  const [entriesRes, profileRes] = await Promise.all([
+  const [entriesRes, profileRes, frequentsRes] = await Promise.all([
     supabase
       .from("nutrition_entries")
       .select(
@@ -41,10 +41,17 @@ export async function fetchNutritionData(
     supabase
       .from("profiles")
       .select(
-        "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides",
+        "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides, streak_connexions",
       )
       .eq("id", uid)
       .single(),
+    supabase
+      .from("nutrition_entries")
+      .select(
+        "aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
+      )
+      .eq("user_id", uid)
+      .limit(200),
   ]);
 
   if (entriesRes.error) throw new Error(entriesRes.error.message);
@@ -82,21 +89,33 @@ export async function fetchNutritionData(
     }),
   );
 
-  const profile = profileRes.data ?? {
-    objectif_calories: 2000,
-    objectif_proteines: 150,
-    objectif_glucides: 250,
-    objectif_lipides: 70,
-  };
+  const profileData = profileRes.data;
+
+  type FreqRow = { aliment_id: string; aliments: NutritionAliment | null };
+  const freqRows = (frequentsRes.data ?? []) as FreqRow[];
+  const counts = new Map<string, number>();
+  const alimentMap = new Map<string, NutritionAliment>();
+  for (const row of freqRows) {
+    if (!row.aliments) continue;
+    counts.set(row.aliment_id, (counts.get(row.aliment_id) ?? 0) + 1);
+    alimentMap.set(row.aliment_id, row.aliments);
+  }
+  const frequents = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20)
+    .map(([id]) => alimentMap.get(id)!)
+    .filter(Boolean);
 
   return {
     entries,
     profile: {
-      objectif_calories: profile.objectif_calories ?? 2000,
-      objectif_proteines: profile.objectif_proteines ?? 150,
-      objectif_glucides: profile.objectif_glucides ?? 250,
-      objectif_lipides: profile.objectif_lipides ?? 70,
+      objectif_calories: profileData?.objectif_calories ?? 2000,
+      objectif_proteines: profileData?.objectif_proteines ?? 150,
+      objectif_glucides: profileData?.objectif_glucides ?? 250,
+      objectif_lipides: profileData?.objectif_lipides ?? 70,
     },
     date,
+    streak: profileData?.streak_connexions ?? 0,
+    frequents,
   };
 }
