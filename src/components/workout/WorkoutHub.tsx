@@ -2,80 +2,44 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Play, Trash2, X, Pencil } from "lucide-react";
+import {
+  FolderPlus,
+  ClipboardList,
+  Search,
+  ChevronDown,
+  Trash2,
+  X,
+  Pencil,
+  Play,
+} from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useRouter } from "next/navigation";
 import RoutineCard from "./RoutineCard";
-import {
-  getRoutineExercises,
-  deleteRoutine,
-  type RoutineExerciseData,
-} from "@/app/actions/routines";
+import { getRoutineExercises, deleteRoutine } from "@/app/actions/routines";
 import type { WorkoutPageData, Routine } from "@/lib/workout";
 
 const EditRoutineModal = dynamic(() => import("./EditRoutineModal"), {
   ssr: false,
 });
 
-const FILTRES = ["Tous", "Push / Pull", "Upper / Lower", "Full Body"];
-
-function getCategorie(nom: string): string {
-  const n = nom.toLowerCase();
-  if (n.includes("push") || n.includes("pull")) return "Push / Pull";
-  if (n.includes("upper") || n.includes("lower")) return "Upper / Lower";
-  if (n.includes("full") || n.includes("corps") || n.includes("body"))
-    return "Full Body";
-  return "";
-}
-
 interface Props {
   data: WorkoutPageData;
+  onNewRoutine: () => void;
+  onExplorer: () => void;
 }
 
-export default function WorkoutHub({ data }: Props) {
+export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
   const router = useRouter();
-  const [filtre, setFiltre] = useState("Tous");
+  const [mesRoutinesOpen, setMesRoutinesOpen] = useState(true);
   const [menuRoutine, setMenuRoutine] = useState<Routine | null>(null);
   const [editRoutine, setEditRoutine] = useState<Routine | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [exercisesCache, setExercisesCache] = useState<
-    Record<string, RoutineExerciseData[]>
-  >({});
-  const [loadingId, setLoadingId] = useState<string | null>(null);
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
-
-  const routinesFiltrees =
-    filtre === "Tous"
-      ? data.routines
-      : data.routines.filter((r) => getCategorie(r.nom) === filtre);
-
-  const fetchExercises = async (routine: Routine) => {
-    if (exercisesCache[routine.id]) return;
-    setLoadingId(routine.id);
-    try {
-      const exs = await getRoutineExercises(routine.id);
-      setExercisesCache((prev) => ({ ...prev, [routine.id]: exs }));
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
-  const handleToggleExpand = async (routine: Routine) => {
-    if (expandedId === routine.id) {
-      setExpandedId(null);
-      return;
-    }
-    setExpandedId(routine.id);
-    await fetchExercises(routine);
-  };
 
   const handleStartRoutine = async (routine: Routine) => {
     setMenuRoutine(null);
-    setExpandedId(null);
     try {
-      const exercices =
-        exercisesCache[routine.id] ?? (await getRoutineExercises(routine.id));
+      const exercices = await getRoutineExercises(routine.id);
       startWorkout({
         routineId: routine.id,
         routineName: routine.nom,
@@ -105,62 +69,104 @@ export default function WorkoutHub({ data }: Props) {
 
   return (
     <div>
-      {/* Section label */}
-      <div
-        style={{
-          fontFamily: "var(--font-nunito), sans-serif",
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--text-muted)",
-          marginBottom: 12,
-        }}
-      >
-        Mes routines
+      {/* Routines header */}
+      <div className="flex items-center justify-between mb-3">
+        <span
+          style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 17,
+            fontWeight: 700,
+            color: "var(--text-primary)",
+          }}
+        >
+          Routines
+        </span>
+        <button onClick={onNewRoutine} className="active:opacity-70 p-1">
+          <FolderPlus size={22} style={{ color: "var(--text-primary)" }} />
+        </button>
       </div>
 
-      {/* Filtres */}
-      <div
-        className="flex gap-2.5 overflow-x-auto pb-1.5 mb-4"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {FILTRES.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFiltre(f)}
-            className="shrink-0 active:scale-95 transition-all"
+      {/* Nouv. Routine + Explorer */}
+      <div className="flex gap-3 mb-5">
+        <button
+          onClick={onNewRoutine}
+          className="flex-1 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          style={{
+            background: "#1C1C1E",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "12px 16px",
+          }}
+        >
+          <ClipboardList size={18} style={{ color: "var(--text-primary)" }} />
+          <span
             style={{
               fontFamily: "var(--font-nunito), sans-serif",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
-              padding: "8px 16px",
-              borderRadius: 9999,
-              border: "none",
-              cursor: "pointer",
-              background: filtre === f ? "var(--green)" : "rgba(0,0,0,0.04)",
-              color: filtre === f ? "#fff" : "var(--text-muted)",
+              color: "var(--text-primary)",
             }}
           >
-            {f}
-          </button>
-        ))}
+            Nouv. Routine
+          </span>
+        </button>
+        <button
+          onClick={onExplorer}
+          className="flex-1 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          style={{
+            background: "#1C1C1E",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "12px 16px",
+          }}
+        >
+          <Search size={18} style={{ color: "var(--text-primary)" }} />
+          <span
+            style={{
+              fontFamily: "var(--font-nunito), sans-serif",
+              fontSize: 14,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+            }}
+          >
+            Explorer
+          </span>
+        </button>
       </div>
 
-      {/* Liste routines */}
-      {routinesFiltrees.length > 0 && (
-        <div>
-          {routinesFiltrees.map((routine) => (
+      {/* Mes routines collapsible header */}
+      <button
+        onClick={() => setMesRoutinesOpen((v) => !v)}
+        className="flex items-center gap-1.5 mb-3 active:opacity-70"
+      >
+        <ChevronDown
+          size={14}
+          className="transition-transform duration-200"
+          style={{
+            color: "var(--text-secondary)",
+            transform: mesRoutinesOpen ? "rotate(0deg)" : "rotate(-90deg)",
+          }}
+        />
+        <span
+          style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 14,
+            fontWeight: 500,
+            color: "var(--text-secondary)",
+          }}
+        >
+          Mes routines ({data.routines.length})
+        </span>
+      </button>
+
+      {mesRoutinesOpen && data.routines.length > 0 && (
+        <div className="space-y-3">
+          {data.routines.map((routine) => (
             <RoutineCard
               key={routine.id}
               routine={routine}
-              index={data.routines.indexOf(routine)}
-              onToggle={() => handleToggleExpand(routine)}
               onOptions={() => setMenuRoutine(routine)}
               onStart={() => handleStartRoutine(routine)}
-              expanded={expandedId === routine.id}
-              exercises={exercisesCache[routine.id] ?? []}
-              loadingExpanded={loadingId === routine.id}
             />
           ))}
         </div>
@@ -168,16 +174,14 @@ export default function WorkoutHub({ data }: Props) {
 
       {data.routines.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Aucune routine. Appuie sur + pour créer ta première routine ou
-            démarrer une séance libre.
-          </p>
-        </div>
-      )}
-      {routinesFiltrees.length === 0 && data.routines.length > 0 && (
-        <div className="text-center py-10">
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Aucune routine dans cette catégorie.
+          <p
+            className="text-sm"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-nunito), sans-serif",
+            }}
+          >
+            Aucune routine. Appuie sur + pour créer ta première routine.
           </p>
         </div>
       )}
@@ -204,7 +208,7 @@ export default function WorkoutHub({ data }: Props) {
               className="text-center font-semibold mb-4 truncate px-4"
               style={{
                 fontFamily: "var(--font-nunito), sans-serif",
-                color: "var(--text-primary)",
+                color: "#1C1917",
               }}
             >
               {menuRoutine.nom}
@@ -215,7 +219,7 @@ export default function WorkoutHub({ data }: Props) {
                 className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
                 style={{
                   fontFamily: "var(--font-nunito), sans-serif",
-                  background: "var(--green)",
+                  background: "var(--accent)",
                   color: "white",
                   border: "none",
                 }}
@@ -229,7 +233,7 @@ export default function WorkoutHub({ data }: Props) {
                 style={{
                   fontFamily: "var(--font-nunito), sans-serif",
                   background: "rgba(255,255,255,0.5)",
-                  color: "var(--text-primary)",
+                  color: "#1C1917",
                   border: "none",
                 }}
               >
@@ -255,7 +259,7 @@ export default function WorkoutHub({ data }: Props) {
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl text-sm"
                 style={{
                   fontFamily: "var(--font-nunito), sans-serif",
-                  color: "var(--text-muted)",
+                  color: "#78716C",
                   background: "none",
                   border: "none",
                 }}

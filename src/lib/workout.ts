@@ -5,6 +5,7 @@ export interface Routine {
   id: string;
   nom: string;
   exercisesCount: number;
+  exerciceNoms: string[];
   groupes: string[];
   dureeEstimee: number;
   derniereSeance: string | null;
@@ -27,7 +28,7 @@ export interface WorkoutPageData {
 type RoutineExerciseWithEx = {
   id: string;
   series_cible: number | null;
-  exercises: { groupe_musculaire: string } | null;
+  exercises: { nom: string; groupe_musculaire: string } | null;
 };
 
 type RoutineWithExercises = {
@@ -68,7 +69,9 @@ export async function fetchWorkoutPageData(
   const [routinesRes, workoutsRes, lastWorkoutsRes] = await Promise.all([
     supabase
       .from("routines")
-      .select("id, nom, routine_exercises(id, exercises(groupe_musculaire))")
+      .select(
+        "id, nom, routine_exercises(id, series_cible, exercises(nom, groupe_musculaire))",
+      )
       .eq("user_id", uid)
       .order("created_at", { ascending: false }),
     supabase
@@ -104,9 +107,13 @@ export async function fetchWorkoutPageData(
     (routinesRes.data ?? []) as unknown as RoutineWithExercises[]
   ).map((r) => {
     const groupesSet = new Set<string>();
+    const exerciceNoms: string[] = [];
     for (const re of r.routine_exercises) {
       if (re.exercises?.groupe_musculaire) {
         groupesSet.add(re.exercises.groupe_musculaire.toLowerCase());
+      }
+      if (re.exercises?.nom) {
+        exerciceNoms.push(re.exercises.nom);
       }
     }
     const exercisesCount = r.routine_exercises.length;
@@ -118,6 +125,7 @@ export async function fetchWorkoutPageData(
       id: r.id,
       nom: r.nom,
       exercisesCount,
+      exerciceNoms,
       groupes: Array.from(groupesSet),
       dureeEstimee: Math.max(10, Math.round(totalSets * 3.5)),
       derniereSeance: lastWorkoutMap.get(r.id) ?? null,

@@ -44,7 +44,7 @@ export default memo(function WeeklyWorkoutCard({
         <Link
           href="/historique"
           className="text-[10px] font-semibold"
-          style={{ color: "#74BF7A" }}
+          style={{ color: "#0589D6" }}
         >
           Voir tout &rarr;
         </Link>
@@ -80,8 +80,8 @@ export default memo(function WeeklyWorkoutCard({
           if (isToday) {
             dotStyle = {
               ...dotStyle,
-              background: "#1B2E1D",
-              borderColor: "#2d4a2f",
+              background: "#0d1f2d",
+              borderColor: "#024a7a",
               boxShadow: "0 2px 12px rgba(27,46,29,0.6)",
             };
           }
@@ -115,7 +115,7 @@ export default memo(function WeeklyWorkoutCard({
           <div
             className="rounded-[14px] p-3 px-3.5 flex items-center gap-2.5"
             style={{
-              background: "linear-gradient(135deg, #07100A 0%, #74BF7A 100%)",
+              background: "linear-gradient(135deg, #001429 0%, #0589D6 100%)",
               border: "1px solid rgba(116,191,122,0.2)",
             }}
           >

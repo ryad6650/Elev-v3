@@ -122,8 +122,8 @@ export default memo(function SleepCard({ sommeilMinutes }: Props) {
             disabled={saving}
             className="flex-1 text-[10px] font-semibold py-1.5 rounded-lg active:scale-95 transition-transform"
             style={{
-              background: "#1B2E1D",
-              color: "#74BF7A",
+              background: "#0d1f2d",
+              color: "#0589D6",
               opacity: saving ? 0.5 : 1,
             }}
           >
@@ -151,7 +151,7 @@ export default memo(function SleepCard({ sommeilMinutes }: Props) {
         <>
           <span
             className="text-[28px] font-bold leading-none"
-            style={{ color: "#74BF7A" }}
+            style={{ color: "#0589D6" }}
           >
             {formatSleep(saved)}
           </span>

@@ -77,7 +77,7 @@ export default memo(function MacrosCard({
       <MacroCol
         value={proteines.consumed}
         objective={proteines.objective}
-        color="#74BF7A"
+        color="#0589D6"
         label="Proteines"
       />
       <div

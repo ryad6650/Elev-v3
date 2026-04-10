@@ -21,7 +21,7 @@ export default memo(function SeancesWeekCard({ count }: Props) {
       <span className="text-[20px]">🏋️</span>
       <span
         className="text-[28px] font-bold leading-none"
-        style={{ color: "#74BF7A" }}
+        style={{ color: "#0589D6" }}
       >
         {count}
       </span>

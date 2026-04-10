@@ -30,20 +30,20 @@ body {
   --text-muted: #666666;
 
   /* Accents fitness */
-  --green: #00ffc3;
-  --green-dim: rgba(0, 255, 195, 0.1);
-  --accent: #00ffc3;
-  --accent-hover: #00e6b0;
-  --accent-bg: rgba(0, 255, 195, 0.1);
-  --accent-text: #00ffc3;
-  --accent-secondary: #00bf93;
+  --green: #0589d6;
+  --green-dim: rgba(5, 137, 214, 0.1);
+  --accent: #0589d6;
+  --accent-hover: #0472b3;
+  --accent-bg: rgba(5, 137, 214, 0.1);
+  --accent-text: #0589d6;
+  --accent-secondary: #0472b3;
 
   /* Macros */
-  --color-protein: #00ffc3;
-  --color-carbs: #00ffc3;
-  --color-fat: #00ffc3;
+  --color-protein: #0589d6;
+  --color-carbs: #0589d6;
+  --color-fat: #0589d6;
 
-  --success: #2a9d6e;
+  --success: #0589d6;
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.12);
 
@@ -60,25 +60,25 @@ body {
   --radius-sm: 12px;
 
   /* CTA */
-  --cta-bg: #1b2e1d;
-  --cta-text: #2a9d6e;
+  --cta-bg: #0d1f2d;
+  --cta-text: #0589d6;
 
   /* Gradients */
   --bg-gradient: #111927;
-  --grad-workout: linear-gradient(135deg, #001a14 0%, #00ffc3 100%);
+  --grad-workout: linear-gradient(135deg, #001429 0%, #0589d6 100%);
   --grad-btn-accent: linear-gradient(
     135deg,
-    #001a14 0%,
-    #004d3a 40%,
-    #00ffc3 100%
+    #001429 0%,
+    #024a7a 40%,
+    #0589d6 100%
   );
-  --grad-sleep: linear-gradient(135deg, #001a14 0%, #111111 70%);
-  --grad-header-line: linear-gradient(to right, #004d3a, #00ffc3, transparent);
-  --grad-monday: linear-gradient(135deg, #00ffc322 0%, #000000 100%);
+  --grad-sleep: linear-gradient(135deg, #001429 0%, #111111 70%);
+  --grad-header-line: linear-gradient(to right, #024a7a, #0589d6, transparent);
+  --grad-monday: linear-gradient(135deg, #0589d622 0%, #000000 100%);
 
   /* Bar warm (workout actif) */
-  --bar-from: #00ffc3;
-  --bar-to: #00e6b0;
+  --bar-from: #0589d6;
+  --bar-to: #0472b3;
 }
 
 @theme inline {
