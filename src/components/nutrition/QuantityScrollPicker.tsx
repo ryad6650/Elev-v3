@@ -10,6 +10,11 @@ interface Props {
   step?: number;
   suffix?: string;
   compact?: boolean;
+  visible?: number;
+  itemHeight?: number;
+  hideHighlight?: boolean;
+  bgColor?: string;
+  gradientHeight?: number;
   onCenterTap?: () => void;
   editing?: boolean;
   editValue?: string;
@@ -26,6 +31,11 @@ export default function QuantityScrollPicker({
   step = 1,
   suffix,
   compact,
+  visible: visibleProp,
+  itemHeight: itemHeightProp,
+  hideHighlight,
+  bgColor,
+  gradientHeight,
   onCenterTap,
   editing,
   editValue,
@@ -33,8 +43,8 @@ export default function QuantityScrollPicker({
   onEditConfirm,
   inputRef,
 }: Props) {
-  const ITEM_H = compact ? 46 : 52;
-  const VISIBLE = compact ? 3 : 5;
+  const ITEM_H = itemHeightProp ?? (compact ? 46 : 52);
+  const VISIBLE = visibleProp ?? (compact ? 3 : 5);
   const half = Math.floor(VISIBLE / 2);
 
   const touchRef = useRef<{
@@ -133,27 +143,30 @@ export default function QuantityScrollPicker({
         position: "relative",
         touchAction: "none",
         userSelect: "none",
+        perspective: `${ITEM_H * VISIBLE * 1.2}px`,
       }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       {/* Centre highlight */}
-      <div
-        style={{
-          position: "absolute",
-          top: ITEM_H * half,
-          height: ITEM_H,
-          left: 8,
-          right: 8,
-          background: "var(--accent-bg)",
-          borderRadius: 14,
-          border:
-            "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
-          zIndex: 0,
-          boxShadow:
-            "0 0 12px color-mix(in srgb, var(--accent) 10%, transparent)",
-        }}
-      />
+      {!hideHighlight && (
+        <div
+          style={{
+            position: "absolute",
+            top: ITEM_H * half,
+            height: ITEM_H,
+            left: 8,
+            right: 8,
+            background: "var(--accent-bg)",
+            borderRadius: 14,
+            border:
+              "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
+            zIndex: 0,
+            boxShadow:
+              "0 0 12px color-mix(in srgb, var(--accent) 10%, transparent)",
+          }}
+        />
+      )}
       {/* Gradient haut */}
       <div
         style={{
@@ -161,9 +174,8 @@ export default function QuantityScrollPicker({
           top: 0,
           left: 0,
           right: 0,
-          height: ITEM_H * half,
-          background:
-            "linear-gradient(to bottom, var(--bg-secondary) 10%, transparent)",
+          height: gradientHeight ?? ITEM_H * half,
+          background: `linear-gradient(to bottom, ${bgColor ?? "var(--bg-secondary)"} 10%, transparent)`,
           zIndex: 2,
           pointerEvents: "none",
         }}
@@ -175,9 +187,8 @@ export default function QuantityScrollPicker({
           bottom: 0,
           left: 0,
           right: 0,
-          height: ITEM_H * half,
-          background:
-            "linear-gradient(to top, var(--bg-secondary) 10%, transparent)",
+          height: gradientHeight ?? ITEM_H * half,
+          background: `linear-gradient(to top, ${bgColor ?? "var(--bg-secondary)"} 10%, transparent)`,
           zIndex: 2,
           pointerEvents: "none",
         }}
@@ -207,6 +218,7 @@ export default function QuantityScrollPicker({
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
+                transform: `rotateX(${i * 12}deg)`,
               }}
             >
               <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
@@ -251,21 +263,9 @@ export default function QuantityScrollPicker({
                   <>
                     <span
                       style={{
-                        fontSize: isCenter
-                          ? compact
-                            ? 26
-                            : 30
-                          : dist === 1
-                            ? compact
-                              ? 19
-                              : 22
-                            : compact
-                              ? 13
-                              : 15,
-                        fontWeight: isCenter ? 800 : dist === 1 ? 600 : 400,
-                        color: isCenter
-                          ? "var(--accent-text)"
-                          : "var(--text-secondary)",
+                        fontSize: compact ? 18 : 17,
+                        fontWeight: isCenter ? 700 : 400,
+                        color: isCenter ? "#C2C2C3" : "var(--text-secondary)",
                         opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
                         transition: "font-size 0.1s, opacity 0.1s",
                         lineHeight: 1,

@@ -1,10 +1,155 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, Heart, Pencil, Plus, Minus } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronDown, Star, Pencil } from "lucide-react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
-import FoodNutritionCard from "./FoodNutritionCard";
-import { useUiStore } from "@/store/uiStore";
+import QuantityScrollPicker from "@/components/nutrition/QuantityScrollPicker";
+
+const PICK_ITEM_H = 40;
+const PICK_VISIBLE = 7;
+const PICK_HALF = Math.floor(PICK_VISIBLE / 2);
+
+function UnitScrollColumn({
+  units,
+  value,
+  onChange,
+}: {
+  units: string[];
+  value: number;
+  onChange: (idx: number) => void;
+}) {
+  const touchRef = useRef<{ startY: number; startVal: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const valueRef = useRef(value);
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    function handleTouchMove(e: TouchEvent) {
+      if (!touchRef.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const dy = e.touches[0].clientY - touchRef.current.startY;
+      const mod = ((dy % PICK_ITEM_H) + PICK_ITEM_H) % PICK_ITEM_H;
+      setDragOffset(mod > PICK_ITEM_H / 2 ? mod - PICK_ITEM_H : mod);
+      const steps = -Math.round(dy / PICK_ITEM_H);
+      const newVal = Math.max(
+        0,
+        Math.min(units.length - 1, touchRef.current.startVal + steps),
+      );
+      if (newVal !== valueRef.current) onChange(newVal);
+    }
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", handleTouchMove);
+  }, [units.length, onChange]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        height: PICK_ITEM_H * PICK_VISIBLE,
+        overflow: "hidden",
+        position: "relative",
+        touchAction: "none",
+        userSelect: "none",
+        perspective: `${PICK_ITEM_H * PICK_VISIBLE * 1.2}px`,
+      }}
+      onTouchStart={(e) => {
+        touchRef.current = { startY: e.touches[0].clientY, startVal: value };
+        setDragOffset(0);
+        setDragging(true);
+      }}
+      onTouchEnd={() => {
+        touchRef.current = null;
+        setDragOffset(0);
+        setDragging(false);
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 28,
+          background: "linear-gradient(to bottom, #212121 10%, transparent)",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 28,
+          background: "linear-gradient(to top, #212121 10%, transparent)",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          transform: `translateY(${dragOffset}px)`,
+          transition: dragging ? "none" : "transform 0.12s ease-out",
+          zIndex: 1,
+        }}
+      >
+        {Array.from({ length: PICK_VISIBLE }, (_, i) => i - PICK_HALF).map(
+          (offset) => {
+            const idx = value + offset;
+            const valid = idx >= 0 && idx < units.length;
+            const dist = Math.abs(offset);
+            return (
+              <div
+                key={offset}
+                style={{
+                  height: PICK_ITEM_H,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  paddingLeft: 8,
+                  paddingRight: 12,
+                  transform: `rotateX(${offset * 12}deg)`,
+                }}
+              >
+                {valid && (
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: offset === 0 ? 700 : 400,
+                      color: offset === 0 ? "#C2C2C3" : "var(--text-secondary)",
+                      opacity: offset === 0 ? 1 : dist === 1 ? 0.5 : 0.25,
+                      lineHeight: 1,
+                      textAlign: "center",
+                      fontFamily: "var(--font-sans)",
+                      transition: dragging
+                        ? "none"
+                        : "font-size 0.1s, opacity 0.1s",
+                    }}
+                  >
+                    {units[idx]}
+                  </span>
+                )}
+              </div>
+            );
+          },
+        )}
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   aliment: NutritionAliment;
@@ -18,6 +163,13 @@ interface Props {
   confirmLabel?: string;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+}
+
+function fmt(v: number) {
+  if (v === 0) return "0";
+  if (v < 1) return v.toFixed(2);
+  if (v < 10) return v.toFixed(1);
+  return String(Math.round(v));
 }
 
 export default function FoodDetailSheet({
@@ -35,18 +187,16 @@ export default function FoodDetailSheet({
 }: Props) {
   const portionG = aliment.taille_portion_g ?? 0;
   const hasPortion = portionG > 0;
-  const initMode =
+  const initMode: "g" | "portion" =
     initialPortionQty != null && hasPortion
-      ? ("portion" as const)
-      : initialQuantity && !initialPortionQty
-        ? ("g" as const)
-        : hasPortion
-          ? ("portion" as const)
-          : ("g" as const);
+      ? "portion"
+      : hasPortion && !initialQuantity
+        ? "portion"
+        : "g";
   const initVal = initialQuantity
     ? initMode === "portion" && initialPortionQty != null
       ? initialPortionQty
-      : initMode === "portion" && portionG > 0
+      : initMode === "portion"
         ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
         : initialQuantity
     : hasPortion
@@ -54,444 +204,432 @@ export default function FoodDetailSheet({
       : 100;
 
   const [mode, setMode] = useState<"g" | "portion">(initMode);
-  const [pickerVal, setPickerVal] = useState(initVal);
+  const [val, setVal] = useState(initVal);
   const [fav, setFav] = useState(isFavorite ?? false);
-  const [editing, setEditing] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+  const handleDragRef = useRef<{ startY: number } | null>(null);
+  const prevGValRef = useRef(initVal);
 
-  useEffect(() => {
-    setFullscreenModal(true);
-    return () => setFullscreenModal(false);
-  }, [setFullscreenModal]);
+  function onHandleTouchStart(e: React.TouchEvent) {
+    handleDragRef.current = { startY: e.touches[0].clientY };
+  }
 
-  const step = mode === "portion" ? 0.5 : 10;
-  const max = mode === "portion" ? 20 : 2000;
-  const min = mode === "portion" ? 0.5 : 1;
-  const qty = mode === "portion" ? pickerVal * portionG : pickerVal;
-  const scale = qty / 100;
+  function onHandleTouchEnd(e: React.TouchEvent) {
+    if (!handleDragRef.current) return;
+    const dy = e.changedTouches[0].clientY - handleDragRef.current.startY;
+    handleDragRef.current = null;
+    if (dy < -15) setShowPicker(true);
+    else if (dy > 15) setShowPicker(false);
+    else setShowPicker((p) => !p);
+  }
+
+  const qtyG = mode === "portion" ? val * portionG : val;
+  const scale = qtyG / 100;
   const cal = Math.round(aliment.calories * scale);
   const prot = Math.round((aliment.proteines ?? 0) * scale * 10) / 10;
   const gluc = Math.round((aliment.glucides ?? 0) * scale * 10) / 10;
   const lip = Math.round((aliment.lipides ?? 0) * scale * 10) / 10;
-  const F = "var(--font-nunito), sans-serif";
+  const unitLabel =
+    mode === "portion" ? (aliment.portion_nom ?? "portion") : "g";
+
+  const macros = [
+    { val: cal, unit: "kcal", label: "Calories" },
+    { val: gluc, unit: "g", label: "Glucides" },
+    { val: prot, unit: "g", label: "Protéines" },
+    { val: lip, unit: "g", label: "Lipides" },
+  ];
+
+  const nutriRows: { label: string; val: string; sub?: boolean }[] = [
+    { label: "Calories", val: `${cal} kcal` },
+    { label: "Protéines", val: `${prot} g` },
+    { label: "Glucides", val: `${gluc} g` },
+    {
+      label: "Fibres alimentaires",
+      val:
+        aliment.fibres != null
+          ? `${fmt((aliment.fibres * qtyG) / 100)} g`
+          : "—",
+      sub: true,
+    },
+    {
+      label: "Sucre",
+      val:
+        aliment.sucres != null
+          ? `${fmt((aliment.sucres * qtyG) / 100)} g`
+          : "—",
+      sub: true,
+    },
+    { label: "Lipides", val: `${lip} g` },
+    ...(aliment.sel != null
+      ? [
+          {
+            label: "Sel",
+            val: `${fmt((aliment.sel * qtyG) / 100)} g`,
+            sub: true,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: "var(--bg-gradient)" }}
+      style={{ background: "#111927" }}
     >
       <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
-        <TopBar
-          onBack={onBack}
-          onEdit={onEdit}
-          fav={fav}
-          onToggleFav={
-            onToggleFavorite
-              ? () => {
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-5 pb-3 shrink-0"
+          style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
+        >
+          <button
+            onClick={onBack}
+            className="p-1 active:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={26} style={{ color: "var(--text-primary)" }} />
+          </button>
+          <span
+            className="text-[17px] font-semibold"
+            style={{
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-sans)",
+            }}
+          >
+            {mealLabel}
+          </span>
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="p-1 active:opacity-70 transition-opacity"
+              >
+                <Pencil size={20} style={{ color: "var(--text-secondary)" }} />
+              </button>
+            )}
+            {onToggleFavorite ? (
+              <button
+                onClick={() => {
                   setFav((f) => !f);
                   onToggleFavorite();
-                }
-              : undefined
-          }
-        />
+                }}
+                className="p-1 active:opacity-70 transition-opacity"
+              >
+                <Star
+                  size={22}
+                  fill={fav ? "#FACC15" : "none"}
+                  style={{ color: fav ? "#FACC15" : "#FACC15" }}
+                />
+              </button>
+            ) : (
+              <div className="w-9" />
+            )}
+          </div>
+        </div>
 
         <div
-          className="flex-1 overflow-y-auto px-5 pb-2 min-h-0"
-          style={
-            {
-              overscrollBehavior: "contain",
-              scrollbarWidth: "none",
-            } as React.CSSProperties
-          }
+          className="flex-1 overflow-y-auto min-h-0 pb-2"
+          style={{ scrollbarWidth: "none" } as React.CSSProperties}
+          onClick={() => {
+            if (showPicker) setShowPicker(false);
+          }}
         >
-          {/* Name + brand centered */}
-          <div className="mb-[18px]">
+          {/* Hero */}
+          <div
+            className="flex flex-col items-center px-5 py-16"
+            style={{
+              background: "linear-gradient(to right, #404040 0%, #242424 100%)",
+            }}
+          >
             <p
-              className="text-[22px] font-semibold text-center leading-tight"
-              style={{ fontFamily: F, color: "var(--text-primary)" }}
+              className="text-[20px] font-bold text-center leading-tight"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
+              }}
             >
               {aliment.nom}
             </p>
             {aliment.marque && (
               <p
-                className="text-[15px] font-medium text-center mt-[5px]"
-                style={{ fontFamily: F, color: "var(--text-muted)" }}
+                className="text-[15px] text-center mt-2"
+                style={{
+                  color: "var(--text-secondary)",
+                  fontFamily: "var(--font-sans)",
+                }}
               >
                 {aliment.marque}
               </p>
             )}
           </div>
 
-          {/* Macros card: kcal | G | P | L */}
-          <MacrosCard cal={cal} gluc={gluc} prot={prot} lip={lip} />
+          {/* Macros */}
+          <div className="flex px-4 py-5 mb-2">
+            {macros.map((m, i) => (
+              <div key={m.label} className="contents">
+                <div className="flex-1 flex flex-col items-center gap-1.5 px-1">
+                  <span
+                    className="text-[21px] leading-none"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily:
+                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {m.val}
+                    <span
+                      className="text-[13px] ml-0.5"
+                      style={{
+                        color: "var(--text-primary)",
+                        fontFamily:
+                          "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {m.unit}
+                    </span>
+                  </span>
+                  <span
+                    className="text-[12px] text-center leading-tight"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily:
+                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {m.label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          {/* Portion button */}
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="w-full flex items-center justify-between mb-5 active:opacity-80"
+          {/* Valeurs nutritives */}
+          <div className="px-4 pb-8">
+            <p
+              className="text-[17px] font-bold mb-4"
               style={{
-                padding: "18px 20px",
-                borderRadius: "var(--radius-sm)",
-                background: "var(--glass-bg)",
-                backdropFilter: "var(--glass-blur)",
-                border: hasPortion
-                  ? "1px solid var(--glass-border)"
-                  : "1.5px dashed rgba(0,0,0,0.10)",
-                cursor: "pointer",
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-sans)",
               }}
             >
-              <div className="flex items-center gap-[10px]">
+              Valeurs nutritives
+            </p>
+            <div>
+              {nutriRows.map((r, i) => (
                 <div
-                  className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center"
-                  style={{ background: "rgba(42,157,110,0.10)" }}
+                  key={r.label + i}
+                  className={`flex items-center justify-between ${r.sub ? "py-[4px]" : "py-[10px]"}`}
+                  style={{
+                    borderBottom: "none",
+                  }}
                 >
-                  {hasPortion ? (
-                    <Pencil size={16} style={{ color: "var(--green)" }} />
-                  ) : (
-                    <Plus size={18} style={{ color: "var(--green)" }} />
-                  )}
+                  <span
+                    className="text-[15px]"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily:
+                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+                      fontWeight: 400,
+                      paddingLeft: r.sub ? 12 : 0,
+                    }}
+                  >
+                    {r.label}
+                  </span>
+                  <span
+                    className="text-[15px]"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily:
+                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {r.val}
+                  </span>
                 </div>
-                <span
-                  className="text-[15px] font-semibold"
-                  style={{ fontFamily: F, color: "var(--text-secondary)" }}
-                >
-                  {hasPortion ? "Modifier la portion" : "Ajouter une portion"}
-                </span>
-              </div>
-              <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-                ›
-              </span>
-            </button>
-          )}
-
-          <FoodNutritionCard
-            aliment={aliment}
-            qty={qty}
-            cal={cal}
-            prot={prot}
-            gluc={gluc}
-            lip={lip}
-          />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Bottom bar */}
-        <BottomBar
-          mode={mode}
-          setMode={setMode}
-          pickerVal={pickerVal}
-          setPickerVal={setPickerVal}
-          editing={editing}
-          setEditing={setEditing}
-          inputRef={inputRef}
-          step={step}
-          min={min}
-          max={max}
-          hasPortion={hasPortion}
-          portionLabel={aliment.portion_nom ?? "portion"}
-          portionG={portionG}
-          qty={qty}
-          pending={pending}
-          confirmLabel={confirmLabel}
-          mealLabel={mealLabel}
-          onConfirm={() =>
-            onConfirm(qty, mode === "portion" ? pickerVal : null)
-          }
-        />
-      </div>
-    </div>
-  );
-}
-
-function TopBar({
-  onBack,
-  onEdit,
-  fav,
-  onToggleFav,
-}: {
-  onBack: () => void;
-  onEdit?: () => void;
-  fav: boolean;
-  onToggleFav?: () => void;
-}) {
-  return (
-    <div
-      className="flex items-center justify-between px-5 pb-2 shrink-0"
-      style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
-    >
-      <RoundBtn onClick={onBack}>
-        <ChevronLeft size={14} style={{ color: "var(--text-secondary)" }} />
-      </RoundBtn>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{
-          fontFamily: "var(--font-nunito), sans-serif",
-          color: "var(--text-muted)",
-        }}
-      >
-        Fiche produit
-      </span>
-      <div className="flex gap-2">
-        {onEdit && (
-          <RoundBtn onClick={onEdit}>
-            <Pencil size={14} style={{ color: "var(--text-secondary)" }} />
-          </RoundBtn>
-        )}
-        {onToggleFav && (
-          <RoundBtn onClick={onToggleFav}>
-            <Heart
-              size={14}
-              fill={fav ? "#e06060" : "none"}
-              style={{ color: fav ? "#e06060" : "var(--text-secondary)" }}
-            />
-          </RoundBtn>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MacrosCard({
-  cal,
-  gluc,
-  prot,
-  lip,
-}: {
-  cal: number;
-  gluc: number;
-  prot: number;
-  lip: number;
-}) {
-  const F = "var(--font-nunito), sans-serif";
-  const items = [
-    { val: cal, label: "kcal", color: "var(--text-primary)" },
-    { val: gluc, label: "Glucides", color: "var(--color-carbs)" },
-    { val: prot, label: "Protéines", color: "var(--color-protein)" },
-    { val: lip, label: "Lipides", color: "var(--color-fat)" },
-  ];
-  return (
-    <div
-      className="flex items-center rounded-[20px] mb-5 p-[26px_16px]"
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "var(--glass-blur)",
-        WebkitBackdropFilter: "var(--glass-blur)",
-        border: "1px solid var(--glass-border)",
-      }}
-    >
-      {items.map((m, i) => (
-        <div key={m.label} className="contents">
-          {i > 0 && (
+        <div
+          className="shrink-0 px-4 pt-3 flex flex-col gap-2"
+          style={{
+            paddingBottom: "max(28px, env(safe-area-inset-bottom))",
+            background: "#212121",
+            borderTop: "1px solid var(--border)",
+          }}
+        >
+          <div
+            className="flex justify-center mb-1 py-1 cursor-pointer"
+            onTouchStart={onHandleTouchStart}
+            onTouchEnd={onHandleTouchEnd}
+            onClick={() => setShowPicker((p) => !p)}
+          >
             <div
-              className="w-px h-[42px] shrink-0"
-              style={{ background: "rgba(0,0,0,0.06)" }}
+              style={{
+                width: 56,
+                height: 4,
+                borderRadius: 2,
+                background: "rgba(255,255,255,0.3)",
+              }}
             />
-          )}
-          <div className="flex-1 flex flex-col items-center gap-[5px]">
-            <span
-              className="text-[24px] font-bold leading-none"
-              style={{ fontFamily: F, color: m.color }}
-            >
-              {m.val}
-            </span>
-            <span
-              className="text-[11px] font-semibold uppercase tracking-[0.04em]"
-              style={{ fontFamily: F, color: "var(--text-muted)" }}
-            >
-              {m.label}
-            </span>
           </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function RoundBtn({
-  onClick,
-  children,
-}: {
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-9 h-9 rounded-full flex items-center justify-center"
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "var(--glass-blur)",
-        border: "1px solid var(--glass-border)",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function BottomBar({
-  mode,
-  setMode,
-  pickerVal,
-  setPickerVal,
-  editing,
-  setEditing,
-  inputRef,
-  step,
-  min,
-  max,
-  hasPortion,
-  portionLabel,
-  portionG,
-  qty,
-  pending,
-  confirmLabel,
-  mealLabel,
-  onConfirm,
-}: {
-  mode: "g" | "portion";
-  setMode: (m: "g" | "portion") => void;
-  pickerVal: number;
-  setPickerVal: (fn: (v: number) => number) => void;
-  editing: boolean;
-  setEditing: (v: boolean) => void;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  step: number;
-  min: number;
-  max: number;
-  hasPortion: boolean;
-  portionLabel: string;
-  portionG: number;
-  qty: number;
-  pending?: boolean;
-  confirmLabel?: string;
-  mealLabel: string;
-  onConfirm: () => void;
-}) {
-  const F = "var(--font-nunito), sans-serif";
-  return (
-    <div
-      className="shrink-0 flex flex-col gap-3 px-6 pt-[14px]"
-      style={{
-        paddingBottom: "max(16px, env(safe-area-inset-bottom))",
-        background: "rgba(255,255,255,0.7)",
-        backdropFilter: "blur(16px)",
-        borderTop: "1px solid rgba(0,0,0,0.04)",
-      }}
-    >
-      {/* Tabs */}
-      <div
-        className="flex rounded-[10px] p-[3px] gap-[2px]"
-        style={{ background: "rgba(0,0,0,0.04)" }}
-      >
-        <button
-          onClick={() => {
-            setMode("g");
-            setPickerVal(() => 100);
-          }}
-          className="flex-1 py-[7px] rounded-lg text-[12px] font-semibold text-center"
-          style={{
-            fontFamily: F,
-            background: mode === "g" ? "#fff" : "transparent",
-            color: mode === "g" ? "var(--text-primary)" : "var(--text-muted)",
-            boxShadow: mode === "g" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
-          }}
-        >
-          Grammes
-        </button>
-        <button
-          onClick={() => {
-            if (hasPortion) {
-              setMode("portion");
-              setPickerVal(() => 1);
-            }
-          }}
-          className="flex-1 py-[7px] rounded-lg text-[12px] font-semibold text-center"
-          style={{
-            fontFamily: F,
-            background: mode === "portion" ? "#fff" : "transparent",
-            color:
-              mode === "portion" ? "var(--text-primary)" : "var(--text-muted)",
-            opacity: hasPortion ? 1 : 0.4,
-            boxShadow:
-              mode === "portion" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
-          }}
-        >
-          {hasPortion ? `${portionLabel} (${portionG}g)` : "Portion"}
-        </button>
-      </div>
-      {/* Qty row */}
-      <div className="flex items-center justify-center">
-        <button
-          onClick={() => setPickerVal((v) => Math.max(min, v - step))}
-          className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.04)" }}
-        >
-          <Minus size={18} style={{ color: "var(--text-secondary)" }} />
-        </button>
-        <div className="flex items-baseline justify-center gap-1 min-w-[120px]">
-          {editing ? (
-            <input
-              ref={inputRef}
-              type="number"
-              inputMode="decimal"
-              defaultValue={pickerVal}
-              onBlur={(e) => {
-                const v = parseFloat(e.target.value);
-                if (!isNaN(v) && v >= min && v <= max)
-                  setPickerVal(() =>
-                    mode === "portion" ? Math.round(v * 2) / 2 : Math.round(v),
-                  );
-                setEditing(false);
+          <div className="flex gap-[2px]">
+            <div
+              className="rounded-l-2xl overflow-hidden"
+              style={{
+                background: "#3d3d3d",
+                border: "1px solid rgba(255,255,255,0.08)",
+                width: "28%",
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-              }}
-              className="w-[60px] text-center text-[28px] font-bold outline-none bg-transparent [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-              style={{ fontFamily: F, color: "var(--text-primary)" }}
-              autoFocus
-            />
-          ) : (
+            >
+              <input
+                ref={inputRef}
+                type="number"
+                inputMode="numeric"
+                value={val}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  if (!isNaN(v) && v > 0)
+                    setVal(
+                      mode === "portion"
+                        ? Math.round(v * 2) / 2
+                        : Math.round(v),
+                    );
+                }}
+                onFocus={(e) => e.target.select()}
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                className="w-full bg-transparent text-[15px] font-semibold text-right pr-3 outline-none py-[6px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                style={{
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-sans)",
+                }}
+              />
+            </div>
             <button
               onClick={() => {
-                setEditing(true);
-                setTimeout(() => inputRef.current?.select(), 10);
+                if (!hasPortion) return;
+                const newMode = mode === "g" ? "portion" : "g";
+                if (newMode === "portion") {
+                  prevGValRef.current = val;
+                  setVal(1);
+                } else setVal(prevGValRef.current);
+                setMode(newMode);
               }}
-              className="text-[28px] font-bold text-center w-[60px] bg-transparent border-none"
-              style={{ fontFamily: F, color: "var(--text-primary)" }}
+              className="flex-1 rounded-r-2xl flex items-center justify-between px-5 py-[6px] active:opacity-70 transition-opacity"
+              style={{
+                background: "#3d3d3d",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
             >
-              {pickerVal}
+              <span
+                className="text-[15px] font-medium"
+                style={{
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                {unitLabel}
+              </span>
+              {hasPortion && (
+                <ChevronDown size={16} style={{ color: "var(--text-muted)" }} />
+              )}
             </button>
-          )}
-          <span
-            className="text-[14px] font-semibold"
-            style={{ fontFamily: F, color: "var(--text-muted)" }}
+          </div>
+          <button
+            onClick={() => onConfirm(qtyG, mode === "portion" ? val : null)}
+            disabled={pending}
+            className="w-full block py-[15px] rounded-full text-[16px] font-bold active:scale-[0.98] transition-transform"
+            style={{
+              background: "#0589D6",
+              color: "#ffffff",
+              opacity: pending ? 0.6 : 1,
+              fontFamily: "var(--font-sans)",
+            }}
           >
-            {mode === "portion" ? portionLabel : "g"}
-          </span>
+            {pending ? "Ajout..." : (confirmLabel ?? "Ajouter")}
+          </button>
         </div>
-        <button
-          onClick={() => setPickerVal((v) => Math.min(max, v + step))}
-          className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(42,157,110,0.10)" }}
-        >
-          <Plus size={18} style={{ color: "var(--green)" }} />
-        </button>
+
+        {/* Picker sheet — en dessous de la bottom bar, glisse depuis le bas */}
+        {(() => {
+          const portionLabel = aliment.portion_nom
+            ? `${aliment.portion_nom} (${portionG}g)`
+            : `portion (${portionG}g)`;
+          const units = hasPortion ? ["g", portionLabel] : ["g"];
+          const unitIdx = mode === "g" ? 0 : 1;
+          return (
+            <div
+              className="shrink-0 overflow-hidden"
+              style={{
+                maxHeight: showPicker ? PICK_ITEM_H * PICK_VISIBLE : 0,
+                transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1)",
+                background: "#212121",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  height: PICK_ITEM_H * PICK_VISIBLE,
+                  position: "relative",
+                }}
+              >
+                {/* Shared center highlight */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top:
+                      PICK_ITEM_H * PICK_HALF +
+                      Math.floor((PICK_ITEM_H - 36) / 2),
+                    height: 36,
+                    left: 8,
+                    right: 8,
+                    background: "#303032",
+                    borderRadius: 10,
+                    zIndex: 0,
+                    pointerEvents: "none",
+                  }}
+                />
+                {/* Left: quantity scroll */}
+                <div style={{ width: "50%", position: "relative", zIndex: 1 }}>
+                  <QuantityScrollPicker
+                    value={val}
+                    onChange={setVal}
+                    min={1}
+                    max={mode === "portion" ? 100 : 2000}
+                    step={mode === "portion" ? 0.5 : 1}
+                    visible={7}
+                    itemHeight={PICK_ITEM_H}
+                    hideHighlight
+                    bgColor="#212121"
+                    gradientHeight={20}
+                  />
+                </div>
+                {/* Right: unit scroll */}
+                <div style={{ width: "50%", position: "relative", zIndex: 1 }}>
+                  <UnitScrollColumn
+                    units={units}
+                    value={unitIdx}
+                    onChange={(idx) => {
+                      const newMode = idx === 0 ? "g" : "portion";
+                      if (newMode === "portion") {
+                        prevGValRef.current = val;
+                        setVal(1);
+                      } else setVal(prevGValRef.current);
+                      setMode(newMode);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
-      {/* Add button */}
-      <button
-        onClick={onConfirm}
-        disabled={pending}
-        className="w-full py-[14px] rounded-[12px] text-[14px] font-semibold text-white active:scale-[0.98] transition-transform"
-        style={{
-          fontFamily: F,
-          background: "var(--green)",
-          opacity: pending ? 0.6 : 1,
-        }}
-      >
-        {pending ? "Ajout..." : (confirmLabel ?? `Ajouter au ${mealLabel}`)}
-      </button>
     </div>
   );
 }
