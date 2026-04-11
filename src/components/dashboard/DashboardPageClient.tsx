@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { DashboardData } from "@/lib/dashboard";
@@ -24,11 +22,6 @@ interface Props {
 }
 
 export default function DashboardPageClient({ initialData }: Props) {
-  const router = useRouter();
-  useEffect(() => {
-    router.refresh();
-  }, [router]);
-
   const data = initialData;
   const prenom = data.prenom ?? "toi";
 

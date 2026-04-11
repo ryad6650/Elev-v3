@@ -22,21 +22,28 @@ const BARCODE_FORMATS = [
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type QuaggaInstance = any;
 
-/** Charge Quagga2 depuis le CDN (une seule fois) */
+/** Charge Quagga2 depuis le CDN (une seule fois, promise partagée) */
+let quaggaPromise: Promise<QuaggaInstance> | null = null;
+
 function loadQuagga(): Promise<QuaggaInstance> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const w = window as any;
   if (w.Quagga) return Promise.resolve(w.Quagga);
+  if (quaggaPromise) return quaggaPromise;
 
-  return new Promise((resolve, reject) => {
+  quaggaPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = QUAGGA_CDN;
     script.async = true;
     script.onload = () =>
       w.Quagga ? resolve(w.Quagga) : reject(new Error("Quagga non chargé"));
-    script.onerror = () => reject(new Error("Échec chargement Quagga CDN"));
+    script.onerror = () => {
+      quaggaPromise = null;
+      reject(new Error("Échec chargement Quagga CDN"));
+    };
     document.head.appendChild(script);
   });
+  return quaggaPromise;
 }
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
@@ -69,7 +76,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         advanced: [{ torch: next }],
       });
       setTorch(next);
-    } catch {}
+    } catch (e) {
+      console.warn("Torch non disponible:", e);
+    }
   }, [torch]);
 
   useEffect(() => {
@@ -159,7 +168,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       trackRef.current = null;
       try {
         Q?.stop();
-      } catch {}
+      } catch (e) {
+        console.warn("Quagga stop échoué:", e);
+      }
     };
   }, [stableOnDetected]);
 

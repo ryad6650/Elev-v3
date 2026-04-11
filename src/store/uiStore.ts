@@ -12,6 +12,11 @@ export const useUiStore = create<UiStore>((set) => ({
   setFullscreenModal: (open) =>
     set((s) => {
       const next = s._fullscreenCount + (open ? 1 : -1);
+      if (next < 0 && process.env.NODE_ENV === "development") {
+        console.warn(
+          "uiStore: fullscreenCount négatif — un composant a appelé setFullscreenModal(false) sans open correspondant",
+        );
+      }
       const count = Math.max(0, next);
       return { _fullscreenCount: count, fullscreenModal: count > 0 };
     }),

@@ -56,8 +56,8 @@ function MealRing({ pct }: { pct: number }) {
 interface Props {
   meal: Meal;
   calorieObjectif: number;
-  onAdd: () => void;
-  onMealClick: () => void;
+  onAdd: (meal: Meal) => void;
+  onMealClick: (meal: Meal) => void;
 }
 
 export default memo(function MealSection({
@@ -104,7 +104,7 @@ export default memo(function MealSection({
       {/* Texte — clic pour ouvrir le détail */}
       <button
         className="flex-1 text-left active:opacity-70 transition-opacity"
-        onClick={onMealClick}
+        onClick={() => onMealClick(meal)}
       >
         <div
           style={{
@@ -133,8 +133,8 @@ export default memo(function MealSection({
 
       {/* Bouton + */}
       <button
-        onClick={onAdd}
-        className="active:scale-95 transition-transform flex items-center justify-center"
+        onClick={() => onAdd(meal)}
+        className="active:scale-90 transition-all duration-150 ease-out flex items-center justify-center hover:scale-110"
         style={{
           width: 34,
           height: 34,

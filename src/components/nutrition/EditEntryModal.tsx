@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FoodDetailSheet from "./FoodDetailSheet";
 import NutriInfoForm from "./NutriInfoForm";
 import { useNutritionStore } from "@/store/nutritionStore";
@@ -23,17 +23,22 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
   const [step, setStep] = useState<"detail" | "edit">("detail");
   const [aliment, setAliment] = useState<NutritionAliment>(entry.aliment);
+  const mountedRef = useRef(true);
 
   const isCustom = !!aliment.id && aliment.is_global === false;
   const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
 
   useEffect(() => {
+    mountedRef.current = true;
     document.body.style.overflow = "hidden";
     setFullscreenModal(true);
     getFavoriteIds()
-      .then((ids) => setFavIds(new Set(ids)))
+      .then((ids) => {
+        if (mountedRef.current) setFavIds(new Set(ids));
+      })
       .catch(() => {});
     return () => {
+      mountedRef.current = false;
       document.body.style.overflow = "";
       setFullscreenModal(false);
     };
@@ -44,6 +49,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     quantitePortion: number | null,
   ) {
     if (pending) return;
+    setPending(true);
     const alimentChanged = aliment.id !== entry.aliment.id;
 
     // Si l'aliment a changé (fork), mettre à jour le store AVANT updateEntry
@@ -59,11 +65,12 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     const updatePromise = updateEntry(entry.id, quantite, quantitePortion);
 
     if (alimentChanged) {
-      setPending(true);
       await Promise.all([
         updatePromise,
         updateEntryAlimentId(entry.id, aliment.id),
       ]);
+    } else {
+      await updatePromise;
     }
 
     onClose();
@@ -71,6 +78,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
 
   async function handleToggleFavorite() {
     if (!aliment.id) return;
+    const prev = favIds;
     const next = new Set(favIds);
     if (next.has(aliment.id)) next.delete(aliment.id);
     else next.add(aliment.id);
@@ -78,7 +86,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
     try {
       await toggleFavoriteAliment(aliment.id);
     } catch {
-      setFavIds(favIds);
+      if (mountedRef.current) setFavIds(prev);
     }
   }
 

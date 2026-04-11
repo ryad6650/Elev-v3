@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar } from "lucide-react";
 import NutritionHeader from "./NutritionHeader";
@@ -82,6 +82,15 @@ export default function NutritionPageClient({ initialData }: Props) {
       (num) => map.get(num) ?? { meal_number: num, meal_time: "", entries: [] },
     );
   }, [mealsFromEntries]);
+
+  const handleMealAdd = useCallback((meal: Meal) => {
+    setModalMealTime(meal.meal_time || new Date().toISOString());
+    setModalMeal(meal.meal_number);
+  }, []);
+
+  const handleMealClick = useCallback((meal: Meal) => {
+    setViewMeal(meal);
+  }, []);
 
   const isToday = date === today;
   const dateTitle = isToday
@@ -284,13 +293,8 @@ export default function NutritionPageClient({ initialData }: Props) {
                 <MealSection
                   meal={meal}
                   calorieObjectif={displayProfile.objectif_calories ?? 2000}
-                  onAdd={() => {
-                    setModalMealTime(
-                      meal.meal_time || new Date().toISOString(),
-                    );
-                    setModalMeal(meal.meal_number);
-                  }}
-                  onMealClick={() => setViewMeal(meal)}
+                  onAdd={handleMealAdd}
+                  onMealClick={handleMealClick}
                 />
               </div>
             ))}

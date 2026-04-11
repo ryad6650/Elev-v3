@@ -78,16 +78,16 @@ export async function fetchNutritionData(
       taille_portion_g: number | null;
     } | null;
   };
-  const entries: NutritionEntry[] = (entriesRes.data ?? ([] as RawEntry[])).map(
-    (e: RawEntry) => ({
+  const entries: NutritionEntry[] = (entriesRes.data ?? ([] as RawEntry[]))
+    .filter((e: RawEntry) => e.aliments !== null)
+    .map((e: RawEntry) => ({
       id: e.id,
       meal_number: e.meal_number,
       meal_time: e.meal_time,
       quantite_g: e.quantite_g,
       quantite_portion: e.quantite_portion,
       aliment: e.aliments as NutritionAliment,
-    }),
-  );
+    }));
 
   const profileData = profileRes.data;
 
@@ -103,8 +103,8 @@ export async function fetchNutritionData(
   const frequents = [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 20)
-    .map(([id]) => alimentMap.get(id)!)
-    .filter(Boolean);
+    .map(([id]) => alimentMap.get(id))
+    .filter((a): a is NutritionAliment => !!a);
 
   return {
     entries,

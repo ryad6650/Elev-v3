@@ -62,6 +62,7 @@ export function calcNutrients(aliment: NutritionAliment, quantite_g: number) {
 export function sumEntries(entries: NutritionEntry[]) {
   return entries.reduce(
     (acc, e) => {
+      if (!e.aliment) return acc;
       const n = calcNutrients(e.aliment, e.quantite_g);
       return {
         calories: acc.calories + n.calories,

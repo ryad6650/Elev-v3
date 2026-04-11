@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { MoreVertical } from "lucide-react";
 import type { Routine } from "@/lib/workout";
 
 interface Props {
   routine: Routine;
   onOptions: () => void;
-  onStart: () => void;
+  onStart: () => Promise<void> | void;
   onView: () => void;
 }
 
@@ -16,7 +17,19 @@ export default function RoutineCard({
   onStart,
   onView,
 }: Props) {
+  const [isStarting, setIsStarting] = useState(false);
   const exerciceText = routine.exerciceNoms.join(", ");
+
+  const handleStart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isStarting) return;
+    setIsStarting(true);
+    try {
+      await onStart();
+    } finally {
+      setIsStarting(false);
+    }
+  };
 
   return (
     <div
@@ -76,11 +89,9 @@ export default function RoutineCard({
 
       {/* Bouton Commencer */}
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onStart();
-        }}
-        className="w-full py-3.5 rounded-2xl font-semibold active:scale-[0.98] transition-transform"
+        onClick={handleStart}
+        disabled={isStarting}
+        className={`w-full py-3.5 rounded-2xl font-semibold transition-all duration-200 ${isStarting ? "scale-[0.97] opacity-80" : "active:scale-[0.97]"}`}
         style={{
           background: "var(--accent)",
           fontFamily: "var(--font-nunito), sans-serif",
@@ -89,7 +100,22 @@ export default function RoutineCard({
           border: "none",
         }}
       >
-        Commencer la Routine
+        {isStarting ? (
+          <span className="flex items-center justify-center gap-2">
+            <span
+              className="animate-spin rounded-full border-2"
+              style={{
+                width: 16,
+                height: 16,
+                borderColor: "rgba(255,255,255,0.3)",
+                borderTopColor: "white",
+              }}
+            />
+            Chargement...
+          </span>
+        ) : (
+          "Commencer la Routine"
+        )}
       </button>
     </div>
   );

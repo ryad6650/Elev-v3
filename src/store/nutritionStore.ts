@@ -54,6 +54,7 @@ function getSupabase() {
 }
 
 let cachedUserId: string | null = null;
+let fetchDayRequestId = 0;
 
 async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId) return cachedUserId;
@@ -72,11 +73,12 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   hasFetched: false,
 
   fetchDay: async (date: string) => {
+    const requestId = ++fetchDayRequestId;
     set({ isLoading: true, date });
 
     const userId = await getCurrentUserId();
-    if (!userId) {
-      set({ isLoading: false });
+    if (!userId || requestId !== fetchDayRequestId) {
+      if (requestId === fetchDayRequestId) set({ isLoading: false });
       return;
     }
 
@@ -100,6 +102,9 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .single(),
     ]);
 
+    // Ignorer la réponse si une requête plus récente a été lancée
+    if (requestId !== fetchDayRequestId) return;
+
     if (entriesRes.error || profileRes.error) {
       set({ isLoading: false });
       return;
@@ -114,16 +119,16 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       aliments: NutritionAliment | null;
     };
 
-    const entries: NutritionEntry[] = (
-      (entriesRes.data ?? []) as RawEntry[]
-    ).map((e) => ({
-      id: e.id,
-      meal_number: e.meal_number,
-      meal_time: e.meal_time,
-      quantite_g: e.quantite_g,
-      quantite_portion: e.quantite_portion,
-      aliment: e.aliments as NutritionAliment,
-    }));
+    const entries: NutritionEntry[] = ((entriesRes.data ?? []) as RawEntry[])
+      .filter((e) => e.aliments !== null)
+      .map((e) => ({
+        id: e.id,
+        meal_number: e.meal_number,
+        meal_time: e.meal_time,
+        quantite_g: e.quantite_g,
+        quantite_portion: e.quantite_portion,
+        aliment: e.aliments as NutritionAliment,
+      }));
 
     const p = profileRes.data;
     const profile: NutritionProfile = {
@@ -257,10 +262,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   },
 
   removeEntry: async (id: string) => {
-    // Capturer l'entrée + sa position pour rollback correct
+    // Capturer l'entrée + l'id de l'entrée suivante pour rollback stable
     const entries = get().entries;
     const removedIndex = entries.findIndex((e) => e.id === id);
     const removedEntry = removedIndex >= 0 ? entries[removedIndex] : null;
+    const nextEntryId =
+      removedIndex >= 0 && removedIndex < entries.length - 1
+        ? entries[removedIndex + 1].id
+        : null;
 
     // 1. Suppression optimiste immédiate
     set((s) => ({
@@ -278,10 +287,17 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       .eq("user_id", userId);
 
     if (error && removedEntry) {
-      // Rollback : réinsérer à la bonne position
+      // Rollback : réinsérer avant l'entrée qui suivait (par id, pas par index)
       set((s) => {
         const copy = [...s.entries];
-        copy.splice(removedIndex, 0, removedEntry);
+        const insertAt = nextEntryId
+          ? copy.findIndex((e) => e.id === nextEntryId)
+          : -1;
+        if (insertAt >= 0) {
+          copy.splice(insertAt, 0, removedEntry);
+        } else {
+          copy.push(removedEntry);
+        }
         return { entries: copy };
       });
     } else {
@@ -292,18 +308,21 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
   updateAlimentInEntries: (alimentId, aliment) => {
     set((s) => ({
       entries: s.entries.map((e) =>
-        e.aliment.id === alimentId ? { ...e, aliment } : e,
+        e.aliment?.id === alimentId ? { ...e, aliment } : e,
       ),
     }));
   },
 
   setEntries: (entries) => set({ entries }),
-  reset: () =>
+  reset: () => {
+    _supabase = null;
+    cachedUserId = null;
     set({
       entries: [],
       profile: DEFAULT_PROFILE,
       date: "",
       isLoading: false,
       hasFetched: false,
-    }),
+    });
+  },
 }));

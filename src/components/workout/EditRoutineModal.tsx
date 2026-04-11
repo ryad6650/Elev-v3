@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, Plus, Dumbbell } from "lucide-react";
+import { Plus, Dumbbell, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { updateRoutine, getRoutineExercises } from "@/app/actions/routines";
 import ExerciseSearch from "./ExerciseSearch";
 import EditExerciseModal from "./EditExerciseModal";
 import ExerciseEditMenu from "./ExerciseEditMenu";
 import RoutineExerciseCard from "./RoutineExerciseCard";
-import { getGroupeColor } from "./exerciseColors";
 import { useUiStore } from "@/store/uiStore";
 import { useRoutineExercises } from "@/hooks/useRoutineExercises";
 import type { RawExercise } from "@/hooks/useRoutineExercises";
@@ -140,9 +139,6 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
     );
   }
 
-  const totalSeries = exercices.reduce((s, e) => s + e.seriesCible, 0);
-  const groupes = [...new Set(exercices.map((e) => e.groupeMusculaire))];
-
   const renderEditMenu = (i: number) => (
     <ExerciseEditMenu
       isOpen={menuIndex === i}
@@ -156,6 +152,10 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
         setReplaceIndex(i);
         setShowSearch(true);
       }}
+      onRemove={() => {
+        setMenuIndex(null);
+        remove(i);
+      }}
       onClose={() => setMenuIndex(null)}
     />
   );
@@ -163,39 +163,44 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
   return (
     <div
       className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col overflow-hidden"
-      style={{ background: "var(--bg-gradient)", height: "100dvh" }}
+      style={{ background: "#000000", height: "100dvh" }}
     >
-      {/* Header */}
+      {/* Header iOS-style */}
       <div
-        className="px-4 pb-4 border-b"
+        className="relative flex items-center px-4 pb-3"
         style={{
-          borderColor: "rgba(0,0,0,0.06)",
-          paddingTop: "max(1.25rem, env(safe-area-inset-top))",
+          paddingTop: "max(1rem, env(safe-area-inset-top))",
+          background: "#1C1C1E",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div className="flex items-center gap-2 mb-4">
-          <button
-            onClick={onClose}
-            className="p-1.5 -ml-1.5 rounded-lg active:scale-95"
-          >
-            <ChevronLeft size={22} style={{ color: "var(--text-primary)" }} />
-          </button>
-          <span
-            className="text-[11px] font-semibold uppercase tracking-wider"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Modifier la routine
+        <button
+          onClick={onClose}
+          className="text-left active:opacity-60 transition-opacity shrink-0 z-10"
+        >
+          <span className="text-[17px]" style={{ color: "#008CFF" }}>
+            Annuler
           </span>
-          <div className="flex-1" />
-          <button
-            onClick={handleSave}
-            disabled={saving || !nom.trim()}
-            className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
-            style={{ background: "var(--accent)", color: "white" }}
-          >
-            {saving ? "Sauvegarde..." : "Sauvegarder"}
-          </button>
-        </div>
+        </button>
+        <span
+          className="absolute inset-x-0 text-center text-[17px] font-semibold pointer-events-none"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Modifier la routine
+        </span>
+        <div className="flex-1" />
+        <button
+          onClick={handleSave}
+          disabled={saving || !nom.trim()}
+          className="whitespace-nowrap px-4 py-1.5 rounded-xl text-[15px] font-semibold active:opacity-70 transition-opacity disabled:opacity-40 z-10"
+          style={{ background: "#008CFF", color: "white" }}
+        >
+          {saving ? "..." : "Mettre à jour"}
+        </button>
+      </div>
+
+      {/* Routine name */}
+      <div className="flex items-center gap-3 px-4 py-4">
         <input
           type="text"
           value={nom}
@@ -204,48 +209,35 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
             setErreur("");
           }}
           placeholder="Nom de la routine"
-          className="w-full bg-transparent outline-none mb-3"
+          className="flex-1 bg-transparent outline-none"
           style={{
-            fontFamily: "var(--font-nunito), sans-serif",
+            fontFamily: "var(--font-sans)",
             fontWeight: 700,
             color: "var(--text-primary)",
-            fontSize: "24px",
+            fontSize: "22px",
             lineHeight: "1.2",
           }}
         />
-        {erreur && (
-          <p className="text-xs mt-1 mb-2" style={{ color: "#c94444" }}>
-            {erreur}
-          </p>
-        )}
-        {exercices.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            {groupes.map((g) => {
-              const c = getGroupeColor(g);
-              return (
-                <span
-                  key={g}
-                  className="text-[10px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full"
-                  style={{ background: c.bg, color: c.text }}
-                >
-                  {g}
-                </span>
-              );
-            })}
-            <span
-              className="text-[11px] ml-auto"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {exercices.length} exo{exercices.length > 1 ? "s" : ""} ·{" "}
-              {totalSeries} série{totalSeries > 1 ? "s" : ""}
-            </span>
-          </div>
+        {nom && (
+          <button
+            onClick={() => setNom("")}
+            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 active:opacity-70 transition-opacity"
+            style={{ background: "#48484A" }}
+          >
+            <X size={13} color="white" />
+          </button>
         )}
       </div>
+      {erreur && (
+        <p className="text-xs px-4 -mt-2 mb-2" style={{ color: "#EF4444" }}>
+          {erreur}
+        </p>
+      )}
+      <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }} />
 
       {/* Liste */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-3 pb-6"
+        className="flex-1 min-h-0 overflow-y-auto pb-6"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {loading && (
@@ -283,21 +275,22 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
           />
         ))}
         {!loading && (
-          <button
-            onClick={() => {
-              setReplaceIndex(null);
-              setShowSearch(true);
-            }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98] border-2 border-dashed"
-            style={{
-              borderColor: "color-mix(in srgb, var(--accent) 30%, transparent)",
-              color: "var(--accent)",
-              background: "color-mix(in srgb, var(--accent) 6%, transparent)",
-            }}
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            Ajouter un exercice
-          </button>
+          <div className="px-4 pt-1 pb-6">
+            <button
+              onClick={() => {
+                setReplaceIndex(null);
+                setShowSearch(true);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-[15px] font-semibold transition-all active:opacity-70"
+              style={{
+                background: "#008CFF",
+                color: "white",
+              }}
+            >
+              <Plus size={18} strokeWidth={2.5} />
+              Ajouter un exercice
+            </button>
+          </div>
         )}
       </div>
 

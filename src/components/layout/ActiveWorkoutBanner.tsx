@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { useWorkoutStore, type ActiveWorkout } from "@/store/workoutStore";
+import { useShallow } from "zustand/react/shallow";
 
 const subscribe = () => () => {};
 const getSnapshot = () => true;
@@ -110,9 +111,13 @@ export default function ActiveWorkoutBanner() {
     getSnapshot,
     getServerSnapshot,
   );
-  const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
-  const isMinimized = useWorkoutStore((s) => s.isMinimized);
-  const maximizeWorkout = useWorkoutStore((s) => s.maximizeWorkout);
+  const { activeWorkout, isMinimized, maximizeWorkout } = useWorkoutStore(
+    useShallow((s) => ({
+      activeWorkout: s.activeWorkout,
+      isMinimized: s.isMinimized,
+      maximizeWorkout: s.maximizeWorkout,
+    })),
+  );
   const pathname = usePathname();
   const router = useRouter();
 

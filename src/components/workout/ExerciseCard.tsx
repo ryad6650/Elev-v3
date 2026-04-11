@@ -1,14 +1,14 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import { Timer } from "lucide-react";
+import { Timer, MoreVertical } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import type { WorkoutSet } from "@/store/workoutStore";
 import { saveExerciseRest, saveExerciseNote } from "@/app/actions/routines";
-import SetRow from "./SetRow";
+import SwipeableSetRow from "./SwipeableSetRow";
 import SetsHeader from "./SetsHeader";
 import RestDurationPicker from "./RestDurationPicker";
-import ExerciseMenu from "./ExerciseMenu";
+import ExerciseMenuSheet from "./ExerciseMenu";
 import ExerciseGif from "./ExerciseGif";
 
 function formatRest(s: number): string {
@@ -38,7 +38,9 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
     (s) => s.setExerciseRestDuration,
   );
   const setExerciseNote = useWorkoutStore((s) => s.setExerciseNote);
+  const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const [showPicker, setShowPicker] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleToggle = useCallback(
     (set: WorkoutSet) => {
@@ -113,10 +115,23 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         >
           {exercise.nom}
         </span>
-        <ExerciseMenu
-          onReplace={() => onReplace?.(uid)}
-          onDelete={() => removeExercise(uid)}
-        />
+        <button
+          onClick={() => setShowMenu(true)}
+          className="p-1.5 rounded-lg transition-opacity active:opacity-70"
+          style={{ color: "var(--text-muted)" }}
+        >
+          <MoreVertical size={18} />
+        </button>
+        {showMenu && (
+          <ExerciseMenuSheet
+            onReorganize={() => {}}
+            onReplace={() => onReplace?.(uid)}
+            onAddSuperset={() => {}}
+            onAddWarmup={() => addWarmupSets(uid)}
+            onDelete={() => removeExercise(uid)}
+            onClose={() => setShowMenu(false)}
+          />
+        )}
       </div>
 
       {/* Notes */}
@@ -159,7 +174,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
       {/* Tableau séries */}
       <SetsHeader />
       {exercise.sets.map((set, i) => (
-        <SetRow
+        <SwipeableSetRow
           key={set.id}
           set={set}
           index={i}
@@ -245,4 +260,7 @@ function ClosedCard({
   );
 }
 
-export default memo(ExerciseCard);
+export default memo(
+  ExerciseCard,
+  (prev, next) => prev.uid === next.uid && prev.isOpen === next.isOpen,
+);

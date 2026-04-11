@@ -53,6 +53,7 @@ export default function AddFoodModal({
   const addEntry = useNutritionStore((s) => s.addEntry);
 
   const [step, setStep] = useState<Step>("search");
+  const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [lastUsed, setLastUsed] = useState<Record<string, number>>({});
@@ -73,29 +74,40 @@ export default function AddFoodModal({
   useEffect(() => {
     document.body.style.overflow = "hidden";
     setFullscreenModal(true);
+    const t = requestAnimationFrame(() => setIsVisible(true));
     return () => {
+      cancelAnimationFrame(t);
       document.body.style.overflow = "";
       setFullscreenModal(false);
     };
   }, [setFullscreenModal]);
 
   useEffect(() => {
+    let ignore = false;
     Promise.all([
       getRecentAliments().catch(() => [] as NutritionAliment[]),
       getFavoriteAliments().catch(() => [] as NutritionAliment[]),
     ]).then(([r, favAliments]) => {
+      if (ignore) return;
       setRecents(r as NutritionAliment[]);
       const aliments = favAliments as NutritionAliment[];
       setFavoris(aliments);
       setFavoriteIds(new Set(aliments.map((a) => a.id)));
       setLoadingInitial(false);
     });
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const search = useCallback(async (q: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/aliments?q=${encodeURIComponent(q)}`);
+      if (!res.ok) {
+        setResults([]);
+        return;
+      }
       const data = await res.json();
       setResults(Array.isArray(data) ? data : []);
     } catch {
@@ -121,6 +133,10 @@ export default function AddFoodModal({
       const res = await fetch(
         `/api/aliments?barcode=${encodeURIComponent(code)}`,
       );
+      if (!res.ok) {
+        setQuery(code);
+        return;
+      }
       const data: NutritionAliment[] = await res.json();
       if (data.length > 0) handleSelect(data[0]);
       else setQuery(code);
@@ -135,15 +151,21 @@ export default function AddFoodModal({
   }
 
   async function handleQuickAdd(aliment: NutritionAliment) {
-    const qty = lastUsed[aliment.id] ?? aliment.taille_portion_g ?? 100;
-    let alimentId = aliment.id;
-    if (!alimentId && aliment.source === "openfoodfacts") {
-      const { id } = await upsertExternalAliment(aliment);
-      alimentId = id;
+    if (pending) return;
+    setPending(true);
+    try {
+      const qty = lastUsed[aliment.id] ?? aliment.taille_portion_g ?? 100;
+      let alimentId = aliment.id;
+      if (!alimentId && aliment.source === "openfoodfacts") {
+        const { id } = await upsertExternalAliment(aliment);
+        alimentId = id;
+      }
+      addEntry(mealNumber, aliment, alimentId, qty, date, mealTime, null);
+      setLastUsed((prev) => ({ ...prev, [alimentId]: qty }));
+      setSessionCount((c) => c + 1);
+    } finally {
+      setPending(false);
     }
-    addEntry(mealNumber, aliment, alimentId, qty, date, mealTime, null);
-    setLastUsed((prev) => ({ ...prev, [alimentId]: qty }));
-    setSessionCount((c) => c + 1);
   }
 
   async function handleConfirm(
@@ -221,10 +243,12 @@ export default function AddFoodModal({
       className="fixed inset-0 z-50 flex flex-col"
       style={{
         background: isBeige ? "var(--bg-gradient)" : "#111927",
-        transform: isClosing ? "translateY(100%)" : "translateY(0)",
-        opacity: isClosing ? 0 : 1,
-        transition:
-          "transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease",
+        transform:
+          isClosing || !isVisible ? "translateY(100%)" : "translateY(0)",
+        opacity: isClosing ? 0 : isVisible ? 1 : 0,
+        transition: isVisible
+          ? "transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease"
+          : "none",
       }}
     >
       <div className="w-full h-full max-w-[430px] mx-auto flex flex-col relative">

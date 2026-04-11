@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useLayoutEffect } from "react";
-import { Pencil, Settings, ArrowLeftRight } from "lucide-react";
+import { MoreVertical, Settings, ArrowLeftRight, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   onToggle: () => void;
   onEdit: () => void;
   onReplace: () => void;
+  onRemove: () => void;
   onClose: () => void;
 }
 
@@ -17,6 +18,7 @@ export default function ExerciseEditMenu({
   onToggle,
   onEdit,
   onReplace,
+  onRemove,
   onClose,
 }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -33,46 +35,64 @@ export default function ExerciseEditMenu({
       <button
         ref={btnRef}
         onClick={onToggle}
-        className="p-1.5 rounded-lg"
-        style={{ color: "var(--accent-text)" }}
+        className="p-2 rounded-lg active:opacity-60 transition-opacity"
+        style={{ color: "var(--text-secondary)" }}
       >
-        <Pencil size={14} />
+        <MoreVertical size={18} />
       </button>
       {isOpen &&
         createPortal(
           <>
             <div className="fixed inset-0 z-[70]" onClick={onClose} />
             <div
-              className="fixed z-[70] w-56 rounded-xl py-1 shadow-lg"
+              className="fixed z-[70] w-56 rounded-2xl overflow-hidden shadow-xl"
               style={{
                 top: pos.top,
                 right: pos.right,
-                background: "rgba(255,255,255,0.5)",
-                border: "1px solid rgba(0,0,0,0.06)",
+                background: "#1C1C1E",
+                border: "1px solid rgba(255,255,255,0.08)",
               }}
             >
               <button
                 onClick={onEdit}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold"
-                style={{ color: "var(--text-primary)" }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:opacity-60 transition-opacity"
               >
-                <Settings size={14} style={{ color: "var(--accent-text)" }} />
-                Modifier les informations
+                <Settings size={16} style={{ color: "#008CFF" }} />
+                <span
+                  className="text-[15px]"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Modifier les informations
+                </span>
               </button>
               <div
-                className="mx-3 h-px"
-                style={{ background: "var(--border)" }}
+                className="mx-4 h-px"
+                style={{ background: "rgba(255,255,255,0.08)" }}
               />
               <button
                 onClick={onReplace}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-xs font-semibold"
-                style={{ color: "var(--text-primary)" }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:opacity-60 transition-opacity"
               >
-                <ArrowLeftRight
-                  size={14}
-                  style={{ color: "var(--accent-text)" }}
-                />
-                Changer l&apos;exercice actuel
+                <ArrowLeftRight size={16} style={{ color: "#008CFF" }} />
+                <span
+                  className="text-[15px]"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Changer l&apos;exercice
+                </span>
+              </button>
+              <div
+                className="mx-4 h-px"
+                style={{ background: "rgba(255,255,255,0.08)" }}
+              />
+              <button
+                onClick={onRemove}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:opacity-60 transition-opacity"
+              >
+                <Trash2 size={16} style={{ color: "#EF4444" }} />
+                <span className="text-[15px]" style={{ color: "#EF4444" }}>
+                  Retirer l&apos;exercice
+                </span>
               </button>
             </div>
           </>,

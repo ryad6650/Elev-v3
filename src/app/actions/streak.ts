@@ -3,6 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { getTodayString, getNDaysAgo } from "@/lib/date-utils";
+import { guardSupabase } from "@/lib/supabase/guard";
 
 /**
  * Met à jour le streak de connexions de l'utilisateur.
@@ -31,13 +32,15 @@ export async function updateConnexionStreak(
   }
 
   if (derniereConnexion !== today) {
-    await supabase
-      .from("profiles")
-      .update({
-        streak_connexions: streakConnexions,
-        derniere_connexion: today,
-      })
-      .eq("id", userId);
+    guardSupabase(
+      await supabase
+        .from("profiles")
+        .update({
+          streak_connexions: streakConnexions,
+          derniere_connexion: today,
+        })
+        .eq("id", userId),
+    );
   }
 
   return streakConnexions;

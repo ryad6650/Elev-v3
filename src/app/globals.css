@@ -136,6 +136,12 @@ body {
 }
 
 /* Page transition animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes page-enter {
   from {
     opacity: 0;
@@ -195,6 +201,12 @@ input,
 select,
 textarea {
   font-size: 16px;
+}
+
+/* Supprime le trait rouge natif des inputs invalides (browser validation UI) */
+input:invalid {
+  box-shadow: none;
+  outline: none;
 }
 
 /* Scrollbar */

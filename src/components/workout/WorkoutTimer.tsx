@@ -47,16 +47,22 @@ export default function WorkoutTimer({
   large = false,
   compact = false,
 }: Props) {
-  const [elapsed, setElapsed] = useState(() =>
+  const [liveElapsed, setLiveElapsed] = useState(() =>
     calcElapsed(startedAt, pausedAt, totalPausedMs),
   );
 
   useEffect(() => {
     if (pausedAt !== null) return;
     return subscribeSharedTimer(() =>
-      setElapsed(calcElapsed(startedAt, pausedAt, totalPausedMs)),
+      setLiveElapsed(calcElapsed(startedAt, pausedAt, totalPausedMs)),
     );
   }, [startedAt, pausedAt, totalPausedMs]);
+
+  // En pause : valeur figée calculée au render, pas besoin d'effect
+  const elapsed =
+    pausedAt !== null
+      ? calcElapsed(startedAt, pausedAt, totalPausedMs)
+      : liveElapsed;
 
   if (compact) {
     return (

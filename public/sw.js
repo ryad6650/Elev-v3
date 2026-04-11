@@ -64,6 +64,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Requêtes RSC (navigation client-side Next.js, router.refresh()) → réseau direct
+  if (
+    request.headers.get("RSC") === "1" ||
+    request.headers.get("Next-Router-State-Tree")
+  ) {
+    return;
+  }
+
   // Requêtes API (lecture) → network-first avec fallback cache
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(networkFirst(request));

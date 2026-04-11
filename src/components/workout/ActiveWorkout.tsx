@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { ChevronDown, AlarmClock, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
@@ -30,7 +30,7 @@ export default function ActiveWorkout() {
   const exercises = useWorkoutStore(
     useShallow((s) => s.activeWorkout?.exercises ?? []),
   );
-  const exerciseUids = exercises.map((e) => e.uid);
+  const exerciseUids = useMemo(() => exercises.map((e) => e.uid), [exercises]);
   const minimizeWorkout = useWorkoutStore((s) => s.minimizeWorkout);
   const replaceExercise = useWorkoutStore((s) => s.replaceExercise);
   const [showSearch, setShowSearch] = useState(false);
@@ -79,24 +79,31 @@ export default function ActiveWorkout() {
     setShowSearch(true);
   }, []);
 
-  const volume = exercises.reduce(
-    (sum, ex) =>
-      sum +
-      ex.sets
-        .filter((s) => s.completed && !s.isWarmup)
-        .reduce((s2, set) => s2 + (set.poids ?? 0) * (set.reps ?? 0), 0),
-    0,
-  );
-  const totalSeries = exercises.reduce(
-    (sum, ex) => sum + ex.sets.filter((s) => s.completed && !s.isWarmup).length,
-    0,
-  );
+  const { volume, totalSeries } = useMemo(() => {
+    let vol = 0;
+    let series = 0;
+    for (const ex of exercises) {
+      for (const s of ex.sets) {
+        if (s.completed && !s.isWarmup) {
+          vol += (s.poids ?? 0) * (s.reps ?? 0);
+          series++;
+        }
+      }
+    }
+    return { volume: vol, totalSeries: series };
+  }, [exercises]);
 
   if (!isActive) return null;
   if (showSummary) {
     const workout = useWorkoutStore.getState().activeWorkout;
     if (!workout) return null;
-    return <WorkoutSummary workout={workout} totalPausedMs={0} />;
+    return (
+      <WorkoutSummary
+        workout={workout}
+        totalPausedMs={0}
+        onBack={() => setShowSummary(false)}
+      />
+    );
   }
 
   return (
@@ -104,42 +111,43 @@ export default function ActiveWorkout() {
       <div className="min-h-dvh flex flex-col" style={{ background: "#000" }}>
         {/* Header */}
         <div
-          className="shrink-0 flex items-center justify-between px-4"
+          className="shrink-0"
           style={{
-            paddingTop: "max(1rem, env(safe-area-inset-top))",
-            paddingBottom: 12,
             background: "#1C1C1E",
+            paddingTop: "env(safe-area-inset-top)",
           }}
         >
-          <button
-            onClick={minimizeWorkout}
-            className="flex items-center gap-2 active:opacity-70"
-          >
-            <ChevronDown size={22} style={{ color: "var(--text-primary)" }} />
-            <span
-              style={{
-                fontFamily: "var(--font-nunito),sans-serif",
-                fontSize: 20,
-                fontWeight: 700,
-                color: "var(--text-primary)",
-              }}
-            >
-              Entraînement
-            </span>
-          </button>
-          <div className="flex items-center gap-3">
-            <AlarmClock size={22} style={{ color: "var(--text-primary)" }} />
+          <div className="flex items-center justify-between px-4 py-3">
             <button
-              onClick={() => setShowSummary(true)}
-              className="px-5 py-2 rounded-full font-semibold text-[15px] active:scale-[0.97] transition-transform"
-              style={{
-                background: "var(--accent)",
-                color: "#fff",
-                fontFamily: "var(--font-nunito),sans-serif",
-              }}
+              onClick={minimizeWorkout}
+              className="flex items-center gap-2 active:opacity-70"
             >
-              Terminer
+              <ChevronDown size={22} style={{ color: "var(--text-primary)" }} />
+              <span
+                style={{
+                  fontFamily: "var(--font-nunito),sans-serif",
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "var(--text-primary)",
+                }}
+              >
+                Entraînement
+              </span>
             </button>
+            <div className="flex items-center gap-3">
+              <AlarmClock size={22} style={{ color: "var(--text-primary)" }} />
+              <button
+                onClick={() => setShowSummary(true)}
+                className="px-5 py-2 rounded-full font-semibold text-[15px] active:scale-[0.97] transition-transform"
+                style={{
+                  background: "var(--accent)",
+                  color: "#fff",
+                  fontFamily: "var(--font-nunito),sans-serif",
+                }}
+              >
+                Terminer
+              </button>
+            </div>
           </div>
         </div>
 

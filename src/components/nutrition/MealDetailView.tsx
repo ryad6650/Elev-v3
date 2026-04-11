@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, SquarePen, Camera, ChevronRight } from "lucide-react";
-import { sumEntries, calcNutrients } from "@/lib/nutrition-utils";
+import { ChevronLeft, SquarePen, Camera } from "lucide-react";
+import { sumEntries } from "@/lib/nutrition-utils";
 import type {
   Meal,
   NutritionEntry,
   NutritionProfile,
 } from "@/lib/nutrition-utils";
+import SwipeableFoodItem from "./SwipeableFoodItem";
 import { useUiStore } from "@/store/uiStore";
 import MealNutriSection from "./MealNutriSection";
 
@@ -215,60 +216,12 @@ export default function MealDetailView({
                 Aucun aliment dans ce repas
               </p>
             ) : (
-              meal.entries.map((entry) => {
-                const n = calcNutrients(entry.aliment, entry.quantite_g);
-                const subtitle = [
-                  entry.aliment.marque,
-                  `${Math.round(entry.quantite_g)} g`,
-                ]
-                  .filter(Boolean)
-                  .join(", ");
-                return (
-                  <div key={entry.id}>
-                    <button
-                      onClick={() => onFoodClick(entry)}
-                      className="w-full flex items-center justify-between py-3 active:opacity-70 transition-opacity text-left"
-                    >
-                      <div>
-                        <div
-                          className="text-[15px] font-semibold"
-                          style={{
-                            color: "var(--text-primary)",
-                            fontFamily: "var(--font-sans)",
-                          }}
-                        >
-                          {entry.aliment.nom}
-                        </div>
-                        <div
-                          className="text-[13px] mt-0.5"
-                          style={{
-                            color: "var(--text-secondary)",
-                            fontFamily: "var(--font-sans)",
-                          }}
-                        >
-                          {subtitle}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 ml-3 shrink-0">
-                        <span
-                          className="text-[15px] font-semibold"
-                          style={{
-                            color: "var(--text-primary)",
-                            fontFamily: "var(--font-sans)",
-                          }}
-                        >
-                          {n.calories} kcal
-                        </span>
-                        <ChevronRight
-                          size={16}
-                          style={{ color: "var(--text-muted)" }}
-                        />
-                      </div>
-                    </button>
-                    <div style={{ height: 1, background: "#595F60" }} />
-                  </div>
-                );
-              })
+              meal.entries.map((entry) => (
+                <div key={entry.id}>
+                  <SwipeableFoodItem entry={entry} onFoodClick={onFoodClick} />
+                  <div style={{ height: 1, background: "#595F60" }} />
+                </div>
+              ))
             )}
           </div>
 

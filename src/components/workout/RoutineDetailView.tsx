@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, Share, MoreHorizontal, ChevronDown } from "lucide-react";
 import type { Routine } from "@/lib/workout";
@@ -36,12 +36,42 @@ export default function RoutineDetailView({
   const [history, setHistory] = useState<RoutineVolumePoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<ChartTab>("volume");
+  const [isStarting, setIsStarting] = useState(false);
+
+  const handleStart = () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    setTimeout(onStart, 250);
+  };
+
+  const cacheRef = useRef<
+    Map<
+      string,
+      {
+        exercises: RoutineExerciseData[];
+        history: RoutineVolumePoint[];
+        ts: number;
+      }
+    >
+  >(new Map());
 
   useEffect(() => {
+    const cached = cacheRef.current.get(routine.id);
+    if (cached && Date.now() - cached.ts < 60_000) {
+      setExercises(cached.exercises);
+      setHistory(cached.history);
+      setLoading(false);
+      return;
+    }
     Promise.all([
       getRoutineExercises(routine.id),
       getRoutineVolumeHistory(routine.id),
     ]).then(([exs, hist]) => {
+      cacheRef.current.set(routine.id, {
+        exercises: exs,
+        history: hist,
+        ts: Date.now(),
+      });
       setExercises(exs);
       setHistory(hist);
       setLoading(false);
@@ -127,17 +157,18 @@ export default function RoutineDetailView({
               color: "#fff",
               fontSize: 22,
               fontWeight: 700,
-              margin: "16px 0 4px",
+              margin: "12px 0 2px",
             }}
           >
             {routine.nom}
           </h1>
-          <p style={{ color: "#8E8E93", fontSize: 14, margin: "0 0 20px" }}>
+          <p style={{ color: "#8E8E93", fontSize: 14, margin: "0 0 12px" }}>
             Créée par {userName}
           </p>
 
           <button
-            onClick={onStart}
+            onClick={handleStart}
+            disabled={isStarting}
             style={{
               width: "100%",
               background: "#008CFF",
@@ -147,11 +178,32 @@ export default function RoutineDetailView({
               padding: "6px",
               fontSize: 17,
               fontWeight: 600,
-              marginBottom: 24,
-              cursor: "pointer",
+              marginBottom: 16,
+              cursor: isStarting ? "default" : "pointer",
+              transform: isStarting ? "scale(0.97)" : "scale(1)",
+              opacity: isStarting ? 0.85 : 1,
+              transition: "transform 200ms ease, opacity 200ms ease",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
             }}
           >
-            Commencer la Routine
+            {isStarting && (
+              <span
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  border: "2.5px solid rgba(255,255,255,0.3)",
+                  borderTopColor: "#fff",
+                  animation: "spin 0.7s linear infinite",
+                  display: "inline-block",
+                  flexShrink: 0,
+                }}
+              />
+            )}
+            {isStarting ? "Chargement..." : "Commencer la Routine"}
           </button>
 
           {/* Stats + chart */}
@@ -199,7 +251,7 @@ export default function RoutineDetailView({
           </div>
 
           {/* Tabs */}
-          <div style={{ display: "flex", gap: 8, margin: "16px 0 24px" }}>
+          <div style={{ display: "flex", gap: 8, margin: "8px 0 12px" }}>
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
@@ -226,7 +278,7 @@ export default function RoutineDetailView({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: 16,
+              marginBottom: 8,
             }}
           >
             <span style={{ color: "#8E8E93", fontSize: 14 }}>Exercices</span>

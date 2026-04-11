@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
+import { guardSupabase } from "@/lib/supabase/guard";
 
 export interface RoutineExerciseData {
   exerciseId: string;
@@ -214,7 +215,12 @@ export async function updateRoutine(
     .select("id")
     .single();
   if (!owned) throw new Error("Non autorisé");
-  await supabase.from("routine_exercises").delete().eq("routine_id", routineId);
+  guardSupabase(
+    await supabase
+      .from("routine_exercises")
+      .delete()
+      .eq("routine_id", routineId),
+  );
 
   if (exercices.length > 0) {
     const { error: reError } = await supabase.from("routine_exercises").insert(
@@ -239,11 +245,13 @@ export async function deleteRoutine(routineId: string): Promise<void> {
   ]);
   if (!user) throw new Error("Non authentifié");
 
-  await supabase
-    .from("routines")
-    .delete()
-    .eq("id", routineId)
-    .eq("user_id", user.id);
+  guardSupabase(
+    await supabase
+      .from("routines")
+      .delete()
+      .eq("id", routineId)
+      .eq("user_id", user.id),
+  );
   revalidatePath("/workout");
 }
 
@@ -267,27 +275,32 @@ export async function saveExerciseRest(
       .single();
 
     if (existing?.notes) {
-      // Garder la row pour préserver les notes
-      await supabase
-        .from("user_exercise_rest")
-        .update({ rest_duration: 0 })
-        .eq("user_id", user.id)
-        .eq("exercise_id", exerciseId);
+      guardSupabase(
+        await supabase
+          .from("user_exercise_rest")
+          .update({ rest_duration: 0 })
+          .eq("user_id", user.id)
+          .eq("exercise_id", exerciseId),
+      );
     } else {
-      await supabase
-        .from("user_exercise_rest")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("exercise_id", exerciseId);
+      guardSupabase(
+        await supabase
+          .from("user_exercise_rest")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("exercise_id", exerciseId),
+      );
     }
   } else {
-    await supabase.from("user_exercise_rest").upsert(
-      {
-        user_id: user.id,
-        exercise_id: exerciseId,
-        rest_duration: restDuration,
-      },
-      { onConflict: "user_id,exercise_id" },
+    guardSupabase(
+      await supabase.from("user_exercise_rest").upsert(
+        {
+          user_id: user.id,
+          exercise_id: exerciseId,
+          rest_duration: restDuration,
+        },
+        { onConflict: "user_id,exercise_id" },
+      ),
     );
   }
 }
@@ -313,26 +326,32 @@ export async function saveExerciseNote(
       .single();
 
     if (existing && existing.rest_duration > 0) {
-      await supabase
-        .from("user_exercise_rest")
-        .update({ notes: "" })
-        .eq("user_id", user.id)
-        .eq("exercise_id", exerciseId);
+      guardSupabase(
+        await supabase
+          .from("user_exercise_rest")
+          .update({ notes: "" })
+          .eq("user_id", user.id)
+          .eq("exercise_id", exerciseId),
+      );
     } else {
-      await supabase
-        .from("user_exercise_rest")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("exercise_id", exerciseId);
+      guardSupabase(
+        await supabase
+          .from("user_exercise_rest")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("exercise_id", exerciseId),
+      );
     }
   } else {
-    await supabase.from("user_exercise_rest").upsert(
-      {
-        user_id: user.id,
-        exercise_id: exerciseId,
-        notes: trimmed,
-      },
-      { onConflict: "user_id,exercise_id" },
+    guardSupabase(
+      await supabase.from("user_exercise_rest").upsert(
+        {
+          user_id: user.id,
+          exercise_id: exerciseId,
+          notes: trimmed,
+        },
+        { onConflict: "user_id,exercise_id" },
+      ),
     );
   }
 }

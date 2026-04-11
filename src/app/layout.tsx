@@ -1,80 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import {
-  DM_Sans,
-  DM_Serif_Display,
-  Inter,
-  Geist,
-  Geist_Mono,
-  Plus_Jakarta_Sans,
-  Playfair_Display,
-  Sora,
-  IBM_Plex_Mono,
-  Nunito,
-  Lora,
-  Comfortaa,
-} from "next/font/google";
+import { Inter, Nunito, Lora } from "next/font/google";
 import "./globals.css";
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const dmSerifDisplay = DM_Serif_Display({
-  variable: "--font-dm-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-});
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -90,13 +21,6 @@ const lora = Lora({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  display: "swap",
-});
-
-const comfortaa = Comfortaa({
-  variable: "--font-comfortaa",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -130,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${geist.variable} ${geistMono.variable} ${plusJakarta.variable} ${playfair.variable} ${sora.variable} ${ibmPlexMono.variable} ${nunito.variable} ${lora.variable} ${comfortaa.variable}`}
+      className={`${inter.variable} ${nunito.variable} ${lora.variable}`}
     >
       <head>
         <link

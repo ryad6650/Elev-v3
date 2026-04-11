@@ -7,16 +7,17 @@ import {
   ClipboardList,
   Search,
   ChevronDown,
-  Trash2,
   X,
   Pencil,
-  Play,
+  Share,
+  Copy,
 } from "lucide-react";
 
 const RoutineDetailView = dynamic(() => import("./RoutineDetailView"), {
   ssr: false,
 });
 import { useWorkoutStore } from "@/store/workoutStore";
+import { useUiStore } from "@/store/uiStore";
 import { useRouter } from "next/navigation";
 import RoutineCard from "./RoutineCard";
 import { getRoutineExercises, deleteRoutine } from "@/app/actions/routines";
@@ -40,9 +41,20 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
   const [viewRoutine, setViewRoutine] = useState<Routine | null>(null);
   const [deleting, setDeleting] = useState(false);
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+
+  const openMenu = (routine: Routine) => {
+    setMenuRoutine(routine);
+    setFullscreenModal(true);
+  };
+
+  const closeMenu = () => {
+    setMenuRoutine(null);
+    setFullscreenModal(false);
+  };
 
   const handleStartRoutine = async (routine: Routine) => {
-    setMenuRoutine(null);
+    closeMenu();
     try {
       const exercices = await getRoutineExercises(routine.id);
       startWorkout({
@@ -59,7 +71,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
     setDeleting(true);
     try {
       await deleteRoutine(routine.id);
-      setMenuRoutine(null);
+      closeMenu();
       router.refresh();
     } finally {
       setDeleting(false);
@@ -68,7 +80,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
 
   const handleOpenEdit = () => {
     const routine = menuRoutine;
-    setMenuRoutine(null);
+    closeMenu();
     if (routine) setEditRoutine(routine);
   };
 
@@ -171,7 +183,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
               key={routine.id}
               routine={routine}
               onView={() => setViewRoutine(routine)}
-              onOptions={() => setMenuRoutine(routine)}
+              onOptions={() => openMenu(routine)}
               onStart={() => handleStartRoutine(routine)}
             />
           ))}
@@ -192,86 +204,81 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
         </div>
       )}
 
-      {/* Menu options routine */}
+      {/* Menu options routine — bottom sheet */}
       {menuRoutine && (
-        <div
-          className="fixed inset-0 z-40 flex items-end justify-center pb-[88px] px-4"
-          style={{ background: "rgba(0,0,0,0.4)" }}
-          onClick={() => setMenuRoutine(null)}
-        >
+        <div className="fixed inset-0 z-40 flex flex-col justify-end">
+          {/* Overlay */}
           <div
-            className="w-full max-w-[420px] px-4 pb-6 pt-4 rounded-[20px]"
-            style={{
-              background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
-            }}
-            onClick={(e) => e.stopPropagation()}
+            className="absolute inset-0"
+            style={{ background: "rgba(0,0,0,0.55)" }}
+            onClick={closeMenu}
+          />
+
+          {/* Sheet */}
+          <div
+            className="relative rounded-t-[28px] pb-10 px-4"
+            style={{ background: "#161618" }}
           >
-            <div
-              className="w-10 h-1 rounded-full mx-auto mb-4"
-              style={{ background: "rgba(0,0,0,0.08)" }}
-            />
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-4">
+              <div
+                className="w-10 h-[5px] rounded-full"
+                style={{ background: "rgba(255,255,255,0.2)" }}
+              />
+            </div>
+
+            {/* Titre */}
             <p
-              className="text-center font-semibold mb-4 truncate px-4"
+              className="text-center pb-4 truncate px-4"
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                color: "#1C1917",
+                fontFamily: "var(--font-sans), sans-serif",
+                fontSize: 15,
+                fontWeight: 500,
+                color: "var(--text-primary)",
               }}
             >
               {menuRoutine.nom}
             </p>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleStartRoutine(menuRoutine)}
-                className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  background: "var(--accent)",
-                  color: "white",
-                  border: "none",
-                }}
-              >
-                <Play size={16} fill="white" />
-                Lancer cette routine
-              </button>
-              <button
+
+            {/* Actions */}
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ background: "#1C1C1E" }}
+            >
+              <RoutineMenuItem
+                icon={<Share size={22} />}
+                label="Partager la routine"
+                onClick={closeMenu}
+              />
+              <RoutineDivider />
+              <RoutineMenuItem
+                icon={<Copy size={22} />}
+                label="Dupliquer la Routine"
+                onClick={closeMenu}
+              />
+              <RoutineDivider />
+              <RoutineMenuItem
+                icon={<Pencil size={22} />}
+                label="Modifier la Routine"
                 onClick={handleOpenEdit}
-                className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  background: "rgba(255,255,255,0.5)",
-                  color: "#1C1917",
-                  border: "none",
-                }}
-              >
-                <Pencil size={16} />
-                Modifier la routine
-              </button>
+              />
+              <RoutineDivider />
               <button
                 onClick={() => handleDelete(menuRoutine)}
                 disabled={deleting}
-                className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm disabled:opacity-50"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  background: "rgba(255,255,255,0.5)",
-                  color: "#c94444",
-                  border: "none",
-                }}
+                className="w-full flex items-center gap-5 px-5 py-4 active:opacity-60 transition-opacity disabled:opacity-40"
               >
-                <Trash2 size={16} />
-                {deleting ? "Suppression..." : "Supprimer la routine"}
-              </button>
-              <button
-                onClick={() => setMenuRoutine(null)}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl text-sm"
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  color: "#78716C",
-                  background: "none",
-                  border: "none",
-                }}
-              >
-                <X size={15} />
-                Annuler
+                <X size={22} style={{ color: "#EF4444" }} />
+                <span
+                  style={{
+                    fontFamily: "var(--font-sans), sans-serif",
+                    fontSize: 17,
+                    fontWeight: 400,
+                    color: "#EF4444",
+                  }}
+                >
+                  {deleting ? "Suppression..." : "Supprimer la Routine"}
+                </span>
               </button>
             </div>
           </div>
@@ -302,5 +309,43 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
         />
       )}
     </div>
+  );
+}
+
+function RoutineMenuItem({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-5 px-5 py-4 active:opacity-60 transition-opacity"
+    >
+      <span style={{ color: "var(--text-primary)" }}>{icon}</span>
+      <span
+        style={{
+          fontFamily: "var(--font-sans), sans-serif",
+          fontSize: 17,
+          fontWeight: 400,
+          color: "var(--text-primary)",
+        }}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function RoutineDivider() {
+  return (
+    <div
+      className="mx-5 h-px"
+      style={{ background: "rgba(255,255,255,0.08)" }}
+    />
   );
 }

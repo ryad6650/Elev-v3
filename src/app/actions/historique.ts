@@ -150,9 +150,9 @@ export async function updateWorkoutSet(
     .eq("id", setId)
     .single();
 
-  const owner = (set as unknown as { workouts: { user_id: string } })?.workouts
-    ?.user_id;
-  if (owner !== user.id) throw new Error("Non autorisé");
+  const owner = (set as unknown as { workouts: { user_id: string } | null })
+    ?.workouts?.user_id;
+  if (!owner || owner !== user.id) throw new Error("Non autorisé");
 
   const { error } = await supabase
     .from("workout_sets")

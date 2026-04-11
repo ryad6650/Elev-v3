@@ -30,6 +30,7 @@ export default function PoidsPageClient({ initialData }: Props) {
   const [modal, setModal] = useState<{ open: boolean; entry?: PoidsEntry }>({
     open: false,
   });
+  const [error, setError] = useState<string | null>(null);
 
   const refreshData = useCallback(async () => {
     const supabase = createClient();
@@ -37,9 +38,14 @@ export default function PoidsPageClient({ initialData }: Props) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
-    fetchPoidsData(supabase, user.id)
-      .then((d) => setData(d))
-      .catch(console.error);
+    try {
+      const d = await fetchPoidsData(supabase, user.id);
+      setData(d);
+      setError(null);
+    } catch (e) {
+      console.error(e);
+      setError("Impossible de charger les données de poids");
+    }
   }, []);
 
   const optimisticUpsert = useCallback(
@@ -112,6 +118,19 @@ export default function PoidsPageClient({ initialData }: Props) {
           Poids
         </h1>
       </div>
+
+      {error && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm font-medium"
+          style={{
+            background: "rgba(239,68,68,0.12)",
+            color: "#ef4444",
+            marginBottom: 16,
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <PoidsHero
         poidsActuel={current?.poids ?? null}

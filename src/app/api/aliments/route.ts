@@ -79,7 +79,8 @@ async function searchOFF(
     return (data.products ?? [])
       .map(normalizeOFF)
       .filter(Boolean) as NutritionAliment[];
-  } catch {
+  } catch (e) {
+    console.warn("OpenFoodFacts recherche indisponible:", e);
     return [];
   }
 }
@@ -114,8 +115,8 @@ async function searchByBarcode(
       const aliment = normalizeOFF({ ...json.product, code: barcode });
       if (aliment) return [aliment];
     }
-  } catch {
-    /* OFF indisponible */
+  } catch (e) {
+    console.warn("OpenFoodFacts barcode indisponible:", e);
   }
   return [];
 }

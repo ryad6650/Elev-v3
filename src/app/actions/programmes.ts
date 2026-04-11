@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
+import { guardSupabase } from "@/lib/supabase/guard";
 
 interface CreateProgrammeInput {
   nom: string;
@@ -47,7 +48,7 @@ export async function createProgramme(
     }));
 
   if (lignes.length > 0) {
-    await supabase.from("programme_routines").insert(lignes);
+    guardSupabase(await supabase.from("programme_routines").insert(lignes));
   }
 
   revalidatePath("/programmes");
@@ -60,13 +61,15 @@ export async function activerProgramme(programmeId: string): Promise<void> {
   ]);
   if (!user) throw new Error("Non authentifié");
 
-  await supabase
-    .from("profiles")
-    .update({
-      programme_actif_id: programmeId,
-      programme_actif_debut: new Date().toISOString().split("T")[0],
-    })
-    .eq("id", user.id);
+  guardSupabase(
+    await supabase
+      .from("profiles")
+      .update({
+        programme_actif_id: programmeId,
+        programme_actif_debut: new Date().toISOString().split("T")[0],
+      })
+      .eq("id", user.id),
+  );
 
   revalidatePath("/programmes");
   revalidatePath("/dashboard");
@@ -79,10 +82,12 @@ export async function desactiverProgramme(): Promise<void> {
   ]);
   if (!user) throw new Error("Non authentifié");
 
-  await supabase
-    .from("profiles")
-    .update({ programme_actif_id: null, programme_actif_debut: null })
-    .eq("id", user.id);
+  guardSupabase(
+    await supabase
+      .from("profiles")
+      .update({ programme_actif_id: null, programme_actif_debut: null })
+      .eq("id", user.id),
+  );
 
   revalidatePath("/programmes");
   revalidatePath("/dashboard");
@@ -95,10 +100,12 @@ export async function deleteProgramme(programmeId: string): Promise<void> {
   ]);
   if (!user) throw new Error("Non authentifié");
 
-  await supabase
-    .from("programmes")
-    .delete()
-    .eq("id", programmeId)
-    .eq("user_id", user.id);
+  guardSupabase(
+    await supabase
+      .from("programmes")
+      .delete()
+      .eq("id", programmeId)
+      .eq("user_id", user.id),
+  );
   revalidatePath("/programmes");
 }

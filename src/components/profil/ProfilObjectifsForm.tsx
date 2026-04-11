@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { Check } from "lucide-react";
 import { updateObjectifsNutrition } from "@/app/actions/profil";
 import type { ProfilData } from "@/lib/profil";
@@ -34,11 +34,18 @@ export default function ProfilObjectifsForm({ profil }: Props) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Recalcule les glucides automatiquement
   useEffect(() => {
     setGlucides(calcGlucides(calories, proteines, lipides));
   }, [calories, proteines, lipides]);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,7 +65,7 @@ export default function ProfilObjectifsForm({ profil }: Props) {
           objectif_lipides: lipides ? parseFloat(lipides) : null,
         });
         setSuccess(true);
-        setTimeout(() => setSuccess(false), 2000);
+        successTimerRef.current = setTimeout(() => setSuccess(false), 2000);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur");
       }

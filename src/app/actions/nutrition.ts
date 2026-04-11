@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
+import { guardSupabase } from "@/lib/supabase/guard";
 
 /** Invalide le Router Cache pour que les pages affichent les données à jour */
 export async function revalidateDashboard() {
@@ -347,7 +348,7 @@ export async function getFavoriteAliments(): Promise<
   if (!data) return [];
   return (data as unknown as { aliments: EntryWithAliment["aliments"] }[])
     .map((r) => r.aliments)
-    .filter(Boolean);
+    .filter((a): a is NonNullable<EntryWithAliment["aliments"]> => !!a);
 }
 
 export async function toggleFavoriteAliment(
@@ -367,16 +368,20 @@ export async function toggleFavoriteAliment(
     .maybeSingle();
 
   if (existing) {
-    await supabase
-      .from("user_aliment_favorites")
-      .delete()
-      .eq("id", existing.id);
+    guardSupabase(
+      await supabase
+        .from("user_aliment_favorites")
+        .delete()
+        .eq("id", existing.id),
+    );
     return false;
   }
 
-  await supabase
-    .from("user_aliment_favorites")
-    .insert({ user_id: user.id, aliment_id: alimentId });
+  guardSupabase(
+    await supabase
+      .from("user_aliment_favorites")
+      .insert({ user_id: user.id, aliment_id: alimentId }),
+  );
   return true;
 }
 

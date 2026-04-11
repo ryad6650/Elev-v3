@@ -22,6 +22,7 @@ export default function HistoriquePageClient({ initialData }: Props) {
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDetail | null>(
     null,
   );
+  const [error, setError] = useState<string | null>(null);
 
   const reload = async () => {
     const supabase = createClient();
@@ -29,9 +30,14 @@ export default function HistoriquePageClient({ initialData }: Props) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
-    fetchHistoriqueData(supabase, user.id)
-      .then((d) => setData(d))
-      .catch(console.error);
+    try {
+      const d = await fetchHistoriqueData(supabase, user.id);
+      setData(d);
+      setError(null);
+    } catch (e) {
+      console.error(e);
+      setError("Impossible de charger l'historique");
+    }
   };
 
   const handleSelect = async (id: string) => {
@@ -40,6 +46,7 @@ export default function HistoriquePageClient({ initialData }: Props) {
       setSelectedWorkout(detail);
     } catch (e) {
       console.error(e);
+      setError("Impossible de charger le détail de la séance");
     }
   };
 
@@ -86,6 +93,19 @@ export default function HistoriquePageClient({ initialData }: Props) {
           Historique
         </h1>
       </div>
+
+      {error && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm font-medium"
+          style={{
+            background: "rgba(239,68,68,0.12)",
+            color: "#ef4444",
+            marginBottom: 16,
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <HistoriqueStatsCards
         workouts={data.workouts}

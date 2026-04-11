@@ -9,7 +9,10 @@ export async function GET(request: Request) {
   const supabase = await createClient();
 
   if (code) {
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+    }
   }
 
   if (type === "recovery") {

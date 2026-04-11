@@ -122,13 +122,13 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
       <div className="flex items-center justify-center">
         <button
           onClick={() => onToggle(set)}
-          className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-all duration-200"
+          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 active:scale-90"
           style={{
-            background: set.completed ? "#3A3A3C" : "#2C2C2E",
+            background: set.completed ? "#22C55E" : "#2C2C2E",
             border: set.completed ? "none" : "1.5px solid #48484A",
           }}
         >
-          {set.completed && <Check size={11} strokeWidth={3} color="#fff" />}
+          {set.completed && <Check size={15} strokeWidth={2.5} color="#fff" />}
         </button>
       </div>
     </div>
@@ -138,7 +138,16 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
 export default memo(
   SetRow,
   (prev, next) =>
-    prev.set === next.set &&
+    prev.set.id === next.set.id &&
+    prev.set.poids === next.set.poids &&
+    prev.set.reps === next.set.reps &&
+    prev.set.completed === next.set.completed &&
+    prev.set.numSerie === next.set.numSerie &&
+    prev.set.isWarmup === next.set.isWarmup &&
+    prev.set.poidsRef === next.set.poidsRef &&
+    prev.set.repsRef === next.set.repsRef &&
+    prev.set.repsCible === next.set.repsCible &&
+    prev.set.repsCibleMax === next.set.repsCibleMax &&
     prev.isActive === next.isActive &&
     prev.index === next.index,
 );

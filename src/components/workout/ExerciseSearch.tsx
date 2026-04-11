@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Plus, ChevronDown, PenLine } from "lucide-react";
+import { Search, X, TrendingUp, ChevronDown } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import {
   getUserExerciseSettings,
@@ -37,7 +37,6 @@ const GROUPES = [
   "Mollets",
   "Avant-bras",
 ];
-
 const EQUIPEMENTS = [
   "Barre",
   "Haltères",
@@ -49,23 +48,19 @@ const EQUIPEMENTS = [
   "Smith machine",
   "Bande élastique",
 ];
-
-// Badge couleur par équipement
-// Cache résultats exercices (5 min TTL)
 const exerciseCache = new Map<string, { data: Exercise[]; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_MAX_SIZE = 100;
 
-const EQUIPEMENT_COLOR: Record<string, string> = {
-  Barre: "#6366F1",
-  Haltères: "#3B82F6",
-  Machine: "#8B5CF6",
-  "Poulie / Câble": "#06B6D4",
-  "Poids du corps": "#22C55E",
-  Corde: "#F59E0B",
-  Kettlebell: "#c94444",
-  "Smith machine": "#EC4899",
-  "Bande élastique": "#14B8A6",
-};
+const settingsCache = new Map<
+  string,
+  Promise<
+    [
+      Record<string, { restDuration: number | null; notes: string }>,
+      Record<string, { poids: number | null; reps: number | null }>,
+    ]
+  >
+>();
 
 export default function ExerciseSearch({
   onClose,
@@ -84,7 +79,6 @@ export default function ExerciseSearch({
   const addExercise = useWorkoutStore((s) => s.addExercise);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounce saisie texte
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => setDebouncedQ(q), 300);
@@ -93,27 +87,28 @@ export default function ExerciseSearch({
     };
   }, [q]);
 
-  // Fetch exercices avec cache 5 min
   const fetchExercises = useCallback(
     async (search: string, grp: string, equip: string) => {
       const params = new URLSearchParams();
       if (search) params.set("q", search);
       if (grp) params.set("groupe", grp);
       if (equip) params.set("equipement", equip);
-      const cacheKey = params.toString();
-
-      const cached = exerciseCache.get(cacheKey);
-      if (cached && Date.now() - cached.ts < CACHE_TTL) {
-        setResults(cached.data);
+      const key = params.toString();
+      const hit = exerciseCache.get(key);
+      if (hit && Date.now() - hit.ts < CACHE_TTL) {
+        setResults(hit.data);
         return;
       }
-
       setLoading(true);
       try {
         const r = await fetch(`/api/exercises?${params}`);
         const data: Exercise[] = await r.json();
         const list = Array.isArray(data) ? data : [];
-        exerciseCache.set(cacheKey, { data: list, ts: Date.now() });
+        if (exerciseCache.size >= CACHE_MAX_SIZE) {
+          const oldest = exerciseCache.keys().next().value;
+          if (oldest !== undefined) exerciseCache.delete(oldest);
+        }
+        exerciseCache.set(key, { data: list, ts: Date.now() });
         setResults(list);
       } catch {
         setResults([]);
@@ -131,311 +126,183 @@ export default function ExerciseSearch({
   const handleAdd = async (ex: Exercise) => {
     if (onSelect) {
       onSelect(ex);
-    } else {
-      const [settingsMap, refsMap] = await Promise.all([
-        getUserExerciseSettings([ex.id]),
-        getExerciseLastRefs([ex.id]),
-      ]);
-      const s = settingsMap[ex.id];
-      addExercise({
-        exerciseId: ex.id,
-        nom: ex.nom,
-        groupeMusculaire: ex.groupe_musculaire,
-        gifUrl: ex.gif_url,
-        ordre: 0,
-        seriesCible: 3,
-        repsCible: 10,
-        repsCibleMax: null,
-        restDuration: s?.restDuration ?? null,
-        notes: s?.notes ?? "",
-        poidsRef: refsMap[ex.id]?.poids ?? null,
-        repsRef: refsMap[ex.id]?.reps ?? null,
-      });
-      onClose();
+      return;
     }
+    if (!settingsCache.has(ex.id)) {
+      settingsCache.set(
+        ex.id,
+        Promise.all([
+          getUserExerciseSettings([ex.id]),
+          getExerciseLastRefs([ex.id]),
+        ]),
+      );
+    }
+    const [sMap, rMap] = await settingsCache.get(ex.id)!;
+    const s = sMap[ex.id];
+    addExercise({
+      exerciseId: ex.id,
+      nom: ex.nom,
+      groupeMusculaire: ex.groupe_musculaire,
+      gifUrl: ex.gif_url,
+      ordre: 0,
+      seriesCible: 3,
+      repsCible: 10,
+      repsCibleMax: null,
+      restDuration: s?.restDuration ?? null,
+      notes: s?.notes ?? "",
+      poidsRef: rMap[ex.id]?.poids ?? null,
+      repsRef: rMap[ex.id]?.reps ?? null,
+    });
+    onClose();
   };
 
   const handleCreated = (ex: Exercise) => {
     setShowCreate(false);
     handleAdd(ex);
   };
+  const suggested = !q ? results.slice(0, 5) : results;
+  const recents = !q ? results.slice(5) : [];
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col"
-      style={{ background: "var(--bg-gradient)" }}
+      className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col"
+      style={{ background: "#000" }}
     >
-      {/* Header */}
-      <div
-        className="px-4 pb-4 border-b"
-        style={{
-          borderColor: "rgba(0,0,0,0.06)",
-          paddingTop: "max(1.5rem, env(safe-area-inset-top))",
-          background:
-            "linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 100%)",
-        }}
-      >
-        <div className="flex items-center gap-3 mb-3">
+      {/* Header iOS */}
+      <div style={{ paddingTop: "env(safe-area-inset-top)" }}>
+        <div className="flex items-center justify-between px-5 py-3">
           <button
             onClick={onClose}
-            className="p-2 rounded-xl"
-            style={{ background: "rgba(255,255,255,0.5)" }}
+            className="active:opacity-60"
+            style={{ color: "#3B82F6", fontSize: 17 }}
           >
-            <X size={18} style={{ color: "var(--text-primary)" }} />
+            Annuler
           </button>
-          <div className="flex-1" />
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+          <span
             style={{
-              background: "var(--accent-bg)",
-              color: "var(--accent-text)",
+              color: "#fff",
+              fontSize: 17,
+              fontWeight: 600,
+              fontFamily: "var(--font-nunito), sans-serif",
             }}
           >
-            <PenLine size={13} />
+            {title}
+          </span>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="active:opacity-60"
+            style={{ color: "#3B82F6", fontSize: 17 }}
+          >
             Créer
           </button>
         </div>
-        <h2
-          className="text-2xl mb-1"
-          style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            fontWeight: 700,
-            color: "var(--text-primary)",
-          }}
-        >
-          {title}
-        </h2>
       </div>
 
-      <div className="px-4 pt-4 pb-2 space-y-3">
-        {/* Recherche texte */}
+      {/* Search + Filters */}
+      <div className="px-4 pt-1 pb-3 space-y-3">
         <div
-          className="flex items-center gap-2 px-4 py-3 rounded-xl"
-          style={{
-            background: "rgba(255,255,255,0.5)",
-            border: "1px solid var(--border)",
-          }}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl"
+          style={{ background: "#1C1C1E" }}
         >
-          <Search size={16} style={{ color: "var(--text-muted)" }} />
+          <Search size={17} style={{ color: "#636366" }} />
           <input
             autoFocus
             type="text"
-            placeholder="Rechercher un exercice..."
+            placeholder="Chercher un exercice"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-sm"
-            style={{ color: "var(--text-primary)" }}
+            className="flex-1 bg-transparent outline-none"
+            style={{
+              color: "#fff",
+              fontSize: 17,
+              fontFamily: "var(--font-nunito), sans-serif",
+            }}
           />
           {q && (
             <button onClick={() => setQ("")}>
-              <X size={14} style={{ color: "var(--text-muted)" }} />
+              <X size={15} style={{ color: "#636366" }} />
             </button>
           )}
         </div>
 
-        {/* Filtres : Groupe musculaire + Équipement côte à côte */}
-        <div className="flex gap-2">
-          {/* Bouton Groupe musculaire */}
-          <button
-            onClick={() => {
-              setShowGroupe(!showGroupe);
-              setShowEquipement(false);
-            }}
-            className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
-            style={{
-              background: groupe
-                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                : "rgba(255,255,255,0.5)",
-              border: groupe
-                ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
-                : "1px solid var(--border)",
-              color: groupe ? "var(--accent-text)" : "var(--text-secondary)",
-            }}
-          >
-            <span className="truncate">{groupe || "Groupe musculaire"}</span>
-            <ChevronDown
-              size={14}
-              className="shrink-0 ml-1"
-              style={{
-                transform: showGroupe ? "rotate(180deg)" : "none",
-                transition: "200ms",
-              }}
-            />
-          </button>
-
-          {/* Bouton Équipement */}
-          <button
-            onClick={() => {
+        <div className="flex gap-3">
+          <FilterBtn
+            label="Tous les Équipements"
+            value={equipement}
+            open={showEquipement}
+            onToggle={() => {
               setShowEquipement(!showEquipement);
               setShowGroupe(false);
             }}
-            className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
-            style={{
-              background: equipement
-                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                : "rgba(255,255,255,0.5)",
-              border: equipement
-                ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
-                : "1px solid var(--border)",
-              color: equipement
-                ? "var(--accent-text)"
-                : "var(--text-secondary)",
+          />
+          <FilterBtn
+            label="Tous les Muscles"
+            value={groupe}
+            open={showGroupe}
+            onToggle={() => {
+              setShowGroupe(!showGroupe);
+              setShowEquipement(false);
             }}
-          >
-            <span className="truncate">{equipement || "Équipement"}</span>
-            <ChevronDown
-              size={14}
-              className="shrink-0 ml-1"
-              style={{
-                transform: showEquipement ? "rotate(180deg)" : "none",
-                transition: "200ms",
-              }}
-            />
-          </button>
+          />
         </div>
 
-        {/* Dropdown Groupe musculaire */}
-        {showGroupe && (
-          <div className="flex flex-wrap gap-2 pb-1">
-            {GROUPES.map((g) => {
-              const active = groupe === g;
-              return (
-                <button
-                  key={g}
-                  onClick={() => {
-                    setGroupe(active ? "" : g);
-                    setShowGroupe(false);
-                  }}
-                  className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-                  style={{
-                    background: active
-                      ? "var(--accent)"
-                      : "rgba(255,255,255,0.5)",
-                    color: active ? "white" : "var(--text-secondary)",
-                  }}
-                >
-                  {g}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Dropdown Équipement */}
         {showEquipement && (
-          <div className="flex flex-wrap gap-2 pb-1">
-            {EQUIPEMENTS.map((eq) => {
-              const active = equipement === eq;
-              const color = EQUIPEMENT_COLOR[eq] ?? "var(--text-secondary)";
-              return (
-                <button
-                  key={eq}
-                  onClick={() => {
-                    setEquipement(active ? "" : eq);
-                    setShowEquipement(false);
-                  }}
-                  className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-                  style={{
-                    background: active ? color : "rgba(255,255,255,0.5)",
-                    color: active ? "white" : "var(--text-secondary)",
-                    border: active ? "none" : `1px solid ${color}40`,
-                  }}
-                >
-                  {eq}
-                </button>
-              );
-            })}
-          </div>
+          <FilterDropdown
+            items={EQUIPEMENTS}
+            selected={equipement}
+            onSelect={(v) => {
+              setEquipement(v === equipement ? "" : v);
+              setShowEquipement(false);
+            }}
+          />
+        )}
+        {showGroupe && (
+          <FilterDropdown
+            items={GROUPES}
+            selected={groupe}
+            onSelect={(v) => {
+              setGroupe(v === groupe ? "" : v);
+              setShowGroupe(false);
+            }}
+          />
         )}
       </div>
 
-      {/* Résultats */}
-      <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-6">
-        {/* Compteur résultats */}
-        {!loading && results.length > 0 && (
-          <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
-            {results.length} exercice{results.length > 1 ? "s" : ""}
-          </p>
-        )}
-
+      {/* Results */}
+      <div
+        className="flex-1 overflow-y-auto pb-10"
+        style={{ scrollbarWidth: "none" }}
+      >
         {loading && (
-          <p
-            className="text-sm text-center mt-8"
-            style={{ color: "var(--text-muted)" }}
-          >
+          <p className="text-sm text-center mt-12" style={{ color: "#636366" }}>
             Chargement...
           </p>
         )}
         {!loading && results.length === 0 && (
-          <div className="flex flex-col items-center gap-4 mt-12">
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Aucun exercice trouvé
-            </p>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-              style={{
-                background: "var(--accent-bg)",
-                color: "var(--accent-text)",
-                border: "1px solid var(--accent)",
-              }}
-            >
-              <PenLine size={15} />
-              Créer &quot;{q || "un exercice personnalisé"}&quot;
-            </button>
-          </div>
+          <p className="text-sm text-center mt-12" style={{ color: "#636366" }}>
+            Aucun exercice trouvé
+          </p>
         )}
-
-        {results.map((ex) => {
-          const badgeColor =
-            EQUIPEMENT_COLOR[ex.equipement ?? ""] ?? "var(--text-muted)";
-          return (
-            <button
-              key={ex.id}
-              onClick={() => handleAdd(ex)}
-              className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-opacity active:opacity-70"
-              style={{
-                background: "rgba(0,0,0,0.04)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="sm" />
-              <div className="flex-1 min-w-0">
-                <p
-                  className="text-sm font-semibold truncate"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {ex.nom}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span
-                    className="text-xs"
-                    style={{ color: "var(--text-muted)" }}
-                  >
-                    {ex.groupe_musculaire}
-                  </span>
-                  {ex.equipement && (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{
-                        background: `${badgeColor}20`,
-                        color: badgeColor,
-                      }}
-                    >
-                      {ex.equipement}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <Plus
-                size={18}
-                className="shrink-0 ml-3"
-                style={{ color: "var(--accent)" }}
-              />
-            </button>
-          );
-        })}
+        {!loading && results.length > 0 && (
+          <>
+            <SectionLabel label={q ? "Résultats" : "Exercices suggérés"} />
+            {suggested.map((ex) => (
+              <ExerciseRow key={ex.id} ex={ex} onSelect={() => handleAdd(ex)} />
+            ))}
+            {recents.length > 0 && (
+              <>
+                <SectionLabel label="Exercices Récents" />
+                {recents.map((ex) => (
+                  <ExerciseRow
+                    key={ex.id}
+                    ex={ex}
+                    onSelect={() => handleAdd(ex)}
+                  />
+                ))}
+              </>
+            )}
+          </>
+        )}
       </div>
 
       {showCreate && (
@@ -445,5 +312,111 @@ export default function ExerciseSearch({
         />
       )}
     </div>
+  );
+}
+
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <p className="px-4 pt-5 pb-2" style={{ color: "#636366", fontSize: 14 }}>
+      {label}
+    </p>
+  );
+}
+
+function FilterBtn({
+  label,
+  value,
+  open,
+  onToggle,
+}: {
+  label: string;
+  value: string;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl active:opacity-70"
+      style={{ background: "#1C1C1E" }}
+    >
+      <span
+        className="truncate"
+        style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}
+      >
+        {value || label}
+      </span>
+      <ChevronDown
+        size={14}
+        className="shrink-0 ml-1"
+        style={{
+          color: "#636366",
+          transform: open ? "rotate(180deg)" : "none",
+          transition: "transform 200ms",
+        }}
+      />
+    </button>
+  );
+}
+
+function FilterDropdown({
+  items,
+  selected,
+  onSelect,
+}: {
+  items: string[];
+  selected: string;
+  onSelect: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <button
+          key={item}
+          onClick={() => onSelect(item)}
+          className="px-3 py-1.5 rounded-full text-xs font-semibold active:opacity-70"
+          style={{
+            background: selected === item ? "#3B82F6" : "#2C2C2E",
+            color: "#fff",
+          }}
+        >
+          {item}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ExerciseRow({ ex, onSelect }: { ex: Exercise; onSelect: () => void }) {
+  return (
+    <button
+      onClick={onSelect}
+      className="w-full flex items-center gap-4 px-4 py-3 active:opacity-60"
+      style={{ borderBottom: "1px solid #1C1C1E" }}
+    >
+      <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="md" circle />
+      <div className="flex-1 min-w-0 text-left">
+        <p
+          className="truncate"
+          style={{
+            color: "#fff",
+            fontSize: 17,
+            fontWeight: 600,
+            fontFamily: "var(--font-nunito), sans-serif",
+          }}
+        >
+          {ex.nom}
+        </p>
+        <p style={{ color: "#636366", fontSize: 14, marginTop: 2 }}>
+          {ex.groupe_musculaire}
+        </p>
+      </div>
+      <div
+        className="flex items-center justify-center rounded-full shrink-0"
+        style={{ width: 30, height: 30, border: "1.5px solid #3A3A3C" }}
+      >
+        <TrendingUp size={13} style={{ color: "#8E8E93" }} />
+      </div>
+    </button>
   );
 }

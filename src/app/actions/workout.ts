@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 import type { WorkoutExercise } from "@/store/workoutStore";
 
@@ -11,10 +10,10 @@ export async function saveWorkout(
   routineId: string | null,
   totalPausedMs = 0,
 ): Promise<{ success: boolean; id?: string; error?: string }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Non authentifié" };
 
   const dureeMinutes = Math.round(
@@ -55,7 +54,16 @@ export async function saveWorkout(
   if (sets.length > 0) {
     const { error: sError } = await supabase.from("workout_sets").insert(sets);
     if (sError) {
-      await supabase.from("workouts").delete().eq("id", workout.id);
+      const { error: cleanupError } = await supabase
+        .from("workouts")
+        .delete()
+        .eq("id", workout.id);
+      if (cleanupError) {
+        console.error(
+          `Cleanup échoué — workout orphelin ${workout.id}:`,
+          cleanupError.message,
+        );
+      }
       return { success: false, error: sError.message };
     }
   }

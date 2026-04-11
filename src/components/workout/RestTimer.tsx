@@ -9,16 +9,19 @@ export default function RestTimer() {
   const dismissRestTimer = useWorkoutStore((s) => s.dismissRestTimer);
   const [remaining, setRemaining] = useState(0);
 
+  const isActive = restTimer?.active ?? false;
+  const endAt = restTimer?.endAt ?? 0;
+
   useEffect(() => {
-    if (!restTimer?.active) return;
+    if (!isActive) return;
     const update = () => {
-      const r = Math.max(0, Math.ceil((restTimer.endAt - Date.now()) / 1000));
+      const r = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
       setRemaining(r);
     };
     update();
     const id = setInterval(update, 250);
     return () => clearInterval(id);
-  }, [restTimer]);
+  }, [isActive, endAt]);
 
   // Dismiss via effet séparé pour ne pas muter le store depuis l'intervalle
   useEffect(() => {
