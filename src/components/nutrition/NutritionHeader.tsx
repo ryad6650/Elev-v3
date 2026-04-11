@@ -32,7 +32,7 @@ function CalorieRing({
           cy={cy}
           r={r}
           fill="none"
-          stroke="var(--bg-elevated)"
+          stroke="#3a3532"
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={`${trackArc} ${gapArc}`}
@@ -135,7 +135,7 @@ function MacroCol({
           width: "100%",
           height: 6,
           borderRadius: 99,
-          background: "var(--bg-elevated)",
+          background: "#3a3532",
         }}
       >
         <div

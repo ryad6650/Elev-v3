@@ -32,7 +32,7 @@ function MealRing({ pct }: { pct: number }) {
         cy={cy}
         r={r}
         fill="none"
-        stroke="var(--bg-elevated)"
+        stroke="#3a3532"
         strokeWidth="4.5"
       />
       {pct > 0 && (
@@ -139,13 +139,12 @@ export default memo(function MealSection({
           width: 34,
           height: 34,
           borderRadius: "50%",
-          background: "white",
+          background: "#74BF7A",
           flexShrink: 0,
           fontSize: 20,
           fontWeight: 300,
-          color: "black",
+          color: "#fff",
           lineHeight: 1,
-          boxShadow: "0 0 14px rgba(255,255,255,0.35)",
         }}
         aria-label="Ajouter un aliment"
       >

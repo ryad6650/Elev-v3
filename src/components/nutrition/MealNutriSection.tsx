@@ -99,7 +99,7 @@ export default function MealNutriSection({ values, progressBars }: Props) {
             </div>
             <div
               className="h-1.5 rounded-full"
-              style={{ background: "var(--bg-elevated)" }}
+              style={{ background: "#3a3532" }}
             >
               <div
                 className="h-full rounded-full"

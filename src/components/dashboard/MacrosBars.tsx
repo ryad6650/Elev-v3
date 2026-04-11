@@ -26,7 +26,7 @@ function MacroBar({ label, consumed, objective, color }: MacroBarProps) {
       </div>
       <div
         className="rounded-full overflow-hidden"
-        style={{ height: 6, background: "var(--bg-elevated)" }}
+        style={{ height: 6, background: "#3a3532" }}
       >
         <div
           className="h-full rounded-full"

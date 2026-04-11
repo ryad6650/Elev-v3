@@ -101,7 +101,7 @@ export default function MensurationsCard({ initial }: Props) {
           <div
             key={key}
             style={{
-              background: "rgba(0,0,0,0.03)",
+              background: "rgba(255,255,255,0.06)",
               borderRadius: "var(--radius-sm)",
               padding: "10px 12px",
             }}
@@ -136,12 +136,14 @@ export default function MensurationsCard({ initial }: Props) {
                   className="outline-none"
                   style={{
                     width: "100%",
-                    background: "transparent",
+                    background: "rgba(255,255,255,0.08)",
                     fontFamily: "var(--font-nunito), sans-serif",
                     fontSize: 15,
                     fontWeight: 700,
                     color: "var(--text-primary)",
-                    border: "none",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: 8,
+                    padding: "4px 8px",
                   }}
                   placeholder="—"
                 />

@@ -53,6 +53,7 @@ export default function AddPoidsModal({
           background: "linear-gradient(to bottom, #e8e6e2, #f3f0ea)",
           maxWidth: 430,
           margin: "0 auto",
+          colorScheme: "light",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -62,7 +63,7 @@ export default function AddPoidsModal({
               fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 20,
               fontWeight: 600,
-              color: "var(--text-primary)",
+              color: "#1c1917",
             }}
           >
             {defaultPoids ? "Modifier le poids" : "Enregistrer le poids"}
@@ -72,7 +73,7 @@ export default function AddPoidsModal({
             className="p-2 rounded-full"
             style={{ background: "rgba(0,0,0,0.04)" }}
           >
-            <X size={18} style={{ color: "var(--text-secondary)" }} />
+            <X size={18} style={{ color: "#78716c" }} />
           </button>
         </div>
 
@@ -81,7 +82,7 @@ export default function AddPoidsModal({
             className="text-xs font-semibold uppercase tracking-wider"
             style={{
               fontFamily: "var(--font-nunito), sans-serif",
-              color: "var(--text-muted)",
+              color: "#78716c",
             }}
           >
             Date
@@ -93,9 +94,10 @@ export default function AddPoidsModal({
             onChange={(e) => setDate(e.target.value)}
             className="block w-full mt-1.5 px-4 py-3 rounded-xl text-base outline-none"
             style={{
-              background: "rgba(255,255,255,0.5)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              color: "var(--text-primary)",
+              background: "#ffffff",
+              border: "1px solid rgba(0,0,0,0.12)",
+              color: "#1c1917",
+              colorScheme: "light",
               fontFamily: "var(--font-nunito), sans-serif",
             }}
           />
@@ -106,7 +108,7 @@ export default function AddPoidsModal({
             className="text-xs font-semibold uppercase tracking-wider"
             style={{
               fontFamily: "var(--font-nunito), sans-serif",
-              color: "var(--text-muted)",
+              color: "#78716c",
             }}
           >
             Poids (kg)
@@ -121,9 +123,10 @@ export default function AddPoidsModal({
             onChange={(e) => setPoids(e.target.value)}
             className="block w-full mt-1.5 px-4 py-3 rounded-xl text-3xl font-bold text-center outline-none"
             style={{
-              background: "rgba(255,255,255,0.5)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              color: "var(--text-primary)",
+              background: "#ffffff",
+              border: "1px solid rgba(0,0,0,0.12)",
+              color: "#1c1917",
+              colorScheme: "light",
               fontFamily: "var(--font-nunito), sans-serif",
             }}
             autoFocus

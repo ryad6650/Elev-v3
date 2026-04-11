@@ -178,7 +178,7 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
                       cy="40"
                       r="34"
                       fill="none"
-                      stroke="var(--bg-elevated)"
+                      stroke="#3a3532"
                       strokeWidth="6"
                     />
                     <circle
@@ -270,7 +270,7 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
             <div className="mb-3">
               <div
                 className="h-2.5 rounded-full flex gap-0.5 mb-3 overflow-hidden"
-                style={{ background: "var(--bg-elevated)" }}
+                style={{ background: "#3a3532" }}
               >
                 <div
                   className="h-full rounded-full"
