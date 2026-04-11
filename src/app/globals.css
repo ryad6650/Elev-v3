@@ -49,7 +49,7 @@ body {
 
   /* Glass morphism */
   --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
   --glass-subtle: rgba(255, 255, 255, 0.04);
   --glass-blur: blur(12px);
   --glass-blur-sm: blur(8px);

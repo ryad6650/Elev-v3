@@ -118,6 +118,8 @@ export default function NutritionPageClient({ initialData }: Props) {
           margin: "0 auto",
           padding: "20px 20px 0",
           paddingBottom: "calc(env(safe-area-inset-bottom) + 40px)",
+          background: "#0D0D0D",
+          minHeight: "100dvh",
         }}
       >
         {/* Stats en haut à droite */}

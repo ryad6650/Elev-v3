@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elev — Accueil Mockups</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page:       #000000;
+      --bg-primary:    #111927;
+      --bg-card:       #1C1C1E;
+      --bg-elevated:   #2a2a2e;
+      --bg-inner:      rgba(255,255,255,0.04);
+      --border:        rgba(255,255,255,0.08);
+      --border-card:   #595F60;
+      --text-primary:  #ffffff;
+      --text-secondary:#9a9a9a;
+      --text-muted:    #666666;
+      --accent:        #0589d6;
+      --accent-dim:    rgba(5,137,214,0.1);
+      --accent-mid:    rgba(5,137,214,0.25);
+      --accent-dark:   #024a7a;
+      --green-success: #34d399;
+      --danger:        #ef4444;
+      --glass-bg:      rgba(255,255,255,0.05);
+      --glass-border:  rgba(255,255,255,0.10);
+      --font-body:     'Nunito', system-ui, sans-serif;
+      --font-display:  'Lora', serif;
+      --radius:        16px;
+      --radius-pill:   9999px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      min-height: 100dvh;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page layout ── */
+    .page-header {
+      text-align: center;
+      padding: 48px 32px 24px;
+    }
+    .page-eyebrow {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-style: italic; font-size: 32px;
+      color: var(--text-primary);
+    }
+
+    .variants-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 48px;
+      padding: 16px 24px 80px;
+      max-width: 1600px;
+    }
+
+    /* ── Phone shell ── */
+    .phone-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 14px;
+    }
+    .variant-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .variant-desc {
+      font-size: 12px; color: var(--text-secondary);
+      max-width: 280px; text-align: center; line-height: 1.5;
+      margin-top: -4px;
+    }
+    .phone {
+      width: 310px; height: 672px;
+      border-radius: 44px; overflow: hidden;
+      position: relative;
+      background: var(--bg-primary);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 0 8px rgba(0,0,0,0.5),
+        0 48px 100px rgba(0,0,0,0.6);
+    }
+    .phone-ui {
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px 0; flex-shrink: 0;
+    }
+    .s-time { font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .s-icons { display: flex; gap: 4px; align-items: center; }
+    .s-icons svg { width: 14px; height: 14px; }
+
+    /* ── Content ── */
+    .content {
+      flex: 1; overflow-y: auto;
+      padding: 12px 20px 0;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      flex-shrink: 0;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 16px 22px;
+      display: flex; justify-content: space-around; align-items: center;
+    }
+    .nav-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+    }
+    .nav-item svg { width: 22px; height: 22px; stroke-width: 1.8; }
+    .nav-item .nav-label {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-muted);
+    }
+    .nav-item.active svg { color: var(--accent); }
+    .nav-item.active .nav-label { color: var(--accent); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim { opacity: 0; animation: fadeUp 500ms ease-out forwards; }
+    .d1 { animation-delay: 100ms; }
+    .d2 { animation-delay: 200ms; }
+    .d3 { animation-delay: 300ms; }
+    .d4 { animation-delay: 400ms; }
+    .d5 { animation-delay: 500ms; }
+    .d6 { animation-delay: 600ms; }
+    .d7 { animation-delay: 700ms; }
+    .d8 { animation-delay: 800ms; }
+
+    @keyframes ringAnim {
+      from { stroke-dashoffset: 251; }
+    }
+    @keyframes barGrow {
+      from { width: 0; }
+    }
+
+    /* ════════════════════════════════════════════
+       SHARED COMPONENT STYLES
+       ════════════════════════════════════════════ */
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card-strong {
+      background: var(--bg-card);
+      border: 2px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .accent-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: var(--radius-pill);
+      background: var(--accent-dim);
+      font-size: 11px; font-weight: 700;
+      color: var(--accent);
+    }
+
+    .macro-bar-track {
+      height: 4px; border-radius: 99px;
+      background: rgba(255,255,255,0.08);
+    }
+    .macro-bar-fill {
+      height: 100%; border-radius: 99px;
+    }
+
+    .cta-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 16px;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 700;
+      border: none; cursor: pointer;
+    }
+    .cta-btn-outline {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px;
+      border-radius: var(--radius);
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-family: var(--font-body);
+      font-size: 14px; font-weight: 700;
+    }
+    .cta-gradient {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #001429 0%, #024a7a 40%, #0589d6 100%);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 700;
+      border: none;
+    }
+
+    /* ════════════════════════════════════════════
+       VARIANTE A — "Whoop / Oura Hub"
+       Dense, ring central, stats grille
+       ════════════════════════════════════════════ */
+
+    .va-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .va-greeting-small {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .va-greeting-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 26px; color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .va-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 700;
+      color: var(--accent);
+      border: 1.5px solid rgba(5,137,214,0.25);
+    }
+
+    .va-ring-section {
+      display: flex; flex-direction: column;
+      align-items: center; padding: 16px 0 8px;
+    }
+    .va-ring-wrap {
+      width: 140px; height: 140px;
+      position: relative;
+    }
+    .va-ring-svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    .va-ring-bg {
+      fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 8;
+    }
+    .va-ring-fill {
+      fill: none; stroke-width: 8;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-dasharray: 251 251;
+      stroke-dashoffset: 95;
+      animation: ringAnim 1s ease-out 400ms backwards;
+    }
+    .va-ring-fill-secondary {
+      fill: none; stroke-width: 8;
+      stroke: var(--green-success);
+      stroke-linecap: round;
+      stroke-dasharray: 220 251;
+      stroke-dashoffset: 75;
+      animation: ringAnim 1s ease-out 500ms backwards;
+    }
+    .va-ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .va-ring-pct {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+    }
+    .va-ring-label {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-secondary); margin-top: 2px;
+    }
+
+    .va-ring-legend {
+      display: flex; gap: 16px; margin-top: 12px;
+    }
+    .va-legend-item {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .va-legend-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .va-legend-text {
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    }
+
+    .va-stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 16px;
+    }
+    .va-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .va-stat-icon {
+      font-size: 18px; margin-bottom: 8px;
+    }
+    .va-stat-value {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+    }
+    .va-stat-unit {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-muted);
+    }
+    .va-stat-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-secondary); margin-top: 4px;
+    }
+    .va-stat-delta {
+      font-size: 10px; font-weight: 700;
+      color: var(--green-success); margin-top: 4px;
+    }
+    .va-stat-delta.down { color: var(--danger); }
+
+    .va-workout-card {
+      margin-top: 14px;
+      background: linear-gradient(135deg, #001429 0%, #0a2a4a 60%, #0589d6 100%);
+      border: 1px solid rgba(5,137,214,0.2);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .va-workout-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .va-workout-info { flex: 1; }
+    .va-workout-title {
+      font-size: 14px; font-weight: 700;
+      color: #fff; margin-bottom: 2px;
+    }
+    .va-workout-meta {
+      font-size: 11px; color: rgba(255,255,255,0.6);
+    }
+    .va-workout-play {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════
+       VARIANTE B — "Apple Health Feed"
+       Sections empilees, mini graphes
+       ════════════════════════════════════════════ */
+
+    .vb-header {
+      margin-bottom: 20px;
+    }
+    .vb-date {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .vb-greeting {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 34px; font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.15;
+    }
+    .vb-sub {
+      font-size: 14px; color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .vb-summary-row {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .vb-summary-item {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+    .vb-summary-value {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vb-summary-label {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-muted); margin-top: 4px;
+    }
+    .vb-summary-bar {
+      height: 3px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      margin-top: 8px; overflow: hidden;
+    }
+    .vb-summary-bar-fill {
+      height: 100%; border-radius: 99px;
+    }
+
+    .vb-section { margin-bottom: 16px; }
+    .vb-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .vb-section-title {
+      font-size: 16px; font-weight: 800;
+      color: var(--text-primary);
+    }
+    .vb-section-link {
+      font-size: 12px; font-weight: 600;
+      color: var(--accent);
+    }
+
+    .vb-cal-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .vb-cal-top {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 14px;
+    }
+    .vb-cal-ring-wrap {
+      width: 56px; height: 56px;
+      position: relative; flex-shrink: 0;
+    }
+    .vb-cal-ring-svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    .vb-cal-ring-bg {
+      fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6;
+    }
+    .vb-cal-ring-fill {
+      fill: none; stroke-width: 6;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-dasharray: 157;
+      stroke-dashoffset: 60;
+      animation: ringAnim 800ms ease-out 400ms backwards;
+    }
+    .vb-cal-ring-center {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--text-primary);
+    }
+    .vb-cal-info { flex: 1; }
+    .vb-cal-eaten {
+      font-family: var(--font-display);
+      font-size: 24px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vb-cal-target {
+      font-size: 12px; color: var(--text-muted); margin-top: 2px;
+    }
+    .vb-cal-remaining {
+      font-size: 11px; font-weight: 700;
+      color: var(--accent); margin-top: 4px;
+    }
+
+    .vb-macros-row {
+      display: flex; gap: 8px;
+    }
+    .vb-macro-item { flex: 1; }
+    .vb-macro-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .vb-macro-value {
+      font-size: 12px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+
+    .vb-week-row {
+      display: flex; justify-content: space-between;
+      padding: 0 4px;
+    }
+    .vb-week-day {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+    }
+    .vb-week-label {
+      font-size: 10px; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .vb-week-label.today { color: var(--accent); }
+    .vb-week-dot {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vb-week-dot.done {
+      background: var(--accent);
+    }
+    .vb-week-dot.done svg { color: #fff; }
+    .vb-week-dot.today {
+      border: 2px solid var(--accent);
+      background: var(--accent-dim);
+    }
+    .vb-week-dot svg {
+      width: 12px; height: 12px; color: var(--text-muted);
+    }
+
+    .vb-workout-next {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .vb-workout-thumb {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg, #001429, #0589d6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .vb-workout-detail { flex: 1; }
+    .vb-workout-name {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .vb-workout-sub {
+      font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    }
+    .vb-workout-arrow {
+      color: var(--text-muted); font-size: 16px;
+    }
+
+    /* ════════════════════════════════════════════
+       VARIANTE C — "Revolut Premium"
+       Hero numbers, glass, gradient CTA
+       ════════════════════════════════════════════ */
+
+    .vc-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .vc-date {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-muted); margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+    .vc-name {
+      font-size: 28px; font-weight: 800;
+      color: var(--text-primary); line-height: 1.15;
+    }
+    .vc-name span {
+      color: var(--accent);
+    }
+    .vc-notif {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .vc-notif svg { width: 18px; height: 18px; color: var(--text-secondary); }
+    .vc-notif-dot {
+      position: absolute; top: 8px; right: 8px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .vc-hero-card {
+      background: linear-gradient(160deg, #0d1f35 0%, #112a45 50%, #0a1929 100%);
+      border: 1px solid rgba(5,137,214,0.15);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .vc-hero-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -30px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(5,137,214,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .vc-hero-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; position: relative;
+    }
+    .vc-hero-tag {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent);
+    }
+    .vc-hero-pct {
+      font-size: 12px; font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .vc-hero-number {
+      font-family: var(--font-display);
+      font-size: 44px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+      margin-bottom: 2px; position: relative;
+    }
+    .vc-hero-sub {
+      font-size: 13px; color: var(--text-muted);
+      margin-bottom: 14px; position: relative;
+    }
+    .vc-hero-bar {
+      height: 6px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden; position: relative;
+    }
+    .vc-hero-bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+      animation: barGrow 800ms ease-out 400ms backwards;
+    }
+    .vc-hero-macros {
+      display: flex; gap: 0; margin-top: 14px; position: relative;
+    }
+    .vc-hero-macro {
+      flex: 1; text-align: center;
+      padding: 0 8px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .vc-hero-macro:last-child { border-right: none; }
+    .vc-hero-macro-val {
+      font-size: 16px; font-weight: 800;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vc-hero-macro-label {
+      font-size: 9px; font-weight: 600;
+      color: var(--text-muted); margin-top: 3px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    .vc-quick-row {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .vc-quick-card {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 12px;
+    }
+    .vc-quick-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .vc-quick-icon { font-size: 20px; }
+    .vc-quick-delta {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 6px; border-radius: 6px;
+    }
+    .vc-quick-delta.up {
+      background: rgba(52,211,153,0.12);
+      color: var(--green-success);
+    }
+    .vc-quick-delta.down {
+      background: rgba(239,68,68,0.12);
+      color: var(--danger);
+    }
+    .vc-quick-delta.neutral {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+    }
+    .vc-quick-value {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 700;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vc-quick-unit {
+      font-size: 13px; font-weight: 500; color: var(--text-muted);
+    }
+    .vc-quick-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-secondary); margin-top: 4px;
+    }
+
+    .vc-streak-section { margin-bottom: 14px; }
+    .vc-streak-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .vc-streak-title {
+      font-size: 14px; font-weight: 800; color: var(--text-primary);
+    }
+    .vc-streak-badge {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 700;
+      color: var(--accent);
+    }
+    .vc-streak-row {
+      display: flex; justify-content: space-between;
+    }
+    .vc-streak-day {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 5px;
+    }
+    .vc-streak-label {
+      font-size: 10px; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .vc-streak-label.today { color: var(--text-primary); }
+    .vc-streak-dot {
+      width: 30px; height: 30px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vc-streak-dot.empty { background: rgba(255,255,255,0.04); }
+    .vc-streak-dot.done { background: var(--accent); }
+    .vc-streak-dot.done svg { color: #fff; }
+    .vc-streak-dot.current {
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+    }
+
+    /* ════════════════════════════════════════════
+       VARIANTE D — "Fitness Minimal"
+       Strong-app inspired, clean, typographic
+       ════════════════════════════════════════════ */
+
+    .vd-header {
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .vd-date {
+      font-size: 12px; font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+    .vd-greeting {
+      font-size: 30px; font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .vd-score {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 18px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-card);
+      border-radius: var(--radius);
+    }
+    .vd-score-ring-wrap {
+      width: 64px; height: 64px;
+      position: relative; flex-shrink: 0;
+    }
+    .vd-score-ring-svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    .vd-score-ring-bg {
+      fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6;
+    }
+    .vd-score-ring-fill {
+      fill: none; stroke-width: 6;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-dasharray: 170;
+      stroke-dashoffset: 42;
+      animation: ringAnim 800ms ease-out 300ms backwards;
+    }
+    .vd-score-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .vd-score-pct {
+      font-size: 18px; font-weight: 900;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vd-score-info { flex: 1; }
+    .vd-score-title {
+      font-size: 14px; font-weight: 800;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+    .vd-score-desc {
+      font-size: 12px; color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .vd-metrics {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .vd-metric {
+      flex: 1;
+      padding: 12px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .vd-metric-value {
+      font-size: 20px; font-weight: 900;
+      color: var(--text-primary); line-height: 1;
+    }
+    .vd-metric-label {
+      font-size: 9px; font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+    }
+    .vd-metric-sub {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-secondary); margin-top: 2px;
+    }
+
+    .vd-today-label {
+      font-size: 13px; font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .vd-routine {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+    }
+    .vd-routine-color {
+      width: 4px; height: 40px;
+      border-radius: 3px; flex-shrink: 0;
+    }
+    .vd-routine-info { flex: 1; }
+    .vd-routine-name {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .vd-routine-meta {
+      font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    }
+    .vd-routine-go {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .vd-week-bar {
+      display: flex; gap: 4px; margin-bottom: 16px;
+    }
+    .vd-week-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+    }
+    .vd-week-bar-fill {
+      width: 100%; border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      height: 40px; position: relative; overflow: hidden;
+    }
+    .vd-week-bar-inner {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      border-radius: 4px;
+      background: var(--accent);
+    }
+    .vd-week-bar-label {
+      font-size: 9px; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .vd-week-bar-label.today { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-eyebrow">Mockup</div>
+    <div class="page-title">Accueil</div>
+  </div>
+
+  <div class="variants-grid">
+
+    <!-- ═══════════════════════════════════════════
+         VARIANTE A — Whoop / Oura Hub
+         ═══════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="variant-label">Variante A</div>
+      <div class="variant-desc">Hub de controle — ring de progression central, grille de stats</div>
+      <div class="phone">
+        <div class="phone-ui">
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#fff"><path d="M1 1l4 4m14-4l-4 4M12 9v4m0 4h.01"/><path d="M3 7v4a9 9 0 0018 0V7"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" color="#fff"><rect x="1" y="6" width="3" height="12" rx="1" opacity=".3"/><rect x="6" y="4" width="3" height="14" rx="1" opacity=".5"/><rect x="11" y="2" width="3" height="16" rx="1" opacity=".7"/><rect x="16" y="0" width="3" height="18" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="#fff"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- Header -->
+            <div class="va-header anim d1">
+              <div>
+                <div class="va-greeting-small">Bonjour</div>
+                <div class="va-greeting-name">Louis</div>
+              </div>
+              <div class="va-avatar">L</div>
+            </div>
+
+            <!-- Ring -->
+            <div class="va-ring-section anim d2">
+              <div class="va-ring-wrap">
+                <svg class="va-ring-svg" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" class="va-ring-bg" />
+                  <circle cx="50" cy="50" r="40" class="va-ring-fill-secondary" />
+                  <circle cx="50" cy="50" r="32" class="va-ring-bg" />
+                  <circle cx="50" cy="50" r="32" class="va-ring-fill" />
+                </svg>
+                <div class="va-ring-center">
+                  <div class="va-ring-pct">74%</div>
+                  <div class="va-ring-label">Score du jour</div>
+                </div>
+              </div>
+              <div class="va-ring-legend">
+                <div class="va-legend-item">
+                  <div class="va-legend-dot" style="background: var(--accent);"></div>
+                  <div class="va-legend-text">Nutrition</div>
+                </div>
+                <div class="va-legend-item">
+                  <div class="va-legend-dot" style="background: var(--green-success);"></div>
+                  <div class="va-legend-text">Activite</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="va-stats-grid anim d3">
+              <div class="va-stat-card">
+                <div class="va-stat-icon">🔥</div>
+                <div class="va-stat-value">1 420 <span class="va-stat-unit">kcal</span></div>
+                <div class="va-stat-label">Consommees</div>
+                <div class="va-stat-delta">580 restantes</div>
+              </div>
+              <div class="va-stat-card">
+                <div class="va-stat-icon">⚖️</div>
+                <div class="va-stat-value">78.2 <span class="va-stat-unit">kg</span></div>
+                <div class="va-stat-label">Poids actuel</div>
+                <div class="va-stat-delta">-0.4 cette sem.</div>
+              </div>
+              <div class="va-stat-card">
+                <div class="va-stat-icon">🏋️</div>
+                <div class="va-stat-value">4 <span class="va-stat-unit">/ 5</span></div>
+                <div class="va-stat-label">Seances cette sem.</div>
+                <div class="va-stat-delta">1 restante</div>
+              </div>
+              <div class="va-stat-card">
+                <div class="va-stat-icon">😴</div>
+                <div class="va-stat-value">7h30</div>
+                <div class="va-stat-label">Sommeil</div>
+                <div class="va-stat-delta">+15min vs moy.</div>
+              </div>
+            </div>
+
+            <!-- Seance du jour -->
+            <div class="va-workout-card anim d5">
+              <div class="va-workout-icon">💪</div>
+              <div class="va-workout-info">
+                <div class="va-workout-title">Push — Pectoraux / Epaules</div>
+                <div class="va-workout-meta">5 exercices · ~55 min</div>
+              </div>
+              <div class="va-workout-play">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+              </div>
+            </div>
+
+            <div style="height: 20px;"></div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="bottom-nav">
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span class="nav-label">Seances</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M12 20V4m-6 8l6-8 6 8"/></svg>
+              <span class="nav-label">Poids</span>
+            </div>
+            <div class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+              <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              <span class="nav-label">Nutrition</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="nav-label">Historique</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         VARIANTE B — Apple Health Feed
+         ═══════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="variant-label">Variante B</div>
+      <div class="variant-desc">Feed quotidien — sections empilees, Lora italic, aere</div>
+      <div class="phone" style="background:#000000;">
+        <div class="phone-ui">
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#fff"><path d="M1 1l4 4m14-4l-4 4M12 9v4m0 4h.01"/><path d="M3 7v4a9 9 0 0018 0V7"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" color="#fff"><rect x="1" y="6" width="3" height="12" rx="1" opacity=".3"/><rect x="6" y="4" width="3" height="14" rx="1" opacity=".5"/><rect x="11" y="2" width="3" height="16" rx="1" opacity=".7"/><rect x="16" y="0" width="3" height="18" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="#fff"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- Header -->
+            <div class="vb-header anim d1">
+              <div class="vb-date">Vendredi 11 avril</div>
+              <div class="vb-greeting">Bonjour,<br/>Louis</div>
+              <div class="vb-sub">Encore 1 seance cette semaine 💪</div>
+            </div>
+
+            <!-- Quick summary -->
+            <div class="vb-summary-row anim d2">
+              <div class="vb-summary-item">
+                <div class="vb-summary-value">1 420</div>
+                <div class="vb-summary-label">kcal</div>
+                <div class="vb-summary-bar"><div class="vb-summary-bar-fill" style="width:62%; background: var(--accent);"></div></div>
+              </div>
+              <div class="vb-summary-item">
+                <div class="vb-summary-value">78.2</div>
+                <div class="vb-summary-label">kg</div>
+                <div class="vb-summary-bar"><div class="vb-summary-bar-fill" style="width:88%; background: var(--green-success);"></div></div>
+              </div>
+              <div class="vb-summary-item">
+                <div class="vb-summary-value">7h30</div>
+                <div class="vb-summary-label">sommeil</div>
+                <div class="vb-summary-bar"><div class="vb-summary-bar-fill" style="width:94%; background: #a78bfa;"></div></div>
+              </div>
+            </div>
+
+            <!-- Nutrition -->
+            <div class="vb-section anim d3">
+              <div class="vb-section-header">
+                <div class="vb-section-title">Nutrition</div>
+                <div class="vb-section-link">Voir tout →</div>
+              </div>
+              <div class="vb-cal-card">
+                <div class="vb-cal-top">
+                  <div class="vb-cal-ring-wrap">
+                    <svg class="vb-cal-ring-svg" viewBox="0 0 64 64">
+                      <circle cx="32" cy="32" r="25" class="vb-cal-ring-bg" />
+                      <circle cx="32" cy="32" r="25" class="vb-cal-ring-fill" />
+                    </svg>
+                    <div class="vb-cal-ring-center">62%</div>
+                  </div>
+                  <div class="vb-cal-info">
+                    <div class="vb-cal-eaten">1 420 <span style="font-size:14px;color:var(--text-muted);font-family:var(--font-body);">/ 2 300</span></div>
+                    <div class="vb-cal-target">calories consommees</div>
+                    <div class="vb-cal-remaining">880 kcal restantes</div>
+                  </div>
+                </div>
+                <div class="vb-macros-row">
+                  <div class="vb-macro-item">
+                    <div class="vb-macro-label" style="color: #00FFC3;">Glucides</div>
+                    <div class="vb-macro-value">142 / 260g</div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#00FFC3;animation:barGrow 700ms ease-out 600ms backwards;"></div></div>
+                  </div>
+                  <div class="vb-macro-item">
+                    <div class="vb-macro-label" style="color: #00FFC3;">Proteines</div>
+                    <div class="vb-macro-value">98 / 160g</div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" style="width:61%;background:#00FFC3;animation:barGrow 700ms ease-out 700ms backwards;"></div></div>
+                  </div>
+                  <div class="vb-macro-item">
+                    <div class="vb-macro-label" style="color: #00FFC3;">Lipides</div>
+                    <div class="vb-macro-value">52 / 80g</div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" style="width:65%;background:#00FFC3;animation:barGrow 700ms ease-out 800ms backwards;"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semaine -->
+            <div class="vb-section anim d4">
+              <div class="vb-section-header">
+                <div class="vb-section-title">Cette semaine</div>
+                <div class="accent-pill">🔥 4 jours</div>
+              </div>
+              <div class="card" style="padding:14px;">
+                <div class="vb-week-row">
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Lun</div>
+                    <div class="vb-week-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Mar</div>
+                    <div class="vb-week-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Mer</div>
+                    <div class="vb-week-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Jeu</div>
+                    <div class="vb-week-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label today">Ven</div>
+                    <div class="vb-week-dot today">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="width:14px;height:14px;"><circle cx="12" cy="12" r="4"/></svg>
+                    </div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Sam</div>
+                    <div class="vb-week-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" opacity=".15"/><line x1="5" y1="12" x2="19" y2="12" opacity=".15"/></svg></div>
+                  </div>
+                  <div class="vb-week-day">
+                    <div class="vb-week-label">Dim</div>
+                    <div class="vb-week-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" opacity=".15"/><line x1="5" y1="12" x2="19" y2="12" opacity=".15"/></svg></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prochaine seance -->
+            <div class="vb-section anim d5">
+              <div class="vb-section-header">
+                <div class="vb-section-title">Prochaine seance</div>
+              </div>
+              <div class="vb-workout-next">
+                <div class="vb-workout-thumb">🏋️</div>
+                <div class="vb-workout-detail">
+                  <div class="vb-workout-name">Pull — Dos / Biceps</div>
+                  <div class="vb-workout-sub">6 exercices · Programme Force</div>
+                </div>
+                <div class="vb-workout-arrow">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="anim d6" style="margin-bottom: 16px;">
+              <button class="cta-gradient">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                Demarrer la seance
+              </button>
+            </div>
+
+            <div style="height: 10px;"></div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span class="nav-label">Seances</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M12 20V4m-6 8l6-8 6 8"/></svg>
+              <span class="nav-label">Poids</span>
+            </div>
+            <div class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+              <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              <span class="nav-label">Nutrition</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="nav-label">Historique</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         VARIANTE C — Revolut Premium
+         ═══════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="variant-label">Variante C</div>
+      <div class="variant-desc">Premium — hero calories, cartes glass, gradient accent</div>
+      <div class="phone">
+        <div class="phone-ui">
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#fff"><path d="M1 1l4 4m14-4l-4 4M12 9v4m0 4h.01"/><path d="M3 7v4a9 9 0 0018 0V7"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" color="#fff"><rect x="1" y="6" width="3" height="12" rx="1" opacity=".3"/><rect x="6" y="4" width="3" height="14" rx="1" opacity=".5"/><rect x="11" y="2" width="3" height="16" rx="1" opacity=".7"/><rect x="16" y="0" width="3" height="18" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="#fff"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- Header -->
+            <div class="vc-header anim d1">
+              <div>
+                <div class="vc-date">Vendredi 11 avril</div>
+                <div class="vc-name">Salut, <span>Louis</span></div>
+              </div>
+              <div class="vc-notif">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <div class="vc-notif-dot"></div>
+              </div>
+            </div>
+
+            <!-- Hero calories -->
+            <div class="vc-hero-card anim d2">
+              <div class="vc-hero-top">
+                <div class="vc-hero-tag">Calories du jour</div>
+                <div class="vc-hero-pct">62%</div>
+              </div>
+              <div class="vc-hero-number">1 420</div>
+              <div class="vc-hero-sub">sur 2 300 kcal · 880 restantes</div>
+              <div class="vc-hero-bar">
+                <div class="vc-hero-bar-fill" style="width: 62%;"></div>
+              </div>
+              <div class="vc-hero-macros">
+                <div class="vc-hero-macro">
+                  <div class="vc-hero-macro-val">98g</div>
+                  <div class="vc-hero-macro-label">Proteines</div>
+                </div>
+                <div class="vc-hero-macro">
+                  <div class="vc-hero-macro-val">142g</div>
+                  <div class="vc-hero-macro-label">Glucides</div>
+                </div>
+                <div class="vc-hero-macro">
+                  <div class="vc-hero-macro-val">52g</div>
+                  <div class="vc-hero-macro-label">Lipides</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick stats -->
+            <div class="vc-quick-row anim d3">
+              <div class="vc-quick-card">
+                <div class="vc-quick-top">
+                  <div class="vc-quick-icon">⚖️</div>
+                  <div class="vc-quick-delta down">-0.4</div>
+                </div>
+                <div class="vc-quick-value">78.2 <span class="vc-quick-unit">kg</span></div>
+                <div class="vc-quick-label">Poids</div>
+              </div>
+              <div class="vc-quick-card">
+                <div class="vc-quick-top">
+                  <div class="vc-quick-icon">😴</div>
+                  <div class="vc-quick-delta up">+15min</div>
+                </div>
+                <div class="vc-quick-value">7h30</div>
+                <div class="vc-quick-label">Sommeil</div>
+              </div>
+            </div>
+
+            <!-- Streak -->
+            <div class="vc-streak-section anim d4">
+              <div class="vc-streak-header">
+                <div class="vc-streak-title">Activite</div>
+                <div class="vc-streak-badge">🔥 4 jours</div>
+              </div>
+              <div class="card" style="padding: 12px 14px;">
+                <div class="vc-streak-row">
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">L</div>
+                    <div class="vc-streak-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">M</div>
+                    <div class="vc-streak-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">M</div>
+                    <div class="vc-streak-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">J</div>
+                    <div class="vc-streak-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label today">V</div>
+                    <div class="vc-streak-dot current"></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">S</div>
+                    <div class="vc-streak-dot empty"></div>
+                  </div>
+                  <div class="vc-streak-day">
+                    <div class="vc-streak-label">D</div>
+                    <div class="vc-streak-dot empty"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="anim d5" style="margin-bottom: 16px;">
+              <button class="cta-gradient">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                Demarrer la seance
+              </button>
+            </div>
+
+            <div style="height: 10px;"></div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span class="nav-label">Seances</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M12 20V4m-6 8l6-8 6 8"/></svg>
+              <span class="nav-label">Poids</span>
+            </div>
+            <div class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+              <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              <span class="nav-label">Nutrition</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="nav-label">Historique</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         VARIANTE D — Fitness Minimal (Strong-like)
+         ═══════════════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="variant-label">Variante D</div>
+      <div class="variant-desc">Minimal — typographique, Strong-app inspired, donnees brutes</div>
+      <div class="phone">
+        <div class="phone-ui">
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#fff"><path d="M1 1l4 4m14-4l-4 4M12 9v4m0 4h.01"/><path d="M3 7v4a9 9 0 0018 0V7"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" color="#fff"><rect x="1" y="6" width="3" height="12" rx="1" opacity=".3"/><rect x="6" y="4" width="3" height="14" rx="1" opacity=".5"/><rect x="11" y="2" width="3" height="16" rx="1" opacity=".7"/><rect x="16" y="0" width="3" height="18" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="#fff"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- Header -->
+            <div class="vd-header anim d1">
+              <div class="vd-date">Ven. 11 avril</div>
+              <div class="vd-greeting">Bonjour, Louis</div>
+            </div>
+
+            <!-- Score du jour -->
+            <div class="vd-score anim d2">
+              <div class="vd-score-ring-wrap">
+                <svg class="vd-score-ring-svg" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" r="27" class="vd-score-ring-bg" />
+                  <circle cx="32" cy="32" r="27" class="vd-score-ring-fill" />
+                </svg>
+                <div class="vd-score-center">
+                  <div class="vd-score-pct">75</div>
+                </div>
+              </div>
+              <div class="vd-score-info">
+                <div class="vd-score-title">Score quotidien</div>
+                <div class="vd-score-desc">Nutrition 62% · 4 seances cette semaine · 7h30 de sommeil</div>
+              </div>
+            </div>
+
+            <!-- Metrics row -->
+            <div class="vd-metrics anim d3">
+              <div class="vd-metric">
+                <div class="vd-metric-value">1420</div>
+                <div class="vd-metric-label">Kcal</div>
+                <div class="vd-metric-sub">/ 2 300</div>
+              </div>
+              <div class="vd-metric">
+                <div class="vd-metric-value">78.2</div>
+                <div class="vd-metric-label">Poids</div>
+                <div class="vd-metric-sub" style="color:var(--green-success);">-0.4 kg</div>
+              </div>
+              <div class="vd-metric">
+                <div class="vd-metric-value">4/5</div>
+                <div class="vd-metric-label">Seances</div>
+                <div class="vd-metric-sub">cette sem.</div>
+              </div>
+            </div>
+
+            <!-- Week activity bars -->
+            <div class="anim d4" style="margin-bottom: 16px;">
+              <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:10px;">Activite de la semaine</div>
+              <div class="vd-week-bar">
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:85%;"></div></div>
+                  <div class="vd-week-bar-label">L</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:70%;"></div></div>
+                  <div class="vd-week-bar-label">M</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:95%;"></div></div>
+                  <div class="vd-week-bar-label">M</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:60%;"></div></div>
+                  <div class="vd-week-bar-label">J</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:20%;opacity:0.4;"></div></div>
+                  <div class="vd-week-bar-label today">V</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:0%;"></div></div>
+                  <div class="vd-week-bar-label">S</div>
+                </div>
+                <div class="vd-week-col">
+                  <div class="vd-week-bar-fill"><div class="vd-week-bar-inner" style="height:0%;"></div></div>
+                  <div class="vd-week-bar-label">D</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seance du jour -->
+            <div class="vd-today-label anim d5">Seance du jour</div>
+            <div class="vd-routine anim d5">
+              <div class="vd-routine-color" style="background: var(--accent);"></div>
+              <div class="vd-routine-info">
+                <div class="vd-routine-name">Pull — Dos / Biceps</div>
+                <div class="vd-routine-meta">6 exercices · Programme Force</div>
+              </div>
+              <div class="vd-routine-go">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+              </div>
+            </div>
+
+            <div class="vd-routine anim d6" style="opacity:0.5;">
+              <div class="vd-routine-color" style="background: var(--text-muted);"></div>
+              <div class="vd-routine-info">
+                <div class="vd-routine-name">Legs — Quadriceps</div>
+                <div class="vd-routine-meta">Demain · 5 exercices</div>
+              </div>
+              <div class="vd-routine-go" style="background: rgba(255,255,255,0.06);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+            <div style="height: 20px;"></div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span class="nav-label">Seances</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M12 20V4m-6 8l6-8 6 8"/></svg>
+              <span class="nav-label">Poids</span>
+            </div>
+            <div class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+              <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              <span class="nav-label">Nutrition</span>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" color="#666"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="nav-label">Historique</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
