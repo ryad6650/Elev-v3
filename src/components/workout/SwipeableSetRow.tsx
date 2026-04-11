@@ -110,7 +110,7 @@ export default function SwipeableSetRow({
   }, [doDelete]);
 
   // Fond solide pour couvrir le bouton supprimer quand non swipé
-  const rowBg = index % 2 === 1 ? "#151312" : "#000";
+  const rowBg = index % 2 === 0 ? "#262220" : "#1B1715";
 
   return (
     <div

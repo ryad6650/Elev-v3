@@ -66,10 +66,9 @@ function BannerInner({
         onClick={onClick}
         className="flex items-center gap-3 px-4 py-3 w-full max-w-[420px] mx-auto transition-transform active:scale-[0.98]"
         style={{
-          background:
-            "color-mix(in srgb, var(--bg-secondary) 95%, transparent)",
+          background: "#262220",
           backdropFilter: "blur(16px)",
-          border: "1px solid var(--accent)",
+          border: "1px solid rgba(255,255,255,0.12)",
           borderRadius: "16px",
           boxShadow:
             "0 4px 24px color-mix(in srgb, var(--accent) 15%, transparent)",
@@ -94,12 +93,12 @@ function BannerInner({
 
         <span
           className="font-mono font-bold text-sm tabular-nums"
-          style={{ color: "var(--accent-text)" }}
+          style={{ color: "#74BF7A" }}
         >
           {timer}
         </span>
 
-        <ChevronRight size={18} style={{ color: "var(--accent)" }} />
+        <ChevronRight size={18} style={{ color: "#74BF7A" }} />
       </button>
     </div>
   );

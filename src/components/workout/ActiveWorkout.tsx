@@ -108,12 +108,15 @@ export default function ActiveWorkout() {
 
   return (
     <>
-      <div className="min-h-dvh flex flex-col" style={{ background: "#000" }}>
+      <div
+        className="min-h-dvh flex flex-col"
+        style={{ background: "#1B1715" }}
+      >
         {/* Header */}
         <div
           className="shrink-0"
           style={{
-            background: "#262220",
+            background: "#1B1715",
             paddingTop: "env(safe-area-inset-top)",
           }}
         >

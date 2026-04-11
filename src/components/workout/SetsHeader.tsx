@@ -14,6 +14,7 @@ export default function SetsHeader() {
       style={{
         gridTemplateColumns: "40px 1fr 80px 70px 40px",
         gap: "0 8px",
+        background: "#262220",
       }}
     >
       <span className="text-center" style={hdrStyle}>

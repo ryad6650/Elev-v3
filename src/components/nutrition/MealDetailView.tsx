@@ -108,7 +108,7 @@ export default function MealDetailView({
     <div
       className="fixed inset-0 z-40"
       style={{
-        background: "#0C0E0E",
+        background: "#1B1715",
         transform: visible ? "translateY(0)" : "translateY(100%)",
         transition: "transform 320ms cubic-bezier(0.32, 0.72, 0, 1)",
       }}
@@ -163,7 +163,7 @@ export default function MealDetailView({
           {/* Macro 2×2 grid */}
           <div
             className="mx-4 mb-6 rounded-2xl overflow-hidden"
-            style={{ background: "#262828", border: "1.5px solid #8A9090" }}
+            style={{ background: "#262220", border: "1.5px solid #8A9090" }}
           >
             {macroRows.map((row, ri) => (
               <div
@@ -234,15 +234,15 @@ export default function MealDetailView({
           style={{
             paddingBottom: "max(24px, env(safe-area-inset-bottom))",
             paddingTop: 10,
-            background: "#0C0E0E",
+            background: "#1B1715",
           }}
         >
           <button
             onClick={onAdd}
             className="w-full py-4 rounded-full text-[16px] font-bold active:scale-[0.98] transition-transform"
             style={{
-              background: "white",
-              color: "#1C1917",
+              background: "#74BF7A",
+              color: "#fff",
               fontFamily: "var(--font-sans)",
             }}
           >

@@ -99,7 +99,7 @@ export default function RoutineDetailView({
         position: "fixed",
         inset: 0,
         zIndex: 48,
-        background: "#000",
+        background: "#1B1715",
         overflowY: "auto",
       }}
     >
@@ -111,7 +111,7 @@ export default function RoutineDetailView({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "max(20px, env(safe-area-inset-top)) 16px 12px",
-            background: "#262220",
+            background: "#1B1715",
           }}
         >
           <button
@@ -361,7 +361,7 @@ export default function RoutineDetailView({
                         gridTemplateColumns: "56px 1fr 1fr",
                         padding: "11px 16px",
                         margin: "0 -16px",
-                        background: num % 2 === 0 ? "#262220" : "#000",
+                        background: num % 2 === 0 ? "#262220" : "#1B1715",
                         borderBottom: "1px solid #111",
                       }}
                     >

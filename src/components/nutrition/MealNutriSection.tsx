@@ -70,7 +70,7 @@ export default function MealNutriSection({ values, progressBars }: Props) {
       <div
         className="rounded-2xl mb-4"
         style={{
-          background: "#262828",
+          background: "#262220",
           border: "1px solid rgba(255,255,255,0.08)",
           padding: "12px 16px",
         }}
@@ -118,7 +118,7 @@ export default function MealNutriSection({ values, progressBars }: Props) {
       <div
         className="rounded-2xl overflow-hidden"
         style={{
-          background: "#262828",
+          background: "#262220",
           border: "1px solid rgba(255,255,255,0.08)",
         }}
       >

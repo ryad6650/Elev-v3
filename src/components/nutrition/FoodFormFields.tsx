@@ -12,12 +12,12 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "14px 16px",
   borderRadius: "var(--radius-sm)",
-  background: "rgba(255,255,255,0.5)",
-  border: "1px solid rgba(0,0,0,0.06)",
+  background: "rgba(255,255,255,0.07)",
+  border: "1px solid rgba(255,255,255,0.1)",
   fontFamily: "var(--font-nunito), sans-serif",
   fontSize: 15,
   fontWeight: 600,
-  color: "var(--text-primary)",
+  color: "#fafaf9",
   outline: "none",
 };
 

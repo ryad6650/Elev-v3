@@ -237,13 +237,13 @@ export default function AddFoodModal({
 
   const isCustom = selected?.is_global === false && !!selected?.id;
   const mealLabel = MEAL_NAMES[mealNumber] ?? `Repas ${mealNumber}`;
-  const isBeige = step === "custom" || step === "edit";
+  const isFormStep = step === "custom" || step === "edit";
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
       style={{
-        background: isBeige ? "#1B1715" : "#111927",
+        background: "#1B1715",
         transform:
           isClosing || !isVisible ? "translateY(100%)" : "translateY(0)",
         opacity: isClosing ? 0 : isVisible ? 1 : 0,
@@ -261,11 +261,11 @@ export default function AddFoodModal({
           >
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ background: "transparent", border: "2px solid #3B82F6" }}
+              style={{ background: "transparent", border: "2px solid #74BF7A" }}
             >
               <span
                 className="text-sm font-bold"
-                style={{ color: "#3B82F6", fontFamily: "var(--font-sans)" }}
+                style={{ color: "#74BF7A", fontFamily: "var(--font-sans)" }}
               >
                 {sessionCount}
               </span>
@@ -286,12 +286,14 @@ export default function AddFoodModal({
                   : mealLabel}
             </p>
             <button
-              onClick={isBeige ? () => setStep("search") : handleClose}
+              onClick={isFormStep ? () => setStep("search") : handleClose}
               className="w-9 h-9 flex items-center justify-center active:opacity-70 transition-opacity"
             >
               <X
                 size={20}
-                style={{ color: isBeige ? "#78716C" : "var(--text-secondary)" }}
+                style={{
+                  color: isFormStep ? "#78716C" : "var(--text-secondary)",
+                }}
               />
             </button>
           </div>
@@ -365,7 +367,7 @@ export default function AddFoodModal({
                 onClick={handleClose}
                 className="w-full py-4 rounded-full font-bold text-[17px] active:scale-[0.98] transition-transform"
                 style={{
-                  background: "#3B82F6",
+                  background: "#74BF7A",
                   color: "white",
                   fontFamily: "var(--font-sans)",
                 }}
@@ -412,18 +414,14 @@ export default function AddFoodModal({
                     size={22}
                     style={{
                       color:
-                        step === "search"
-                          ? "var(--accent-text)"
-                          : "var(--text-muted)",
+                        step === "search" ? "#74BF7A" : "var(--text-muted)",
                     }}
                   />
                   <span
                     className="text-[11px] font-medium"
                     style={{
                       color:
-                        step === "search"
-                          ? "var(--accent-text)"
-                          : "var(--text-muted)",
+                        step === "search" ? "#74BF7A" : "var(--text-muted)",
                       fontFamily: "var(--font-sans)",
                     }}
                   >

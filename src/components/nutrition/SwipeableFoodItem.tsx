@@ -190,7 +190,7 @@ export default function SwipeableFoodItem({ entry, onFoodClick }: Props) {
         style={{
           transform: `translate3d(${x}px, 0, 0)`,
           transition: snapping ? "transform 250ms ease" : "none",
-          background: "#0C0E0E",
+          background: "#1B1715",
           position: "relative",
           zIndex: 1,
           willChange: "transform",

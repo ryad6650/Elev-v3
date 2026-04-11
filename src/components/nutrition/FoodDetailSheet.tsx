@@ -77,7 +77,7 @@ function UnitScrollColumn({
           left: 0,
           right: 0,
           height: 28,
-          background: "linear-gradient(to bottom, #212121 10%, transparent)",
+          background: "linear-gradient(to bottom, #262220 10%, transparent)",
           zIndex: 2,
           pointerEvents: "none",
         }}
@@ -89,7 +89,7 @@ function UnitScrollColumn({
           left: 0,
           right: 0,
           height: 28,
-          background: "linear-gradient(to top, #212121 10%, transparent)",
+          background: "linear-gradient(to top, #262220 10%, transparent)",
           zIndex: 2,
           pointerEvents: "none",
         }}
@@ -275,7 +275,7 @@ export default function FoodDetailSheet({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: "#111927" }}
+      style={{ background: "#1B1715" }}
     >
       <div className="w-full h-full max-w-[430px] mx-auto flex flex-col">
         {/* Header */}
@@ -460,7 +460,7 @@ export default function FoodDetailSheet({
           className="shrink-0 px-4 pt-3 flex flex-col gap-2"
           style={{
             paddingBottom: "max(28px, env(safe-area-inset-bottom))",
-            background: "#212121",
+            background: "#262220",
             borderTop: "1px solid var(--border)",
           }}
         >
@@ -483,7 +483,7 @@ export default function FoodDetailSheet({
             <div
               className="rounded-l-2xl overflow-hidden"
               style={{
-                background: "#3d3d3d",
+                background: "#262220",
                 border: "1px solid rgba(255,255,255,0.08)",
                 width: "28%",
               }}
@@ -523,7 +523,7 @@ export default function FoodDetailSheet({
               }}
               className="flex-1 rounded-r-2xl flex items-center justify-between px-5 py-[6px] active:opacity-70 transition-opacity"
               style={{
-                background: "#3d3d3d",
+                background: "#262220",
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
             >
@@ -546,7 +546,7 @@ export default function FoodDetailSheet({
             disabled={pending}
             className="w-full block py-[15px] rounded-full text-[16px] font-bold active:scale-[0.98] transition-transform"
             style={{
-              background: "#0589D6",
+              background: "#74BF7A",
               color: "#ffffff",
               opacity: pending ? 0.6 : 1,
               fontFamily: "var(--font-sans)",
@@ -569,7 +569,7 @@ export default function FoodDetailSheet({
               style={{
                 maxHeight: showPicker ? PICK_ITEM_H * PICK_VISIBLE : 0,
                 transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1)",
-                background: "#212121",
+                background: "#262220",
               }}
             >
               <div
@@ -606,7 +606,7 @@ export default function FoodDetailSheet({
                     visible={7}
                     itemHeight={PICK_ITEM_H}
                     hideHighlight
-                    bgColor="#212121"
+                    bgColor="#262220"
                     gradientHeight={20}
                   />
                 </div>

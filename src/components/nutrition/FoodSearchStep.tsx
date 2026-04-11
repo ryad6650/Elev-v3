@@ -91,12 +91,12 @@ export default function FoodSearchStep({
           className="flex items-center gap-3 rounded-2xl px-4 h-[50px]"
           style={{
             background: "#262828",
-            border: "2px solid #3B82F6",
-            boxShadow: q ? "0 0 0 3px rgba(59,130,246,0.12)" : "none",
+            border: "2px solid #74BF7A",
+            boxShadow: q ? "0 0 0 3px rgba(116,191,122,0.12)" : "none",
             transition: "box-shadow 0.2s",
           }}
         >
-          <Search size={17} color="#3B82F6" style={{ flexShrink: 0 }} />
+          <Search size={17} color="#74BF7A" style={{ flexShrink: 0 }} />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

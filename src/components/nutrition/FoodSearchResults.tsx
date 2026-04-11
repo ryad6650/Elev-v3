@@ -41,7 +41,7 @@ export default memo(function FoodSearchResults({
       <div className="flex justify-center py-8">
         <div
           className="w-5 h-5 rounded-full border-2 animate-spin"
-          style={{ borderColor: "#3B82F6", borderTopColor: "transparent" }}
+          style={{ borderColor: "#74BF7A", borderTopColor: "transparent" }}
         />
       </div>
     );
@@ -118,9 +118,9 @@ export default memo(function FoodSearchResults({
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300"
                 style={{
                   background: addedIds.has(a.id || a.nom)
-                    ? "#3B82F6"
+                    ? "#74BF7A"
                     : "transparent",
-                  border: "2px solid #3B82F6",
+                  border: "2px solid #74BF7A",
                   transform: addedIds.has(a.id || a.nom)
                     ? "scale(1.15)"
                     : "scale(1)",
@@ -129,7 +129,7 @@ export default memo(function FoodSearchResults({
                 {addedIds.has(a.id || a.nom) ? (
                   <Check size={18} color="#fff" strokeWidth={2.5} />
                 ) : (
-                  <Plus size={18} color="#3B82F6" strokeWidth={2.5} />
+                  <Plus size={18} color="#74BF7A" strokeWidth={2.5} />
                 )}
               </button>
             </div>

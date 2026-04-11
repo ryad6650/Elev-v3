@@ -190,12 +190,12 @@ export default function CustomFoodForm({
               width: 48,
               height: 48,
               borderRadius: "var(--radius-sm)",
-              background: "var(--green-dim)",
-              border: "1px solid rgba(42,157,110,0.15)",
+              background: "rgba(116,191,122,0.12)",
+              border: "1px solid rgba(116,191,122,0.15)",
               cursor: "pointer",
             }}
           >
-            <ScanBarcode size={20} style={{ color: "var(--green)" }} />
+            <ScanBarcode size={20} style={{ color: "#74BF7A" }} />
           </button>
         </div>
         {showScanner && (
@@ -221,21 +221,21 @@ export default function CustomFoodForm({
         value={vals.gluc}
         onChange={(v) => set("gluc", v)}
         unit="g"
-        dot="var(--color-carbs)"
+        dot="#74BF7A"
       />
       <MacroField
         label="Protéines"
         value={vals.prot}
         onChange={(v) => set("prot", v)}
         unit="g"
-        dot="var(--color-protein)"
+        dot="#74BF7A"
       />
       <MacroField
         label="Lipides"
         value={vals.lip}
         onChange={(v) => set("lip", v)}
         unit="g"
-        dot="var(--color-fat)"
+        dot="#74BF7A"
       />
 
       <div className="flex gap-2.5" style={{ marginBottom: 16 }}>
@@ -297,7 +297,7 @@ export default function CustomFoodForm({
         className="w-full flex items-center justify-center text-[15px] font-semibold text-white mt-3 active:scale-[0.98] transition-transform"
         style={{
           padding: 16,
-          background: "var(--green)",
+          background: "#74BF7A",
           borderRadius: "var(--radius-sm)",
           border: "none",
           opacity: disabled ? 0.5 : 1,
