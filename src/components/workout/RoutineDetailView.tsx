@@ -111,7 +111,7 @@ export default function RoutineDetailView({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "max(20px, env(safe-area-inset-top)) 16px 12px",
-            background: "#151312",
+            background: "#262220",
           }}
         >
           <button
@@ -260,7 +260,7 @@ export default function RoutineDetailView({
                   padding: "8px 18px",
                   borderRadius: 20,
                   border: "none",
-                  background: tab === key ? "#1E9D4C" : "#151312",
+                  background: tab === key ? "#1E9D4C" : "#262220",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: tab === key ? 600 : 400,
@@ -361,7 +361,7 @@ export default function RoutineDetailView({
                         gridTemplateColumns: "56px 1fr 1fr",
                         padding: "11px 16px",
                         margin: "0 -16px",
-                        background: num % 2 === 0 ? "#151312" : "#000",
+                        background: num % 2 === 0 ? "#262220" : "#000",
                         borderBottom: "1px solid #111",
                       }}
                     >

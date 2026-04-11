@@ -191,7 +191,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           onClick={() => addSet(uid)}
           className="w-full py-1.5 rounded-xl flex items-center justify-center gap-2 font-semibold active:scale-[0.98] transition-transform"
           style={{
-            background: "#151312",
+            background: "#262220",
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 15,
             color: "var(--text-primary)",

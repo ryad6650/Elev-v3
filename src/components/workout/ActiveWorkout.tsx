@@ -113,7 +113,7 @@ export default function ActiveWorkout() {
         <div
           className="shrink-0"
           style={{
-            background: "#151312",
+            background: "#262220",
             paddingTop: "env(safe-area-inset-top)",
           }}
         >

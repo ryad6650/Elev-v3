@@ -88,7 +88,7 @@ export default function DashboardNutritionCard({
   return (
     <div
       style={{
-        background: "#151312",
+        background: "#262220",
         border: "2px solid #595F60",
         borderRadius: 20,
         padding: 22,

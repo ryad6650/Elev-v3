@@ -53,7 +53,7 @@ export default function DashboardNextRoutine({ routine }: Props) {
 
       <div
         style={{
-          background: "#151312",
+          background: "#262220",
           border: "1px solid var(--border)",
           borderRadius: 16,
           padding: 16,

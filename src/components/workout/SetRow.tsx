@@ -55,7 +55,7 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
         gridTemplateColumns: "40px 1fr 80px 70px 40px",
         gap: "0 8px",
         borderTop: "none",
-        background: index % 2 === 1 ? "#151312" : "transparent",
+        background: index % 2 === 1 ? "#262220" : "transparent",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >

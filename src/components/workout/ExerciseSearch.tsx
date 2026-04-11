@@ -202,7 +202,7 @@ export default function ExerciseSearch({
       <div className="px-4 pt-1 pb-3 space-y-3">
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl"
-          style={{ background: "#151312" }}
+          style={{ background: "#262220" }}
         >
           <Search size={17} style={{ color: "#636366" }} />
           <input
@@ -338,7 +338,7 @@ function FilterBtn({
     <button
       onClick={onToggle}
       className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl active:opacity-70"
-      style={{ background: "#151312" }}
+      style={{ background: "#262220" }}
     >
       <span
         className="truncate"

@@ -56,7 +56,7 @@ export default function DashboardSummaryRow({
           key={item.label}
           className="flex-1 text-center"
           style={{
-            background: "#151312",
+            background: "#262220",
             border: "1px solid var(--border)",
             borderRadius: 18,
             padding: "18px 14px",

@@ -89,7 +89,7 @@ export default function WorkoutPageClient({
         onClick={() => startWorkout({ routineId: null, routineName: null })}
         className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform mb-6"
         style={{
-          background: "#151312",
+          background: "#262220",
           border: "1px solid var(--border)",
           borderRadius: 14,
           padding: "16px 20px",

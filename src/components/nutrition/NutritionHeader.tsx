@@ -185,7 +185,7 @@ export default function NutritionHeader({
   return (
     <div
       style={{
-        background: "#151312",
+        background: "#262220",
         borderRadius: 16,
         border: "2px solid #595F60",
         padding: "20px 16px",

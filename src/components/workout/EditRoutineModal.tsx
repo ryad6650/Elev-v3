@@ -170,7 +170,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
         className="relative flex items-center px-4 pb-3"
         style={{
           paddingTop: "max(1rem, env(safe-area-inset-top))",
-          background: "#151312",
+          background: "#262220",
           borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >

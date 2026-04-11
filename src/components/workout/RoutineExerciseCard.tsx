@@ -103,7 +103,7 @@ export default function RoutineExerciseCard({
         <div
           key={n}
           className="flex items-center px-4 py-4"
-          style={{ background: n % 2 === 0 ? "#151312" : "transparent" }}
+          style={{ background: n % 2 === 0 ? "#262220" : "transparent" }}
         >
           <span
             className="w-14 text-[17px] font-bold tabular-nums"
@@ -131,7 +131,7 @@ export default function RoutineExerciseCard({
         <button
           onClick={() => onUpdateSeries(index, 1)}
           className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-[17px] font-semibold active:opacity-70 transition-opacity"
-          style={{ background: "#151312", color: "var(--text-primary)" }}
+          style={{ background: "#262220", color: "var(--text-primary)" }}
         >
           + Ajouter une Série
         </button>

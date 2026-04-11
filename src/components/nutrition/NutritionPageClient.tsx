@@ -286,7 +286,7 @@ export default function NutritionPageClient({ initialData }: Props) {
           </div>
           <div
             style={{
-              background: "#151312",
+              background: "#262220",
               borderRadius: 16,
               overflow: "hidden",
               border: "2px solid #595F60",

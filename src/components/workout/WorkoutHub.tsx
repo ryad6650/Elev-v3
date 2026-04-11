@@ -109,7 +109,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
           onClick={onNewRoutine}
           className="flex-1 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           style={{
-            background: "#151312",
+            background: "#262220",
             border: "1px solid var(--border)",
             borderRadius: 12,
             padding: "12px 16px",
@@ -131,7 +131,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
           onClick={onExplorer}
           className="flex-1 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           style={{
-            background: "#151312",
+            background: "#262220",
             border: "1px solid var(--border)",
             borderRadius: 12,
             padding: "12px 16px",
@@ -243,7 +243,7 @@ export default function WorkoutHub({ data, onNewRoutine, onExplorer }: Props) {
             {/* Actions */}
             <div
               className="rounded-2xl overflow-hidden"
-              style={{ background: "#151312" }}
+              style={{ background: "#262220" }}
             >
               <RoutineMenuItem
                 icon={<Share size={22} />}

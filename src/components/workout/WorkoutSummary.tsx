@@ -93,7 +93,7 @@ export default function WorkoutSummary({
       <div
         className="flex items-center justify-between px-4 pb-3"
         style={{
-          background: "#151312",
+          background: "#262220",
           paddingTop: "calc(env(safe-area-inset-top) + 12px)",
         }}
       >
@@ -247,7 +247,7 @@ export default function WorkoutSummary({
         >
           <div
             className="w-full max-w-sm p-6 rounded-2xl space-y-4"
-            style={{ background: "#151312" }}
+            style={{ background: "#262220" }}
             onClick={(e) => e.stopPropagation()}
           >
             <p className="font-semibold text-white">Abandonner la séance ?</p>
