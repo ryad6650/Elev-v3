@@ -1,5 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import {
+  computeStreak,
+  computePRs,
+  aggregateNutrition,
+} from "./historique-helpers";
+import type { WorkoutJoin, NutriEntryJoin } from "./historique-helpers";
 
 export interface HistoriqueWorkout {
   id: string;
@@ -22,91 +28,85 @@ export interface SommeilRecord {
   duree_minutes: number;
 }
 
+export interface NutritionDaySummary {
+  date: string;
+  calories: number;
+  proteines: number;
+  glucides: number;
+  lipides: number;
+}
+
+export interface PoidsRecord {
+  date: string;
+  poids: number;
+}
+
+export interface NutritionObjectifs {
+  calories: number;
+  proteines: number | null;
+  glucides: number | null;
+  lipides: number | null;
+}
+
 export interface HistoriquePageData {
   totalSeances: number;
   streakActuel: number;
   prsRecents: PRRecord[];
   workouts: HistoriqueWorkout[];
   sommeil: SommeilRecord[];
-}
-
-type SetJoin = {
-  exercise_id: string;
-  poids: number | null;
-  reps: number | null;
-  completed: boolean;
-  exercises: { nom: string } | null;
-};
-
-type WorkoutJoin = {
-  id: string;
-  date: string;
-  duree_minutes: number | null;
-  routines: { nom: string } | null;
-  workout_sets: SetJoin[];
-};
-
-function computeStreak(dates: string[]): number {
-  if (dates.length === 0) return 0;
-  const sorted = [...new Set(dates)].sort((a, b) => b.localeCompare(a));
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-  if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const curr = new Date(sorted[i] + "T12:00:00");
-    const prev = new Date(sorted[i - 1] + "T12:00:00");
-    const diff = Math.round((prev.getTime() - curr.getTime()) / 86400000);
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
-}
-
-function computePRs(workouts: WorkoutJoin[]): PRRecord[] {
-  const map = new Map<string, { nom: string; poids: number; reps: number }>();
-  for (const w of workouts) {
-    for (const s of w.workout_sets) {
-      if (!s.completed || !s.poids) continue;
-      const nom = s.exercises?.nom ?? "Exercice";
-      const prev = map.get(s.exercise_id);
-      if (!prev || s.poids > prev.poids) {
-        map.set(s.exercise_id, { nom, poids: s.poids, reps: s.reps ?? 0 });
-      }
-    }
-  }
-  return Array.from(map.values())
-    .sort((a, b) => b.poids - a.poids)
-    .slice(0, 3)
-    .map((e) => ({ exerciceNom: e.nom, poidsMax: e.poids, repsAuMax: e.reps }));
+  nutritionDays: NutritionDaySummary[];
+  poidsHistory: PoidsRecord[];
+  objectifs: NutritionObjectifs;
 }
 
 export async function fetchHistoriqueData(
   supabase: SupabaseClient<Database>,
   userId: string,
 ): Promise<HistoriquePageData> {
-  const [workoutsRes, countRes, sommeilRes] = await Promise.all([
-    supabase
-      .from("workouts")
-      .select(
-        `id, date, duree_minutes,
+  const [workoutsRes, countRes, sommeilRes, nutriRes, poidsRes, profileRes] =
+    await Promise.all([
+      supabase
+        .from("workouts")
+        .select(
+          `id, date, duree_minutes,
         routines(nom),
         workout_sets(exercise_id, poids, reps, completed, exercises(nom))`,
-      )
-      .eq("user_id", userId)
-      .order("date", { ascending: false })
-      .limit(30),
-    supabase
-      .from("workouts")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId),
-    supabase
-      .from("sommeil")
-      .select("id, date, duree_minutes")
-      .eq("user_id", userId)
-      .order("date", { ascending: false })
-      .limit(30),
-  ]);
+        )
+        .eq("user_id", userId)
+        .order("date", { ascending: false })
+        .limit(30),
+      supabase
+        .from("workouts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
+      supabase
+        .from("sommeil")
+        .select("id, date, duree_minutes")
+        .eq("user_id", userId)
+        .order("date", { ascending: false })
+        .limit(30),
+      supabase
+        .from("nutrition_entries")
+        .select(
+          "date, quantite_g, quantite_portion, aliments(calories, proteines, glucides, lipides, taille_portion_g)",
+        )
+        .eq("user_id", userId)
+        .order("date", { ascending: false })
+        .limit(300),
+      supabase
+        .from("poids_history")
+        .select("date, poids")
+        .eq("user_id", userId)
+        .order("date", { ascending: false })
+        .limit(30),
+      supabase
+        .from("profiles")
+        .select(
+          "objectif_calories, objectif_proteines, objectif_glucides, objectif_lipides",
+        )
+        .eq("id", userId)
+        .single(),
+    ]);
 
   if (workoutsRes.error) throw new Error(workoutsRes.error.message);
 
@@ -141,11 +141,29 @@ export async function fetchHistoriqueData(
     duree_minutes: s.duree_minutes,
   }));
 
+  const nutriEntries = (nutriRes.data ?? []) as unknown as NutriEntryJoin[];
+  const nutritionDays = aggregateNutrition(nutriEntries);
+
+  const poidsHistory: PoidsRecord[] = (poidsRes.data ?? [])
+    .filter((p): p is typeof p & { date: string } => p.date !== null)
+    .map((p) => ({ date: p.date, poids: p.poids }));
+
+  const profile = profileRes.data;
+  const objectifs: NutritionObjectifs = {
+    calories: profile?.objectif_calories ?? 2200,
+    proteines: profile?.objectif_proteines ?? null,
+    glucides: profile?.objectif_glucides ?? null,
+    lipides: profile?.objectif_lipides ?? null,
+  };
+
   return {
     totalSeances: countRes.count ?? 0,
     streakActuel: computeStreak(raw.map((w) => w.date)),
     prsRecents: computePRs(raw),
     workouts,
     sommeil,
+    nutritionDays,
+    poidsHistory,
+    objectifs,
   };
 }

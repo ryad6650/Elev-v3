@@ -41,7 +41,7 @@ export default function RoutineExerciseCard({
         <ExerciseGif gifUrl={ex.gifUrl} nom={ex.nom} size="sm" circle />
         <span
           className="flex-1 text-[17px] font-semibold leading-tight"
-          style={{ color: "#008CFF" }}
+          style={{ color: "#1E9D4C" }}
         >
           {ex.nom}
         </span>
@@ -57,10 +57,10 @@ export default function RoutineExerciseCard({
 
       {/* Rest timer */}
       <div className="px-4 pb-3 flex items-center gap-1.5">
-        <Clock size={18} style={{ color: "#008CFF" }} />
+        <Clock size={18} style={{ color: "#1E9D4C" }} />
         <span
           className="text-[15px] font-semibold"
-          style={{ color: "#008CFF" }}
+          style={{ color: "#1E9D4C" }}
         >
           Repos: DÉSACTIVÉ
         </span>
@@ -103,7 +103,7 @@ export default function RoutineExerciseCard({
         <div
           key={n}
           className="flex items-center px-4 py-4"
-          style={{ background: n % 2 === 0 ? "#1C1C1E" : "transparent" }}
+          style={{ background: n % 2 === 0 ? "#151312" : "transparent" }}
         >
           <span
             className="w-14 text-[17px] font-bold tabular-nums"
@@ -131,7 +131,7 @@ export default function RoutineExerciseCard({
         <button
           onClick={() => onUpdateSeries(index, 1)}
           className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-[17px] font-semibold active:opacity-70 transition-opacity"
-          style={{ background: "#1C1C1E", color: "var(--text-primary)" }}
+          style={{ background: "#151312", color: "var(--text-primary)" }}
         >
           + Ajouter une Série
         </button>

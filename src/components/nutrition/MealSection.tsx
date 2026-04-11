@@ -41,7 +41,7 @@ function MealRing({ pct }: { pct: number }) {
           cy={cy}
           r={r}
           fill="none"
-          stroke="#00FFC3"
+          stroke="#74BF7A"
           strokeWidth="4.5"
           strokeLinecap="round"
           strokeDasharray={`${progress} ${circ - progress}`}

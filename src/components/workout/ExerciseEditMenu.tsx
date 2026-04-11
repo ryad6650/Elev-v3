@@ -49,7 +49,7 @@ export default function ExerciseEditMenu({
               style={{
                 top: pos.top,
                 right: pos.right,
-                background: "#1C1C1E",
+                background: "#151312",
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
             >
@@ -57,7 +57,7 @@ export default function ExerciseEditMenu({
                 onClick={onEdit}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:opacity-60 transition-opacity"
               >
-                <Settings size={16} style={{ color: "#008CFF" }} />
+                <Settings size={16} style={{ color: "#1E9D4C" }} />
                 <span
                   className="text-[15px]"
                   style={{ color: "var(--text-primary)" }}
@@ -73,7 +73,7 @@ export default function ExerciseEditMenu({
                 onClick={onReplace}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:opacity-60 transition-opacity"
               >
-                <ArrowLeftRight size={16} style={{ color: "#008CFF" }} />
+                <ArrowLeftRight size={16} style={{ color: "#1E9D4C" }} />
                 <span
                   className="text-[15px]"
                   style={{ color: "var(--text-primary)" }}

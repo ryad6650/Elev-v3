@@ -16,7 +16,7 @@ export default function MondayReportCard() {
         className="p-4 rounded-2xl border flex items-center gap-4 transition-all active:scale-[0.98]"
         style={{
           background: "var(--grad-monday)",
-          borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)",
+          borderColor: "rgba(30,157,76,0.25)",
         }}
       >
         <div
@@ -24,18 +24,14 @@ export default function MondayReportCard() {
           style={{
             width: 44,
             height: 44,
-            background: "var(--accent-bg)",
-            border:
-              "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
+            background: "rgba(27,46,29,0.35)",
+            border: "1px solid rgba(30,157,76,0.3)",
           }}
         >
-          <FileText size={20} style={{ color: "var(--accent)" }} />
+          <FileText size={20} style={{ color: "#1E9D4C" }} />
         </div>
         <div className="flex-1 min-w-0">
-          <p
-            className="text-xs font-semibold"
-            style={{ color: "var(--accent-text)" }}
-          >
+          <p className="text-xs font-semibold" style={{ color: "#74BF7A" }}>
             Rapport hebdomadaire prêt
           </p>
           <p
@@ -50,7 +46,7 @@ export default function MondayReportCard() {
           style={{
             width: 32,
             height: 32,
-            background: "var(--accent)",
+            background: "#1E9D4C",
           }}
         >
           <ArrowRight size={16} color="#fff" />

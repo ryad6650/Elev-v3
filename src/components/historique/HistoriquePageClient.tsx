@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import type { HistoriquePageData } from "@/lib/historique";
 import { fetchHistoriqueData } from "@/lib/historique";
 import { createClient } from "@/lib/supabase/client";
 import { fetchWorkoutDetail } from "@/app/actions/historique";
 import type { WorkoutDetail } from "@/app/actions/historique";
-import HistoriqueStatsCards from "./HistoriqueStatsCards";
 import HistoriqueCalendar from "./HistoriqueCalendar";
+import DaySummary from "./DaySummary";
+import WeekSummary from "./WeekSummary";
 import PRSection from "./PRSection";
-import HistoriqueList from "./HistoriqueList";
-import SleepHistorySection from "./SleepHistorySection";
 import WorkoutDetailSheet from "./WorkoutDetailSheet";
 
 interface Props {
@@ -18,13 +17,15 @@ interface Props {
 }
 
 export default function HistoriquePageClient({ initialData }: Props) {
+  const todayStr = new Date().toISOString().split("T")[0];
   const [data, setData] = useState(initialData);
+  const [selectedDate, setSelectedDate] = useState(todayStr);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDetail | null>(
     null,
   );
   const [error, setError] = useState<string | null>(null);
 
-  const reload = async () => {
+  const reload = useCallback(async () => {
     const supabase = createClient();
     const {
       data: { user },
@@ -38,39 +39,63 @@ export default function HistoriquePageClient({ initialData }: Props) {
       console.error(e);
       setError("Impossible de charger l'historique");
     }
-  };
+  }, []);
 
-  const handleSelect = async (id: string) => {
+  const handleSelectWorkout = useCallback(async (id: string) => {
     try {
       const detail = await fetchWorkoutDetail(id);
       setSelectedWorkout(detail);
     } catch (e) {
       console.error(e);
-      setError("Impossible de charger le détail de la séance");
+      setError("Impossible de charger le détail");
     }
-  };
+  }, []);
 
-  const handleDeleted = () => {
-    setSelectedWorkout(null);
-    reload();
-  };
+  const dayNutrition = useMemo(
+    () => data.nutritionDays.find((n) => n.date === selectedDate),
+    [data.nutritionDays, selectedDate],
+  );
+  const dayPoids = useMemo(
+    () => data.poidsHistory.find((p) => p.date === selectedDate),
+    [data.poidsHistory, selectedDate],
+  );
+  const previousPoids = useMemo(() => {
+    const sorted = [...data.poidsHistory].sort((a, b) =>
+      b.date.localeCompare(a.date),
+    );
+    const idx = sorted.findIndex((p) => p.date < selectedDate);
+    return idx >= 0 ? sorted[idx] : undefined;
+  }, [data.poidsHistory, selectedDate]);
 
-  const handleUpdated = (w: WorkoutDetail) => {
-    setSelectedWorkout(w);
-    reload();
-  };
+  const daySommeil = useMemo(
+    () => data.sommeil.find((s) => s.date === selectedDate),
+    [data.sommeil, selectedDate],
+  );
+  const avgSommeil = useMemo(() => {
+    if (data.sommeil.length === 0) return 0;
+    return Math.round(
+      data.sommeil.reduce((s, e) => s + e.duree_minutes, 0) /
+        data.sommeil.length,
+    );
+  }, [data.sommeil]);
 
   return (
     <main
       className="page-enter"
-      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 28px 112px" }}
+      style={{
+        maxWidth: 430,
+        margin: "0 auto",
+        padding: "20px 28px",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+        background: "#0C0A09",
+        minHeight: "100dvh",
+      }}
     >
       {/* Header */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 16 }}>
         <div
           style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -83,7 +108,7 @@ export default function HistoriquePageClient({ initialData }: Props) {
         <h1
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
-            fontSize: 32,
+            fontSize: 34,
             fontWeight: 500,
             color: "var(--text-primary)",
             letterSpacing: "-0.5px",
@@ -94,51 +119,93 @@ export default function HistoriquePageClient({ initialData }: Props) {
         </h1>
       </div>
 
+      {/* Streak + mois */}
+      <div
+        className="flex items-center justify-between"
+        style={{ marginBottom: 12 }}
+      >
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            background: "rgba(232,184,109,0.1)",
+            borderRadius: 999,
+            padding: "5px 12px",
+            fontSize: 13,
+            fontWeight: 700,
+            color: "#E8B86D",
+            border: "1px solid rgba(232,184,109,0.12)",
+          }}
+        >
+          🔥 {data.streakActuel} jour{data.streakActuel > 1 ? "s" : ""}
+        </span>
+        <span
+          style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}
+        >
+          {data.totalSeances} séances au total
+        </span>
+      </div>
+
       {error && (
         <div
           className="rounded-xl px-4 py-3 text-sm font-medium"
           style={{
             background: "rgba(239,68,68,0.12)",
             color: "#ef4444",
-            marginBottom: 16,
+            marginBottom: 12,
           }}
         >
           {error}
         </div>
       )}
 
-      <HistoriqueStatsCards
-        workouts={data.workouts}
-        totalSeances={data.totalSeances}
-        streakActuel={data.streakActuel}
-        estTout={true}
-      />
-
+      {/* Calendrier */}
       <HistoriqueCalendar
         workouts={data.workouts}
-        streakActuel={data.streakActuel}
+        nutritionDays={data.nutritionDays}
+        poidsHistory={data.poidsHistory}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
       />
 
-      <HistoriqueList workouts={data.workouts} onSelect={handleSelect} />
+      {/* Résumé du jour */}
+      <DaySummary
+        date={selectedDate}
+        workouts={data.workouts}
+        nutrition={dayNutrition}
+        poids={dayPoids}
+        previousPoids={previousPoids}
+        sommeil={daySommeil}
+        avgSommeil={avgSommeil}
+        objectifs={data.objectifs}
+        onSelectWorkout={handleSelectWorkout}
+      />
 
-      <SleepHistorySection
+      {/* Semaine en bref */}
+      <WeekSummary
+        selectedDate={selectedDate}
+        workouts={data.workouts}
+        nutritionDays={data.nutritionDays}
         sommeil={data.sommeil}
-        onDeleted={(id) => {
-          setData((d) => ({
-            ...d,
-            sommeil: d.sommeil.filter((s) => s.id !== id),
-          }));
-        }}
       />
 
+      {/* PRs */}
       <PRSection prs={data.prsRecents} />
 
+      {/* Détail séance */}
       {selectedWorkout && (
         <WorkoutDetailSheet
           workout={selectedWorkout}
           onClose={() => setSelectedWorkout(null)}
-          onDeleted={handleDeleted}
-          onUpdated={handleUpdated}
+          onDeleted={() => {
+            setSelectedWorkout(null);
+            reload();
+          }}
+          onUpdated={(w) => {
+            setSelectedWorkout(w);
+            reload();
+          }}
         />
       )}
     </main>

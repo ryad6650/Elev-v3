@@ -44,7 +44,7 @@ export default memo(function WeeklyWorkoutCard({
         <Link
           href="/historique"
           className="text-[10px] font-semibold"
-          style={{ color: "#0589D6" }}
+          style={{ color: "#74BF7A" }}
         >
           Voir tout &rarr;
         </Link>
@@ -115,7 +115,7 @@ export default memo(function WeeklyWorkoutCard({
           <div
             className="rounded-[14px] p-3 px-3.5 flex items-center gap-2.5"
             style={{
-              background: "linear-gradient(135deg, #001429 0%, #0589D6 100%)",
+              background: "linear-gradient(135deg, #0a1f0e 0%, #1E9D4C 100%)",
               border: "1px solid rgba(116,191,122,0.2)",
             }}
           >

@@ -29,7 +29,7 @@ function MacroBar({
           fontWeight: 700,
           textTransform: "uppercase",
           letterSpacing: "0.06em",
-          color: "#00FFC3",
+          color: "#74BF7A",
           marginBottom: 6,
         }}
       >
@@ -57,7 +57,7 @@ function MacroBar({
           style={{
             height: "100%",
             borderRadius: 99,
-            background: "#00FFC3",
+            background: "#74BF7A",
             width: `${pct}%`,
             transition: "width 700ms ease",
           }}
@@ -88,7 +88,7 @@ export default function DashboardNutritionCard({
   return (
     <div
       style={{
-        background: "#1C1C1E",
+        background: "#151312",
         border: "2px solid #595F60",
         borderRadius: 20,
         padding: 22,
@@ -117,7 +117,7 @@ export default function DashboardNutritionCard({
               cy="39"
               r={r}
               fill="none"
-              stroke="#00FFC3"
+              stroke="#74BF7A"
               strokeWidth="7"
               strokeLinecap="round"
               strokeDasharray={circ}
@@ -172,7 +172,7 @@ export default function DashboardNutritionCard({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: "#00FFC3",
+              color: "#1E9D4C",
               marginTop: 6,
             }}
           >

@@ -110,7 +110,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           className="flex-1 min-w-0 text-[17px] font-bold truncate"
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
-            color: "var(--accent)",
+            color: "#1E9D4C",
           }}
         >
           {exercise.nom}
@@ -155,13 +155,13 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         onClick={() => setShowPicker(true)}
         className="flex items-center gap-2 px-4 pb-3 active:opacity-70"
       >
-        <Timer size={14} style={{ color: "var(--accent)" }} />
+        <Timer size={14} style={{ color: "#1E9D4C" }} />
         <span
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--accent)",
+            color: "#1E9D4C",
           }}
         >
           Repos:{" "}
@@ -191,7 +191,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           onClick={() => addSet(uid)}
           className="w-full py-1.5 rounded-xl flex items-center justify-center gap-2 font-semibold active:scale-[0.98] transition-transform"
           style={{
-            background: "#1C1C1E",
+            background: "#151312",
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 15,
             color: "var(--text-primary)",
@@ -245,14 +245,14 @@ function ClosedCard({
         className="flex-1 text-left text-[16px] font-bold truncate"
         style={{
           fontFamily: "var(--font-nunito), sans-serif",
-          color: "var(--accent)",
+          color: "#1E9D4C",
         }}
       >
         {nom}
       </span>
       <span
         className="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0"
-        style={{ background: "var(--accent-bg)", color: "var(--accent)" }}
+        style={{ background: "rgba(27,46,29,0.35)", color: "#1E9D4C" }}
       >
         {completedWork}/{totalSets}
       </span>

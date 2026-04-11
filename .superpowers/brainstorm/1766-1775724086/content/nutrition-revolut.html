@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elev — Nutrition Revolut Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary:    #f5f3f0;
+      --bg-card:       rgba(255,255,255,0.55);
+      --bg-inner:      rgba(255,255,255,0.4);
+
+      --text-primary:  #1e1e1e;
+      --text-secondary:#5c5a57;
+      --text-muted:    #908d88;
+
+      --green:         #2a9d6e;
+      --green-dim:     rgba(42,157,110,0.10);
+      --color-protein: #3872c4;
+      --color-carbs:   #b08a1a;
+      --color-fat:     #c94444;
+
+      --border:        rgba(0,0,0,0.04);
+
+      --font-display:  'Inter', sans-serif;
+      --font-body:     'DM Sans', sans-serif;
+
+      --radius-card:   20px;
+      --radius-pill:   9999px;
+      --radius-sm:     12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: #d8d5d0;
+      overflow-x: hidden;
+    }
+
+    .page-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #e8e5e0 0%, #d8d5d0 50%, #e0ddd8 100%);
+      z-index: 0;
+    }
+
+    .layout {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 36px;
+      padding: 48px 32px 64px;
+      width: 100%;
+    }
+
+    .page-header { text-align: center; }
+    .page-eyebrow {
+      font-family: var(--font-display);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .phone-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+    .screen-label {
+      font-family: var(--font-display);
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .phone {
+      width: 430px; height: 932px;
+      border-radius: 46px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.04),
+        0 0 0 9px rgba(0,0,0,0.07),
+        0 0 0 10px rgba(0,0,0,0.02),
+        0 48px 120px rgba(0,0,0,0.15);
+    }
+    .phone-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, #dce8d8 0%, #e4ead8 25%, #ede8df 55%, #f3f0ea 100%);
+      z-index: 0;
+    }
+    .phone-ui {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 32px 0; flex-shrink: 0;
+    }
+    .s-time {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .s-icons { display: flex; gap: 5px; }
+    .s-icons span { font-size: 13px; color: var(--text-muted); }
+
+    .content-area {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 20px 28px 0;
+      overflow-y: auto;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+
+    /* ── Date nav ── */
+    .date-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeIn 400ms ease-out 100ms forwards;
+    }
+    .date-nav-title {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+    .date-picker {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .date-arrow {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary); font-size: 18px; font-weight: 600;
+    }
+    .date-current {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ── Calories summary card ── */
+    .cal-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.35);
+      opacity: 0; animation: fadeIn 400ms ease-out 200ms forwards;
+    }
+    .cal-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .cal-left {}
+    .cal-left-label {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .cal-left-number {
+      font-family: var(--font-display);
+      font-size: 42px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .cal-left-unit {
+      font-size: 14px; color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .cal-left-remaining {
+      font-size: 14px; font-weight: 500;
+      color: var(--green);
+      margin-top: 8px;
+    }
+
+    /* Macros bars */
+    .macros-bars {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .macro-row {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .macro-label-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .macro-name {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .macro-name.protein { color: var(--color-protein); }
+    .macro-name.carbs { color: var(--color-carbs); }
+    .macro-name.fat { color: var(--color-fat); }
+    .macro-val {
+      font-family: var(--font-display);
+      font-size: 12px; font-weight: 500;
+      color: var(--text-muted);
+    }
+    .macro-bar-track {
+      height: 5px; border-radius: 99px;
+      background: rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .macro-bar-fill { height: 100%; border-radius: 99px; }
+    .macro-bar-fill.protein { background: var(--color-protein); width: 0; animation: barP 700ms ease-out 500ms forwards; }
+    .macro-bar-fill.carbs { background: var(--color-carbs); width: 0; animation: barC 700ms ease-out 500ms forwards; }
+    .macro-bar-fill.fat { background: var(--color-fat); width: 0; animation: barF 700ms ease-out 500ms forwards; }
+
+    @keyframes barP { to { width: 65%; } }
+    @keyframes barC { to { width: 58%; } }
+    @keyframes barF { to { width: 60%; } }
+
+    /* ── Meal section ── */
+    .meal {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.35);
+      opacity: 0; animation: fadeIn 400ms ease-out forwards;
+    }
+    .meal:nth-child(1) { animation-delay: 300ms; }
+    .meal:nth-child(2) { animation-delay: 400ms; }
+    .meal:nth-child(3) { animation-delay: 500ms; }
+    .meal:nth-child(4) { animation-delay: 600ms; }
+
+    .meal-header {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .meal-emoji { font-size: 20px; }
+    .meal-name {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .meal-kcal {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 600;
+      color: var(--text-muted);
+    }
+    .meal-chevron {
+      font-size: 12px; color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .meal-chevron.open { transform: rotate(180deg); }
+
+    /* Macro split bar */
+    .macro-split-bar {
+      height: 5px; border-radius: 99px;
+      display: flex; gap: 2px; overflow: hidden;
+      margin: 12px 0 10px;
+      background: rgba(0,0,0,0.04);
+    }
+    .macro-split-bar .seg { height: 100%; border-radius: 99px; }
+    .macro-split-bar .seg.protein { background: var(--color-protein); }
+    .macro-split-bar .seg.carbs { background: var(--color-carbs); }
+    .macro-split-bar .seg.fat { background: var(--color-fat); }
+
+    /* Macro legend */
+    .macro-legend {
+      display: flex; gap: 14px; margin-bottom: 12px;
+    }
+    .macro-badge { display: flex; align-items: center; gap: 5px; }
+    .macro-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .macro-dot.protein { background: var(--color-protein); }
+    .macro-dot.carbs { background: var(--color-carbs); }
+    .macro-dot.fat { background: var(--color-fat); }
+    .macro-badge-label {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+    }
+    .macro-badge-value {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 700; color: var(--text-primary);
+    }
+
+    /* Food items */
+    .food-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .food-item:last-of-type { border-bottom: none; }
+    .food-accent {
+      width: 4px; height: 32px; border-radius: 2px;
+    }
+    .food-info { flex: 1; }
+    .food-name {
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 600;
+      color: var(--text-primary); line-height: 1.3;
+    }
+    .food-qty {
+      font-size: 12px; color: var(--text-muted); margin-top: 2px;
+    }
+    .food-kcal {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Add button */
+    .add-food-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 0 2px; margin-top: 4px;
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 600;
+      color: var(--green);
+    }
+    .add-food-btn .plus {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--green-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Collapsed meal */
+    .meal-collapsed .meal-header { margin-bottom: 0; }
+
+    /* ── Bottom nav ── */
+    .nav-wrap {
+      padding: 0 0 28px; flex-shrink: 0;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 14px 32px 0;
+    }
+    .nav-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 5px;
+    }
+    .nav-item svg {
+      width: 26px; height: 26px;
+      stroke: var(--text-muted); stroke-width: 1.8;
+      fill: none;
+    }
+    .nav-item.active svg { stroke: var(--text-primary); }
+    .nav-item-label {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 500;
+      color: var(--text-muted);
+    }
+    .nav-item.active .nav-item-label { color: var(--text-primary); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-bg"></div>
+
+  <div class="layout">
+    <div class="page-header">
+      <div class="page-eyebrow">Revolut x Fitness</div>
+      <div class="page-title">Nutrition</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="screen-label">Suivi nutritionnel</div>
+      <div class="phone">
+        <div class="phone-bg"></div>
+        <div class="phone-ui">
+
+          <!-- Status bar + Dynamic Island -->
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div style="width:126px;height:36px;background:#000;border-radius:20px;flex-shrink:0;"></div>
+            <div class="s-icons">
+              <span>&#9679;</span>
+              <span>&#9679;</span>
+              <span>&#9679;</span>
+            </div>
+          </div>
+
+          <div class="content-area">
+
+            <!-- Date nav -->
+            <div class="date-nav">
+              <div class="date-nav-title">Nutrition</div>
+              <div class="date-picker">
+                <div class="date-arrow">&#8249;</div>
+                <div class="date-current">Auj.</div>
+                <div class="date-arrow" style="opacity:0.3">&#8250;</div>
+              </div>
+            </div>
+
+            <!-- Calories summary -->
+            <div class="cal-card">
+              <div class="cal-top">
+                <div class="cal-left">
+                  <div class="cal-left-label">Aujourd'hui</div>
+                  <div class="cal-left-number">1 482</div>
+                  <div class="cal-left-unit">/ 2 000 kcal</div>
+                  <div class="cal-left-remaining">518 restantes</div>
+                </div>
+              </div>
+              <div class="macros-bars">
+                <div class="macro-row">
+                  <div class="macro-label-row">
+                    <span class="macro-name protein">Proteines</span>
+                    <span class="macro-val">98g / 150g</span>
+                  </div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill protein"></div></div>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-label-row">
+                    <span class="macro-name carbs">Glucides</span>
+                    <span class="macro-val">145g / 250g</span>
+                  </div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill carbs"></div></div>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-label-row">
+                    <span class="macro-name fat">Lipides</span>
+                    <span class="macro-val">42g / 70g</span>
+                  </div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill fat"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meals -->
+            <div class="meals">
+
+              <!-- Petit-dejeuner (expanded) -->
+              <div class="meal">
+                <div class="meal-header">
+                  <span class="meal-emoji">&#9728;&#65039;</span>
+                  <span class="meal-name">Petit-dejeuner</span>
+                  <span class="meal-kcal">485 kcal</span>
+                  <span class="meal-chevron open">&#9660;</span>
+                </div>
+                <div class="macro-split-bar">
+                  <div class="seg carbs" style="width:45%"></div>
+                  <div class="seg protein" style="width:30%"></div>
+                  <div class="seg fat" style="width:25%"></div>
+                </div>
+                <div class="macro-legend">
+                  <div class="macro-badge">
+                    <div class="macro-dot carbs"></div>
+                    <span class="macro-badge-label">G</span>
+                    <span class="macro-badge-value">52g</span>
+                  </div>
+                  <div class="macro-badge">
+                    <div class="macro-dot protein"></div>
+                    <span class="macro-badge-label">P</span>
+                    <span class="macro-badge-value">35g</span>
+                  </div>
+                  <div class="macro-badge">
+                    <div class="macro-dot fat"></div>
+                    <span class="macro-badge-label">L</span>
+                    <span class="macro-badge-value">14g</span>
+                  </div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-carbs)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Flocons d'avoine</div>
+                    <div class="food-qty">80g</div>
+                  </div>
+                  <div class="food-kcal">295 kcal</div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-protein)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Whey proteine</div>
+                    <div class="food-qty">1 portion</div>
+                  </div>
+                  <div class="food-kcal">120 kcal</div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-fat)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Beurre de cacahuete</div>
+                    <div class="food-qty">15g</div>
+                  </div>
+                  <div class="food-kcal">70 kcal</div>
+                </div>
+                <div class="add-food-btn">
+                  <div class="plus">+</div>
+                  Ajouter un aliment
+                </div>
+              </div>
+
+              <!-- Dejeuner (expanded) -->
+              <div class="meal">
+                <div class="meal-header">
+                  <span class="meal-emoji">&#127780;&#65039;</span>
+                  <span class="meal-name">Dejeuner</span>
+                  <span class="meal-kcal">620 kcal</span>
+                  <span class="meal-chevron open">&#9660;</span>
+                </div>
+                <div class="macro-split-bar">
+                  <div class="seg carbs" style="width:35%"></div>
+                  <div class="seg protein" style="width:40%"></div>
+                  <div class="seg fat" style="width:25%"></div>
+                </div>
+                <div class="macro-legend">
+                  <div class="macro-badge">
+                    <div class="macro-dot carbs"></div>
+                    <span class="macro-badge-label">G</span>
+                    <span class="macro-badge-value">58g</span>
+                  </div>
+                  <div class="macro-badge">
+                    <div class="macro-dot protein"></div>
+                    <span class="macro-badge-label">P</span>
+                    <span class="macro-badge-value">45g</span>
+                  </div>
+                  <div class="macro-badge">
+                    <div class="macro-dot fat"></div>
+                    <span class="macro-badge-label">L</span>
+                    <span class="macro-badge-value">22g</span>
+                  </div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-protein)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Poulet grille</div>
+                    <div class="food-qty">150g</div>
+                  </div>
+                  <div class="food-kcal">248 kcal</div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-carbs)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Riz basmati</div>
+                    <div class="food-qty">200g (cuit)</div>
+                  </div>
+                  <div class="food-kcal">260 kcal</div>
+                </div>
+                <div class="food-item">
+                  <div class="food-accent" style="background:var(--color-fat)"></div>
+                  <div class="food-info">
+                    <div class="food-name">Huile d'olive</div>
+                    <div class="food-qty">10ml</div>
+                  </div>
+                  <div class="food-kcal">90 kcal</div>
+                </div>
+                <div class="add-food-btn">
+                  <div class="plus">+</div>
+                  Ajouter un aliment
+                </div>
+              </div>
+
+              <!-- Collation (collapsed) -->
+              <div class="meal meal-collapsed">
+                <div class="meal-header">
+                  <span class="meal-emoji">&#127822;</span>
+                  <span class="meal-name">Collation</span>
+                  <span class="meal-kcal">377 kcal</span>
+                  <span class="meal-chevron">&#9660;</span>
+                </div>
+              </div>
+
+              <!-- Diner (collapsed) -->
+              <div class="meal meal-collapsed">
+                <div class="meal-header">
+                  <span class="meal-emoji">&#127769;</span>
+                  <span class="meal-name">Diner</span>
+                  <span class="meal-kcal">0 kcal</span>
+                  <span class="meal-chevron">&#9660;</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="nav-wrap">
+            <div class="nav-row">
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <div class="nav-item-label">Seances</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+                <div class="nav-item-label">Poids</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <div class="nav-item-label">Accueil</div>
+              </div>
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                <div class="nav-item-label">Nutrition</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="nav-item-label">Historique</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

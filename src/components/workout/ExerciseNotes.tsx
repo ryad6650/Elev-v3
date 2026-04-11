@@ -31,20 +31,20 @@ function ExerciseNotesButton({
       className="flex-1 text-[13px] font-semibold py-2 rounded-[10px] flex items-center justify-center gap-1.5 transition-opacity active:opacity-70"
       style={{
         background: "rgba(0,0,0,0.04)",
-        color: hasContent ? "var(--green)" : "var(--text-muted)",
+        color: hasContent ? "#74BF7A" : "var(--text-muted)",
       }}
     >
       <PenLine
         size={13}
         className={shouldBlink ? "animate-pulse" : ""}
-        style={shouldBlink ? { color: "var(--green)" } : undefined}
+        style={shouldBlink ? { color: "#74BF7A" } : undefined}
       />
       <span className={shouldBlink ? "animate-pulse" : ""}>
         Notes
         {shouldBlink && (
           <span
             className="inline-block w-1.5 h-1.5 rounded-full ml-1 align-middle"
-            style={{ background: "var(--green)" }}
+            style={{ background: "#74BF7A" }}
           />
         )}
       </span>

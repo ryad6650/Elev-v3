@@ -1,19 +1,42 @@
 "use client";
 
-import Link from "next/link";
-import { ChevronRight, Play } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ProchaineRoutine } from "@/lib/dashboard";
+import { useWorkoutStore } from "@/store/workoutStore";
+import { getRoutineExercises } from "@/app/actions/routines";
 
 interface Props {
   routine: ProchaineRoutine | null;
 }
 
 export default function DashboardNextRoutine({ routine }: Props) {
+  const router = useRouter();
+  const startWorkout = useWorkoutStore((s) => s.startWorkout);
+  const [isStarting, setIsStarting] = useState(false);
+
   if (!routine) return null;
 
-  const dureeLabel = routine.dureeEstimee
-    ? `${routine.nbExercices} exercices · ~${routine.dureeEstimee} min`
-    : `${routine.nbExercices} exercices`;
+  const exerciceText = routine.exerciceNoms.join(", ");
+
+  const handleStart = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    try {
+      const exercices = await getRoutineExercises(routine.id);
+      startWorkout({
+        routineId: routine.id,
+        routineName: routine.nom,
+        exercises: exercices,
+      });
+      router.push("/workout");
+    } catch {
+      startWorkout({ routineId: routine.id, routineName: routine.nom });
+      router.push("/workout");
+    } finally {
+      setIsStarting(false);
+    }
+  };
 
   return (
     <div>
@@ -28,79 +51,78 @@ export default function DashboardNextRoutine({ routine }: Props) {
         Prochaine seance
       </div>
 
-      <Link
-        href="/workout"
-        className="flex items-center gap-4 active:scale-[0.98] transition-transform"
+      <div
         style={{
-          background: "#1C1C1E",
+          background: "#151312",
           border: "1px solid var(--border)",
-          borderRadius: 20,
-          padding: 18,
-          textDecoration: "none",
+          borderRadius: 16,
+          padding: 16,
         }}
       >
-        {/* Icon */}
-        <div
-          className="flex items-center justify-center shrink-0"
+        {/* Titre */}
+        <p
           style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: "linear-gradient(135deg, #001429, var(--accent))",
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 16,
+            fontWeight: 700,
+            color: "var(--text-primary)",
+            lineHeight: 1.25,
+            marginBottom: 8,
           }}
         >
-          <span style={{ fontSize: 26 }}>🏋️</span>
-        </div>
+          {routine.nom}
+        </p>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <div
+        {/* Apercu exercices */}
+        {exerciceText && (
+          <p
             style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {routine.nom}
-          </div>
-          <div
-            style={{
+              fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 14,
               color: "var(--text-muted)",
-              marginTop: 3,
+              lineHeight: 1.5,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical" as const,
+              overflow: "hidden",
+              marginBottom: 16,
             }}
           >
-            {dureeLabel}
-          </div>
-        </div>
+            {exerciceText}
+          </p>
+        )}
 
-        {/* Arrow */}
-        <ChevronRight size={22} color="var(--text-muted)" />
-      </Link>
-
-      {/* CTA */}
-      <Link
-        href="/workout"
-        className="flex items-center justify-center gap-2.5 active:scale-[0.98] transition-transform"
-        style={{
-          width: "100%",
-          marginTop: 16,
-          padding: 20,
-          borderRadius: 20,
-          background:
-            "linear-gradient(135deg, #001429 0%, #024a7a 40%, #0589d6 100%)",
-          color: "#fff",
-          fontSize: 18,
-          fontWeight: 700,
-          textDecoration: "none",
-        }}
-      >
-        <Play size={18} fill="#fff" stroke="#fff" />
-        Demarrer la seance
-      </Link>
+        {/* Bouton Commencer */}
+        <button
+          onClick={handleStart}
+          disabled={isStarting}
+          className={`w-full py-3.5 rounded-2xl font-semibold transition-all duration-200 ${isStarting ? "scale-[0.97] opacity-80" : "active:scale-[0.97]"}`}
+          style={{
+            background: "#74BF7A",
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 15,
+            color: "white",
+            border: "none",
+          }}
+        >
+          {isStarting ? (
+            <span className="flex items-center justify-center gap-2">
+              <span
+                className="animate-spin rounded-full border-2"
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderColor: "rgba(255,255,255,0.3)",
+                  borderTopColor: "white",
+                }}
+              />
+              Chargement...
+            </span>
+          ) : (
+            "Commencer la Routine"
+          )}
+        </button>
+      </div>
     </div>
   );
 }

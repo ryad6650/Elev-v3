@@ -33,13 +33,13 @@ export default function DashboardSummaryRow({
       value: calories.toLocaleString("fr-FR"),
       label: "kcal",
       pct: calPct,
-      color: "#00FFC3",
+      color: "#74BF7A",
     },
     {
       value: poids != null ? poids.toString() : "—",
       label: "kg",
       pct: poids != null ? 88 : 0,
-      color: "#34d399",
+      color: "#74BF7A",
     },
     {
       value: sommeilMinutes != null ? formatSleep(sommeilMinutes) : "—",
@@ -56,7 +56,7 @@ export default function DashboardSummaryRow({
           key={item.label}
           className="flex-1 text-center"
           style={{
-            background: "#1C1C1E",
+            background: "#151312",
             border: "1px solid var(--border)",
             borderRadius: 18,
             padding: "18px 14px",

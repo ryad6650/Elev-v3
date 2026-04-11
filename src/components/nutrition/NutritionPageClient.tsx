@@ -46,7 +46,7 @@ export default function NutritionPageClient({ initialData }: Props) {
   const fetchDay = useNutritionStore((s) => s.fetchDay);
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
-  const [viewMeal, setViewMeal] = useState<Meal | null>(null);
+  const [viewMealNumber, setViewMealNumber] = useState<number | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
 
   const hydratedDateRef = useRef<string | null>(null);
@@ -83,13 +83,24 @@ export default function NutritionPageClient({ initialData }: Props) {
     );
   }, [mealsFromEntries]);
 
+  const viewMeal = useMemo(() => {
+    if (viewMealNumber === null) return null;
+    return (
+      meals.find((m) => m.meal_number === viewMealNumber) ?? {
+        meal_number: viewMealNumber,
+        meal_time: "",
+        entries: [],
+      }
+    );
+  }, [viewMealNumber, meals]);
+
   const handleMealAdd = useCallback((meal: Meal) => {
     setModalMealTime(meal.meal_time || new Date().toISOString());
     setModalMeal(meal.meal_number);
   }, []);
 
   const handleMealClick = useCallback((meal: Meal) => {
-    setViewMeal(meal);
+    setViewMealNumber(meal.meal_number);
   }, []);
 
   const isToday = date === today;
@@ -117,8 +128,8 @@ export default function NutritionPageClient({ initialData }: Props) {
           maxWidth: 430,
           margin: "0 auto",
           padding: "20px 20px 0",
-          paddingBottom: "calc(env(safe-area-inset-bottom) + 40px)",
-          background: "#0D0D0D",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+          background: "#0C0A09",
           minHeight: "100dvh",
         }}
       >
@@ -229,7 +240,7 @@ export default function NutritionPageClient({ initialData }: Props) {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: "var(--accent-text)",
+                color: "#1E9D4C",
                 fontFamily: "var(--font-sans)",
               }}
             >
@@ -266,7 +277,7 @@ export default function NutritionPageClient({ initialData }: Props) {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: "var(--accent-text)",
+                color: "#1E9D4C",
                 fontFamily: "var(--font-sans)",
               }}
             >
@@ -275,7 +286,7 @@ export default function NutritionPageClient({ initialData }: Props) {
           </div>
           <div
             style={{
-              background: "#1C1C1E",
+              background: "#151312",
               borderRadius: 16,
               overflow: "hidden",
               border: "2px solid #595F60",
@@ -310,9 +321,12 @@ export default function NutritionPageClient({ initialData }: Props) {
           mealTime={modalMealTime ?? new Date().toISOString()}
           date={date}
           initialFrequents={initialData.frequents}
-          onClose={() => {
+          onClose={(addedCount) => {
+            const mealNum = modalMeal;
             setModalMeal(null);
             setModalMealTime(null);
+            if (mealNum !== null && addedCount && addedCount > 0)
+              setViewMealNumber(mealNum);
           }}
         />
       )}
@@ -320,7 +334,7 @@ export default function NutritionPageClient({ initialData }: Props) {
         <MealDetailView
           meal={viewMeal}
           profile={displayProfile}
-          onClose={() => setViewMeal(null)}
+          onClose={() => setViewMealNumber(null)}
           onFoodClick={(entry) => setViewEntry(entry)}
           onAdd={() => {
             setModalMealTime(viewMeal.meal_time || new Date().toISOString());

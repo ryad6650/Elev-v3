@@ -38,10 +38,10 @@ export default function DashboardWeekCard({ streakJours }: Props) {
             gap: 5,
             padding: "6px 14px",
             borderRadius: 9999,
-            background: "rgba(5,137,214,0.1)",
+            background: "rgba(30,157,76,0.1)",
             fontSize: 14,
             fontWeight: 700,
-            color: "var(--accent)",
+            color: "#1E9D4C",
           }}
         >
           🔥 {streakJours} jour{streakJours > 1 ? "s" : ""}
@@ -50,7 +50,7 @@ export default function DashboardWeekCard({ streakJours }: Props) {
 
       <div
         style={{
-          background: "#1C1C1E",
+          background: "#151312",
           border: "1px solid var(--border)",
           borderRadius: 20,
           padding: "18px 16px",
@@ -67,7 +67,7 @@ export default function DashboardWeekCard({ streakJours }: Props) {
                   style={{
                     fontSize: 13,
                     fontWeight: 700,
-                    color: isToday ? "var(--accent)" : "var(--text-muted)",
+                    color: isToday ? "#1E9D4C" : "var(--text-muted)",
                   }}
                 >
                   {jour}
@@ -79,11 +79,11 @@ export default function DashboardWeekCard({ streakJours }: Props) {
                     height: 38,
                     borderRadius: 10,
                     ...(isPast
-                      ? { background: "var(--accent)" }
+                      ? { background: "#1B2E1D" }
                       : isToday
                         ? {
-                            background: "rgba(5,137,214,0.1)",
-                            border: "2px solid var(--accent)",
+                            background: "rgba(30,157,76,0.1)",
+                            border: "2px solid #1E9D4C",
                           }
                         : { background: "rgba(255,255,255,0.04)" }),
                   }}

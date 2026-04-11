@@ -170,7 +170,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
         className="relative flex items-center px-4 pb-3"
         style={{
           paddingTop: "max(1rem, env(safe-area-inset-top))",
-          background: "#1C1C1E",
+          background: "#151312",
           borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
@@ -178,7 +178,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
           onClick={onClose}
           className="text-left active:opacity-60 transition-opacity shrink-0 z-10"
         >
-          <span className="text-[17px]" style={{ color: "#008CFF" }}>
+          <span className="text-[17px]" style={{ color: "#1E9D4C" }}>
             Annuler
           </span>
         </button>
@@ -193,7 +193,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
           onClick={handleSave}
           disabled={saving || !nom.trim()}
           className="whitespace-nowrap px-4 py-1.5 rounded-xl text-[15px] font-semibold active:opacity-70 transition-opacity disabled:opacity-40 z-10"
-          style={{ background: "#008CFF", color: "white" }}
+          style={{ background: "#1E9D4C", color: "white" }}
         >
           {saving ? "..." : "Mettre à jour"}
         </button>
@@ -283,7 +283,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
               }}
               className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-[15px] font-semibold transition-all active:opacity-70"
               style={{
-                background: "#008CFF",
+                background: "#1E9D4C",
                 color: "white",
               }}
             >

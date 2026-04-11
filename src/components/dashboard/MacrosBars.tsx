@@ -64,7 +64,7 @@ export default memo(function MacrosBars({
         label="Protéines"
         consumed={proteines.consumed}
         objective={proteines.objective}
-        color="#3B82F6"
+        color="#74BF7A"
       />
       <MacroBar
         label="Lipides"

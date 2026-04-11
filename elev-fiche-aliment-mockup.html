@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elev — Fiche Aliment Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary:    #F2E8D5;
+      --text-primary:  #4A3728;
+      --text-muted:    #78716C;
+      --text-secondary:#A8A29E;
+      --border-card:   rgba(74,55,40,0.12);
+      --bar-track:     rgba(74,55,40,0.1);
+      --bar-from:      #c4a882;
+      --bar-to:        #a0785c;
+      --accent:        #1B2E1D;
+      --accent-text:   #74bf7a;
+      --color-prot:    #74bf7a;
+      --color-carb:    #9b6b3a;
+      --color-fat:     #c07858;
+      --color-fiber:   #6BA3D6;
+      --font-serif:    'DM Serif Display', serif;
+      --font-sans:     'DM Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      min-height: 100dvh;
+      display: flex; align-items: flex-start; justify-content: center;
+      background: #0a0806; overflow-x: hidden;
+    }
+
+    .body-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #f2e8d5 0%, #e5d8c2 30%, #d5e2d0 65%, #f2e8d5 100%);
+      z-index: 0;
+    }
+
+    .layout {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 36px;
+      padding: 48px 32px 64px; width: 100%;
+    }
+
+    .page-header { text-align: center; }
+    .page-eyebrow {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--text-muted); opacity: 0.5; margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: var(--font-serif); font-style: italic; font-size: 36px;
+      color: var(--text-primary); letter-spacing: -0.01em;
+    }
+
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .screen-label {
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(74,55,40,0.35);
+    }
+    .phone {
+      width: 310px; height: 672px;
+      border-radius: 46px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.08), 0 0 0 9px rgba(0,0,0,0.15),
+        0 0 0 10px rgba(0,0,0,0.05), 0 48px 120px rgba(0,0,0,0.3);
+    }
+    .phone-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #f2e8d5 0%, #e5d8c2 30%, #d5e2d0 65%, #f2e8d5 100%);
+      z-index: 0;
+    }
+    .phone-ui {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 0; flex-shrink: 0;
+    }
+    .s-time { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .s-icons { display: flex; gap: 5px; }
+    .s-icons span { font-size: 11px; color: rgba(74,55,40,0.6); }
+
+    .content-area {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 10px 20px 0; overflow-y: auto;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+
+    /* ---- Top bar ---- */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+      opacity: 0; animation: fadeSlideUp 500ms ease-out 100ms forwards;
+    }
+    .topbar-back {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(74,55,40,0.07);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--text-muted);
+    }
+    .topbar-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .topbar-actions { display: flex; gap: 6px; }
+    .topbar-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(74,55,40,0.07);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--text-muted); border: none;
+    }
+    .topbar-btn.fav { color: #e06060; }
+
+    /* ---- Food identity ---- */
+    .food-identity {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 18px;
+      opacity: 0; animation: fadeSlideUp 500ms ease-out 180ms forwards;
+    }
+    .food-avatar {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: linear-gradient(135deg, #c4a882, #a0785c);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-serif); font-size: 22px;
+      color: #fff; font-weight: 700; flex-shrink: 0;
+    }
+    .food-info { flex: 1; }
+    .food-name {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 20px; color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .food-brand {
+      font-size: 11px; color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .food-source {
+      display: inline-block; margin-top: 4px;
+      font-size: 7px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 6px;
+      background: rgba(116,191,122,0.1); color: var(--accent-text);
+    }
+
+    /* ---- Calories hero ---- */
+    .cal-hero {
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; padding: 16px 0;
+      border-bottom: 1px solid rgba(74,55,40,0.08);
+      margin-bottom: 16px;
+      opacity: 0; animation: fadeSlideUp 500ms ease-out 260ms forwards;
+    }
+    .cal-hero-value {
+      font-family: var(--font-serif);
+      font-size: 44px; color: var(--text-primary);
+      letter-spacing: -0.03em; line-height: 1;
+    }
+    .cal-hero-unit {
+      font-size: 13px; color: var(--text-muted); font-weight: 600;
+      margin-top: 2px;
+    }
+    .cal-hero-sub {
+      font-size: 9px; color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* ---- Donut chart ---- */
+    .donut-section {
+      display: flex; align-items: center; gap: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(74,55,40,0.08);
+      margin-bottom: 14px;
+      opacity: 0; animation: fadeSlideUp 500ms ease-out 340ms forwards;
+    }
+    .donut-wrap {
+      width: 90px; height: 90px; position: relative; flex-shrink: 0;
+    }
+    .donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .donut-bg { fill: none; stroke: rgba(74,55,40,0.06); stroke-width: 8; }
+    .donut-prot {
+      fill: none; stroke: var(--color-prot); stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251; stroke-dashoffset: 163;
+    }
+    .donut-carb {
+      fill: none; stroke: var(--color-carb); stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251; stroke-dashoffset: 176;
+    }
+    .donut-fat {
+      fill: none; stroke: var(--color-fat); stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251; stroke-dashoffset: 213;
+    }
+    .donut-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .donut-center-val {
+      font-family: var(--font-serif);
+      font-size: 18px; color: var(--text-primary); line-height: 1;
+    }
+    .donut-center-unit {
+      font-size: 8px; color: var(--text-secondary); font-weight: 600;
+    }
+
+    .macros-breakdown { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .macro-row { display: flex; align-items: center; gap: 8px; }
+    .macro-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .macro-info { flex: 1; }
+    .macro-name {
+      font-size: 9px; font-weight: 600; color: var(--text-muted);
+    }
+    .macro-bar-track {
+      height: 4px; border-radius: 99px;
+      background: var(--bar-track); margin-top: 3px;
+    }
+    .macro-bar-fill {
+      height: 100%; border-radius: 99px;
+    }
+    .macro-val {
+      font-size: 12px; font-weight: 700; color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    /* ---- Detail table ---- */
+    .detail-section {
+      opacity: 0; animation: fadeSlideUp 500ms ease-out 420ms forwards;
+    }
+    .detail-label {
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-secondary); margin-bottom: 8px;
+    }
+    .detail-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(74,55,40,0.06);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-name {
+      font-size: 11px; color: var(--text-muted);
+    }
+    .detail-name.sub {
+      padding-left: 14px; font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .detail-value {
+      font-size: 11px; font-weight: 700; color: var(--text-primary);
+    }
+
+    /* ---- Quantity bar ---- */
+    .qty-bar {
+      position: sticky; bottom: 0;
+      padding: 10px 20px 10px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      opacity: 0; animation: fadeSlideUp 400ms ease-out 500ms forwards;
+    }
+    .qty-controls {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .qty-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(74,55,40,0.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--text-muted); border: none;
+      font-weight: 300;
+    }
+    .qty-input {
+      width: 54px; padding: 6px 4px;
+      border-radius: 10px; border: 1px solid var(--border-card);
+      background: rgba(255,255,255,0.6);
+      font-size: 14px; font-weight: 700; text-align: center;
+      color: var(--text-primary); font-family: var(--font-sans);
+      outline: none;
+    }
+    .qty-unit-toggle {
+      font-size: 9px; font-weight: 700;
+      padding: 5px 10px; border-radius: 8px;
+      background: rgba(74,55,40,0.08);
+      color: var(--text-muted); border: none;
+    }
+    .qty-unit-toggle.active {
+      background: linear-gradient(135deg, #c4a882, #a0785c);
+      color: #fff;
+    }
+    .qty-cal-preview {
+      flex: 1; text-align: right;
+      font-family: var(--font-serif);
+      font-size: 16px; color: var(--text-primary);
+    }
+    .qty-cal-unit {
+      font-family: var(--font-sans);
+      font-size: 9px; color: var(--text-muted);
+    }
+
+    /* ---- Add button ---- */
+    .add-bar {
+      padding: 0 20px 8px;
+      opacity: 0; animation: fadeSlideUp 400ms ease-out 560ms forwards;
+    }
+    .add-btn {
+      width: 100%; padding: 12px;
+      border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #c4a882, #a0785c);
+      color: #fff; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: var(--font-sans);
+    }
+
+    /* ---- Bottom nav ---- */
+    .nav-wrap { padding: 0 0 24px; flex-shrink: 0; }
+    .nav-row {
+      display: flex; align-items: center;
+      justify-content: space-around; padding: 12px 32px;
+    }
+    .nav-icon {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-icon img { width: 22px; height: 22px; object-fit: contain; opacity: 0.45; }
+    .nav-icon.active img { opacity: 1; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="body-bg"></div>
+
+  <div class="layout">
+    <div class="page-header">
+      <div class="page-eyebrow">Mockup</div>
+      <div class="page-title">Fiche aliment</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="screen-label">D&eacute;tail produit</div>
+      <div class="phone">
+        <div class="phone-bg"></div>
+        <div class="phone-ui">
+
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <span>&#9679;</span><span>&#9679;</span><span>&#9679;</span>
+            </div>
+          </div>
+
+          <div class="content-area">
+
+            <!-- Top bar -->
+            <div class="topbar">
+              <div class="topbar-back">&lsaquo;</div>
+              <span class="topbar-label">Fiche produit</span>
+              <div class="topbar-actions">
+                <button class="topbar-btn">&#9998;</button>
+                <button class="topbar-btn fav">&#9829;</button>
+              </div>
+            </div>
+
+            <!-- Food identity -->
+            <div class="food-identity">
+              <div class="food-avatar">F</div>
+              <div class="food-info">
+                <div class="food-name">Flocons d'avoine</div>
+                <div class="food-brand">Quaker</div>
+                <div class="food-source">Open Food Facts</div>
+              </div>
+            </div>
+
+            <!-- Donut + Macros -->
+            <div class="donut-section">
+              <div class="donut-wrap">
+                <svg class="donut-svg" viewBox="0 0 90 90">
+                  <circle class="donut-bg" cx="45" cy="45" r="40" />
+                  <!-- Glucides (74% des macros cal) -->
+                  <circle class="donut-carb" cx="45" cy="45" r="40"
+                    style="stroke-dashoffset: 163; stroke-dasharray: 251;" />
+                  <!-- Prot&eacute;ines -->
+                  <circle class="donut-prot" cx="45" cy="45" r="40"
+                    style="stroke-dashoffset: 201; stroke-dasharray: 251;
+                    transform: rotate(126deg); transform-origin: center;" />
+                  <!-- Lipides -->
+                  <circle class="donut-fat" cx="45" cy="45" r="40"
+                    style="stroke-dashoffset: 213; stroke-dasharray: 251;
+                    transform: rotate(198deg); transform-origin: center;" />
+                </svg>
+                <div class="donut-center">
+                  <span class="donut-center-val" id="donut-kcal">389</span>
+                  <span class="donut-center-unit">kcal</span>
+                </div>
+              </div>
+              <div class="macros-breakdown">
+                <div class="macro-row">
+                  <div class="macro-dot" style="background: var(--color-carb);"></div>
+                  <div class="macro-info">
+                    <div class="macro-name">Glucides</div>
+                    <div class="macro-bar-track">
+                      <div class="macro-bar-fill" id="bar-carb" style="width: 80%; background: var(--color-carb);"></div>
+                    </div>
+                  </div>
+                  <span class="macro-val" id="macro-carb">58.7 g</span>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-dot" style="background: var(--color-prot);"></div>
+                  <div class="macro-info">
+                    <div class="macro-name">Prot&eacute;ines</div>
+                    <div class="macro-bar-track">
+                      <div class="macro-bar-fill" id="bar-prot" style="width: 65%; background: var(--color-prot);"></div>
+                    </div>
+                  </div>
+                  <span class="macro-val" id="macro-prot">13.5 g</span>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-dot" style="background: var(--color-fat);"></div>
+                  <div class="macro-info">
+                    <div class="macro-name">Lipides</div>
+                    <div class="macro-bar-track">
+                      <div class="macro-bar-fill" id="bar-fat" style="width: 35%; background: var(--color-fat);"></div>
+                    </div>
+                  </div>
+                  <span class="macro-val" id="macro-fat">6.9 g</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detail table -->
+            <div class="detail-section">
+              <div class="detail-label" id="detail-label">Informations pour 100 g</div>
+              <div class="detail-row">
+                <span class="detail-name">&Eacute;nergie</span>
+                <span class="detail-value" id="d-energy">389 kcal</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name">Prot&eacute;ines</span>
+                <span class="detail-value" id="d-prot">13.5 g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name">Glucides</span>
+                <span class="detail-value" id="d-carb">58.7 g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name sub">dont sucres</span>
+                <span class="detail-value" id="d-sugar">1.3 g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name">Lipides</span>
+                <span class="detail-value" id="d-fat">6.9 g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name">Fibres</span>
+                <span class="detail-value" id="d-fiber">10.6 g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-name">Sel</span>
+                <span class="detail-value" id="d-salt">0.01 g</span>
+              </div>
+            </div>
+
+            <div style="height: 10px;"></div>
+          </div>
+
+          <!-- Quantity bar -->
+          <div class="qty-bar">
+            <div class="qty-controls">
+              <button class="qty-btn" id="qty-minus">&minus;</button>
+              <input class="qty-input" id="qty-input" type="number" value="100" min="0" step="10" />
+              <button class="qty-btn" id="qty-plus">+</button>
+            </div>
+            <button class="qty-unit-toggle active">g</button>
+            <button class="qty-unit-toggle">portion</button>
+          </div>
+
+          <!-- Add button -->
+          <div class="add-bar">
+            <button class="add-btn">Ajouter au petit-d&eacute;jeuner</button>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="nav-wrap">
+            <div class="nav-row">
+              <div class="nav-icon">
+                <img src="assets/icons/nav-seances.png" alt="Séances" />
+              </div>
+              <div class="nav-icon">
+                <img src="assets/icons/nav-poids.png" alt="Poids" />
+              </div>
+              <div class="nav-icon">
+                <img src="assets/icons/nav-accueil.png" alt="Accueil" />
+              </div>
+              <div class="nav-icon active">
+                <img src="assets/icons/nav-nutrition.png" alt="Nutrition" />
+              </div>
+              <div class="nav-icon">
+                <img src="assets/icons/nav-historique.png" alt="Historique" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function() {
+  // Valeurs pour 100g
+  const per100 = {
+    kcal: 389, prot: 13.5, carb: 58.7, fat: 6.9,
+    sugar: 1.3, fiber: 10.6, salt: 0.01
+  };
+
+  const input = document.getElementById('qty-input');
+  const btnMinus = document.getElementById('qty-minus');
+  const btnPlus = document.getElementById('qty-plus');
+
+  function fmt(v) { return v < 1 && v > 0 ? v.toFixed(2) : v < 10 ? v.toFixed(1) : Math.round(v); }
+
+  function update() {
+    const g = Math.max(0, parseFloat(input.value) || 0);
+    const r = g / 100;
+
+    // Donut center
+    document.getElementById('donut-kcal').textContent = Math.round(per100.kcal * r);
+
+    // Macros values
+    document.getElementById('macro-prot').textContent = fmt(per100.prot * r) + ' g';
+    document.getElementById('macro-carb').textContent = fmt(per100.carb * r) + ' g';
+    document.getElementById('macro-fat').textContent = fmt(per100.fat * r) + ' g';
+
+    // Macro bars (relative to max at 100g)
+    document.getElementById('bar-prot').style.width = Math.min(100, per100.prot * r / per100.carb * 100) + '%';
+    document.getElementById('bar-carb').style.width = Math.min(100, per100.carb * r / per100.carb * 100) + '%';
+    document.getElementById('bar-fat').style.width = Math.min(100, per100.fat * r / per100.carb * 100) + '%';
+
+    // Detail table
+    document.getElementById('detail-label').textContent = 'Informations pour ' + g + ' g';
+    document.getElementById('d-energy').textContent = Math.round(per100.kcal * r) + ' kcal';
+    document.getElementById('d-prot').textContent = fmt(per100.prot * r) + ' g';
+    document.getElementById('d-carb').textContent = fmt(per100.carb * r) + ' g';
+    document.getElementById('d-sugar').textContent = fmt(per100.sugar * r) + ' g';
+    document.getElementById('d-fat').textContent = fmt(per100.fat * r) + ' g';
+    document.getElementById('d-fiber').textContent = fmt(per100.fiber * r) + ' g';
+    document.getElementById('d-salt').textContent = fmt(per100.salt * r) + ' g';
+
+
+  }
+
+  input.addEventListener('input', update);
+  btnMinus.addEventListener('click', function() {
+    input.value = Math.max(0, (parseFloat(input.value) || 0) - 10);
+    update();
+  });
+  btnPlus.addEventListener('click', function() {
+    input.value = (parseFloat(input.value) || 0) + 10;
+    update();
+  });
+})();
+</script>
+</body>
+</html>

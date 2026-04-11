@@ -113,7 +113,7 @@ export default function ActiveWorkout() {
         <div
           className="shrink-0"
           style={{
-            background: "#1C1C1E",
+            background: "#151312",
             paddingTop: "env(safe-area-inset-top)",
           }}
         >
@@ -140,7 +140,7 @@ export default function ActiveWorkout() {
                 onClick={() => setShowSummary(true)}
                 className="px-5 py-2 rounded-full font-semibold text-[15px] active:scale-[0.97] transition-transform"
                 style={{
-                  background: "var(--accent)",
+                  background: "#1E9D4C",
                   color: "#fff",
                   fontFamily: "var(--font-nunito),sans-serif",
                 }}
@@ -161,7 +161,7 @@ export default function ActiveWorkout() {
         >
           <div
             className="w-2.5 h-2.5 rounded-full shrink-0"
-            style={{ background: "#22C55E" }}
+            style={{ background: "#74BF7A" }}
           />
           <span
             style={{
@@ -279,7 +279,7 @@ export default function ActiveWorkout() {
               <button
                 onClick={() => setShowSearch(true)}
                 className="px-6 py-3 rounded-2xl text-sm font-semibold"
-                style={{ background: "var(--accent)", color: "#fff" }}
+                style={{ background: "#1E9D4C", color: "#fff" }}
               >
                 Ajouter un exercice
               </button>
@@ -302,15 +302,15 @@ export default function ActiveWorkout() {
           <div
             className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm flex items-center gap-2 px-4 py-3 rounded-xl"
             style={{
-              background: "rgba(5,137,214,0.12)",
-              border: "1px solid rgba(5,137,214,0.25)",
+              background: "rgba(27,46,29,0.35)",
+              border: "1px solid rgba(116,191,122,0.25)",
             }}
           >
             <span className="shrink-0">🏆</span>
             <p
               className="flex-1 text-xs font-semibold truncate"
               style={{
-                color: "var(--accent)",
+                color: "#74BF7A",
                 fontFamily: "var(--font-nunito),sans-serif",
               }}
             >
@@ -318,7 +318,7 @@ export default function ActiveWorkout() {
               {prNotif.reps}
             </p>
             <button onClick={() => setPrNotif(null)}>
-              <X size={14} style={{ color: "var(--accent)" }} />
+              <X size={14} style={{ color: "#74BF7A" }} />
             </button>
           </div>
         )}

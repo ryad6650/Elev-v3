@@ -59,7 +59,12 @@ export default function WorkoutPageClient({
   return (
     <main
       className="page-enter"
-      style={{ maxWidth: 430, margin: "0 auto", padding: "28px 16px 112px" }}
+      style={{
+        maxWidth: 430,
+        margin: "0 auto",
+        padding: "28px 16px",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+      }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-7">
@@ -82,7 +87,7 @@ export default function WorkoutPageClient({
         onClick={() => startWorkout({ routineId: null, routineName: null })}
         className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform mb-6"
         style={{
-          background: "#1C1C1E",
+          background: "#151312",
           border: "1px solid var(--border)",
           borderRadius: 14,
           padding: "16px 20px",

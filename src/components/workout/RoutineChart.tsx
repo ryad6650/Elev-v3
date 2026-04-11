@@ -95,7 +95,7 @@ export default function RoutineChart({ points, tab }: Props) {
         </g>
       ))}
       {points.length > 1 && (
-        <path d={pathD} fill="none" stroke="#008CFF" strokeWidth={1.5} />
+        <path d={pathD} fill="none" stroke="#74BF7A" strokeWidth={1.5} />
       )}
       {points.map((p, i) => (
         <circle
@@ -103,7 +103,7 @@ export default function RoutineChart({ points, tab }: Props) {
           cx={getX(i)}
           cy={getY(values[i])}
           r={i === last ? 5 : 3}
-          fill="#008CFF"
+          fill="#74BF7A"
         />
       ))}
       <text

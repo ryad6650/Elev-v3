@@ -25,13 +25,13 @@ export default function SleepMiniStat({ initialMinutes }: Props) {
       <button
         onClick={() => setOpen(true)}
         className="flex flex-col items-center justify-center p-4 rounded-2xl border gap-1 w-full transition-all active:scale-95 card-surface"
-        style={{ borderColor: minutes ? "var(--accent)" : "var(--border)" }}
+        style={{ borderColor: minutes ? "#1E9D4C" : "var(--border)" }}
       >
         <span className="text-2xl">😴</span>
         <span
           className="text-lg font-bold"
           style={{
-            color: minutes ? "var(--accent-text)" : "var(--text-primary)",
+            color: minutes ? "#74BF7A" : "var(--text-primary)",
           }}
         >
           {minutes != null ? formatDuree(minutes) : "—"}

@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { Plus } from "lucide-react";
+import { memo, useState, useCallback } from "react";
+import { Plus, Check } from "lucide-react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 interface Props {
@@ -19,6 +19,23 @@ export default memo(function FoodSearchResults({
   loading,
   emptyMessage = "Aucun résultat",
 }: Props) {
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+
+  const handleQuickAdd = useCallback(
+    (a: NutritionAliment) => {
+      const key = a.id || a.nom;
+      setAddedIds((prev) => new Set(prev).add(key));
+      setTimeout(() => {
+        setAddedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }, 600);
+      onQuickAdd ? onQuickAdd(a) : onSelect(a);
+    },
+    [onQuickAdd, onSelect],
+  );
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -96,15 +113,24 @@ export default memo(function FoodSearchResults({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onQuickAdd ? onQuickAdd(a) : onSelect(a);
+                  handleQuickAdd(a);
                 }}
-                className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 active:scale-90 transition-transform"
+                className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300"
                 style={{
-                  background: "transparent",
+                  background: addedIds.has(a.id || a.nom)
+                    ? "#3B82F6"
+                    : "transparent",
                   border: "2px solid #3B82F6",
+                  transform: addedIds.has(a.id || a.nom)
+                    ? "scale(1.15)"
+                    : "scale(1)",
                 }}
               >
-                <Plus size={18} color="#3B82F6" strokeWidth={2.5} />
+                {addedIds.has(a.id || a.nom) ? (
+                  <Check size={18} color="#fff" strokeWidth={2.5} />
+                ) : (
+                  <Plus size={18} color="#3B82F6" strokeWidth={2.5} />
+                )}
               </button>
             </div>
           </div>

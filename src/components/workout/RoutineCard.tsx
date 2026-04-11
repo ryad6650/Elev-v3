@@ -35,7 +35,7 @@ export default function RoutineCard({
     <div
       onClick={onView}
       style={{
-        background: "#1C1C1E",
+        background: "#151312",
         border: "1px solid var(--border)",
         borderRadius: 16,
         padding: "16px",
@@ -93,7 +93,7 @@ export default function RoutineCard({
         disabled={isStarting}
         className={`w-full py-3.5 rounded-2xl font-semibold transition-all duration-200 ${isStarting ? "scale-[0.97] opacity-80" : "active:scale-[0.97]"}`}
         style={{
-          background: "var(--accent)",
+          background: "#74BF7A",
           fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 15,
           color: "white",

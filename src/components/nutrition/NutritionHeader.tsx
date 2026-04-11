@@ -45,7 +45,7 @@ function CalorieRing({
             cy={cy}
             r={r}
             fill="none"
-            stroke="#00FFC3"
+            stroke="#74BF7A"
             strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={`${progressArc} ${circ - progressArc}`}
@@ -54,7 +54,7 @@ function CalorieRing({
           />
         )}
         {/* Point */}
-        <circle cx={dotX} cy={dotY} r="5" fill="#00FFC3" />
+        <circle cx={dotX} cy={dotY} r="5" fill="#74BF7A" />
       </svg>
       <div
         style={{
@@ -185,7 +185,7 @@ export default function NutritionHeader({
   return (
     <div
       style={{
-        background: "#1C1C1E",
+        background: "#151312",
         borderRadius: 16,
         border: "2px solid #595F60",
         padding: "20px 16px",
@@ -288,19 +288,19 @@ export default function NutritionHeader({
           label="Glucides"
           value={totalGlucides}
           max={profile.objectif_glucides ?? 250}
-          color="#00FFC3"
+          color="#74BF7A"
         />
         <MacroCol
           label="Protéines"
           value={totalProteines}
           max={profile.objectif_proteines ?? 150}
-          color="#00FFC3"
+          color="#74BF7A"
         />
         <MacroCol
           label="Lipides"
           value={totalLipides}
           max={profile.objectif_lipides ?? 70}
-          color="#00FFC3"
+          color="#74BF7A"
         />
       </div>
     </div>

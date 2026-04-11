@@ -27,7 +27,7 @@ interface Props {
   mealTime: string;
   date: string;
   initialFrequents?: NutritionAliment[];
-  onClose: () => void;
+  onClose: (addedCount?: number) => void;
 }
 
 const MEAL_NAMES: Record<number, string> = {
@@ -190,8 +190,9 @@ export default function AddFoodModal({
         quantitePortion,
       );
       setLastUsed((prev) => ({ ...prev, [alimentId]: quantite }));
-      setSessionCount((c) => c + 1);
-      onClose();
+      const newCount = sessionCount + 1;
+      setSessionCount(newCount);
+      onClose(newCount);
     } finally {
       setPending(false);
     }
@@ -231,7 +232,7 @@ export default function AddFoodModal({
 
   function handleClose() {
     setIsClosing(true);
-    setTimeout(onClose, 320);
+    setTimeout(() => onClose(sessionCount), 320);
   }
 
   const isCustom = selected?.is_global === false && !!selected?.id;

@@ -48,7 +48,7 @@ function HistoriqueRow({
     delta === null || delta === 0
       ? "var(--text-muted)"
       : delta < 0
-        ? "var(--green)"
+        ? "#74BF7A"
         : "#c94444";
 
   const deltaText =

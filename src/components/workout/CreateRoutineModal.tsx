@@ -154,7 +154,7 @@ export default function CreateRoutineModal({ onClose }: Props) {
             onClick={handleSave}
             disabled={saving || !nom.trim()}
             className="px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 disabled:opacity-40"
-            style={{ background: "var(--accent)", color: "white" }}
+            style={{ background: "#1E9D4C", color: "white" }}
           >
             {saving ? "Création..." : "Créer"}
           </button>
@@ -241,9 +241,9 @@ export default function CreateRoutineModal({ onClose }: Props) {
           onClick={() => setShowSearch(true)}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98] border-2 border-dashed"
           style={{
-            borderColor: "color-mix(in srgb, var(--accent) 30%, transparent)",
-            color: "var(--accent)",
-            background: "color-mix(in srgb, var(--accent) 6%, transparent)",
+            borderColor: "color-mix(in srgb, #1E9D4C 30%, transparent)",
+            color: "#1E9D4C",
+            background: "color-mix(in srgb, #1E9D4C 6%, transparent)",
           }}
         >
           <Plus size={18} strokeWidth={2.5} />

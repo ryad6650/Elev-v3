@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition — Palettes de couleurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .page-title {
+    text-align: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(390px, 1fr));
+    gap: 32px;
+    max-width: 1700px;
+    margin: 0 auto;
+    justify-items: center;
+  }
+
+  .variant-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 430px;
+  }
+
+  .variant-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  /* ============================================
+     PALETTE A — Actuel (Dark Mint)
+     ============================================ */
+  .theme-a {
+    --bg: #0C0A09;
+    --bg-card: #1C1C1E;
+    --bg-elevated: #3A3A3C;
+    --border: rgba(255,255,255,0.08);
+    --border-card: #595F60;
+    --text-primary: #FAFAF9;
+    --text-secondary: #A8A29E;
+    --text-muted: #78716C;
+    --accent: #00FFC3;
+    --accent-soft: rgba(0,255,195,0.12);
+    --macro-p: #00FFC3;
+    --macro-c: #00FFC3;
+    --macro-f: #00FFC3;
+    --btn-add-bg: #FFFFFF;
+    --btn-add-color: #000;
+  }
+
+  /* ============================================
+     PALETTE B — Violet Aurora
+     ============================================ */
+  .theme-b {
+    --bg: #0A0812;
+    --bg-card: #150F22;
+    --bg-elevated: #2A1F42;
+    --border: rgba(180,130,255,0.1);
+    --border-card: #3D2D66;
+    --text-primary: #F0EEFF;
+    --text-secondary: #9B8EC4;
+    --text-muted: #6B5E99;
+    --accent: #B47FFF;
+    --accent-soft: rgba(180,127,255,0.15);
+    --macro-p: #B47FFF;
+    --macro-c: #7EC8FF;
+    --macro-f: #FF8FA3;
+    --btn-add-bg: #B47FFF;
+    --btn-add-color: #fff;
+  }
+
+  /* ============================================
+     PALETTE C — Warm Ember
+     ============================================ */
+  .theme-c {
+    --bg: #0E0906;
+    --bg-card: #1E1108;
+    --bg-elevated: #3A2214;
+    --border: rgba(255,160,80,0.1);
+    --border-card: #5C3620;
+    --text-primary: #FFF8F2;
+    --text-secondary: #C49A78;
+    --text-muted: #8A6040;
+    --accent: #FF8C42;
+    --accent-soft: rgba(255,140,66,0.12);
+    --macro-p: #FF8C42;
+    --macro-c: #FFD166;
+    --macro-f: #FF4F5E;
+    --btn-add-bg: #FF8C42;
+    --btn-add-color: #fff;
+  }
+
+  /* ============================================
+     PALETTE D — Ocean Deep
+     ============================================ */
+  .theme-d {
+    --bg: #050D18;
+    --bg-card: #0C1929;
+    --bg-elevated: #162A44;
+    --border: rgba(100,180,255,0.08);
+    --border-card: #1E3D60;
+    --text-primary: #EEF4FF;
+    --text-secondary: #7AAAD4;
+    --text-muted: #4A7CAA;
+    --accent: #38BDF8;
+    --accent-soft: rgba(56,189,248,0.12);
+    --macro-p: #38BDF8;
+    --macro-c: #34D399;
+    --macro-f: #FB923C;
+    --btn-add-bg: #38BDF8;
+    --btn-add-color: #050D18;
+  }
+
+  /* ============================================
+     PALETTE E — Rose Quartz
+     ============================================ */
+  .theme-e {
+    --bg: #100B10;
+    --bg-card: #1D121D;
+    --bg-elevated: #3A1F3A;
+    --border: rgba(255,140,200,0.09);
+    --border-card: #5C2B5C;
+    --text-primary: #FFF0F8;
+    --text-secondary: #C484B4;
+    --text-muted: #8A5080;
+    --accent: #FF6EB4;
+    --accent-soft: rgba(255,110,180,0.12);
+    --macro-p: #FF6EB4;
+    --macro-c: #FF9E64;
+    --macro-f: #A78BFA;
+    --btn-add-bg: #FF6EB4;
+    --btn-add-color: #fff;
+  }
+
+  /* ============================================
+     PALETTE F — Sage & Cream (Light)
+     ============================================ */
+  .theme-f {
+    --bg: #F4F1EC;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #E8E3DA;
+    --border: rgba(0,0,0,0.08);
+    --border-card: #D4CFC6;
+    --text-primary: #1C1917;
+    --text-secondary: #78716C;
+    --text-muted: #A8A29E;
+    --accent: #2D7A4F;
+    --accent-soft: rgba(45,122,79,0.1);
+    --macro-p: #2D7A4F;
+    --macro-c: #B07A30;
+    --macro-f: #C05050;
+    --btn-add-bg: #2D7A4F;
+    --btn-add-color: #fff;
+  }
+
+  /* ============================================
+     PHONE SHELL
+     ============================================ */
+  .phone {
+    width: 390px;
+    border-radius: 44px;
+    background: var(--bg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), inset 0 0 0 1.5px rgba(255,255,255,0.06);
+  }
+
+  .phone-inner {
+    padding: 16px 20px 100px;
+    min-height: 820px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+
+  /* Top row: streak + calendar */
+  .top-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    margin-top: 2px;
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .calendar-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--text-secondary);
+  }
+
+  /* Header date */
+  .date-header {
+    margin-bottom: 24px;
+  }
+
+  .date-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .date-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .date-week {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .nav-arrows {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .nav-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text-secondary);
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Section titles */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .section-cta {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* ============================================
+     CALORIE RING CARD
+     ============================================ */
+  .summary-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 2px solid var(--border-card);
+    padding: 20px 16px;
+    margin-bottom: 24px;
+  }
+
+  .ring-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .ring-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .ring-stat-value {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .ring-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .ring-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+  }
+
+  .ring-inner-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .ring-remaining {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+
+  .ring-remaining-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 -16px 16px;
+  }
+
+  /* Macros */
+  .macros-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .macro-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .macro-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .macro-bar-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--bg-elevated);
+    overflow: hidden;
+  }
+
+  .macro-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+  }
+
+  .macro-value {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  /* ============================================
+     ALIMENTATION CARD
+     ============================================ */
+  .alim-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 2px solid var(--border-card);
+    overflow: hidden;
+  }
+
+  .meal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .meal-divider {
+    height: 1px;
+    background: var(--border);
+    margin-left: 74px;
+  }
+
+  .meal-icon-wrap {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+  }
+
+  .meal-icon-inner {
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .meal-text {
+    flex: 1;
+  }
+
+  .meal-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .meal-arrow {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .meal-kcal {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .btn-add {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--btn-add-bg);
+    color: var(--btn-add-color);
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 40%, transparent);
+    line-height: 1;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    height: 68px;
+    background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 10px;
+    border-radius: 22px;
+    min-width: 52px;
+  }
+
+  .nav-item.active {
+    background: var(--accent);
+  }
+
+  .nav-emoji {
+    font-size: 18px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .nav-item.active .nav-label {
+    color: var(--bg);
+    filter: brightness(0.3);
+  }
+
+  /* Light theme nav fix */
+  .theme-f .nav-item.active .nav-label {
+    color: #fff;
+    filter: none;
+  }
+
+  /* SVG accent color */
+  .accent-stroke { stroke: var(--accent); }
+  .track-stroke { stroke: var(--bg-elevated); }
+
+  /* Badge */
+  .variant-label-a { background: #1a2e29; color: #00FFC3; border: 1px solid #00FFC360; }
+  .variant-label-b { background: #1e1035; color: #B47FFF; border: 1px solid #B47FFF60; }
+  .variant-label-c { background: #2e1a0a; color: #FF8C42; border: 1px solid #FF8C4260; }
+  .variant-label-d { background: #051525; color: #38BDF8; border: 1px solid #38BDF860; }
+  .variant-label-e { background: #2a0e22; color: #FF6EB4; border: 1px solid #FF6EB460; }
+  .variant-label-f { background: #E8F2EC; color: #2D7A4F; border: 1px solid #2D7A4F60; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Onglet Nutrition — Palettes de couleurs</h1>
+<p class="page-subtitle">6 variantes de design pour choisir la direction visuelle</p>
+
+<div class="grid">
+
+  <!-- ============ PALETTE A — ACTUEL ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-a">A — Actuel · Dark Mint</div>
+    <div class="phone theme-a">
+      <div class="phone-inner">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow">‹</div>
+              <div class="nav-arrow" style="opacity:0.3">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résumé -->
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#00FFC3" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)" style="transition:stroke-dasharray 1s ease"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#00FFC3"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#00FFC3"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#00FFC3"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#00FFC3"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alimentation -->
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#00FFC3" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#00FFC3" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#00FFC3" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETTE B — VIOLET AURORA ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-b">B — Violet Aurora</div>
+    <div class="phone theme-b">
+      <div class="phone-inner">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow">‹</div>
+              <div class="nav-arrow" style="opacity:0.3">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#B47FFF" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#B47FFF"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#7EC8FF"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#B47FFF"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#FF8FA3"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#B47FFF" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#B47FFF" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#B47FFF" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETTE C — WARM EMBER ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-c">C — Warm Ember</div>
+    <div class="phone theme-c">
+      <div class="phone-inner">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow">‹</div>
+              <div class="nav-arrow" style="opacity:0.3">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#FF8C42" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#FF8C42"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#FFD166"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#FF8C42"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#FF4F5E"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF8C42" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF8C42" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF8C42" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETTE D — OCEAN DEEP ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-d">D — Ocean Deep</div>
+    <div class="phone theme-d">
+      <div class="phone-inner">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow">‹</div>
+              <div class="nav-arrow" style="opacity:0.3">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#38BDF8" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#38BDF8"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#34D399"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#38BDF8"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#FB923C"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETTE E — ROSE QUARTZ ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-e">E — Rose Quartz</div>
+    <div class="phone theme-e">
+      <div class="phone-inner">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow">‹</div>
+              <div class="nav-arrow" style="opacity:0.3">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#FF6EB4" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#FF6EB4"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#FF9E64"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#FF6EB4"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#A78BFA"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF6EB4" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF6EB4" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#FF6EB4" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETTE F — SAGE & CREAM (LIGHT) ============ -->
+  <div class="variant-wrapper">
+    <div class="variant-label variant-label-f">F — Sage & Cream · Light</div>
+    <div class="phone theme-f">
+      <div class="phone-inner">
+        <div class="status-bar" style="color:var(--text-primary)">
+          <span>9:41</span>
+          <span>● ●●● ▮▮▮</span>
+        </div>
+        <div class="top-row">
+          <div class="streak-badge">🔥 <span>7</span></div>
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="date-header">
+          <div class="date-title-row">
+            <div>
+              <div class="date-title">Aujourd'hui</div>
+              <div class="date-week">Semaine 15</div>
+            </div>
+            <div class="nav-arrows">
+              <div class="nav-arrow" style="box-shadow:0 1px 4px rgba(0,0,0,0.08)">‹</div>
+              <div class="nav-arrow" style="opacity:0.3;box-shadow:0 1px 4px rgba(0,0,0,0.08)">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Résumé</div>
+          <div class="section-cta">Détails</div>
+        </div>
+        <div class="summary-card" style="box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div class="ring-row">
+            <div class="ring-stat">
+              <div class="ring-stat-value">1 240</div>
+              <div class="ring-stat-label">Mangées</div>
+            </div>
+            <div class="ring-container">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="63" fill="none" stroke="var(--bg-elevated)" stroke-width="8" stroke-linecap="round" stroke-dasharray="267.04 66.76" transform="rotate(135 70 70)"/>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="#2D7A4F" stroke-width="8" stroke-linecap="round" stroke-dasharray="160 173.8" transform="rotate(135 70 70)"/>
+                <circle cx="38.5" cy="105.5" r="5" fill="#2D7A4F"/>
+              </svg>
+              <div class="ring-inner-text">
+                <div class="ring-remaining">760</div>
+                <div class="ring-remaining-label">Restantes</div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-stat-value">2 000</div>
+              <div class="ring-stat-label">Objectif</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="macros-row">
+            <div class="macro-col">
+              <div class="macro-label">Glucides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:55%;background:#B07A30"></div></div>
+              <div class="macro-value">137 / 250 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Protéines</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:72%;background:#2D7A4F"></div></div>
+              <div class="macro-value">108 / 150 g</div>
+            </div>
+            <div class="macro-col">
+              <div class="macro-label">Lipides</div>
+              <div class="macro-bar-track"><div class="macro-bar-fill" style="width:38%;background:#C05050"></div></div>
+              <div class="macro-value">26 / 70 g</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Alimentation</div>
+          <div class="section-cta">Plus</div>
+        </div>
+        <div class="alim-card" style="box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#2D7A4F" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="98 65" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner" style="background:rgba(0,0,0,0.04)">☕</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Petit déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">420 / 600 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#2D7A4F" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="65 98" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner" style="background:rgba(0,0,0,0.04)">🥘</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Déjeuner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">480 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+              </svg>
+              <div class="meal-icon-inner" style="background:rgba(0,0,0,0.04)">🍎</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">En-cas <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">0 / 240 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+          <div class="meal-divider"></div>
+          <div class="meal-row">
+            <div class="meal-icon-wrap">
+              <svg width="58" height="58" viewBox="0 0 58 58" style="position:absolute;inset:0">
+                <circle cx="29" cy="29" r="26" fill="none" stroke="var(--bg-elevated)" stroke-width="4.5"/>
+                <circle cx="29" cy="29" r="26" fill="none" stroke="#2D7A4F" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="40 123" transform="rotate(-90 29 29)"/>
+              </svg>
+              <div class="meal-icon-inner" style="background:rgba(0,0,0,0.04)">🥗</div>
+            </div>
+            <div class="meal-text">
+              <div class="meal-name">Dîner <span class="meal-arrow">→</span></div>
+              <div class="meal-kcal">340 / 580 kcal</div>
+            </div>
+            <button class="btn-add">+</button>
+          </div>
+        </div>
+        <div class="bottom-nav" style="box-shadow:0 4px 20px rgba(0,0,0,0.1)">
+          <div class="nav-item"><div class="nav-emoji">💪</div><div class="nav-label">Séances</div></div>
+          <div class="nav-item"><div class="nav-emoji">⚖️</div><div class="nav-label">Poids</div></div>
+          <div class="nav-item"><div class="nav-emoji">🏠</div><div class="nav-label">Accueil</div></div>
+          <div class="nav-item active"><div class="nav-emoji">🥗</div><div class="nav-label">Nutrition</div></div>
+          <div class="nav-item"><div class="nav-emoji">📊</div><div class="nav-label">Historique</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Legend -->
+<div style="max-width:900px;margin:48px auto 0;padding:0 20px 60px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#00FFC3;margin-bottom:6px">A — DARK MINT (ACTUEL)</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond très sombre quasi-noir · Accent vert menthe #00FFC3 · Macros monochrome</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#B47FFF;margin-bottom:6px">B — VIOLET AURORA</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond violet nuit · Accent lavande #B47FFF · Macros tricolores (bleu/violet/rose)</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#FF8C42;margin-bottom:6px">C — WARM EMBER</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond brun chaud · Accent orange #FF8C42 · Macros chaud (jaune/orange/rouge)</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#38BDF8;margin-bottom:6px">D — OCEAN DEEP</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond bleu marine · Accent cyan #38BDF8 · Macros (vert/cyan/orange)</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#FF6EB4;margin-bottom:6px">E — ROSE QUARTZ</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond bordeaux sombre · Accent rose #FF6EB4 · Macros (pêche/rose/violet)</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:14px 16px;border:1px solid #2a2a2a">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;color:#2D7A4F;margin-bottom:6px">F — SAGE & CREAM (LIGHT)</div>
+      <div style="font-size:12px;color:#666;line-height:1.5">Fond crème · Accent vert sauge #2D7A4F · Macros sémantiques (brun/vert/rouge)</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

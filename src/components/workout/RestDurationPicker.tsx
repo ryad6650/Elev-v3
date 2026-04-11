@@ -97,11 +97,11 @@ export default function RestDurationPicker({
                 className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-opacity active:opacity-70"
                 style={{
                   background: isSelected
-                    ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                    ? "color-mix(in srgb, #1E9D4C 12%, transparent)"
                     : "rgba(255,255,255,0.5)",
-                  color: isSelected ? "var(--accent)" : "var(--text-primary)",
+                  color: isSelected ? "#1E9D4C" : "var(--text-primary)",
                   border: isSelected
-                    ? "1.5px solid var(--accent)"
+                    ? "1.5px solid #1E9D4C"
                     : "1.5px solid transparent",
                 }}
               >
@@ -109,7 +109,7 @@ export default function RestDurationPicker({
                 {isSelected && (
                   <span
                     className="text-xs font-bold"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "#1E9D4C" }}
                   >
                     ✓
                   </span>
@@ -124,20 +124,17 @@ export default function RestDurationPicker({
             className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-opacity active:opacity-70"
             style={{
               background: showCustom
-                ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                ? "color-mix(in srgb, #1E9D4C 12%, transparent)"
                 : "rgba(255,255,255,0.5)",
-              color: showCustom ? "var(--accent)" : "var(--text-primary)",
+              color: showCustom ? "#1E9D4C" : "var(--text-primary)",
               border: showCustom
-                ? "1.5px solid var(--accent)"
+                ? "1.5px solid #1E9D4C"
                 : "1.5px solid transparent",
             }}
           >
             <span>Personnalisé…</span>
             {showCustom && isCustom && (
-              <span
-                className="text-xs font-bold"
-                style={{ color: "var(--accent)" }}
-              >
+              <span className="text-xs font-bold" style={{ color: "#1E9D4C" }}>
                 ✓
               </span>
             )}
@@ -215,7 +212,7 @@ export default function RestDurationPicker({
               <button
                 onClick={handleCustomConfirm}
                 className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 self-start mt-0.5"
-                style={{ background: "var(--green)", color: "white" }}
+                style={{ background: "#1E9D4C", color: "white" }}
               >
                 <Check size={18} strokeWidth={2.5} />
               </button>

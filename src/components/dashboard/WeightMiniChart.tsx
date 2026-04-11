@@ -48,16 +48,21 @@ export default function WeightMiniChart({ data }: Props) {
         >
           Poids — 30 jours
         </span>
-        <span className="text-base font-bold" style={{ color: "var(--accent-text)" }}>
+        <span className="text-base font-bold" style={{ color: "#74BF7A" }}>
           {lastWeight} kg
         </span>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" height={60} preserveAspectRatio="none">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        height={60}
+        preserveAspectRatio="none"
+      >
         <defs>
           <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+            <stop offset="0%" stopColor="#74BF7A" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#74BF7A" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -68,15 +73,21 @@ export default function WeightMiniChart({ data }: Props) {
         <polyline
           points={polyline}
           fill="none"
-          stroke="var(--accent)"
+          stroke="#74BF7A"
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
         {/* Dernier point */}
-        <circle cx={last.x} cy={last.y} r={4} fill="var(--accent)" />
-        <circle cx={last.x} cy={last.y} r={7} fill="var(--accent)" fillOpacity={0.2} />
+        <circle cx={last.x} cy={last.y} r={4} fill="#74BF7A" />
+        <circle
+          cx={last.x}
+          cy={last.y}
+          r={7}
+          fill="#74BF7A"
+          fillOpacity={0.2}
+        />
       </svg>
     </div>
   );

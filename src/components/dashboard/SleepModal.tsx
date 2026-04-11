@@ -113,8 +113,8 @@ function ScrollPicker({
           style={{
             top: topPad,
             height: ITEM_HEIGHT,
-            borderTop: "1.5px solid var(--accent)",
-            borderBottom: "1.5px solid var(--accent)",
+            borderTop: "1.5px solid #1E9D4C",
+            borderBottom: "1.5px solid #1E9D4C",
           }}
         />
 
@@ -150,9 +150,7 @@ function ScrollPicker({
                 style={{
                   height: ITEM_HEIGHT,
                   fontSize: isSelected ? 30 : 20,
-                  color: isSelected
-                    ? "var(--accent-text)"
-                    : "var(--text-muted)",
+                  color: isSelected ? "#74BF7A" : "var(--text-muted)",
                   transition: "font-size 150ms, color 150ms",
                   cursor: "pointer",
                 }}

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elev — Fiche Aliment + Séance en cours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-card: rgba(255,255,255,0.55);
+      --text-primary: #1e1e1e;
+      --text-secondary: #5c5a57;
+      --text-muted: #908d88;
+      --green: #2a9d6e;
+      --green-dim: rgba(42,157,110,0.10);
+      --color-protein: #3872c4;
+      --color-carbs: #b08a1a;
+      --color-fat: #c94444;
+      --font-display: 'Inter', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius-card: 20px;
+      --radius-pill: 9999px;
+      --radius-sm: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      min-height: 100dvh;
+      display: flex; align-items: flex-start; justify-content: center;
+      background: #d8d5d0; overflow-x: auto;
+    }
+    .page-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #e8e5e0 0%, #d8d5d0 50%, #e0ddd8 100%);
+      z-index: 0;
+    }
+    .layout {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 36px; padding: 48px 32px 64px; width: 100%;
+    }
+    .phones-row { display: flex; gap: 48px; align-items: flex-start; }
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .screen-label {
+      font-family: var(--font-display); font-size: 9px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .phone {
+      width: 430px; height: 932px;
+      border-radius: 46px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 0 0 9px rgba(0,0,0,0.07),
+        0 0 0 10px rgba(0,0,0,0.02), 0 48px 120px rgba(0,0,0,0.15);
+    }
+    .phone-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, #e6dbd0 0%, #ebe1d6 20%, #f0e7dd 45%, #f4ede5 70%, #f8f3ee 100%);
+      z-index: 0;
+    }
+    .phone-ui {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; height: 100%; overflow: hidden;
+    }
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 32px 0; flex-shrink: 0;
+    }
+    .s-time { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .s-icons { display: flex; gap: 5px; }
+    .s-icons span { font-size: 13px; color: var(--text-muted); }
+    .content-area {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 20px 28px 0; overflow-y: auto;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+    .glass-card {
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius-card);
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    .nav-wrap {
+      flex-shrink: 0; padding: 14px 32px 0;
+      padding-bottom: max(28px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(0,0,0,0.05);
+      background: rgba(243,240,234,0.92);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .nav-row { display: flex; align-items: center; justify-content: space-around; }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      color: var(--text-muted); stroke: var(--text-muted);
+    }
+    .nav-item.active { color: var(--text-primary); stroke: var(--text-primary); }
+    .nav-item svg { width: 26px; height: 26px; fill: none; stroke-width: 1.8; stroke: inherit; }
+    .nav-item-label { font-family: var(--font-display); font-size: 11px; font-weight: 500; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ═══════ FICHE ALIMENT ═══════ */
+    .fa-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.55); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--text-secondary); cursor: pointer;
+    }
+    .fa-name {
+      font-family: var(--font-display); font-size: 22px; font-weight: 600;
+      color: var(--text-primary); line-height: 1.2; text-align: center;
+    }
+    .fa-brand {
+      font-family: var(--font-display); font-size: 15px; font-weight: 500;
+      color: var(--text-muted); margin-top: 5px; text-align: center;
+    }
+    .fa-macros-card {
+      display: flex; align-items: center; padding: 26px 16px;
+    }
+    .fa-macro-col {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .fa-macro-val {
+      font-family: var(--font-display); font-size: 24px; font-weight: 700;
+      line-height: 1;
+    }
+    .fa-macro-unit {
+      font-family: var(--font-display); font-size: 11px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .fa-macro-sep {
+      width: 1px; height: 42px; background: rgba(0,0,0,0.06); flex-shrink: 0;
+    }
+    .fa-detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .fa-detail-label {
+      font-family: var(--font-display); font-size: 15px; color: var(--text-secondary);
+    }
+    .fa-detail-val {
+      font-family: var(--font-display); font-size: 15px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .fa-qty-bar {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 14px 24px;
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+    .fa-qty-tabs {
+      display: flex; background: rgba(0,0,0,0.04); border-radius: 10px;
+      padding: 3px; gap: 2px;
+    }
+    .fa-qty-tab {
+      flex: 1; padding: 7px 0; border-radius: 8px; border: none;
+      font-family: var(--font-display); font-size: 12px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: all 150ms;
+    }
+    .fa-qty-tab.active {
+      background: #fff; color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .fa-qty-tab.inactive {
+      background: none; color: var(--text-muted);
+    }
+    .fa-qty-row {
+      display: flex; align-items: center; justify-content: center; gap: 0;
+    }
+    .fa-qty-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    }
+    .fa-qty-minus {
+      background: rgba(0,0,0,0.04); color: var(--text-secondary);
+    }
+    .fa-qty-plus {
+      background: var(--green-dim); color: var(--green);
+    }
+    .fa-qty-center {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: 4px; min-width: 120px;
+    }
+    .fa-qty-value {
+      font-family: var(--font-display); font-size: 28px; font-weight: 700;
+      color: var(--text-primary); text-align: center; border: none;
+      background: none; outline: none; width: 60px;
+    }
+    .fa-qty-unit {
+      font-family: var(--font-display); font-size: 14px; font-weight: 600;
+      color: var(--text-muted);
+    }
+    .fa-add-btn {
+      flex: 1; padding: 14px; border-radius: var(--radius-sm);
+      background: var(--green); color: #fff; border: none;
+      font-family: var(--font-display); font-size: 14px; font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ═══════ SÉANCE EN COURS ═══════ */
+    .aw-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .aw-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.55); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--text-secondary); cursor: pointer;
+    }
+    .aw-finish {
+      padding: 8px 18px; border-radius: var(--radius-pill);
+      background: var(--green); color: #fff; border: none;
+      font-family: var(--font-display); font-size: 12px; font-weight: 600;
+      cursor: pointer;
+    }
+    .aw-title {
+      font-family: var(--font-display); font-size: 28px; font-weight: 500;
+      color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 14px;
+    }
+    .aw-timer-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; margin-bottom: 18px;
+    }
+    .aw-timer-time {
+      font-family: var(--font-display); font-size: 32px; font-weight: 700;
+      color: var(--text-primary); letter-spacing: -0.02em;
+    }
+    .aw-timer-label {
+      font-family: var(--font-display); font-size: 10px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .aw-timer-btns { display: flex; gap: 8px; }
+    .aw-timer-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.04); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px;
+    }
+    .aw-section-label {
+      font-family: var(--font-display); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    .aw-ex-card { padding: 16px 18px; margin-bottom: 10px; }
+    .aw-ex-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .aw-ex-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .aw-ex-name {
+      font-family: var(--font-display); font-size: 15px; font-weight: 600;
+      color: var(--text-primary); flex: 1;
+    }
+    .aw-ex-badge {
+      font-family: var(--font-display); font-size: 10px; font-weight: 700;
+      padding: 3px 8px; border-radius: var(--radius-pill);
+      background: var(--green-dim); color: var(--green);
+    }
+    .aw-sets-grid {
+      display: grid; grid-template-columns: 32px 1fr 1fr 1fr 36px;
+      gap: 4px 6px; align-items: center; margin-bottom: 10px;
+    }
+    .aw-set-hdr {
+      font-family: var(--font-display); font-size: 9px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .aw-set-num {
+      font-family: var(--font-display); font-size: 12px; font-weight: 700;
+      color: var(--text-muted); text-align: center;
+    }
+    .aw-set-input {
+      background: rgba(0,0,0,0.03); border-radius: 8px; border: none;
+      padding: 8px 4px; text-align: center;
+      font-family: var(--font-display); font-size: 14px; font-weight: 700;
+      color: var(--text-primary); outline: none;
+    }
+    .aw-set-input.active {
+      background: rgba(42,157,110,0.08);
+      border: 1.5px solid var(--green);
+    }
+    .aw-set-ref {
+      font-family: var(--font-display); font-size: 11px; font-weight: 500;
+      color: var(--text-muted); text-align: center;
+    }
+    .aw-set-check {
+      width: 28px; height: 28px; border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin: 0 auto;
+    }
+    .aw-set-check.done { background: var(--green); }
+    .aw-set-check.pending { background: rgba(0,0,0,0.06); }
+    .aw-ex-actions { display: flex; gap: 8px; }
+    .aw-ex-action {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px; border-radius: 10px; background: rgba(0,0,0,0.03);
+      font-family: var(--font-display); font-size: 13px; font-weight: 600;
+      color: var(--text-muted); border: none; cursor: pointer;
+    }
+    .aw-fab {
+      position: absolute; bottom: 28px; right: 28px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--green); border: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(42,157,110,0.3);
+      cursor: pointer;
+    }
+    .aw-rest-float {
+      position: absolute; bottom: 100px; left: 28px;
+      padding: 10px 16px; border-radius: var(--radius-card);
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .aw-rest-ring { width: 36px; height: 36px; }
+    .aw-rest-time {
+      font-family: var(--font-display); font-size: 18px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .aw-rest-label {
+      font-family: var(--font-display); font-size: 9px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .aw-pr-toast {
+      position: absolute; bottom: 164px; left: 28px; right: 28px;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      background: rgba(42,157,110,0.12);
+      border: 1px solid rgba(42,157,110,0.25);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .aw-pr-text {
+      font-family: var(--font-display); font-size: 12px; font-weight: 600;
+      color: var(--green);
+    }
+
+    /* ═══════ ÉDITION PRODUIT ═══════ */
+    .ep-field { margin-bottom: 16px; }
+    .ep-label {
+      font-family: var(--font-display); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .ep-input {
+      width: 100%; padding: 14px 16px; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.06);
+      font-family: var(--font-display); font-size: 15px; font-weight: 600;
+      color: var(--text-primary); outline: none;
+    }
+    .ep-input::placeholder { color: var(--text-muted); font-weight: 400; }
+    .ep-input:focus { border-color: var(--green); }
+    .ep-row { display: flex; gap: 10px; }
+    .ep-row .ep-field { flex: 1; }
+    .ep-section-label {
+      font-family: var(--font-display); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 12px; margin-top: 8px;
+    }
+    .ep-macro-input-wrap {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ep-macro-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .ep-macro-input {
+      flex: 1; padding: 14px 16px; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.06);
+      font-family: var(--font-display); font-size: 15px; font-weight: 600;
+      color: var(--text-primary); outline: none;
+    }
+    .ep-macro-input:focus { border-color: var(--green); }
+    .ep-macro-unit {
+      font-family: var(--font-display); font-size: 13px; font-weight: 600;
+      color: var(--text-muted); flex-shrink: 0;
+    }
+    .ep-save-btn {
+      width: 100%; padding: 16px; border-radius: var(--radius-sm);
+      background: var(--green); color: #fff; border: none;
+      font-family: var(--font-display); font-size: 15px; font-weight: 600;
+      cursor: pointer;
+    }
+    .ep-delete-btn {
+      width: 100%; padding: 14px; border-radius: var(--radius-sm);
+      background: none; color: #c94444; border: none;
+      font-family: var(--font-display); font-size: 13px; font-weight: 600;
+      cursor: pointer; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-bg"></div>
+  <div class="layout">
+
+    <div class="phones-row">
+
+      <!-- ════════ FICHE ALIMENT ════════ -->
+      <div class="phone-wrap">
+        <div class="screen-label">Fiche aliment</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <div class="s-time">9:41</div>
+              <div style="width:126px;height:36px;background:#000;border-radius:20px;flex-shrink:0;"></div>
+              <div class="s-icons"><span>&#9679;</span><span>&#9679;</span><span>&#9679;</span></div>
+            </div>
+            <div class="content-area">
+
+              <!-- Top bar -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div class="fa-back">‹</div>
+                <span style="font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Fiche produit</span>
+                <div style="display:flex;gap:8px;">
+                  <div class="fa-back" style="font-size:14px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </div>
+                  <div class="fa-back" style="font-size:14px;">♡</div>
+                </div>
+              </div>
+
+              <!-- Name + brand centered -->
+              <div style="margin-bottom:18px;opacity:0;animation:fadeIn 400ms ease-out 100ms forwards;">
+                <div class="fa-name">Flocons d'avoine</div>
+                <div class="fa-brand">Quaker · 100g</div>
+              </div>
+
+              <!-- Macros card: kcal | G | P | L -->
+              <div class="glass-card fa-macros-card" style="margin-bottom:20px;opacity:0;animation:fadeIn 400ms ease-out 200ms forwards;">
+                <div class="fa-macro-col">
+                  <span class="fa-macro-val" style="color:var(--text-primary);">389</span>
+                  <span class="fa-macro-unit">kcal</span>
+                </div>
+                <div class="fa-macro-sep"></div>
+                <div class="fa-macro-col">
+                  <span class="fa-macro-val" style="color:var(--color-carbs);">66.3</span>
+                  <span class="fa-macro-unit">Glucides</span>
+                </div>
+                <div class="fa-macro-sep"></div>
+                <div class="fa-macro-col">
+                  <span class="fa-macro-val" style="color:var(--color-protein);">13.5</span>
+                  <span class="fa-macro-unit">Protéines</span>
+                </div>
+                <div class="fa-macro-sep"></div>
+                <div class="fa-macro-col">
+                  <span class="fa-macro-val" style="color:var(--color-fat);">6.9</span>
+                  <span class="fa-macro-unit">Lipides</span>
+                </div>
+              </div>
+
+              <!-- Portion card -->
+              <button style="
+                width:100%; display:flex; align-items:center; justify-content:space-between;
+                padding:18px 20px; margin-bottom:20px; border-radius:var(--radius-sm);
+                background:rgba(255,255,255,0.55); backdrop-filter:blur(12px);
+                border:1.5px dashed rgba(0,0,0,0.10); cursor:pointer;
+                opacity:0; animation:fadeIn 400ms ease-out 270ms forwards;
+              ">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:38px;height:38px;border-radius:10px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                  <span style="font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--text-secondary);">Ajouter une portion</span>
+                </div>
+                <span style="font-size:14px;color:var(--text-muted);">›</span>
+              </button>
+
+              <!-- Nutrition detail card -->
+              <div class="glass-card" style="padding:18px 20px;margin-bottom:20px;opacity:0;animation:fadeIn 400ms ease-out 350ms forwards;">
+                <div style="font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Détails nutritionnels</div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label">Énergie</span>
+                  <span class="fa-detail-val">389 kcal</span>
+                </div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label">Protéines</span>
+                  <span class="fa-detail-val" style="color:var(--color-protein);">13.5 g</span>
+                </div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label">Glucides</span>
+                  <span class="fa-detail-val" style="color:var(--color-carbs);">66.3 g</span>
+                </div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label" style="padding-left:12px;">dont sucres</span>
+                  <span class="fa-detail-val">1.3 g</span>
+                </div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label">Lipides</span>
+                  <span class="fa-detail-val" style="color:var(--color-fat);">6.9 g</span>
+                </div>
+                <div class="fa-detail-row">
+                  <span class="fa-detail-label">Fibres</span>
+                  <span class="fa-detail-val">10.6 g</span>
+                </div>
+                <div class="fa-detail-row" style="border:none;">
+                  <span class="fa-detail-label">Sel</span>
+                  <span class="fa-detail-val">0.01 g</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bottom quantity bar -->
+            <div class="fa-qty-bar" style="flex-shrink:0;">
+              <!-- Tabs: Grammes / Portion -->
+              <div class="fa-qty-tabs">
+                <div class="fa-qty-tab active">Grammes</div>
+                <div class="fa-qty-tab inactive">Portion (40g)</div>
+              </div>
+              <div class="fa-qty-row">
+                <div class="fa-qty-btn fa-qty-minus">−</div>
+                <div class="fa-qty-center">
+                  <div class="fa-qty-value">100</div>
+                  <span class="fa-qty-unit">g</span>
+                </div>
+                <div class="fa-qty-btn fa-qty-plus">+</div>
+              </div>
+              <button class="fa-add-btn" style="width:100%;">Ajouter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ SÉANCE EN COURS ════════ -->
+      <div class="phone-wrap">
+        <div class="screen-label">Séance en cours</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <div class="s-time">9:41</div>
+              <div style="width:126px;height:36px;background:#000;border-radius:20px;flex-shrink:0;"></div>
+              <div class="s-icons"><span>&#9679;</span><span>&#9679;</span><span>&#9679;</span></div>
+            </div>
+            <div class="content-area" style="position:relative;">
+
+              <!-- Header -->
+              <div class="aw-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="aw-back">‹</div>
+                  <span style="font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Push Day</span>
+                </div>
+                <button class="aw-finish">Terminer</button>
+              </div>
+
+              <div class="aw-title" style="opacity:0;animation:fadeIn 300ms ease-out 100ms forwards;">En cours...</div>
+
+              <!-- Timer card -->
+              <div class="glass-card aw-timer-card" style="opacity:0;animation:fadeIn 300ms ease-out 150ms forwards;">
+                <div>
+                  <div class="aw-timer-time">0:42:18</div>
+                  <div class="aw-timer-label">Temps écoulé</div>
+                </div>
+                <div class="aw-timer-btns">
+                  <div class="aw-timer-btn">⏸</div>
+                  <div class="aw-timer-btn" style="background:var(--green-dim);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.56-8.49"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section label -->
+              <div class="aw-section-label" style="opacity:0;animation:fadeIn 300ms ease-out 200ms forwards;">Exercices · 4/6 terminés</div>
+
+              <!-- Exercise 1 — completed (collapsed) -->
+              <div class="glass-card aw-ex-card" style="opacity:0.6;opacity:0;animation:fadeIn 300ms ease-out 250ms forwards;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="aw-ex-dot" style="background:var(--green);"></div>
+                  <span class="aw-ex-name" style="opacity:0.7;">Développé couché</span>
+                  <span class="aw-ex-badge">4/4</span>
+                  <span style="font-size:14px;color:var(--text-muted);">›</span>
+                </div>
+              </div>
+
+              <!-- Exercise 2 — completed (collapsed) -->
+              <div class="glass-card aw-ex-card" style="opacity:0;animation:fadeIn 300ms ease-out 300ms forwards;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="aw-ex-dot" style="background:var(--green);"></div>
+                  <span class="aw-ex-name" style="opacity:0.7;">Développé incliné</span>
+                  <span class="aw-ex-badge">4/4</span>
+                  <span style="font-size:14px;color:var(--text-muted);">›</span>
+                </div>
+              </div>
+
+              <!-- Exercise 3 — ACTIVE (expanded) -->
+              <div class="glass-card aw-ex-card" style="border:1.5px solid var(--green);opacity:0;animation:fadeIn 300ms ease-out 350ms forwards;">
+                <div class="aw-ex-header">
+                  <div class="aw-ex-dot" style="background:var(--color-protein);"></div>
+                  <span class="aw-ex-name">Élévations latérales</span>
+                  <span class="aw-ex-badge">2/4</span>
+                </div>
+
+                <!-- Sets grid -->
+                <div class="aw-sets-grid">
+                  <!-- Headers -->
+                  <div class="aw-set-hdr">#</div>
+                  <div class="aw-set-hdr">Poids</div>
+                  <div class="aw-set-hdr">Reps</div>
+                  <div class="aw-set-hdr">Préc.</div>
+                  <div class="aw-set-hdr"></div>
+
+                  <!-- Set 1 — done -->
+                  <div class="aw-set-num">1</div>
+                  <div class="aw-set-input">14</div>
+                  <div class="aw-set-input">12</div>
+                  <div class="aw-set-ref">12×12</div>
+                  <div class="aw-set-check done">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+
+                  <!-- Set 2 — done -->
+                  <div class="aw-set-num">2</div>
+                  <div class="aw-set-input">14</div>
+                  <div class="aw-set-input">10</div>
+                  <div class="aw-set-ref">12×10</div>
+                  <div class="aw-set-check done">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+
+                  <!-- Set 3 — ACTIVE -->
+                  <div class="aw-set-num" style="color:var(--green);font-weight:800;">3</div>
+                  <div class="aw-set-input active">14</div>
+                  <div class="aw-set-input active" style="color:var(--text-muted);">12</div>
+                  <div class="aw-set-ref">12×10</div>
+                  <div class="aw-set-check pending">
+                    <div style="width:12px;height:12px;border-radius:50%;border:2px solid var(--text-muted);"></div>
+                  </div>
+
+                  <!-- Set 4 — pending -->
+                  <div class="aw-set-num">4</div>
+                  <div class="aw-set-input" style="color:var(--text-muted);">—</div>
+                  <div class="aw-set-input" style="color:var(--text-muted);">12</div>
+                  <div class="aw-set-ref">12×8</div>
+                  <div class="aw-set-check pending">
+                    <div style="width:12px;height:12px;border-radius:50%;border:2px solid var(--text-muted);"></div>
+                  </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="aw-ex-actions">
+                  <div class="aw-ex-action">+ Série</div>
+                  <div class="aw-ex-action">📝 Notes</div>
+                  <div class="aw-ex-action">Échauffement</div>
+                </div>
+              </div>
+
+              <!-- Exercise 4 — not started -->
+              <div class="glass-card aw-ex-card" style="opacity:0;animation:fadeIn 300ms ease-out 400ms forwards;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="aw-ex-dot" style="background:var(--color-carbs);"></div>
+                  <span class="aw-ex-name">Triceps poulie</span>
+                  <span style="font-family:var(--font-display);font-size:10px;font-weight:600;color:var(--text-muted);">0/4</span>
+                  <span style="font-size:14px;color:var(--text-muted);">›</span>
+                </div>
+              </div>
+
+              <!-- Exercise 5 — not started -->
+              <div class="glass-card aw-ex-card" style="opacity:0;animation:fadeIn 300ms ease-out 450ms forwards;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="aw-ex-dot" style="background:var(--color-fat);"></div>
+                  <span class="aw-ex-name">Dips</span>
+                  <span style="font-family:var(--font-display);font-size:10px;font-weight:600;color:var(--text-muted);">0/3</span>
+                  <span style="font-size:14px;color:var(--text-muted);">›</span>
+                </div>
+              </div>
+
+              <!-- PR Toast -->
+              <div style="
+                padding:12px 16px; border-radius:var(--radius-sm); margin-top:6px;
+                background:rgba(42,157,110,0.12); border:1px solid rgba(42,157,110,0.25);
+                display:flex; align-items:center; gap:8px;
+                opacity:0; animation:fadeIn 400ms ease-out 500ms forwards;
+              ">
+                <span style="font-size:16px;">🏆</span>
+                <span class="aw-pr-text">Record ! Développé couché — 90kg × 8</span>
+              </div>
+
+
+
+              <!-- FAB -->
+              <div class="aw-fab" style="opacity:0;animation:fadeIn 400ms ease-out 500ms forwards;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+
+            </div>
+            <!-- No nav bar during active workout -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ ÉDITION PRODUIT ════════ -->
+      <div class="phone-wrap">
+        <div class="screen-label">Édition produit</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <div class="s-time">9:41</div>
+              <div style="width:126px;height:36px;background:#000;border-radius:20px;flex-shrink:0;"></div>
+              <div class="s-icons"><span>&#9679;</span><span>&#9679;</span><span>&#9679;</span></div>
+            </div>
+            <div class="content-area">
+
+              <!-- Header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <div class="fa-back">‹</div>
+                <span style="font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Modifier le produit</span>
+                <div style="width:36px;"></div>
+              </div>
+
+              <!-- Nom -->
+              <div class="ep-field" style="opacity:0;animation:fadeIn 400ms ease-out 100ms forwards;">
+                <div class="ep-label">Nom</div>
+                <input class="ep-input" value="Flocons d'avoine" />
+              </div>
+
+              <!-- Marque + Code-barres -->
+              <div class="ep-row" style="opacity:0;animation:fadeIn 400ms ease-out 150ms forwards;">
+                <div class="ep-field">
+                  <div class="ep-label">Marque</div>
+                  <input class="ep-input" value="Quaker" />
+                </div>
+                <div class="ep-field">
+                  <div class="ep-label">Code-barres</div>
+                  <div style="display:flex;gap:8px;">
+                    <input class="ep-input" value="3168930005728" placeholder="Optionnel" style="flex:1;" />
+                    <button style="
+                      width:48px; height:48px; border-radius:var(--radius-sm); flex-shrink:0;
+                      background:var(--green-dim); border:1px solid rgba(42,157,110,0.15);
+                      display:flex; align-items:center; justify-content:center; cursor:pointer;
+                    ">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round">
+                        <path d="M3 7V5a2 2 0 012-2h2"/><path d="M17 3h2a2 2 0 012 2v2"/><path d="M21 17v2a2 2 0 01-2 2h-2"/><path d="M7 21H5a2 2 0 01-2-2v-2"/>
+                        <line x1="7" y1="8" x2="7" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="13" y1="8" x2="13" y2="16"/><line x1="16" y1="8" x2="16" y2="16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Calories -->
+              <div class="ep-section-label" style="opacity:0;animation:fadeIn 400ms ease-out 200ms forwards;">Valeurs pour 100g</div>
+
+              <div class="ep-field" style="opacity:0;animation:fadeIn 400ms ease-out 220ms forwards;">
+                <div class="ep-label">Calories</div>
+                <div class="ep-macro-input-wrap">
+                  <input class="ep-macro-input" value="389" />
+                  <span class="ep-macro-unit">kcal</span>
+                </div>
+              </div>
+
+              <!-- Macros G/P/L -->
+              <div class="ep-field" style="opacity:0;animation:fadeIn 400ms ease-out 260ms forwards;">
+                <div class="ep-label">Glucides</div>
+                <div class="ep-macro-input-wrap">
+                  <div class="ep-macro-dot" style="background:var(--color-carbs);"></div>
+                  <input class="ep-macro-input" value="66.3" />
+                  <span class="ep-macro-unit">g</span>
+                </div>
+              </div>
+
+              <div class="ep-field" style="opacity:0;animation:fadeIn 400ms ease-out 300ms forwards;">
+                <div class="ep-label">Protéines</div>
+                <div class="ep-macro-input-wrap">
+                  <div class="ep-macro-dot" style="background:var(--color-protein);"></div>
+                  <input class="ep-macro-input" value="13.5" />
+                  <span class="ep-macro-unit">g</span>
+                </div>
+              </div>
+
+              <div class="ep-field" style="opacity:0;animation:fadeIn 400ms ease-out 340ms forwards;">
+                <div class="ep-label">Lipides</div>
+                <div class="ep-macro-input-wrap">
+                  <div class="ep-macro-dot" style="background:var(--color-fat);"></div>
+                  <input class="ep-macro-input" value="6.9" />
+                  <span class="ep-macro-unit">g</span>
+                </div>
+              </div>
+
+              <!-- Détails secondaires -->
+              <div class="ep-row" style="opacity:0;animation:fadeIn 400ms ease-out 380ms forwards;">
+                <div class="ep-field">
+                  <div class="ep-label">Sucres</div>
+                  <input class="ep-input" value="1.3" style="padding:12px 14px;font-size:14px;" />
+                </div>
+                <div class="ep-field">
+                  <div class="ep-label">Fibres</div>
+                  <input class="ep-input" value="10.6" style="padding:12px 14px;font-size:14px;" />
+                </div>
+                <div class="ep-field">
+                  <div class="ep-label">Sel</div>
+                  <input class="ep-input" value="0.01" style="padding:12px 14px;font-size:14px;" />
+                </div>
+              </div>
+
+              <!-- Portion -->
+              <div class="ep-section-label" style="opacity:0;animation:fadeIn 400ms ease-out 420ms forwards;">Portion</div>
+              <div class="ep-row" style="opacity:0;animation:fadeIn 400ms ease-out 440ms forwards;">
+                <div class="ep-field" style="flex:2;">
+                  <div class="ep-label">Nom de la portion</div>
+                  <input class="ep-input" value="1 sachet" placeholder="Ex: 1 tranche, 1 cuillère..." />
+                </div>
+                <div class="ep-field" style="flex:1;">
+                  <div class="ep-label">Taille (g)</div>
+                  <input class="ep-input" value="40" />
+                </div>
+              </div>
+
+              <!-- Save + Delete -->
+              <div style="margin-top:12px;opacity:0;animation:fadeIn 400ms ease-out 500ms forwards;">
+                <button class="ep-save-btn">Sauvegarder</button>
+                <button class="ep-delete-btn">Supprimer cet aliment</button>
+              </div>
+
+              <div style="height:24px;"></div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

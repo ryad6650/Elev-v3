@@ -142,8 +142,7 @@ export default function AddPoidsModal({
           className="w-full py-4 rounded-xl text-base font-semibold transition-all active:scale-95"
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
-            background:
-              isPending || !poids ? "rgba(0,0,0,0.06)" : "var(--green)",
+            background: isPending || !poids ? "rgba(0,0,0,0.06)" : "#74BF7A",
             color: isPending || !poids ? "var(--text-muted)" : "#fff",
             border: "none",
             cursor: isPending || !poids ? "not-allowed" : "pointer",

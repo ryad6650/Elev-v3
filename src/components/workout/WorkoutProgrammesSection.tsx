@@ -67,7 +67,7 @@ export default function WorkoutProgrammesSection({
               fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 12,
               fontWeight: 600,
-              color: "var(--green)",
+              color: "#74BF7A",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -204,7 +204,7 @@ function ActiveProgramme({
             textTransform: "uppercase",
             padding: "3px 10px",
             borderRadius: 9999,
-            background: "var(--green)",
+            background: "#74BF7A",
             color: "#fff",
           }}
         >
@@ -228,7 +228,7 @@ function ActiveProgramme({
                 height: "100%",
                 width: `${pct}%`,
                 borderRadius: 99,
-                background: "var(--green)",
+                background: "#74BF7A",
               }}
             />
           </div>
@@ -252,7 +252,7 @@ function ActiveProgramme({
           onClick={() => onStart(nextRoutine.routine_id, nextRoutine.nom)}
           className="w-full rounded-xl p-3 flex items-center justify-between active:scale-[0.98] transition-transform"
           style={{
-            background: "var(--green)",
+            background: "#74BF7A",
             border: "none",
             cursor: "pointer",
           }}

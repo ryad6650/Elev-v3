@@ -93,7 +93,7 @@ export default function WorkoutSummary({
       <div
         className="flex items-center justify-between px-4 pb-3"
         style={{
-          background: "#1C1C1E",
+          background: "#151312",
           paddingTop: "calc(env(safe-area-inset-top) + 12px)",
         }}
       >
@@ -106,7 +106,7 @@ export default function WorkoutSummary({
           disabled={saving || saved}
           className="px-5 py-2 rounded-full text-sm font-semibold active:scale-95 transition-all"
           style={{
-            background: "#2563EB",
+            background: "#1E9D4C",
             color: "#fff",
             opacity: saving ? 0.6 : 1,
           }}
@@ -151,7 +151,7 @@ export default function WorkoutSummary({
               </p>
               <p
                 className="text-base font-semibold"
-                style={{ color: blue ? "#3B82F6" : "#fff" }}
+                style={{ color: blue ? "#74BF7A" : "#fff" }}
               >
                 {value}
               </p>
@@ -166,7 +166,7 @@ export default function WorkoutSummary({
           <p className="text-xs mb-1" style={{ color: "#8E8E93" }}>
             When
           </p>
-          <p className="text-sm font-medium" style={{ color: "#3B82F6" }}>
+          <p className="text-sm font-medium" style={{ color: "#74BF7A" }}>
             {formatDate(workout.debutAt)}
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function WorkoutSummary({
             }
             rows={3}
             className="w-full bg-transparent text-sm resize-none outline-none"
-            style={{ color: "#fff", caretColor: "#3B82F6" }}
+            style={{ color: "#fff", caretColor: "#74BF7A" }}
           />
         </div>
 
@@ -247,7 +247,7 @@ export default function WorkoutSummary({
         >
           <div
             className="w-full max-w-sm p-6 rounded-2xl space-y-4"
-            style={{ background: "#1C1C1E" }}
+            style={{ background: "#151312" }}
             onClick={(e) => e.stopPropagation()}
           >
             <p className="font-semibold text-white">Abandonner la séance ?</p>

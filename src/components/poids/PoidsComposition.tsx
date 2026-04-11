@@ -155,11 +155,20 @@ export default function PoidsComposition({
       </div>
 
       {/* Échelle */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {["16", "18.5", "25", "30", "40"].map((v) => (
+      <div style={{ position: "relative", height: 14 }}>
+        {[
+          { v: "16", pct: 0 },
+          { v: "18.5", pct: 10.4 },
+          { v: "25", pct: 37.5 },
+          { v: "30", pct: 58.3 },
+          { v: "40", pct: 100 },
+        ].map(({ v, pct }) => (
           <span
             key={v}
             style={{
+              position: "absolute",
+              left: `${pct}%`,
+              transform: "translateX(-50%)",
               fontFamily: "var(--font-nunito), sans-serif",
               fontSize: 9,
               color: "var(--text-muted)",

@@ -1,11 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { HistoriqueWorkout } from "@/lib/historique";
+import type {
+  HistoriqueWorkout,
+  NutritionDaySummary,
+  PoidsRecord,
+} from "@/lib/historique";
 
 interface Props {
   workouts: HistoriqueWorkout[];
-  streakActuel: number;
+  nutritionDays: NutritionDaySummary[];
+  poidsHistory: PoidsRecord[];
+  selectedDate: string;
+  onSelectDate: (date: string) => void;
 }
 
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
@@ -24,14 +31,28 @@ const MOIS = [
   "Décembre",
 ];
 
-export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
+export default function HistoriqueCalendar({
+  workouts,
+  nutritionDays,
+  poidsHistory,
+  selectedDate,
+  onSelectDate,
+}: Props) {
   const today = new Date();
   const [annee, setAnnee] = useState(today.getFullYear());
   const [mois, setMois] = useState(today.getMonth());
 
-  const sessionDates = useMemo(
+  const workoutDates = useMemo(
     () => new Set(workouts.map((w) => w.date)),
     [workouts],
+  );
+  const nutriDates = useMemo(
+    () => new Set(nutritionDays.map((n) => n.date)),
+    [nutritionDays],
+  );
+  const poidsDates = useMemo(
+    () => new Set(poidsHistory.map((p) => p.date)),
+    [poidsHistory],
   );
   const todayStr = today.toISOString().split("T")[0];
 
@@ -52,22 +73,15 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
 
   return (
     <div
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "var(--glass-blur)",
-        WebkitBackdropFilter: "var(--glass-blur)",
-        borderRadius: "var(--radius-card)",
-        border: "1px solid var(--glass-border)",
-        padding: "16px 18px",
-        marginBottom: 14,
-      }}
+      className="card-surface"
+      style={{ padding: "16px 18px", marginBottom: 14 }}
     >
-      {/* Navigation mois */}
+      {/* Nav mois */}
       <div className="flex items-center justify-between mb-3">
         <span
           style={{
             fontFamily: "var(--font-nunito), sans-serif",
-            fontSize: 15,
+            fontSize: 17,
             fontWeight: 600,
             color: "var(--text-primary)",
           }}
@@ -75,16 +89,16 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
           {MOIS[mois]} {annee}
         </span>
         <div className="flex gap-2">
-          {[-1, 1].map((dir) => (
+          {([-1, 1] as const).map((dir) => (
             <button
               key={dir}
-              onClick={() => navMois(dir as -1 | 1)}
-              className="flex items-center justify-center transition-opacity active:opacity-60"
+              onClick={() => navMois(dir)}
+              className="flex items-center justify-center active:opacity-60 transition-opacity"
               style={{
                 width: 28,
                 height: 28,
                 borderRadius: "50%",
-                background: "rgba(0,0,0,0.04)",
+                background: "var(--glass-subtle)",
                 color: "var(--text-muted)",
                 fontSize: 13,
                 border: "none",
@@ -97,15 +111,14 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
         </div>
       </div>
 
-      {/* Entêtes jours */}
+      {/* Entêtes */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
-        {JOURS.map((j, i) => (
+        {JOURS.map((j) => (
           <div
-            key={i}
+            key={j}
             className="text-center py-0.5"
             style={{
-              fontFamily: "var(--font-nunito), sans-serif",
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 600,
               color: "var(--text-muted)",
               letterSpacing: "0.04em",
@@ -117,59 +130,110 @@ export default function HistoriqueCalendar({ workouts, streakActuel }: Props) {
         ))}
       </div>
 
-      {/* Grille jours */}
+      {/* Grille */}
       <div className="grid grid-cols-7 gap-0.5">
         {cells.map((day, i) => {
           if (day === null)
             return <div key={`e-${i}`} className="aspect-square" />;
 
           const dateStr = `${annee}-${String(mois + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-          const hasSession = sessionDates.has(dateStr);
           const isToday = dateStr === todayStr;
+          const isSelected = dateStr === selectedDate && !isToday;
+          const hasWorkout = workoutDates.has(dateStr);
+          const hasNutri = nutriDates.has(dateStr);
+          const hasPoids = poidsDates.has(dateStr);
 
           return (
-            <div
+            <button
               key={dateStr}
-              className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded-lg relative"
+              onClick={() => onSelectDate(dateStr)}
+              className="aspect-square flex flex-col items-center justify-center rounded-lg relative"
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                fontSize: 10,
-                fontWeight: isToday ? 700 : 500,
-                color: isToday ? "#fff" : "var(--text-muted)",
-                background: isToday ? "var(--green)" : "transparent",
+                fontSize: 12,
+                fontWeight: isToday || isSelected ? 700 : 500,
+                border: "none",
+                cursor: "pointer",
+                transition: "background 150ms",
+                color: isToday
+                  ? "#fff"
+                  : isSelected
+                    ? "#4A8B50"
+                    : "var(--text-muted)",
+                background: isToday
+                  ? "#1B2E1D"
+                  : isSelected
+                    ? "rgba(27,46,29,0.15)"
+                    : "transparent",
               }}
             >
               {day}
-              {hasSession && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 2,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: 4,
-                    height: 4,
-                    borderRadius: "50%",
-                    background: isToday ? "#fff" : "var(--green)",
-                  }}
-                />
+              {/* Dots */}
+              {(hasWorkout || hasNutri || hasPoids) && (
+                <div className="absolute flex gap-0.5" style={{ bottom: 2 }}>
+                  {hasWorkout && (
+                    <span
+                      className="block rounded-full"
+                      style={{
+                        width: 5,
+                        height: 5,
+                        background: isToday ? "#fff" : "#74BF7A",
+                      }}
+                    />
+                  )}
+                  {hasNutri && (
+                    <span
+                      className="block rounded-full"
+                      style={{
+                        width: 5,
+                        height: 5,
+                        background: isToday
+                          ? "rgba(255,255,255,0.6)"
+                          : "#936A4F",
+                      }}
+                    />
+                  )}
+                  {hasPoids && (
+                    <span
+                      className="block rounded-full"
+                      style={{
+                        width: 5,
+                        height: 5,
+                        background: isToday
+                          ? "rgba(255,255,255,0.4)"
+                          : "#6BA3D6",
+                      }}
+                    />
+                  )}
+                </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
 
-      {/* Streak */}
-      <div
-        className="text-center mt-3"
-        style={{
-          fontFamily: "var(--font-nunito), sans-serif",
-          fontSize: 11,
-          fontWeight: 600,
-          color: "var(--text-muted)",
-        }}
-      >
-        🔥 Streak actuel : {streakActuel} jour{streakActuel > 1 ? "s" : ""}
+      {/* Légende */}
+      <div className="flex gap-4 mt-2.5 justify-center">
+        {[
+          { color: "#74BF7A", label: "Séance" },
+          { color: "#936A4F", label: "Nutrition" },
+          { color: "#6BA3D6", label: "Pesée" },
+        ].map(({ color, label }) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <span
+              className="block rounded-full"
+              style={{ width: 7, height: 7, background: color }}
+            />
+            <span
+              style={{
+                fontSize: 11,
+                color: "var(--text-muted)",
+                fontWeight: 500,
+              }}
+            >
+              {label}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

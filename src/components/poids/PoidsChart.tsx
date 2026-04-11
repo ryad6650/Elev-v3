@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import type { PoidsEntry } from "@/lib/poids";
 
 type Periode = "1S" | "1M" | "3M" | "6M";
@@ -34,8 +34,20 @@ interface Props {
 }
 
 export default function PoidsChart({ entries }: Props) {
-  const [periode, setPeriode] = useState<Periode>("1M");
+  const [periode, setPeriode] = useState<Periode>("1S");
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
   const periodeConfig = PERIODES.find((p) => p.key === periode)!;
+
+  useEffect(() => {
+    if (selectedIdx === null) return;
+    const handleTap = (e: MouseEvent | TouchEvent) => {
+      if (chartRef.current?.contains(e.target as Node)) return;
+      setSelectedIdx(null);
+    };
+    document.addEventListener("pointerdown", handleTap);
+    return () => document.removeEventListener("pointerdown", handleTap);
+  }, [selectedIdx]);
 
   const filtered = useMemo(
     () => filterByPeriode(entries, periodeConfig.days),
@@ -56,28 +68,55 @@ export default function PoidsChart({ entries }: Props) {
   const chart = useMemo(() => {
     if (filtered.length < 2) return null;
     const vals = filtered.map((e) => e.poids);
+    const dates = filtered.map((e) => new Date(e.date).getTime());
     const maVals = calcMovingAvg(vals);
-    const minV = Math.min(...maVals);
-    const maxV = Math.max(...maVals);
+    const allVals = [...vals, ...maVals];
+    const minV = Math.min(...allVals);
+    const maxV = Math.max(...allVals);
     const range = maxV - minV || 1;
     const pad = range * 0.15;
     const yMin = minV - pad;
     const yMax = maxV + pad;
     const yRange = yMax - yMin;
 
-    const toX = (i: number) => (i / (maVals.length - 1)) * W;
+    const dateMin = dates[0];
+    const dateMax = dates[dates.length - 1];
+    const dateRange = dateMax - dateMin || 1;
+    const pad_x = 6;
+    const toX = (i: number) =>
+      pad_x + ((dates[i] - dateMin) / dateRange) * (W - pad_x * 2);
     const toY = (v: number) => ((yMax - v) / yRange) * H;
 
-    const points = maVals.map((v, i) => ({ x: toX(i), y: toY(v) }));
-    const linePath = points
-      .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`)
-      .join(" ");
+    const rawVals = filtered.map((e) => e.poids);
+    const rawDates = filtered.map((e) => e.date);
+    const rawPoints = rawVals.map((v, i) => ({ x: toX(i), y: toY(v) }));
+
+    // Spline cubique naturelle
+    const spline = (pts: { x: number; y: number }[]) => {
+      if (pts.length < 2) return "";
+      let d = `M ${pts[0].x},${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[Math.max(0, i - 1)];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[Math.min(pts.length - 1, i + 2)];
+        const t = 0.35;
+        const cp1x = p1.x + (p2.x - p0.x) * t;
+        const cp1y = p1.y + (p2.y - p0.y) * t;
+        const cp2x = p2.x - (p3.x - p1.x) * t;
+        const cp2y = p2.y - (p3.y - p1.y) * t;
+        d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+      }
+      return d;
+    };
+
+    const linePath = spline(rawPoints);
     const areaPath =
-      `M ${points[0].x},${H} ` +
-      points.map((p) => `L ${p.x},${p.y}`).join(" ") +
-      ` L ${points[points.length - 1].x},${H} Z`;
-    const last = points[points.length - 1];
-    return { linePath, areaPath, last };
+      `M ${rawPoints[0].x},${H} L ${rawPoints[0].x},${rawPoints[0].y}` +
+      linePath.slice(linePath.indexOf("C") - 1) +
+      ` L ${rawPoints[rawPoints.length - 1].x},${H} Z`;
+    const last = rawPoints[rawPoints.length - 1];
+    return { linePath, areaPath, last, points: rawPoints, rawVals, rawDates };
   }, [filtered]);
 
   if (entries.length === 0) {
@@ -104,6 +143,7 @@ export default function PoidsChart({ entries }: Props) {
 
   return (
     <div
+      ref={chartRef}
       style={{
         background: "var(--glass-bg)",
         backdropFilter: "var(--glass-blur)",
@@ -139,7 +179,10 @@ export default function PoidsChart({ entries }: Props) {
           {PERIODES.map((p) => (
             <button
               key={p.key}
-              onClick={() => setPeriode(p.key)}
+              onClick={() => {
+                setPeriode(p.key);
+                setSelectedIdx(null);
+              }}
               style={{
                 padding: "4px 10px",
                 borderRadius: 9999,
@@ -149,8 +192,7 @@ export default function PoidsChart({ entries }: Props) {
                 cursor: "pointer",
                 fontFamily: "var(--font-nunito), sans-serif",
                 color: periode === p.key ? "#fff" : "var(--text-muted)",
-                background:
-                  periode === p.key ? "var(--green)" : "rgba(0,0,0,0.04)",
+                background: periode === p.key ? "#74BF7A" : "rgba(0,0,0,0.04)",
               }}
             >
               {p.label}
@@ -178,24 +220,81 @@ export default function PoidsChart({ entries }: Props) {
               <path
                 d={chart.linePath}
                 fill="none"
-                stroke="var(--green)"
+                stroke="#74BF7A"
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle
-                cx={chart.last.x}
-                cy={chart.last.y}
-                r={4}
-                fill="var(--green)"
-              />
+              {/* Halo dernier point */}
               <circle
                 cx={chart.last.x}
                 cy={chart.last.y}
                 r={8}
-                fill="var(--green)"
+                fill="#74BF7A"
                 opacity={0.15}
+                style={{ pointerEvents: "none" }}
               />
+              {chart.points.map((p, i) => (
+                <g key={i}>
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={
+                      selectedIdx === i
+                        ? 5
+                        : i === chart.points.length - 1
+                          ? 5
+                          : 3.5
+                    }
+                    fill="#74BF7A"
+                    style={{ pointerEvents: "none" }}
+                  />
+                  {/* Zone de tap invisible */}
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={12}
+                    fill="transparent"
+                    onClick={() => setSelectedIdx(selectedIdx === i ? null : i)}
+                  />
+                </g>
+              ))}
+              {/* Tooltip */}
+              {selectedIdx !== null && chart.points[selectedIdx] && (
+                <g>
+                  <line
+                    x1={chart.points[selectedIdx].x}
+                    y1={0}
+                    x2={chart.points[selectedIdx].x}
+                    y2={H}
+                    stroke="#74BF7A"
+                    strokeWidth={0.5}
+                    strokeDasharray="2,2"
+                    opacity={0.5}
+                  />
+                  <rect
+                    x={Math.min(chart.points[selectedIdx].x - 28, W - 56)}
+                    y={Math.max(chart.points[selectedIdx].y - 28, 0)}
+                    width={56}
+                    height={22}
+                    rx={6}
+                    fill="var(--bg-card, #1c1917)"
+                    stroke="#74BF7A"
+                    strokeWidth={0.5}
+                    opacity={0.95}
+                  />
+                  <text
+                    x={Math.min(chart.points[selectedIdx].x, W - 28)}
+                    y={Math.max(chart.points[selectedIdx].y - 28, 0) + 14.5}
+                    textAnchor="middle"
+                    fontSize={9}
+                    fontWeight={700}
+                    fill="#74BF7A"
+                  >
+                    {chart.rawVals[selectedIdx]} kg
+                  </text>
+                </g>
+              )}
             </>
           ) : (
             <text
@@ -237,7 +336,7 @@ export default function PoidsChart({ entries }: Props) {
                   fontFamily: "var(--font-nunito), sans-serif",
                   fontSize: 17,
                   fontWeight: 700,
-                  color: s.isGreen ? "var(--green)" : "var(--text-primary)",
+                  color: s.isGreen ? "#74BF7A" : "var(--text-primary)",
                   lineHeight: 1.2,
                 }}
               >

@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Élev — Historique · 4 Variantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary:    #0C0A09;
+      --bg-secondary:  #1C1917;
+      --bg-card:       #292524;
+      --bg-elevated:   #44403C;
+      --text-primary:  #FAFAF9;
+      --text-secondary:#A8A29E;
+      --text-muted:    #78716C;
+      --border:        rgba(255,255,255,0.08);
+      --accent:        #1B2E1D;
+      --accent-text:   #74BF7A;
+      --accent-bg:     rgba(27,46,29,0.15);
+      --color-protein: #74BF7A;
+      --color-carbs:   #936A4F;
+      --color-fat:     #C07858;
+      --success:       #22C55E;
+      --danger:        #EF4444;
+      --font-serif:    'DM Serif Display', serif;
+      --font-sans:     'DM Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      min-height: 100dvh;
+      display: flex; align-items: flex-start; justify-content: center;
+      background: #060504; overflow-x: hidden;
+    }
+
+    .body-bg {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(27,46,29,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 80%, rgba(27,46,29,0.08) 0%, transparent 60%),
+                  #060504;
+      z-index: 0;
+    }
+
+    .layout {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 48px;
+      padding: 48px 24px 80px;
+      width: 100%; max-width: 1600px;
+    }
+
+    .page-header { text-align: center; }
+    .page-eyebrow {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--accent-text); opacity: 0.5; margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: var(--font-serif); font-style: italic; font-size: 42px;
+      color: var(--text-primary); letter-spacing: -0.01em;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.6);
+    }
+    .page-subtitle {
+      font-size: 13px; color: var(--text-muted); margin-top: 8px;
+      font-weight: 400;
+    }
+
+    /* ── Variant rows ── */
+    .variant-row {
+      width: 100%; display: flex; flex-direction: column;
+      align-items: center; gap: 20px;
+    }
+    .variant-header { text-align: center; }
+    .variant-letter {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 28px; color: var(--accent-text);
+      line-height: 1;
+    }
+    .variant-name {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text-muted); margin-top: 4px;
+    }
+    .variant-desc {
+      font-size: 12px; color: var(--text-secondary);
+      max-width: 360px; text-align: center; margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .phones-row {
+      display: flex; flex-wrap: wrap; gap: 40px;
+      justify-content: center; align-items: flex-start;
+    }
+
+    .phone-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 10px;
+    }
+    .screen-label {
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+    }
+    .phone {
+      width: 310px; height: 672px;
+      border-radius: 46px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 0 9px rgba(0,0,0,0.5),
+        0 0 0 10px rgba(255,255,255,0.03),
+        0 48px 120px rgba(0,0,0,0.8);
+    }
+    .phone-bg {
+      position: absolute; inset: 0;
+      background: var(--bg-primary);
+      z-index: 0;
+    }
+    .phone-ui {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 0; flex-shrink: 0;
+    }
+    .s-time { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.92); }
+    .s-icons { display: flex; gap: 5px; }
+    .s-icons span { font-size: 10px; color: rgba(255,255,255,0.7); }
+
+    /* ── Content area ── */
+    .content-area {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 12px 18px 0; overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+
+    /* ── Screen header ── */
+    .screen-header { margin-bottom: 14px; }
+    .screen-sub {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 2px;
+    }
+    .screen-title {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 26px; color: var(--text-primary);
+    }
+
+    /* ── Glass cards ── */
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(16px);
+      border-radius: 16px; padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 10px;
+    }
+    .glass-card-dark {
+      background: var(--bg-secondary);
+      border-radius: 16px; padding: 12px 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .card-label {
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: absolute; bottom: 14px; left: 16px; right: 16px;
+      display: flex; align-items: center; justify-content: space-around;
+      background: rgba(28,25,23,0.92);
+      backdrop-filter: blur(16px);
+      border-radius: 32px; padding: 10px 6px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px; font-size: 9px; font-weight: 500;
+      color: var(--text-muted); padding: 6px 10px;
+      border-radius: 22px; transition: all 200ms;
+    }
+    .nav-item.active {
+      background: var(--accent); color: #fff;
+      padding: 6px 14px;
+    }
+    .nav-emoji { font-size: 16px; line-height: 1; }
+
+    /* ── Tabs ── */
+    .tabs-row {
+      display: flex; gap: 6px; margin-bottom: 12px;
+    }
+    .tab-pill {
+      padding: 6px 14px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+    }
+    .tab-pill.active {
+      background: var(--accent); color: #fff;
+      border-color: rgba(116,191,122,0.2);
+    }
+
+    /* ── Stats row ── */
+    .stats-row {
+      display: flex; gap: 8px; margin-bottom: 10px;
+    }
+    .stat-card {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(16px);
+      border-radius: 14px; padding: 10px;
+      border: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .stat-bar {
+      width: 3px; height: 32px; border-radius: 2px;
+    }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-value {
+      font-family: var(--font-serif);
+      font-size: 18px; color: var(--text-primary);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 7.5px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-muted); margin-top: 2px;
+    }
+
+    /* ── Calendar ── */
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .cal-month {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 14px; color: var(--text-primary);
+    }
+    .cal-arrows { display: flex; gap: 8px; }
+    .cal-arrow {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 2px; text-align: center;
+    }
+    .cal-day-name {
+      font-size: 7px; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--text-muted); padding: 3px 0;
+    }
+    .cal-day {
+      font-size: 9px; color: var(--text-muted);
+      padding: 5px 0; border-radius: 8px; position: relative;
+    }
+    .cal-day.today {
+      background: var(--accent); color: #fff;
+      font-weight: 700;
+    }
+    .cal-day.has-workout::after {
+      content: ''; position: absolute;
+      bottom: 1px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--accent-text);
+    }
+    .cal-day.has-nutrition::after {
+      content: ''; position: absolute;
+      bottom: 1px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--color-carbs);
+    }
+    .cal-day.has-both::after {
+      content: ''; position: absolute;
+      bottom: 1px; left: calc(50% - 4px); transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--accent-text);
+    }
+    .cal-day.has-both::before {
+      content: ''; position: absolute;
+      bottom: 1px; left: calc(50% + 4px); transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--color-carbs);
+    }
+
+    /* ── Workout items ── */
+    .workout-item {
+      display: flex; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .workout-item:last-child { border-bottom: none; }
+    .workout-date-col {
+      display: flex; flex-direction: column; align-items: center;
+      min-width: 36px;
+    }
+    .workout-day-num {
+      font-family: var(--font-serif);
+      font-size: 22px; color: var(--text-primary); line-height: 1;
+    }
+    .workout-day-name {
+      font-size: 8px; font-weight: 600;
+      text-transform: uppercase; color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+    .workout-info { flex: 1; }
+    .workout-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 3px;
+    }
+    .workout-meta {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .workout-chip {
+      font-size: 9px; font-weight: 600;
+      padding: 2px 8px; border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-secondary);
+    }
+    .workout-chip.green { color: var(--accent-text); background: rgba(116,191,122,0.1); }
+    .workout-chip.amber { color: #E8B86D; background: rgba(232,184,109,0.1); }
+
+    /* ── Timeline ── */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 8px; top: 0; bottom: 0;
+      width: 2px; background: rgba(255,255,255,0.06);
+      border-radius: 1px;
+    }
+    .tl-item {
+      position: relative; padding: 8px 0;
+    }
+    .tl-item::before {
+      content: ''; position: absolute;
+      left: -22px; top: 14px;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--accent-text);
+      background: var(--bg-primary);
+    }
+    .tl-item.nutrition::before { border-color: var(--color-carbs); }
+    .tl-item.poids::before { border-color: #6BA3D6; }
+    .tl-item.sleep::before { border-color: #9B7EC8; }
+    .tl-date {
+      font-size: 9px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .tl-content {
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px; padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .tl-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 2px;
+    }
+    .tl-sub {
+      font-size: 10px; color: var(--text-secondary);
+    }
+
+    /* ── Heatmap ── */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      gap: 3px;
+    }
+    .hm-cell {
+      aspect-ratio: 1; border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+    }
+    .hm-cell.l1 { background: rgba(116,191,122,0.15); }
+    .hm-cell.l2 { background: rgba(116,191,122,0.3); }
+    .hm-cell.l3 { background: rgba(116,191,122,0.5); }
+    .hm-cell.l4 { background: rgba(116,191,122,0.75); }
+
+    /* ── Week summary bars ── */
+    .week-bar-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0;
+    }
+    .week-label {
+      font-size: 9px; font-weight: 600;
+      color: var(--text-muted); min-width: 24px;
+      text-align: right;
+    }
+    .week-bar-track {
+      flex: 1; height: 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px; overflow: hidden;
+    }
+    .week-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-text));
+    }
+    .week-count {
+      font-size: 10px; font-weight: 700;
+      color: var(--text-secondary); min-width: 20px;
+    }
+
+    /* ── Grouped list ── */
+    .group-header {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin: 12px 0 6px;
+    }
+    .group-header:first-child { margin-top: 0; }
+
+    /* ── Nutrition summary ── */
+    .nutri-summary {
+      display: flex; gap: 12px; align-items: center;
+    }
+    .nutri-ring {
+      width: 44px; height: 44px; position: relative; flex-shrink: 0;
+    }
+    .nutri-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .nutri-ring circle {
+      fill: none; stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .nutri-ring .track { stroke: rgba(255,255,255,0.06); }
+    .nutri-ring .fill { stroke: var(--accent-text); }
+    .nutri-ring-val {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: var(--text-primary);
+    }
+    .nutri-macros { display: flex; gap: 10px; }
+    .nutri-macro {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .nm-val { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+    .nm-label { font-size: 7px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+
+    /* ── Poids sparkline ── */
+    .sparkline-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .spark-val {
+      font-family: var(--font-serif);
+      font-size: 20px; color: var(--text-primary);
+    }
+    .spark-unit {
+      font-size: 11px; color: var(--text-muted);
+    }
+    .spark-svg {
+      flex: 1; height: 32px;
+    }
+    .spark-svg polyline {
+      fill: none; stroke: var(--accent-text);
+      stroke-width: 1.5; stroke-linecap: round;
+    }
+    .spark-svg .area {
+      fill: url(#sparkGrad); stroke: none;
+    }
+
+    /* ── PR badge ── */
+    .pr-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(116,191,122,0.1);
+      border: 1px solid rgba(116,191,122,0.15);
+      border-radius: 8px; padding: 4px 8px;
+      font-size: 10px; font-weight: 600;
+      color: var(--accent-text);
+    }
+
+    /* ── Activity feed item ── */
+    .feed-item {
+      display: flex; gap: 10px; padding: 10px 12px;
+      background: var(--bg-secondary);
+      border-radius: 14px; border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .feed-icon {
+      width: 36px; height: 36px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .feed-icon.workout { background: rgba(116,191,122,0.12); }
+    .feed-icon.nutrition { background: rgba(147,106,79,0.12); }
+    .feed-icon.poids { background: rgba(107,163,214,0.12); }
+    .feed-icon.sleep { background: rgba(155,126,200,0.12); }
+    .feed-icon.pr { background: rgba(232,184,109,0.12); }
+    .feed-body { flex: 1; min-width: 0; }
+    .feed-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 1px;
+    }
+    .feed-sub {
+      font-size: 10px; color: var(--text-secondary);
+    }
+    .feed-time {
+      font-size: 9px; color: var(--text-muted);
+      flex-shrink: 0; padding-top: 2px;
+    }
+
+    /* ── Streak flame ── */
+    .streak-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(232,184,109,0.1);
+      border-radius: 999px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700;
+      color: #E8B86D;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 8px 0;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-1 { opacity: 0; animation: fadeSlideUp 400ms ease-out 100ms forwards; }
+    .anim-2 { opacity: 0; animation: fadeSlideUp 400ms ease-out 180ms forwards; }
+    .anim-3 { opacity: 0; animation: fadeSlideUp 400ms ease-out 260ms forwards; }
+    .anim-4 { opacity: 0; animation: fadeSlideUp 400ms ease-out 340ms forwards; }
+    .anim-5 { opacity: 0; animation: fadeSlideUp 400ms ease-out 420ms forwards; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .phones-row { gap: 24px; }
+      .phone { width: 280px; height: 610px; border-radius: 40px; }
+      .layout { padding: 32px 16px 64px; gap: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="body-bg"></div>
+
+<div class="layout">
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-eyebrow">Élev · Historique</div>
+    <div class="page-title">4 variantes</div>
+    <div class="page-subtitle">Séances, nutrition, poids, sommeil — différents modes d'affichage</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- VARIANTE A — Timeline unifiée (feed d'activité) -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="variant-row">
+    <div class="variant-header">
+      <div class="variant-letter">A</div>
+      <div class="variant-name">Feed d'activité</div>
+      <div class="variant-desc">Tout unifié en timeline chronologique inversée. Chaque action (séance, repas, pesée, sommeil) est une carte dans le feed.</div>
+    </div>
+    <div class="phones-row">
+
+      <!-- A · Écran principal -->
+      <div class="phone-wrap">
+        <div class="screen-label">Feed principal</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Journal</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <!-- Stats row -->
+              <div class="stats-row anim-2">
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#74BF7A,#1B2E1D)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Séances</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#E8B86D,#8B6914)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Streak 🔥</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#6BA3D6,#2A5A8A)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">82.4</div>
+                    <div class="stat-label">Poids kg</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="tabs-row anim-3">
+                <div class="tab-pill active">Tout</div>
+                <div class="tab-pill">💪 Séances</div>
+                <div class="tab-pill">🥗 Nutri</div>
+                <div class="tab-pill">⚖️</div>
+                <div class="tab-pill">😴</div>
+              </div>
+
+              <!-- Feed items -->
+              <div class="anim-4">
+                <div class="group-header">Aujourd'hui</div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Push — Pectoraux & Épaules</div>
+                    <div class="feed-sub">52 min · 6 exos · 4 280 kg volume</div>
+                    <div style="margin-top:4px">
+                      <span class="pr-badge">🏆 PR Développé couché 95kg</span>
+                    </div>
+                  </div>
+                  <div class="feed-time">14h32</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon nutrition">🥗</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Repas 2 — Déjeuner</div>
+                    <div class="feed-sub">680 kcal · P 42g · G 65g · L 24g</div>
+                  </div>
+                  <div class="feed-time">12h15</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon poids">⚖️</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Pesée : 82.4 kg</div>
+                    <div class="feed-sub" style="color:#22C55E">↓ 0.3 kg vs hier</div>
+                  </div>
+                  <div class="feed-time">07h20</div>
+                </div>
+
+                <div class="group-header">Hier</div>
+
+                <div class="feed-item">
+                  <div class="feed-icon sleep">😴</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Sommeil : 7h45</div>
+                    <div class="feed-sub">Au-dessus de ta moyenne (7h12)</div>
+                  </div>
+                  <div class="feed-time">06h30</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Pull — Dos & Biceps</div>
+                    <div class="feed-sub">48 min · 5 exos · 3 840 kg</div>
+                  </div>
+                  <div class="feed-time">18h05</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon nutrition">🥗</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Journée complète</div>
+                    <div class="feed-sub">2 180 kcal · P 158g · G 220g · L 72g</div>
+                  </div>
+                  <div class="feed-time">Résumé</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A · Filtre séances -->
+      <div class="phone-wrap">
+        <div class="screen-label">Filtre séances</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Journal</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <div class="stats-row anim-2">
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#74BF7A,#1B2E1D)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Séances</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#E8B86D,#8B6914)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Streak 🔥</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#6BA3D6,#2A5A8A)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">48k</div>
+                    <div class="stat-label">Volume kg</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tabs-row anim-3">
+                <div class="tab-pill">Tout</div>
+                <div class="tab-pill active">💪 Séances</div>
+                <div class="tab-pill">🥗 Nutri</div>
+                <div class="tab-pill">⚖️</div>
+                <div class="tab-pill">😴</div>
+              </div>
+
+              <div class="anim-4">
+                <div class="group-header">Cette semaine</div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Push — Pectoraux & Épaules</div>
+                    <div class="feed-sub">52 min · 6 exos · 4 280 kg</div>
+                    <div style="margin-top:4px">
+                      <span class="pr-badge">🏆 PR Développé couché 95kg</span>
+                    </div>
+                  </div>
+                  <div class="feed-time">Ven</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Pull — Dos & Biceps</div>
+                    <div class="feed-sub">48 min · 5 exos · 3 840 kg</div>
+                  </div>
+                  <div class="feed-time">Jeu</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Legs — Quadri & Ischios</div>
+                    <div class="feed-sub">58 min · 7 exos · 6 120 kg</div>
+                    <div style="margin-top:4px">
+                      <span class="pr-badge">🏆 PR Squat 130kg</span>
+                    </div>
+                  </div>
+                  <div class="feed-time">Mar</div>
+                </div>
+
+                <div class="group-header">Semaine dernière</div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Push — Pectoraux & Triceps</div>
+                    <div class="feed-sub">45 min · 5 exos · 3 950 kg</div>
+                  </div>
+                  <div class="feed-time">Dim</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Pull — Dos</div>
+                    <div class="feed-sub">42 min · 4 exos · 3 200 kg</div>
+                  </div>
+                  <div class="feed-time">Ven</div>
+                </div>
+
+                <div class="feed-item">
+                  <div class="feed-icon workout">💪</div>
+                  <div class="feed-body">
+                    <div class="feed-title">Legs — Full lower</div>
+                    <div class="feed-sub">55 min · 6 exos · 5 680 kg</div>
+                  </div>
+                  <div class="feed-time">Mer</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- VARIANTE B — Calendrier + détail jour -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="variant-row">
+    <div class="variant-header">
+      <div class="variant-letter">B</div>
+      <div class="variant-name">Calendrier & résumé du jour</div>
+      <div class="variant-desc">Le calendrier est central. Cliquer un jour affiche le résumé complet (séance, nutrition, poids, sommeil) de cette journée.</div>
+    </div>
+    <div class="phones-row">
+
+      <!-- B · Vue mois -->
+      <div class="phone-wrap">
+        <div class="screen-label">Vue mois</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Journal</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <!-- Streak + mois -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px" class="anim-2">
+                <span class="streak-badge">🔥 12 jours</span>
+                <div style="font-size:10px;color:var(--text-muted)">Avril 2026</div>
+              </div>
+
+              <!-- Calendrier enrichi -->
+              <div class="glass-card anim-2">
+                <div class="cal-header">
+                  <div class="cal-month">Avril 2026</div>
+                  <div class="cal-arrows">
+                    <div class="cal-arrow">‹</div>
+                    <div class="cal-arrow">›</div>
+                  </div>
+                </div>
+                <div class="cal-grid">
+                  <div class="cal-day-name">Lun</div><div class="cal-day-name">Mar</div>
+                  <div class="cal-day-name">Mer</div><div class="cal-day-name">Jeu</div>
+                  <div class="cal-day-name">Ven</div><div class="cal-day-name">Sam</div>
+                  <div class="cal-day-name">Dim</div>
+                  <!-- Semaine 1 (avril commence mercredi) -->
+                  <div class="cal-day"></div><div class="cal-day"></div>
+                  <div class="cal-day has-nutrition">1</div>
+                  <div class="cal-day has-both">2</div>
+                  <div class="cal-day has-nutrition">3</div>
+                  <div class="cal-day">4</div>
+                  <div class="cal-day has-workout">5</div>
+                  <!-- Semaine 2 -->
+                  <div class="cal-day has-nutrition">6</div>
+                  <div class="cal-day has-both">7</div>
+                  <div class="cal-day has-nutrition">8</div>
+                  <div class="cal-day has-both">9</div>
+                  <div class="cal-day has-nutrition">10</div>
+                  <div class="cal-day today has-both">11</div>
+                  <div class="cal-day">12</div>
+                  <!-- Semaine 3 -->
+                  <div class="cal-day">13</div><div class="cal-day">14</div>
+                  <div class="cal-day">15</div><div class="cal-day">16</div>
+                  <div class="cal-day">17</div><div class="cal-day">18</div>
+                  <div class="cal-day">19</div>
+                  <!-- Semaine 4 -->
+                  <div class="cal-day">20</div><div class="cal-day">21</div>
+                  <div class="cal-day">22</div><div class="cal-day">23</div>
+                  <div class="cal-day">24</div><div class="cal-day">25</div>
+                  <div class="cal-day">26</div>
+                  <!-- Semaine 5 -->
+                  <div class="cal-day">27</div><div class="cal-day">28</div>
+                  <div class="cal-day">29</div><div class="cal-day">30</div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:8px;justify-content:center">
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <div style="width:6px;height:6px;border-radius:50%;background:var(--accent-text)"></div>
+                    <span style="font-size:8px;color:var(--text-muted)">Séance</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <div style="width:6px;height:6px;border-radius:50%;background:var(--color-carbs)"></div>
+                    <span style="font-size:8px;color:var(--text-muted)">Nutrition</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Résumé jour sélectionné (11 avril) -->
+              <div class="card-label anim-3">VENDREDI 11 AVRIL</div>
+              <div class="glass-card anim-3">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="font-size:14px">💪</span>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Push — Pectoraux & Épaules</div>
+                    <div style="font-size:10px;color:var(--text-secondary)">52 min · 6 exos · 4 280 kg</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:8px">
+                  <span style="font-size:14px">🥗</span>
+                  <div style="flex:1">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Nutrition</div>
+                    <div style="font-size:10px;color:var(--text-secondary)">2 340 kcal · P 172g · G 198g · L 81g</div>
+                  </div>
+                  <div class="nutri-ring" style="width:36px;height:36px">
+                    <svg viewBox="0 0 36 36">
+                      <circle class="track" cx="18" cy="18" r="14" />
+                      <circle class="fill" cx="18" cy="18" r="14"
+                        stroke-dasharray="88" stroke-dashoffset="22" />
+                    </svg>
+                    <div class="nutri-ring-val" style="font-size:8px">93%</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:8px">
+                  <span style="font-size:14px">⚖️</span>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">82.4 kg</div>
+                    <div style="font-size:10px;color:#22C55E">↓ 0.3 kg</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                  <span style="font-size:14px">😴</span>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">7h45 de sommeil</div>
+                    <div style="font-size:10px;color:var(--text-secondary)">+33 min vs moyenne</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PRs récents -->
+              <div class="card-label anim-4">RECORDS PERSONNELS</div>
+              <div style="display:flex;gap:8px" class="anim-4">
+                <div class="glass-card" style="flex:1;text-align:center;margin-bottom:0">
+                  <div style="font-size:14px;margin-bottom:4px">🥇</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--text-primary)">Squat</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--accent-text)">130 kg</div>
+                  <div style="font-size:8px;color:var(--text-muted)">× 3 reps</div>
+                </div>
+                <div class="glass-card" style="flex:1;text-align:center;margin-bottom:0">
+                  <div style="font-size:14px;margin-bottom:4px">🥈</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--text-primary)">Développé couché</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--accent-text)">95 kg</div>
+                  <div style="font-size:8px;color:var(--text-muted)">× 5 reps</div>
+                </div>
+                <div class="glass-card" style="flex:1;text-align:center;margin-bottom:0">
+                  <div style="font-size:14px;margin-bottom:4px">🥉</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--text-primary)">Soulevé terre</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--accent-text)">150 kg</div>
+                  <div style="font-size:8px;color:var(--text-muted)">× 1 rep</div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B · Jour sans séance -->
+      <div class="phone-wrap">
+        <div class="screen-label">Jour repos</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Journal</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px" class="anim-2">
+                <span class="streak-badge">🔥 12 jours</span>
+              </div>
+
+              <!-- Calendrier (même mois, jour 8 sélectionné) -->
+              <div class="glass-card anim-2">
+                <div class="cal-header">
+                  <div class="cal-month">Avril 2026</div>
+                  <div class="cal-arrows">
+                    <div class="cal-arrow">‹</div>
+                    <div class="cal-arrow">›</div>
+                  </div>
+                </div>
+                <div class="cal-grid">
+                  <div class="cal-day-name">Lun</div><div class="cal-day-name">Mar</div>
+                  <div class="cal-day-name">Mer</div><div class="cal-day-name">Jeu</div>
+                  <div class="cal-day-name">Ven</div><div class="cal-day-name">Sam</div>
+                  <div class="cal-day-name">Dim</div>
+                  <div class="cal-day"></div><div class="cal-day"></div>
+                  <div class="cal-day has-nutrition">1</div>
+                  <div class="cal-day has-both">2</div>
+                  <div class="cal-day has-nutrition">3</div>
+                  <div class="cal-day">4</div>
+                  <div class="cal-day has-workout">5</div>
+                  <div class="cal-day has-nutrition">6</div>
+                  <div class="cal-day has-both">7</div>
+                  <div class="cal-day" style="background:rgba(116,191,122,0.15);color:var(--text-primary);font-weight:600">8</div>
+                  <div class="cal-day has-both">9</div>
+                  <div class="cal-day has-nutrition">10</div>
+                  <div class="cal-day today has-both">11</div>
+                  <div class="cal-day">12</div>
+                  <div class="cal-day">13</div><div class="cal-day">14</div>
+                  <div class="cal-day">15</div><div class="cal-day">16</div>
+                  <div class="cal-day">17</div><div class="cal-day">18</div>
+                  <div class="cal-day">19</div>
+                  <div class="cal-day">20</div><div class="cal-day">21</div>
+                  <div class="cal-day">22</div><div class="cal-day">23</div>
+                  <div class="cal-day">24</div><div class="cal-day">25</div>
+                  <div class="cal-day">26</div>
+                  <div class="cal-day">27</div><div class="cal-day">28</div>
+                  <div class="cal-day">29</div><div class="cal-day">30</div>
+                </div>
+              </div>
+
+              <!-- Résumé jour 8 (repos) -->
+              <div class="card-label anim-3">MERCREDI 8 AVRIL — JOUR DE REPOS</div>
+              <div class="glass-card anim-3">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="font-size:14px">🛋️</span>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Pas de séance</div>
+                    <div style="font-size:10px;color:var(--text-secondary)">Jour de repos — bonne récupération !</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:8px">
+                  <span style="font-size:14px">🥗</span>
+                  <div style="flex:1">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Nutrition</div>
+                    <div style="font-size:10px;color:var(--text-secondary)">1 980 kcal · P 148g · G 180g · L 65g</div>
+                  </div>
+                  <div class="nutri-ring" style="width:36px;height:36px">
+                    <svg viewBox="0 0 36 36">
+                      <circle class="track" cx="18" cy="18" r="14" />
+                      <circle class="fill" cx="18" cy="18" r="14"
+                        stroke-dasharray="88" stroke-dashoffset="35" />
+                    </svg>
+                    <div class="nutri-ring-val" style="font-size:8px">79%</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                  <span style="font-size:14px">😴</span>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary)">8h10 de sommeil</div>
+                    <div style="font-size:10px;color:#22C55E">+58 min vs moyenne</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Semaine en bref -->
+              <div class="card-label anim-4">SEMAINE EN BREF</div>
+              <div class="glass-card anim-4">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                  <div style="text-align:center;flex:1">
+                    <div style="font-size:18px;font-weight:700;color:var(--accent-text)">3</div>
+                    <div style="font-size:8px;color:var(--text-muted);text-transform:uppercase">Séances</div>
+                  </div>
+                  <div style="text-align:center;flex:1">
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary)">14.2k</div>
+                    <div style="font-size:8px;color:var(--text-muted);text-transform:uppercase">Volume kg</div>
+                  </div>
+                  <div style="text-align:center;flex:1">
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary)">2 180</div>
+                    <div style="font-size:8px;color:var(--text-muted);text-transform:uppercase">Moy. kcal</div>
+                  </div>
+                  <div style="text-align:center;flex:1">
+                    <div style="font-size:18px;font-weight:700;color:#9B7EC8">7h24</div>
+                    <div style="font-size:8px;color:var(--text-muted);text-transform:uppercase">Moy. sommeil</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- VARIANTE C — Heatmap + liste compacte -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="variant-row">
+    <div class="variant-header">
+      <div class="variant-letter">C</div>
+      <div class="variant-name">Heatmap & stats semaine</div>
+      <div class="variant-desc">Inspiration GitHub contributions. Heatmap d'activité + barres de fréquence par semaine. Vue analytique, dense en infos.</div>
+    </div>
+    <div class="phones-row">
+
+      <!-- C · Heatmap principal -->
+      <div class="phone-wrap">
+        <div class="screen-label">Vue analytique</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Analytique</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <!-- Période -->
+              <div class="tabs-row anim-2">
+                <div class="tab-pill">1M</div>
+                <div class="tab-pill active">3M</div>
+                <div class="tab-pill">6M</div>
+                <div class="tab-pill">1A</div>
+              </div>
+
+              <!-- Stats highlight -->
+              <div class="stats-row anim-2">
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#74BF7A,#1B2E1D)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Séances</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#E8B86D,#8B6914)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">3.6</div>
+                    <div class="stat-label">Moy/sem</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-bar" style="background:linear-gradient(to bottom,#9B7EC8,#5A3D8A)"></div>
+                  <div class="stat-info">
+                    <div class="stat-value">89%</div>
+                    <div class="stat-label">Régularité</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Heatmap -->
+              <div class="card-label anim-3">ACTIVITÉ — 90 DERNIERS JOURS</div>
+              <div class="glass-card anim-3">
+                <div class="heatmap-grid">
+                  <!-- Row 1 (semaine 1) -->
+                  <div class="hm-cell l2"></div><div class="hm-cell"></div><div class="hm-cell l1"></div>
+                  <div class="hm-cell l3"></div><div class="hm-cell"></div><div class="hm-cell l1"></div>
+                  <div class="hm-cell"></div><div class="hm-cell l2"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell"></div><div class="hm-cell l1"></div><div class="hm-cell l3"></div>
+                  <div class="hm-cell"></div><div class="hm-cell l2"></div><div class="hm-cell"></div>
+                  <!-- Row 2 -->
+                  <div class="hm-cell l1"></div><div class="hm-cell l3"></div><div class="hm-cell"></div>
+                  <div class="hm-cell l2"></div><div class="hm-cell l1"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell"></div><div class="hm-cell l3"></div><div class="hm-cell l1"></div>
+                  <div class="hm-cell l2"></div><div class="hm-cell"></div><div class="hm-cell l2"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l1"></div><div class="hm-cell"></div>
+                  <!-- Row 3 -->
+                  <div class="hm-cell"></div><div class="hm-cell l2"></div><div class="hm-cell l3"></div>
+                  <div class="hm-cell l1"></div><div class="hm-cell"></div><div class="hm-cell l2"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell"></div><div class="hm-cell l3"></div>
+                  <div class="hm-cell l1"></div><div class="hm-cell l2"></div><div class="hm-cell"></div>
+                  <div class="hm-cell l3"></div><div class="hm-cell l2"></div><div class="hm-cell l1"></div>
+                  <!-- Row 4 -->
+                  <div class="hm-cell l3"></div><div class="hm-cell"></div><div class="hm-cell l1"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l2"></div><div class="hm-cell"></div>
+                  <div class="hm-cell l1"></div><div class="hm-cell l3"></div><div class="hm-cell l2"></div>
+                  <div class="hm-cell"></div><div class="hm-cell l4"></div><div class="hm-cell l1"></div>
+                  <div class="hm-cell l2"></div><div class="hm-cell l3"></div><div class="hm-cell l4"></div>
+                  <!-- Row 5 -->
+                  <div class="hm-cell l1"></div><div class="hm-cell l2"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell l3"></div><div class="hm-cell l1"></div><div class="hm-cell l2"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l3"></div><div class="hm-cell l2"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l3"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell l2"></div><div class="hm-cell l4"></div><div class="hm-cell l3"></div>
+                  <!-- Row 6 -->
+                  <div class="hm-cell l2"></div><div class="hm-cell l3"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell l2"></div><div class="hm-cell l3"></div><div class="hm-cell l4"></div>
+                  <div class="hm-cell l3"></div><div class="hm-cell l4"></div><div class="hm-cell l3"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l4"></div><div class="hm-cell l3"></div>
+                  <div class="hm-cell l4"></div><div class="hm-cell l4"></div><div class="hm-cell l4"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:8px;align-items:center">
+                  <span style="font-size:8px;color:var(--text-muted)">Moins</span>
+                  <div style="display:flex;gap:3px">
+                    <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.04)"></div>
+                    <div style="width:10px;height:10px;border-radius:2px;background:rgba(116,191,122,0.15)"></div>
+                    <div style="width:10px;height:10px;border-radius:2px;background:rgba(116,191,122,0.3)"></div>
+                    <div style="width:10px;height:10px;border-radius:2px;background:rgba(116,191,122,0.5)"></div>
+                    <div style="width:10px;height:10px;border-radius:2px;background:rgba(116,191,122,0.75)"></div>
+                  </div>
+                  <span style="font-size:8px;color:var(--text-muted)">Plus</span>
+                </div>
+              </div>
+
+              <!-- Fréquence par semaine -->
+              <div class="card-label anim-4">SÉANCES PAR SEMAINE</div>
+              <div class="glass-card anim-4">
+                <div class="week-bar-row">
+                  <div class="week-label">S15</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:80%"></div></div>
+                  <div class="week-count">4</div>
+                </div>
+                <div class="week-bar-row">
+                  <div class="week-label">S14</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:60%"></div></div>
+                  <div class="week-count">3</div>
+                </div>
+                <div class="week-bar-row">
+                  <div class="week-label">S13</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:80%"></div></div>
+                  <div class="week-count">4</div>
+                </div>
+                <div class="week-bar-row">
+                  <div class="week-label">S12</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:100%"></div></div>
+                  <div class="week-count">5</div>
+                </div>
+                <div class="week-bar-row">
+                  <div class="week-label">S11</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:60%"></div></div>
+                  <div class="week-count">3</div>
+                </div>
+                <div class="week-bar-row">
+                  <div class="week-label">S10</div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:80%"></div></div>
+                  <div class="week-count">4</div>
+                </div>
+              </div>
+
+              <!-- Volume evolution -->
+              <div class="card-label anim-5">ÉVOLUTION DU VOLUME</div>
+              <div class="glass-card anim-5">
+                <div class="sparkline-row">
+                  <div>
+                    <div class="spark-val">48k</div>
+                    <div class="spark-unit">kg total</div>
+                  </div>
+                  <svg class="spark-svg" viewBox="0 0 200 40">
+                    <defs>
+                      <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(116,191,122,0.3)" />
+                        <stop offset="100%" stop-color="rgba(116,191,122,0)" />
+                      </linearGradient>
+                    </defs>
+                    <polygon class="area" points="0,35 20,30 40,32 60,25 80,28 100,20 120,22 140,15 160,18 180,10 200,8 200,40 0,40" />
+                    <polyline points="0,35 20,30 40,32 60,25 80,28 100,20 120,22 140,15 160,18 180,10 200,8" />
+                  </svg>
+                </div>
+                <div style="font-size:9px;color:#22C55E;margin-top:4px">↑ +12% vs 3 mois précédents</div>
+              </div>
+
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- C · Détail muscle group breakdown -->
+      <div class="phone-wrap">
+        <div class="screen-label">Répartition muscles</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Analytique</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <div class="tabs-row anim-2">
+                <div class="tab-pill active">1M</div>
+                <div class="tab-pill">3M</div>
+                <div class="tab-pill">6M</div>
+                <div class="tab-pill">1A</div>
+              </div>
+
+              <!-- Répartition groupes musculaires -->
+              <div class="card-label anim-3">GROUPES MUSCULAIRES — 30 JOURS</div>
+              <div class="glass-card anim-3">
+                <!-- Pecs -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Pectoraux</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">18 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:90%"></div></div>
+                </div>
+                <!-- Dos -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Dos</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">16 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:80%"></div></div>
+                </div>
+                <!-- Épaules -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Épaules</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">14 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:70%"></div></div>
+                </div>
+                <!-- Quadriceps -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Quadriceps</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">12 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:60%"></div></div>
+                </div>
+                <!-- Biceps -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Biceps</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">10 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:50%"></div></div>
+                </div>
+                <!-- Triceps -->
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Triceps</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">8 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:40%"></div></div>
+                </div>
+                <!-- Ischios -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                    <span style="font-size:10px;font-weight:600;color:var(--text-primary)">Ischios</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--accent-text)">6 séries</span>
+                  </div>
+                  <div class="week-bar-track"><div class="week-bar-fill" style="width:30%"></div></div>
+                </div>
+              </div>
+
+              <!-- Nutrition moyenne -->
+              <div class="card-label anim-4">NUTRITION MOYENNE / JOUR</div>
+              <div class="glass-card anim-4">
+                <div style="display:flex;align-items:center;gap:14px">
+                  <div class="nutri-ring">
+                    <svg viewBox="0 0 44 44">
+                      <circle class="track" cx="22" cy="22" r="18" />
+                      <circle class="fill" cx="22" cy="22" r="18"
+                        stroke-dasharray="113" stroke-dashoffset="17" />
+                    </svg>
+                    <div class="nutri-ring-val">85%</div>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary)">2 140 <span style="font-size:11px;color:var(--text-muted)">kcal/j</span></div>
+                    <div class="nutri-macros" style="margin-top:6px">
+                      <div class="nutri-macro">
+                        <div class="nm-val" style="color:var(--color-protein)">156g</div>
+                        <div class="nm-label">Prot</div>
+                      </div>
+                      <div class="nutri-macro">
+                        <div class="nm-val" style="color:var(--color-carbs)">215g</div>
+                        <div class="nm-label">Gluc</div>
+                      </div>
+                      <div class="nutri-macro">
+                        <div class="nm-val" style="color:var(--color-fat)">72g</div>
+                        <div class="nm-label">Lip</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Poids courbe -->
+              <div class="card-label anim-5">ÉVOLUTION DU POIDS</div>
+              <div class="glass-card anim-5">
+                <div class="sparkline-row">
+                  <div>
+                    <div class="spark-val">82.4</div>
+                    <div class="spark-unit">kg actuel</div>
+                  </div>
+                  <svg class="spark-svg" viewBox="0 0 200 40">
+                    <defs>
+                      <linearGradient id="sparkGrad2" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(107,163,214,0.3)" />
+                        <stop offset="100%" stop-color="rgba(107,163,214,0)" />
+                      </linearGradient>
+                    </defs>
+                    <polygon style="fill:url(#sparkGrad2);stroke:none" points="0,15 30,18 60,14 90,16 120,12 150,10 180,11 200,8 200,40 0,40" />
+                    <polyline style="fill:none;stroke:#6BA3D6;stroke-width:1.5;stroke-linecap:round" points="0,15 30,18 60,14 90,16 120,12 150,10 180,11 200,8" />
+                  </svg>
+                </div>
+                <div style="font-size:9px;color:#22C55E;margin-top:4px">↓ -1.8 kg sur 30 jours</div>
+              </div>
+
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- VARIANTE D — Timeline verticale + résumé -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="variant-row">
+    <div class="variant-header">
+      <div class="variant-letter">D</div>
+      <div class="variant-name">Timeline verticale</div>
+      <div class="variant-desc">Ligne du temps visuelle avec points colorés par type. Focus sur la progression dans le temps, inspiration journal personnel.</div>
+    </div>
+    <div class="phones-row">
+
+      <!-- D · Timeline -->
+      <div class="phone-wrap">
+        <div class="screen-label">Timeline</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Mon parcours</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <!-- Mini sparkline poids en haut -->
+              <div class="glass-card anim-2" style="padding:10px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div>
+                    <div style="font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Progression</div>
+                    <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+                      <span style="font-family:var(--font-serif);font-size:22px;color:var(--text-primary)">82.4</span>
+                      <span style="font-size:10px;color:var(--text-muted)">kg</span>
+                      <span style="font-size:10px;color:#22C55E;font-weight:600">↓ 1.8</span>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <span class="streak-badge" style="font-size:10px;padding:3px 8px">🔥 12</span>
+                    <span class="pr-badge" style="font-size:10px;padding:3px 8px">🏆 3 PR</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabs période -->
+              <div class="tabs-row anim-2" style="margin-top:2px">
+                <div class="tab-pill">Jour</div>
+                <div class="tab-pill active">Semaine</div>
+                <div class="tab-pill">Mois</div>
+              </div>
+
+              <!-- Timeline -->
+              <div class="timeline anim-3">
+                <!-- Vendredi -->
+                <div class="tl-item">
+                  <div class="tl-date">Ven 11 avril — Aujourd'hui</div>
+                  <div class="tl-content">
+                    <div class="tl-title">💪 Push — Pectoraux & Épaules</div>
+                    <div class="tl-sub">52 min · 6 exos · 4 280 kg</div>
+                    <div style="margin-top:6px">
+                      <span class="pr-badge" style="font-size:9px;padding:3px 6px">🏆 DC 95kg × 5</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tl-item nutrition">
+                  <div class="tl-content" style="padding:8px 12px">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                      <div>
+                        <div class="tl-title" style="font-size:11px">🥗 2 340 kcal</div>
+                        <div class="tl-sub">P 172g · G 198g · L 81g</div>
+                      </div>
+                      <div style="font-size:10px;font-weight:700;color:var(--accent-text)">93%</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tl-item poids">
+                  <div class="tl-content" style="padding:8px 12px">
+                    <div class="tl-title" style="font-size:11px">⚖️ 82.4 kg <span style="color:#22C55E;font-size:10px">↓ 0.3</span></div>
+                  </div>
+                </div>
+
+                <!-- Jeudi -->
+                <div class="tl-item">
+                  <div class="tl-date">Jeu 10 avril</div>
+                  <div class="tl-content">
+                    <div class="tl-title">💪 Pull — Dos & Biceps</div>
+                    <div class="tl-sub">48 min · 5 exos · 3 840 kg</div>
+                  </div>
+                </div>
+                <div class="tl-item nutrition">
+                  <div class="tl-content" style="padding:8px 12px">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                      <div>
+                        <div class="tl-title" style="font-size:11px">🥗 2 180 kcal</div>
+                        <div class="tl-sub">P 158g · G 220g · L 72g</div>
+                      </div>
+                      <div style="font-size:10px;font-weight:700;color:var(--accent-text)">87%</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tl-item sleep">
+                  <div class="tl-content" style="padding:8px 12px">
+                    <div class="tl-title" style="font-size:11px">😴 7h45 <span style="color:#22C55E;font-size:10px">+33 min</span></div>
+                  </div>
+                </div>
+
+                <!-- Mercredi -->
+                <div class="tl-item">
+                  <div class="tl-date">Mer 9 avril — Repos</div>
+                  <div class="tl-content" style="background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.04)">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <span style="font-size:12px">🛋️</span>
+                      <div>
+                        <div class="tl-title" style="font-size:11px;color:var(--text-secondary)">Jour de repos</div>
+                        <div class="tl-sub">😴 8h10 · 🥗 1 980 kcal (79%)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mardi -->
+                <div class="tl-item">
+                  <div class="tl-date">Mar 8 avril</div>
+                  <div class="tl-content">
+                    <div class="tl-title">💪 Legs — Quadri & Ischios</div>
+                    <div class="tl-sub">58 min · 7 exos · 6 120 kg</div>
+                    <div style="margin-top:6px">
+                      <span class="pr-badge" style="font-size:9px;padding:3px 6px">🏆 Squat 130kg × 3</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Lundi -->
+                <div class="tl-item">
+                  <div class="tl-date">Lun 7 avril</div>
+                  <div class="tl-content">
+                    <div class="tl-title">💪 Push — Pectoraux & Triceps</div>
+                    <div class="tl-sub">45 min · 5 exos · 3 950 kg</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D · Vue mois condensée -->
+      <div class="phone-wrap">
+        <div class="screen-label">Vue mois</div>
+        <div class="phone">
+          <div class="phone-bg"></div>
+          <div class="phone-ui">
+            <div class="status-bar">
+              <span class="s-time">9:41</span>
+              <div class="s-icons"><span>📶</span><span>🔋</span></div>
+            </div>
+            <div class="content-area">
+              <div class="screen-header anim-1">
+                <div class="screen-sub">Mon parcours</div>
+                <div class="screen-title">Historique</div>
+              </div>
+
+              <div class="glass-card anim-2" style="padding:10px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div>
+                    <div style="font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Progression</div>
+                    <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+                      <span style="font-family:var(--font-serif);font-size:22px;color:var(--text-primary)">82.4</span>
+                      <span style="font-size:10px;color:var(--text-muted)">kg</span>
+                      <span style="font-size:10px;color:#22C55E;font-weight:600">↓ 1.8</span>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <span class="streak-badge" style="font-size:10px;padding:3px 8px">🔥 12</span>
+                    <span class="pr-badge" style="font-size:10px;padding:3px 8px">🏆 3 PR</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tabs-row anim-2" style="margin-top:2px">
+                <div class="tab-pill">Jour</div>
+                <div class="tab-pill">Semaine</div>
+                <div class="tab-pill active">Mois</div>
+              </div>
+
+              <!-- Résumé mensuel -->
+              <div class="card-label anim-3">MARS 2026 — RÉSUMÉ</div>
+              <div class="glass-card anim-3">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div style="text-align:center">
+                    <div style="font-size:28px;font-weight:700;color:var(--accent-text);font-family:var(--font-serif)">14</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Séances</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div style="font-size:28px;font-weight:700;color:var(--text-primary);font-family:var(--font-serif)">52k</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Volume kg</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div style="font-size:28px;font-weight:700;color:var(--text-primary);font-family:var(--font-serif)">2.2k</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Moy kcal/j</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div style="font-size:28px;font-weight:700;color:#9B7EC8;font-family:var(--font-serif)">7h18</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Moy sommeil</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Semaines du mois -->
+              <div class="card-label anim-4">SEMAINES</div>
+
+              <div class="glass-card anim-4" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;font-weight:600;color:var(--text-primary)">Sem. 31 mars — 6 avr.</span>
+                  <span style="font-size:9px;color:var(--accent-text);font-weight:600">4 séances</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span class="workout-chip green">14.2k kg</span>
+                  <span class="workout-chip">2 180 kcal/j</span>
+                  <span class="workout-chip">7h24 😴</span>
+                </div>
+              </div>
+
+              <div class="glass-card anim-4" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;font-weight:600;color:var(--text-primary)">Sem. 24 — 30 mars</span>
+                  <span style="font-size:9px;color:var(--accent-text);font-weight:600">3 séances</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span class="workout-chip green">11.8k kg</span>
+                  <span class="workout-chip">2 050 kcal/j</span>
+                  <span class="workout-chip">7h05 😴</span>
+                </div>
+              </div>
+
+              <div class="glass-card anim-4" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;font-weight:600;color:var(--text-primary)">Sem. 17 — 23 mars</span>
+                  <span style="font-size:9px;color:var(--accent-text);font-weight:600">4 séances</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span class="workout-chip green">13.5k kg</span>
+                  <span class="workout-chip">2 220 kcal/j</span>
+                  <span class="workout-chip">7h32 😴</span>
+                  <span class="workout-chip amber">🏆 × 2</span>
+                </div>
+              </div>
+
+              <div class="glass-card anim-5" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;font-weight:600;color:var(--text-primary)">Sem. 10 — 16 mars</span>
+                  <span style="font-size:9px;color:var(--accent-text);font-weight:600">3 séances</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span class="workout-chip green">10.2k kg</span>
+                  <span class="workout-chip">2 100 kcal/j</span>
+                  <span class="workout-chip">6h48 😴</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="nav-emoji">💪</span>Séances</div>
+              <div class="nav-item"><span class="nav-emoji">⚖️</span>Poids</div>
+              <div class="nav-item"><span class="nav-emoji">🏠</span>Accueil</div>
+              <div class="nav-item"><span class="nav-emoji">🥗</span>Nutri</div>
+              <div class="nav-item active"><span class="nav-emoji">📊</span>Histo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

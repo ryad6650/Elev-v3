@@ -111,7 +111,7 @@ export default function RoutineDetailView({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "max(20px, env(safe-area-inset-top)) 16px 12px",
-            background: "#1C1C1E",
+            background: "#151312",
           }}
         >
           <button
@@ -171,7 +171,7 @@ export default function RoutineDetailView({
             disabled={isStarting}
             style={{
               width: "100%",
-              background: "#008CFF",
+              background: "#1E9D4C",
               color: "#fff",
               border: "none",
               borderRadius: 14,
@@ -226,7 +226,7 @@ export default function RoutineDetailView({
                 )}
                 {lastDate && (
                   <span
-                    style={{ color: "#008CFF", fontSize: 14, marginLeft: 6 }}
+                    style={{ color: "#1E9D4C", fontSize: 14, marginLeft: 6 }}
                   >
                     {lastDate}
                   </span>
@@ -234,7 +234,7 @@ export default function RoutineDetailView({
               </div>
               <button
                 style={{
-                  color: "#008CFF",
+                  color: "#1E9D4C",
                   fontSize: 13,
                   background: "none",
                   border: "none",
@@ -260,7 +260,7 @@ export default function RoutineDetailView({
                   padding: "8px 18px",
                   borderRadius: 20,
                   border: "none",
-                  background: tab === key ? "#008CFF" : "#1C1C1E",
+                  background: tab === key ? "#1E9D4C" : "#151312",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: tab === key ? 600 : 400,
@@ -285,7 +285,7 @@ export default function RoutineDetailView({
             <button
               onClick={onEdit}
               style={{
-                color: "#008CFF",
+                color: "#1E9D4C",
                 fontSize: 14,
                 background: "none",
                 border: "none",
@@ -324,7 +324,7 @@ export default function RoutineDetailView({
                     circle
                   />
                   <span
-                    style={{ color: "#008CFF", fontSize: 16, fontWeight: 600 }}
+                    style={{ color: "#1E9D4C", fontSize: 16, fontWeight: 600 }}
                   >
                     {ex.nom}
                   </span>
@@ -335,7 +335,7 @@ export default function RoutineDetailView({
                     gridTemplateColumns: "56px 1fr 1fr",
                     padding: "0 16px 6px",
                     margin: "0 -16px",
-                    borderBottom: "1px solid #1C1C1E",
+                    borderBottom: "1px solid #151312",
                   }}
                 >
                   {["SÉRIE", "KG", "RÉPS"].map((h) => (
@@ -361,7 +361,7 @@ export default function RoutineDetailView({
                         gridTemplateColumns: "56px 1fr 1fr",
                         padding: "11px 16px",
                         margin: "0 -16px",
-                        background: num % 2 === 0 ? "#1C1C1E" : "#000",
+                        background: num % 2 === 0 ? "#151312" : "#000",
                         borderBottom: "1px solid #111",
                       }}
                     >

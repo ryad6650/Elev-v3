@@ -45,7 +45,7 @@ export default memo(function WeekDots() {
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 13,
             fontWeight: 600,
-            color: "var(--green)",
+            color: "#74BF7A",
           }}
         >
           {todayIdx} jours
@@ -68,7 +68,7 @@ export default memo(function WeekDots() {
           };
 
           if (isDone) {
-            dotStyle.background = "var(--green)";
+            dotStyle.background = "#74BF7A";
           } else if (isToday) {
             dotStyle.border = "2px solid var(--text-primary)";
             dotStyle.background = "transparent";

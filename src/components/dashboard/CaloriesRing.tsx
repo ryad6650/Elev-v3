@@ -34,7 +34,7 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
               fontStyle: "italic",
               fontSize: 54,
               fontWeight: 600,
-              color: "var(--accent-text)",
+              color: "#74BF7A",
               letterSpacing: "-0.02em",
             }}
           >
@@ -61,7 +61,7 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
               cy={38}
               r={radius}
               fill="none"
-              stroke="var(--accent-bg)"
+              stroke="rgba(27,46,29,0.35)"
               strokeWidth={6}
             />
             <circle
@@ -69,7 +69,7 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
               cy={38}
               r={radius}
               fill="none"
-              stroke="var(--accent)"
+              stroke="#74BF7A"
               strokeWidth={6}
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -105,7 +105,7 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
           <div className="text-center">
             <p
               className="text-base font-bold leading-none"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "#1E9D4C" }}
             >
               {remaining.toLocaleString("fr-FR")}
             </p>

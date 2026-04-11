@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elev — Dashboard Revolut Light</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Revolut light base */
+      --bg-primary:    #ffffff;
+      --bg-card:       #f4f4f4;
+      --bg-elevated:   #eaeaec;
+      --bg-surface:    rgba(0,0,0,0.03);
+
+      /* Text */
+      --text-primary:  #191c1f;
+      --text-secondary:#505a63;
+      --text-muted:    #8d969e;
+
+      /* Fitness accents */
+      --green:         #00a67e;
+      --green-dim:     rgba(0,166,126,0.08);
+      --blue:          #3d7ce0;
+      --blue-dim:      rgba(61,124,224,0.08);
+      --red:           #e04545;
+      --red-dim:       rgba(224,69,69,0.08);
+      --yellow:        #c79400;
+      --yellow-dim:    rgba(199,148,0,0.08);
+
+      /* Macros */
+      --color-protein: #3d7ce0;
+      --color-carbs:   #c79400;
+      --color-fat:     #e04545;
+
+      /* Borders */
+      --border:        rgba(0,0,0,0.06);
+
+      /* Fonts */
+      --font-display:  'Inter', sans-serif;
+      --font-body:     'DM Sans', sans-serif;
+
+      /* Revolut radius */
+      --radius-card:   20px;
+      --radius-pill:   9999px;
+      --radius-sm:     12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: #e8e8ea;
+      overflow-x: hidden;
+    }
+
+    /* ── Page wrapper ── */
+    .page-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #f0f0f2 0%, #e4e4e8 50%, #f0f0f2 100%);
+      z-index: 0;
+    }
+
+    .layout {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 36px;
+      padding: 48px 32px 64px;
+      width: 100%;
+    }
+
+    .page-header { text-align: center; }
+    .page-eyebrow {
+      font-family: var(--font-display);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    /* ── Phone shell ── */
+    .phone-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+    .screen-label {
+      font-family: var(--font-display);
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .phone {
+      width: 310px; height: 672px;
+      border-radius: 46px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+      background: var(--bg-primary);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 0 0 9px rgba(0,0,0,0.08),
+        0 0 0 10px rgba(0,0,0,0.03),
+        0 48px 120px rgba(0,0,0,0.18);
+    }
+    .phone-ui {
+      display: flex; flex-direction: column;
+      height: 100%; overflow: hidden;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 0; flex-shrink: 0;
+    }
+    .s-time {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700;
+      color: var(--text-primary);
+    }
+    .s-icons { display: flex; gap: 5px; }
+    .s-icons span { font-size: 11px; color: var(--text-muted); }
+
+    /* ── Content ── */
+    .content-area {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 16px 20px 0;
+      overflow-y: auto;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar { display: none; }
+
+    /* ── Header row ── */
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeIn 400ms ease-out 100ms forwards;
+    }
+    .greeting-date {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .greeting-name {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+    .profile-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 600;
+      color: var(--green);
+      border: 1px solid rgba(0,166,126,0.12);
+    }
+
+    /* ── Calories card ── */
+    .cal-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      margin-bottom: 12px;
+      opacity: 0; animation: fadeIn 400ms ease-out 200ms forwards;
+    }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .cal-title {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .cal-badge {
+      font-family: var(--font-display);
+      font-size: 10px; font-weight: 600;
+      color: var(--green);
+      background: var(--green-dim);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .cal-main {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 16px;
+    }
+    .cal-ring-wrap {
+      width: 72px; height: 72px;
+      position: relative; flex-shrink: 0;
+    }
+    .cal-ring-svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    .cal-ring-bg {
+      fill: none; stroke: rgba(0,0,0,0.05); stroke-width: 5;
+    }
+    .cal-ring-fill {
+      fill: none; stroke-width: 5;
+      stroke: var(--green);
+      stroke-linecap: round;
+      stroke-dasharray: 188; stroke-dashoffset: 188;
+      animation: ringFill 900ms ease-out 500ms forwards;
+    }
+    .cal-ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .cal-ring-pct {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .cal-numbers { flex: 1; }
+    .cal-consumed {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .cal-objective {
+      font-size: 13px; color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .cal-remaining {
+      font-size: 12px; font-weight: 500;
+      color: var(--green);
+      margin-top: 6px;
+    }
+
+    /* Macros */
+    .macros-grid {
+      display: flex; gap: 8px;
+    }
+    .macro-item {
+      flex: 1;
+      background: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      text-align: center;
+    }
+    .macro-label {
+      font-family: var(--font-display);
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .macro-label.protein { color: var(--color-protein); }
+    .macro-label.carbs { color: var(--color-carbs); }
+    .macro-label.fat { color: var(--color-fat); }
+    .macro-value {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .macro-unit {
+      font-size: 10px; color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .macro-bar-track {
+      height: 3px; border-radius: 99px;
+      background: rgba(0,0,0,0.06);
+      margin-top: 8px; overflow: hidden;
+    }
+    .macro-bar-fill { height: 100%; border-radius: 99px; }
+    .macro-bar-fill.protein { background: var(--color-protein); width: 0; animation: barP 700ms ease-out 600ms forwards; }
+    .macro-bar-fill.carbs { background: var(--color-carbs); width: 0; animation: barC 700ms ease-out 600ms forwards; }
+    .macro-bar-fill.fat { background: var(--color-fat); width: 0; animation: barF 700ms ease-out 600ms forwards; }
+
+    @keyframes barP { to { width: 65%; } }
+    @keyframes barC { to { width: 58%; } }
+    @keyframes barF { to { width: 60%; } }
+    @keyframes ringFill { to { stroke-dashoffset: 71; } }
+
+    /* ── Week streak ── */
+    .streak-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      opacity: 0; animation: fadeIn 400ms ease-out 350ms forwards;
+    }
+    .streak-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .streak-title {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .streak-count {
+      font-family: var(--font-display);
+      font-size: 11px; font-weight: 600;
+      color: var(--green);
+    }
+    .week-row {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .week-day {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+    }
+    .week-day-label {
+      font-family: var(--font-display);
+      font-size: 10px; font-weight: 500;
+      color: var(--text-muted);
+    }
+    .week-day-label.is-today { color: var(--text-primary); }
+    .week-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+    }
+    .week-dot.done {
+      background: var(--green);
+      position: relative;
+    }
+    .week-dot.done::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 10px; height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: translate(-50%,-60%) rotate(-45deg);
+    }
+    .week-dot.today {
+      border: 2px solid var(--text-primary);
+      background: transparent;
+    }
+
+    /* ── Quick stats ── */
+    .stats-row {
+      display: flex; gap: 8px;
+      margin-bottom: 12px;
+      opacity: 0; animation: fadeIn 400ms ease-out 500ms forwards;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-icon { font-size: 18px; margin-bottom: 6px; }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── CTA ── */
+    .cta-wrap {
+      margin-bottom: 16px;
+      opacity: 0; animation: fadeIn 400ms ease-out 650ms forwards;
+    }
+    .cta-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 32px;
+      border-radius: var(--radius-pill);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 600;
+      border: none; cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.85; }
+    .cta-btn svg {
+      width: 16px; height: 16px;
+      stroke: var(--bg-primary); stroke-width: 2.5;
+      fill: none;
+    }
+
+    /* ── Bottom nav ── */
+    .nav-wrap {
+      padding: 0 0 20px; flex-shrink: 0;
+      border-top: 1px solid var(--border);
+    }
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 12px 24px 0;
+    }
+    .nav-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+    }
+    .nav-item svg {
+      width: 20px; height: 20px;
+      stroke: var(--text-muted); stroke-width: 1.8;
+      fill: none;
+    }
+    .nav-item.active svg { stroke: var(--text-primary); }
+    .nav-item-label {
+      font-family: var(--font-display);
+      font-size: 9px; font-weight: 500;
+      color: var(--text-muted);
+    }
+    .nav-item.active .nav-item-label { color: var(--text-primary); }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-bg"></div>
+
+  <div class="layout">
+    <div class="page-header">
+      <div class="page-eyebrow">Revolut x Fitness</div>
+      <div class="page-title">Dashboard</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="screen-label">Accueil</div>
+      <div class="phone">
+        <div class="phone-ui">
+
+          <div class="status-bar">
+            <div class="s-time">9:41</div>
+            <div class="s-icons">
+              <span>&#9679;</span>
+              <span>&#9679;</span>
+              <span>&#9679;</span>
+            </div>
+          </div>
+
+          <div class="content-area">
+
+            <div class="header-row">
+              <div class="greeting-block">
+                <div class="greeting-date">Mercredi 9 avril</div>
+                <div class="greeting-name">Bonjour, Louis</div>
+              </div>
+              <div class="profile-btn">L</div>
+            </div>
+
+            <div class="cal-card">
+              <div class="cal-header">
+                <div class="cal-title">Calories du jour</div>
+                <div class="cal-badge">En cours</div>
+              </div>
+              <div class="cal-main">
+                <div class="cal-ring-wrap">
+                  <svg class="cal-ring-svg" viewBox="0 0 72 72">
+                    <circle class="cal-ring-bg" cx="36" cy="36" r="30" />
+                    <circle class="cal-ring-fill" cx="36" cy="36" r="30" />
+                  </svg>
+                  <div class="cal-ring-center">
+                    <span class="cal-ring-pct">62%</span>
+                  </div>
+                </div>
+                <div class="cal-numbers">
+                  <div class="cal-consumed">1 240</div>
+                  <div class="cal-objective">/ 2 000 kcal</div>
+                  <div class="cal-remaining">760 kcal restantes</div>
+                </div>
+              </div>
+              <div class="macros-grid">
+                <div class="macro-item">
+                  <div class="macro-label protein">Prot</div>
+                  <div class="macro-value">98</div>
+                  <div class="macro-unit">/ 150g</div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill protein"></div></div>
+                </div>
+                <div class="macro-item">
+                  <div class="macro-label carbs">Gluc</div>
+                  <div class="macro-value">145</div>
+                  <div class="macro-unit">/ 250g</div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill carbs"></div></div>
+                </div>
+                <div class="macro-item">
+                  <div class="macro-label fat">Lip</div>
+                  <div class="macro-value">42</div>
+                  <div class="macro-unit">/ 70g</div>
+                  <div class="macro-bar-track"><div class="macro-bar-fill fat"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="streak-card">
+              <div class="streak-header">
+                <div class="streak-title">Cette semaine</div>
+                <div class="streak-count">3 jours</div>
+              </div>
+              <div class="week-row">
+                <div class="week-day">
+                  <div class="week-day-label">Lun</div>
+                  <div class="week-dot done"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label">Mar</div>
+                  <div class="week-dot done"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label is-today">Mer</div>
+                  <div class="week-dot today"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label">Jeu</div>
+                  <div class="week-dot"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label">Ven</div>
+                  <div class="week-dot done"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label">Sam</div>
+                  <div class="week-dot"></div>
+                </div>
+                <div class="week-day">
+                  <div class="week-day-label">Dim</div>
+                  <div class="week-dot"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-icon">&#9878;</div>
+                <div class="stat-value">78.5</div>
+                <div class="stat-label">kg</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">&#128164;</div>
+                <div class="stat-value">7h45</div>
+                <div class="stat-label">sommeil</div>
+              </div>
+            </div>
+
+            <div class="cta-wrap">
+              <button class="cta-btn">
+                <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
+                Demarrer une seance
+              </button>
+            </div>
+
+          </div>
+
+          <div class="nav-wrap">
+            <div class="nav-row">
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <div class="nav-item-label">Seances</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+                <div class="nav-item-label">Poids</div>
+              </div>
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <div class="nav-item-label">Accueil</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                <div class="nav-item-label">Nutrition</div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="nav-item-label">Historique</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

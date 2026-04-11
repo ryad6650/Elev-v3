@@ -49,7 +49,7 @@ export default function ExerciseMenuSheet({
         {/* Actions group */}
         <div
           className="rounded-2xl overflow-hidden mb-3"
-          style={{ background: "#1C1C1E" }}
+          style={{ background: "#151312" }}
         >
           <MenuItem
             icon={<ArrowUpDown size={22} />}
@@ -79,7 +79,7 @@ export default function ExerciseMenuSheet({
         {/* Delete — isolated */}
         <div
           className="rounded-2xl overflow-hidden"
-          style={{ background: "#1C1C1E" }}
+          style={{ background: "#151312" }}
         >
           <button
             onClick={handle(onDelete)}

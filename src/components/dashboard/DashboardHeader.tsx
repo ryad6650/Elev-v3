@@ -87,7 +87,7 @@ export default function DashboardHeader({
                 fontFamily: "var(--font-lora), serif",
                 fontSize: 20,
                 fontWeight: 700,
-                color: "var(--accent)",
+                color: "#74BF7A",
               }}
             >
               {prenom[0]?.toUpperCase() ?? "?"}

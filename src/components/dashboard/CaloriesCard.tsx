@@ -42,7 +42,7 @@ export default memo(function CaloriesCard({
       label: "Prot",
       value: Math.round(proteines),
       max: objectifProteines,
-      color: "var(--color-protein)",
+      color: "#74BF7A",
       cls: "protein",
     },
     {
@@ -87,8 +87,8 @@ export default memo(function CaloriesCard({
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--green)",
-            background: "var(--green-dim)",
+            color: "#74BF7A",
+            background: "rgba(116,191,122,0.12)",
             padding: "5px 14px",
             borderRadius: "var(--radius-pill)",
           }}
@@ -119,7 +119,7 @@ export default memo(function CaloriesCard({
               cy="48"
               r={r}
               fill="none"
-              stroke="var(--green)"
+              stroke="#74BF7A"
               strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={circ}
@@ -170,7 +170,7 @@ export default memo(function CaloriesCard({
             style={{
               fontSize: 14,
               fontWeight: 500,
-              color: "var(--green)",
+              color: "#74BF7A",
               marginTop: 8,
             }}
           >

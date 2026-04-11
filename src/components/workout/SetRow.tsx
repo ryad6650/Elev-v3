@@ -55,7 +55,7 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
         gridTemplateColumns: "40px 1fr 80px 70px 40px",
         gap: "0 8px",
         borderTop: "none",
-        background: index % 2 === 1 ? "#1C1C1E" : "transparent",
+        background: index % 2 === 1 ? "#151312" : "transparent",
         opacity: set.isWarmup ? 0.55 : 1,
       }}
     >
@@ -124,7 +124,7 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
           onClick={() => onToggle(set)}
           className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 active:scale-90"
           style={{
-            background: set.completed ? "#22C55E" : "#2C2C2E",
+            background: set.completed ? "#74BF7A" : "#2C2C2E",
             border: set.completed ? "none" : "1.5px solid #48484A",
           }}
         >

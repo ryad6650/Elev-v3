@@ -79,7 +79,7 @@ export default function MensurationsCard({ initial }: Props) {
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--green)",
+            color: "#74BF7A",
             background: "none",
             border: "none",
             cursor: "pointer",

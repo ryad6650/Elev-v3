@@ -62,7 +62,7 @@ export default function RestTimer() {
           cy={22}
           r={18}
           fill="none"
-          stroke="var(--green)"
+          stroke="#74BF7A"
           strokeWidth={3}
           strokeLinecap="round"
           strokeDasharray={2 * Math.PI * 18}

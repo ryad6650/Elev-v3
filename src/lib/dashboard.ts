@@ -15,6 +15,7 @@ export interface ProchaineRoutine {
   jours: string[];
   dureeEstimee: number | null;
   groupesMusculaires: string[];
+  exerciceNoms: string[];
 }
 
 export interface DashboardData {
@@ -55,6 +56,7 @@ interface RpcNutritionEntry {
 }
 
 interface RpcRoutineExercise {
+  nom: string | null;
   series_cible: number;
   groupe_musculaire: string | null;
 }
@@ -170,6 +172,7 @@ export async function fetchDashboardData(
       nbExercices: exos.length,
       dureeEstimee: totalSets > 0 ? Math.round(totalSets * 3.5) : null,
       groupesMusculaires: [...new Set(groupesRaw)].slice(0, 3),
+      exerciceNoms: exos.map((e) => e.nom).filter(Boolean) as string[],
     };
   }
 

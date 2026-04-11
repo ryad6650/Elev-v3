@@ -88,7 +88,12 @@ export default function PoidsPageClient({ initialData }: Props) {
   return (
     <main
       className="page-enter"
-      style={{ maxWidth: 430, margin: "0 auto", padding: "20px 28px 112px" }}
+      style={{
+        maxWidth: 430,
+        margin: "0 auto",
+        padding: "20px 28px",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+      }}
     >
       {/* Header */}
       <div style={{ marginBottom: 20 }}>

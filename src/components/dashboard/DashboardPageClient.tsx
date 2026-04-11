@@ -16,8 +16,13 @@ export default function DashboardPageClient({ initialData }: Props) {
 
   return (
     <main
-      className="relative flex flex-col min-h-dvh pb-24"
-      style={{ maxWidth: 430, margin: "0 auto", background: "#0D0D0D" }}
+      className="relative flex flex-col min-h-dvh"
+      style={{
+        maxWidth: 430,
+        margin: "0 auto",
+        background: "#0C0A09",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+      }}
     >
       <div className="flex flex-col gap-5" style={{ padding: "24px 24px 0" }}>
         <DashboardHeader
@@ -53,7 +58,7 @@ export default function DashboardPageClient({ initialData }: Props) {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: "var(--accent)",
+                color: "#74BF7A",
                 textDecoration: "none",
               }}
             >

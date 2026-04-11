@@ -69,7 +69,7 @@ export default memo(function WorkoutWeekTimeline({
             fontFamily: "var(--font-nunito), sans-serif",
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--green)",
+            color: "#74BF7A",
           }}
         >
           Historique &rarr;
@@ -130,7 +130,7 @@ function DayDot({
 
   if (isDone) {
     return (
-      <div className={base} style={{ background: "var(--green)" }}>
+      <div className={base} style={{ background: "#74BF7A" }}>
         <span className="text-[12px] font-bold text-white">✓</span>
       </div>
     );
@@ -140,7 +140,7 @@ function DayDot({
       <div
         className={base}
         style={{
-          border: "2px solid var(--green)",
+          border: "2px solid #74BF7A",
           background: "var(--green-dim)",
         }}
       >

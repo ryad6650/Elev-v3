@@ -62,7 +62,7 @@ function PillSelect({
           onClick={() => onChange(item === value ? "" : item)}
           className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
           style={{
-            background: value === item ? "var(--accent)" : "var(--bg-elevated)",
+            background: value === item ? "#1E9D4C" : "var(--bg-elevated)",
             color: value === item ? "white" : "var(--text-secondary)",
           }}
         >
@@ -301,7 +301,7 @@ export default function EditExerciseModal({
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all"
           style={{
             background:
-              canSubmit && !loading ? "var(--accent)" : "var(--bg-elevated)",
+              canSubmit && !loading ? "#1E9D4C" : "var(--bg-elevated)",
             color: canSubmit && !loading ? "white" : "var(--text-muted)",
           }}
         >

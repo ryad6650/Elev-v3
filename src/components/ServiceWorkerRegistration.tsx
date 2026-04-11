@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useSyncQueue } from '@/hooks/useSyncQueue';
+import { useEffect } from "react";
+import { useSyncQueue } from "@/hooks/useSyncQueue";
 
 /**
  * Enregistre le Service Worker et active la synchronisation offline.
@@ -12,25 +12,28 @@ export default function ServiceWorkerRegistration() {
   useSyncQueue();
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!("serviceWorker" in navigator)) return;
 
     navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
+      .register("/sw.js", { scope: "/" })
       .then((registration) => {
         // Vérifier les mises à jour du SW
-        registration.addEventListener('updatefound', () => {
+        registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
-          newWorker?.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          newWorker?.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
               // Nouveau SW disponible — on active immédiatement
-              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              newWorker.postMessage({ type: "SKIP_WAITING" });
             }
           });
         });
       })
       .catch((err) => {
         // Ne pas bloquer l'app si le SW échoue (env dev, HTTPS requis)
-        console.warn('[Élev] Service Worker non disponible:', err);
+        console.warn("[Élev] Service Worker non disponible:", err);
       });
   }, []);
 

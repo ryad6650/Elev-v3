@@ -104,7 +104,7 @@ export default memo(function SleepStat({ sommeilMinutes }: Props) {
           disabled={saving}
           className="text-xs font-semibold px-2 py-1 rounded active:scale-95"
           style={{
-            background: "var(--green)",
+            background: "#74BF7A",
             color: "white",
             opacity: saving ? 0.5 : 1,
           }}

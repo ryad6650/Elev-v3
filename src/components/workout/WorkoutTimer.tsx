@@ -71,7 +71,7 @@ export default function WorkoutTimer({
           fontFamily: "var(--font-nunito), sans-serif",
           fontSize: 16,
           fontWeight: 700,
-          color: "var(--accent)",
+          color: "#74BF7A",
         }}
       >
         {formatCompact(elapsed)}

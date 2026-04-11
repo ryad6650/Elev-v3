@@ -226,7 +226,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                 style={{
                   background:
-                    groupe === g ? "var(--accent)" : "rgba(255,255,255,0.5)",
+                    groupe === g ? "#1E9D4C" : "rgba(255,255,255,0.5)",
                   color: groupe === g ? "white" : "var(--text-secondary)",
                 }}
               >
@@ -255,9 +255,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                 style={{
                   background:
-                    equipement === eq
-                      ? "var(--accent)"
-                      : "rgba(255,255,255,0.5)",
+                    equipement === eq ? "#1E9D4C" : "rgba(255,255,255,0.5)",
                   color: equipement === eq ? "white" : "var(--text-secondary)",
                 }}
               >
@@ -280,7 +278,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all"
           style={{
             background:
-              canSubmit && !loading ? "var(--accent)" : "rgba(255,255,255,0.5)",
+              canSubmit && !loading ? "#1E9D4C" : "rgba(255,255,255,0.5)",
             color: canSubmit && !loading ? "white" : "var(--text-muted)",
             cursor: canSubmit && !loading ? "pointer" : "not-allowed",
           }}

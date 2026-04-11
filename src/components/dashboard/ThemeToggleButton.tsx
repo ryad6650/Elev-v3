@@ -18,7 +18,10 @@ export default function ThemeToggleButton({ initialTheme }: Props) {
 
     // Activer les transitions CSS uniquement pendant le changement de thème
     document.documentElement.classList.add("theme-transitioning");
-    setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 350);
+    setTimeout(
+      () => document.documentElement.classList.remove("theme-transitioning"),
+      350,
+    );
 
     if (next === "light") {
       document.documentElement.setAttribute("data-theme", "light");

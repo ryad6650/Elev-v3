@@ -104,7 +104,7 @@ export default function MealNutriSection({ values, progressBars }: Props) {
               <div
                 className="h-full rounded-full"
                 style={{
-                  background: "#00FFC3",
+                  background: "#74BF7A",
                   width: `${Math.min((row.pct || 0) * 100, 100)}%`,
                   transition: "width 700ms ease",
                 }}

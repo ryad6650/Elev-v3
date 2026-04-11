@@ -92,7 +92,7 @@ export default function PoidsHero({
             fontSize: 12,
             fontWeight: 700,
             fontFamily: "var(--font-nunito), sans-serif",
-            color: delta <= 0 ? "var(--green)" : "#c94444",
+            color: delta <= 0 ? "#74BF7A" : "#c94444",
             background: delta <= 0 ? "var(--green-dim)" : "rgba(201,68,68,0.1)",
           }}
         >
@@ -151,7 +151,7 @@ export default function PoidsHero({
           style={{
             padding: "10px 18px",
             borderRadius: "var(--radius-sm)",
-            background: "var(--green)",
+            background: "#74BF7A",
             color: "#fff",
             fontSize: 13,
             fontWeight: 600,

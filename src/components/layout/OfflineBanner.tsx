@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { WifiOff, RefreshCw } from 'lucide-react';
-import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { getQueueCount } from '@/lib/offlineQueue';
+import { useEffect, useState } from "react";
+import { WifiOff, RefreshCw } from "lucide-react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { getQueueCount } from "@/lib/offlineQueue";
 
 export default function OfflineBanner() {
   const isOnline = useOnlineStatus();
@@ -38,7 +38,7 @@ export default function OfflineBanner() {
       role="status"
       aria-live="polite"
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white transition-colors duration-300 ${
-        syncing ? 'bg-[var(--accent)]' : 'bg-amber-700'
+        syncing ? "bg-[var(--accent)]" : "bg-amber-700"
       }`}
     >
       {syncing ? (
@@ -52,7 +52,7 @@ export default function OfflineBanner() {
           <span>Mode hors ligne</span>
           {pendingCount > 0 && (
             <span className="opacity-80 text-xs">
-              · {pendingCount} action{pendingCount > 1 ? 's' : ''} en attente
+              · {pendingCount} action{pendingCount > 1 ? "s" : ""} en attente
             </span>
           )}
         </>

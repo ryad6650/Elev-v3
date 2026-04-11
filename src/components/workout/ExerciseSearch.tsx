@@ -174,7 +174,7 @@ export default function ExerciseSearch({
           <button
             onClick={onClose}
             className="active:opacity-60"
-            style={{ color: "#3B82F6", fontSize: 17 }}
+            style={{ color: "#1E9D4C", fontSize: 17 }}
           >
             Annuler
           </button>
@@ -191,7 +191,7 @@ export default function ExerciseSearch({
           <button
             onClick={() => setShowCreate(true)}
             className="active:opacity-60"
-            style={{ color: "#3B82F6", fontSize: 17 }}
+            style={{ color: "#1E9D4C", fontSize: 17 }}
           >
             Créer
           </button>
@@ -202,7 +202,7 @@ export default function ExerciseSearch({
       <div className="px-4 pt-1 pb-3 space-y-3">
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl"
-          style={{ background: "#1C1C1E" }}
+          style={{ background: "#151312" }}
         >
           <Search size={17} style={{ color: "#636366" }} />
           <input
@@ -338,7 +338,7 @@ function FilterBtn({
     <button
       onClick={onToggle}
       className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl active:opacity-70"
-      style={{ background: "#1C1C1E" }}
+      style={{ background: "#151312" }}
     >
       <span
         className="truncate"
@@ -376,7 +376,7 @@ function FilterDropdown({
           onClick={() => onSelect(item)}
           className="px-3 py-1.5 rounded-full text-xs font-semibold active:opacity-70"
           style={{
-            background: selected === item ? "#3B82F6" : "#2C2C2E",
+            background: selected === item ? "#1E9D4C" : "#2C2C2E",
             color: "#fff",
           }}
         >
@@ -392,7 +392,7 @@ function ExerciseRow({ ex, onSelect }: { ex: Exercise; onSelect: () => void }) {
     <button
       onClick={onSelect}
       className="w-full flex items-center gap-4 px-4 py-3 active:opacity-60"
-      style={{ borderBottom: "1px solid #1C1C1E" }}
+      style={{ borderBottom: "1px solid #151312" }}
     >
       <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="md" circle />
       <div className="flex-1 min-w-0 text-left">

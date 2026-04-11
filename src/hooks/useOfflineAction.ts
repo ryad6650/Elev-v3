@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { enqueueOperation, type OfflineOperation } from '@/lib/offlineQueue';
+import { useCallback } from "react";
+import { enqueueOperation, type OfflineOperation } from "@/lib/offlineQueue";
 
 interface OfflineActionResult {
   queued: boolean;
@@ -24,7 +24,7 @@ export function useOfflineAction() {
   const execute = useCallback(
     async <T>(
       action: () => Promise<T>,
-      offlineOp: OfflineOperation
+      offlineOp: OfflineOperation,
     ): Promise<OfflineActionResult> => {
       // Hors ligne → mettre en file d'attente immédiatement
       if (!navigator.onLine) {
@@ -45,24 +45,24 @@ export function useOfflineAction() {
         }
         return {
           queued: false,
-          error: err instanceof Error ? err.message : 'Erreur inconnue',
+          error: err instanceof Error ? err.message : "Erreur inconnue",
         };
       }
     },
-    []
+    [],
   );
 
   return { execute };
 }
 
 async function requestBackgroundSync(): Promise<void> {
-  if (!('serviceWorker' in navigator)) return;
+  if (!("serviceWorker" in navigator)) return;
   try {
     const registration = await navigator.serviceWorker.ready;
     // L'API SyncManager n'est pas disponible sur tous les navigateurs (ex: Safari)
-    if ('sync' in registration) {
+    if ("sync" in registration) {
       // @ts-expect-error — SyncManager types non inclus dans lib.dom
-      await registration.sync.register('elev-sync');
+      await registration.sync.register("elev-sync");
     }
   } catch {
     // Silencieux — la queue sera traitée au prochain online event

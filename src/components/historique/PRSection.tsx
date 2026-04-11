@@ -4,81 +4,65 @@ interface Props {
   prs: PRRecord[];
 }
 
-const MEDALS = ["🥇", "🥈", "🥉", "⭐"];
+const MEDALS = ["🥇", "🥈", "🥉"];
 
 export default function PRSection({ prs }: Props) {
   if (prs.length === 0) return null;
 
   return (
-    <div
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "var(--glass-blur)",
-        WebkitBackdropFilter: "var(--glass-blur)",
-        borderRadius: "var(--radius-card)",
-        border: "1px solid var(--glass-border)",
-        padding: 20,
-      }}
-    >
+    <div style={{ marginBottom: 14 }}>
       <div
         style={{
-          fontFamily: "var(--font-nunito), sans-serif",
-          fontSize: 13,
-          fontWeight: 600,
-          letterSpacing: "0.1em",
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: "var(--text-muted)",
-          marginBottom: 12,
+          marginBottom: 8,
         }}
       >
         Records personnels
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex gap-2">
         {prs.map((pr, i) => (
           <div
             key={i}
+            className="card-surface flex-1"
             style={{
-              background: "rgba(0,0,0,0.03)",
-              borderRadius: "var(--radius-sm)",
-              padding: "12px",
+              padding: "12px 8px",
+              textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 16, marginBottom: 4 }}>
+            <div style={{ fontSize: 18, marginBottom: 4 }}>
               {MEDALS[i] ?? "⭐"}
             </div>
             <div
               className="truncate"
               style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                fontSize: 11,
-                color: "var(--text-muted)",
-                marginBottom: 4,
+                fontSize: 12,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                marginBottom: 2,
+                lineHeight: 1.2,
               }}
             >
               {pr.exerciceNom}
             </div>
-            <div>
-              <span
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "var(--green)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {pr.poidsMax}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  fontSize: 11,
-                  color: "var(--text-muted)",
-                  marginLeft: 3,
-                }}
-              >
-                kg × {pr.repsAuMax}
-              </span>
+            <div
+              style={{
+                fontFamily: "var(--font-nunito), sans-serif",
+                fontSize: 24,
+                fontWeight: 700,
+                color: "#74BF7A",
+                lineHeight: 1,
+              }}
+            >
+              {pr.poidsMax}
+            </div>
+            <div
+              style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}
+            >
+              kg × {pr.repsAuMax} reps
             </div>
           </div>
         ))}

@@ -40,8 +40,12 @@ export default function ProgrammesPageClient({ data }: Props) {
 
   return (
     <main
-      className="px-4 pt-6 pb-28 page-enter"
-      style={{ maxWidth: 520, margin: "0 auto" }}
+      className="px-4 pt-6 page-enter"
+      style={{
+        maxWidth: 520,
+        margin: "0 auto",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+      }}
     >
       {/* En-tête */}
       <div className="flex items-center justify-between mb-5">
