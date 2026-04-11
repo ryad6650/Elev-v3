@@ -20,7 +20,7 @@ export default function DashboardPageClient({ initialData }: Props) {
       style={{
         maxWidth: 430,
         margin: "0 auto",
-        background: "#0C0A09",
+        background: "#1B1715",
         paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
       }}
     >

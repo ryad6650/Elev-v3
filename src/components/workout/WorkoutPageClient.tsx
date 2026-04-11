@@ -64,6 +64,8 @@ export default function WorkoutPageClient({
         margin: "0 auto",
         padding: "28px 16px",
         paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+        background: "#1B1715",
+        minHeight: "100dvh",
       }}
     >
       {/* Header */}

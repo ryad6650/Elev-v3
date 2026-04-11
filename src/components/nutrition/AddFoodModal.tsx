@@ -243,7 +243,7 @@ export default function AddFoodModal({
     <div
       className="fixed inset-0 z-50 flex flex-col"
       style={{
-        background: isBeige ? "var(--bg-gradient)" : "#111927",
+        background: isBeige ? "#1B1715" : "#111927",
         transform:
           isClosing || !isVisible ? "translateY(100%)" : "translateY(0)",
         opacity: isClosing ? 0 : isVisible ? 1 : 0,
@@ -273,7 +273,7 @@ export default function AddFoodModal({
             <p
               className="text-[17px] font-bold"
               style={{
-                color: isBeige ? "#2C1E14" : "var(--text-primary)",
+                color: "var(--text-primary)",
                 fontFamily: "var(--font-sans)",
               }}
             >

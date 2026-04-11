@@ -87,7 +87,7 @@ export default function HistoriquePageClient({ initialData }: Props) {
         margin: "0 auto",
         padding: "20px 28px",
         paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
-        background: "#0C0A09",
+        background: "#1B1715",
         minHeight: "100dvh",
       }}
     >
