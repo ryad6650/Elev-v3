@@ -102,6 +102,8 @@ export default function DashboardNutritionCard({
             width="78"
             height="78"
             viewBox="0 0 78 78"
+            role="img"
+            aria-label="Répartition macronutriments"
             style={{ transform: "rotate(-90deg)" }}
           >
             <circle

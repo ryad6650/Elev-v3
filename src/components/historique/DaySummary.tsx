@@ -170,6 +170,8 @@ export default function DaySummary({
                 <div style={{ width: 40, height: 40, position: "relative" }}>
                   <svg
                     viewBox="0 0 40 40"
+                    role="img"
+                    aria-label="Macros du jour"
                     style={{
                       width: "100%",
                       height: "100%",

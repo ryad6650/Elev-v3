@@ -25,6 +25,8 @@ function MealRing({ pct }: { pct: number }) {
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
+      role="img"
+      aria-label="Progression du repas"
       style={{ position: "absolute", inset: 0 }}
     >
       <circle
@@ -136,8 +138,8 @@ export default memo(function MealSection({
         onClick={() => onAdd(meal)}
         className="active:scale-90 transition-all duration-150 ease-out flex items-center justify-center hover:scale-110"
         style={{
-          width: 34,
-          height: 34,
+          width: 44,
+          height: 44,
           borderRadius: "50%",
           background: "#74BF7A",
           flexShrink: 0,

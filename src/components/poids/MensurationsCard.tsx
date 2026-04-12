@@ -106,8 +106,10 @@ export default function MensurationsCard({ initial }: Props) {
               padding: "10px 12px",
             }}
           >
-            <div
+            <label
+              htmlFor={`mens-${key}`}
               style={{
+                display: "block",
                 fontFamily: "var(--font-nunito), sans-serif",
                 fontSize: 9,
                 fontWeight: 600,
@@ -118,10 +120,11 @@ export default function MensurationsCard({ initial }: Props) {
               }}
             >
               {label}
-            </div>
+            </label>
             {editing ? (
               <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <input
+                  id={`mens-${key}`}
                   type="number"
                   step="0.5"
                   min="0"

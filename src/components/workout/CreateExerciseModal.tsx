@@ -128,6 +128,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
             onClick={onClose}
             className="p-1.5 rounded-lg"
             style={{ background: "rgba(255,255,255,0.5)" }}
+            aria-label="Fermer"
           >
             <X size={16} style={{ color: "var(--text-secondary)" }} />
           </button>
@@ -163,6 +164,7 @@ export default function CreateExerciseModal({ onClose, onCreated }: Props) {
                 onClick={removeImage}
                 className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
                 style={{ background: "rgba(0,0,0,0.7)" }}
+                aria-label="Supprimer l'image"
               >
                 <X size={12} color="white" />
               </button>

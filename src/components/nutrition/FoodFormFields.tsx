@@ -23,6 +23,8 @@ const inputStyle: React.CSSProperties = {
 
 export { labelStyle, inputStyle };
 
+let _fieldId = 0;
+
 export function Field({
   label,
   value,
@@ -32,10 +34,14 @@ export function Field({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const id = `field-${label.toLowerCase().replace(/[^a-z]/g, "") || ++_fieldId}`;
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={labelStyle}>{label}</div>
+      <label htmlFor={id} style={labelStyle}>
+        {label}
+      </label>
       <input
+        id={id}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -59,9 +65,12 @@ export function MacroField({
   unit: string;
   dot?: string;
 }) {
+  const id = `macro-${label.toLowerCase().replace(/[^a-z]/g, "") || "field"}`;
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={labelStyle}>{label}</div>
+      <label htmlFor={id} style={labelStyle}>
+        {label}
+      </label>
       <div className="flex items-center gap-2">
         {dot && (
           <div
@@ -70,6 +79,7 @@ export function MacroField({
           />
         )}
         <input
+          id={id}
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -99,10 +109,14 @@ export function SmallField({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const id = `small-${label.toLowerCase().replace(/[^a-z]/g, "") || "field"}`;
   return (
     <div className="flex-1">
-      <div style={labelStyle}>{label}</div>
+      <label htmlFor={id} style={labelStyle}>
+        {label}
+      </label>
       <input
+        id={id}
         type="number"
         value={value}
         onChange={(e) => onChange(e.target.value)}

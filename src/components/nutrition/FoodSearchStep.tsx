@@ -114,6 +114,7 @@ export default function FoodSearchStep({
               onClick={() => setQuery("")}
               className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
               style={{ background: "var(--bg-elevated)" }}
+              aria-label="Effacer la recherche"
             >
               <X size={12} style={{ color: "var(--text-muted)" }} />
             </button>
@@ -121,6 +122,7 @@ export default function FoodSearchStep({
             <button
               onClick={onScan}
               className="shrink-0 active:opacity-60 transition-opacity"
+              aria-label="Scanner un code-barres"
             >
               <ScanBarcode size={20} style={{ color: "var(--text-muted)" }} />
             </button>

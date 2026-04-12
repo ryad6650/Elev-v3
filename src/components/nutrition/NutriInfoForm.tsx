@@ -229,6 +229,7 @@ export default function NutriInfoForm({
           <button
             onClick={onBack}
             className="p-1 active:opacity-70 transition-opacity"
+            aria-label="Retour"
           >
             <ChevronLeft size={26} style={{ color: "#0589D6" }} />
           </button>
@@ -236,6 +237,7 @@ export default function NutriInfoForm({
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center active:opacity-70 transition-opacity"
             style={{ background: "rgba(255,255,255,0.15)" }}
+            aria-label="Fermer"
           >
             <X size={15} style={{ color: "rgba(255,255,255,0.7)" }} />
           </button>

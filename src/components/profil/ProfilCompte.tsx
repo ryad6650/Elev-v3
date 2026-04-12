@@ -126,23 +126,28 @@ export default function ProfilCompte() {
               value: confirmPw,
               setter: setConfirmPw,
             },
-          ].map(({ label, value, setter }) => (
-            <div key={label}>
-              <label
-                className="block text-xs mb-1.5 font-medium"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                {label}
-              </label>
-              <input
-                type="password"
-                value={value}
-                onChange={(e) => setter(e.target.value)}
-                required
-                style={inputStyle}
-              />
-            </div>
-          ))}
+          ].map(({ label, value, setter }) => {
+            const inputId = `pw-${label.toLowerCase().replace(/[^a-z]/g, "")}`;
+            return (
+              <div key={label}>
+                <label
+                  htmlFor={inputId}
+                  className="block text-xs mb-1.5 font-medium"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {label}
+                </label>
+                <input
+                  id={inputId}
+                  type="password"
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  required
+                  style={inputStyle}
+                />
+              </div>
+            );
+          })}
           {pwError && (
             <p className="text-sm" style={{ color: "var(--danger)" }}>
               {pwError}

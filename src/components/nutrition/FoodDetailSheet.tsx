@@ -288,6 +288,7 @@ export default function FoodDetailSheet({
           <button
             onClick={onBack}
             className="p-1 active:opacity-70 transition-opacity"
+            aria-label="Retour"
           >
             <ChevronLeft size={26} style={{ color: "var(--text-primary)" }} />
           </button>
@@ -305,6 +306,7 @@ export default function FoodDetailSheet({
               <button
                 onClick={onEdit}
                 className="p-1 active:opacity-70 transition-opacity"
+                aria-label="Modifier l'aliment"
               >
                 <Pencil size={20} style={{ color: "var(--text-secondary)" }} />
               </button>
@@ -316,6 +318,7 @@ export default function FoodDetailSheet({
                   onToggleFavorite();
                 }}
                 className="p-1 active:opacity-70 transition-opacity"
+                aria-label={fav ? "Retirer des favoris" : "Ajouter aux favoris"}
               >
                 <Star
                   size={22}
@@ -386,7 +389,13 @@ export default function FoodDetailSheet({
               className="relative shrink-0"
               style={{ width: 88, height: 88 }}
             >
-              <svg width="88" height="88" viewBox="0 0 88 88">
+              <svg
+                width="88"
+                height="88"
+                viewBox="0 0 88 88"
+                role="img"
+                aria-label="Répartition macros"
+              >
                 <circle
                   cx="44"
                   cy="44"

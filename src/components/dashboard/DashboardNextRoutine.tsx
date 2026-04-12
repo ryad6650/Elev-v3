@@ -15,7 +15,58 @@ export default function DashboardNextRoutine({ routine }: Props) {
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const [isStarting, setIsStarting] = useState(false);
 
-  if (!routine) return null;
+  if (!routine)
+    return (
+      <div>
+        <div
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: "var(--text-primary)",
+            marginBottom: 14,
+          }}
+        >
+          Prochaine seance
+        </div>
+        <div
+          style={{
+            background: "#262220",
+            border: "1px solid var(--border)",
+            borderRadius: 16,
+            padding: "24px 16px",
+            textAlign: "center",
+          }}
+        >
+          <p style={{ fontSize: 32, marginBottom: 8 }}>🏋️</p>
+          <p
+            style={{
+              fontFamily: "var(--font-nunito), sans-serif",
+              fontSize: 14,
+              color: "var(--text-secondary)",
+              marginBottom: 14,
+            }}
+          >
+            Aucune routine planifiée — crée ta première routine pour commencer !
+          </p>
+          <a
+            href="/programmes"
+            style={{
+              display: "inline-block",
+              padding: "10px 20px",
+              borderRadius: 12,
+              background: "#74BF7A",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: "var(--font-nunito), sans-serif",
+              textDecoration: "none",
+            }}
+          >
+            Créer une routine
+          </a>
+        </div>
+      </div>
+    );
 
   const exerciceText = routine.exerciceNoms.join(", ");
 

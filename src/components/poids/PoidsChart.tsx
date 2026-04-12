@@ -207,6 +207,8 @@ export default function PoidsChart({ entries }: Props) {
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
           style={{ width: "100%", height: "100%" }}
+          role="img"
+          aria-label="Courbe de poids"
         >
           <defs>
             <linearGradient id="poidsGrad" x1="0" y1="0" x2="0" y2="1">

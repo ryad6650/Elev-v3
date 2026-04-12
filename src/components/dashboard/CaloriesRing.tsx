@@ -55,7 +55,13 @@ export default memo(function CaloriesRing({ consumed, objective }: Props) {
       {/* Mini anneau + meta à droite */}
       <div className="flex flex-col items-center gap-2 shrink-0">
         <div className="relative" style={{ width: 76, height: 76 }}>
-          <svg width={76} height={76} className="-rotate-90">
+          <svg
+            width={76}
+            height={76}
+            className="-rotate-90"
+            role="img"
+            aria-label="Calories consommées"
+          >
             <circle
               cx={38}
               cy={38}

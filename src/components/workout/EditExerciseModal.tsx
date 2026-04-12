@@ -245,12 +245,14 @@ export default function EditExerciseModal({
         {/* Nom */}
         <div className="space-y-1.5">
           <label
+            htmlFor="edit-exercice-nom"
             className="text-xs font-semibold uppercase tracking-wider"
             style={{ color: "var(--text-muted)" }}
           >
             Nom *
           </label>
           <input
+            id="edit-exercice-nom"
             autoFocus
             type="text"
             placeholder="Ex : Curl incliné haltères"

@@ -179,9 +179,12 @@ export default function CustomFoodForm({
 
       {/* Code-barres */}
       <div style={{ marginBottom: 16 }}>
-        <div style={labelStyle}>Code-barres</div>
+        <label htmlFor="custom-codebarres" style={labelStyle}>
+          Code-barres
+        </label>
         <div className="flex gap-2">
           <input
+            id="custom-codebarres"
             type="text"
             inputMode="numeric"
             placeholder="Optionnel"
@@ -267,8 +270,11 @@ export default function CustomFoodForm({
       <div style={sectionLabel}>Portion</div>
       <div className="flex gap-2.5" style={{ marginBottom: 16 }}>
         <div style={{ flex: 2 }}>
-          <div style={labelStyle}>Nom de la portion</div>
+          <label htmlFor="custom-portionnom" style={labelStyle}>
+            Nom de la portion
+          </label>
           <input
+            id="custom-portionnom"
             type="text"
             placeholder="Ex: 1 tranche, 1 cuillère..."
             value={vals.portionNom}
@@ -278,8 +284,11 @@ export default function CustomFoodForm({
           />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={labelStyle}>Taille (g)</div>
+          <label htmlFor="custom-portiong" style={labelStyle}>
+            Taille (g)
+          </label>
           <input
+            id="custom-portiong"
             type="number"
             placeholder="40"
             value={vals.portionG}

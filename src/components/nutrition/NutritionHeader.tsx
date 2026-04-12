@@ -25,7 +25,13 @@ function CalorieRing({
 
   return (
     <div style={{ position: "relative", width: 140, height: 140 }}>
-      <svg width="140" height="140" viewBox="0 0 140 140">
+      <svg
+        width="140"
+        height="140"
+        viewBox="0 0 140 140"
+        role="img"
+        aria-label="Progression calories"
+      >
         {/* Track 270° */}
         <circle
           cx={cx}

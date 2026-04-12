@@ -116,6 +116,7 @@ export default function RoutineDetailView({
         >
           <button
             onClick={onBack}
+            aria-label="Retour"
             style={{
               color: "#fff",
               background: "none",
@@ -129,6 +130,7 @@ export default function RoutineDetailView({
           <span style={{ color: "#fff", fontSize: 16 }}>Routine</span>
           <div style={{ display: "flex", gap: 16 }}>
             <button
+              aria-label="Partager"
               style={{
                 color: "#fff",
                 background: "none",
@@ -139,6 +141,7 @@ export default function RoutineDetailView({
               <Share size={20} />
             </button>
             <button
+              aria-label="Plus d'options"
               style={{
                 color: "#fff",
                 background: "none",

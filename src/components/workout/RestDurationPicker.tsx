@@ -161,6 +161,7 @@ export default function RestDurationPicker({
                   placeholder="0"
                   value={customMins}
                   onChange={(e) => setCustomMins(e.target.value)}
+                  aria-label="Minutes"
                   className="w-full text-center text-2xl font-bold rounded-xl py-2 outline-none"
                   style={{
                     background: "rgba(255,255,255,0.5)",
@@ -193,6 +194,7 @@ export default function RestDurationPicker({
                   placeholder="0"
                   value={customSecs}
                   onChange={(e) => setCustomSecs(e.target.value)}
+                  aria-label="Secondes"
                   className="w-full text-center text-2xl font-bold rounded-xl py-2 outline-none"
                   style={{
                     background: "rgba(255,255,255,0.5)",

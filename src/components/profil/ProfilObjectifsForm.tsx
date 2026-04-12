@@ -112,27 +112,33 @@ export default function ProfilObjectifsForm({ profil }: Props) {
       </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
-          {editableFields.map(({ label, value, setter }) => (
-            <div key={label}>
-              <label
-                className="block text-xs mb-1.5 font-medium"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                {label}
-              </label>
-              <input
-                type="number"
-                value={value}
-                onChange={(e) => setter(e.target.value)}
-                placeholder="—"
-                min={0}
-                style={inputStyle}
-              />
-            </div>
-          ))}
+          {editableFields.map(({ label, value, setter }) => {
+            const inputId = `obj-${label.toLowerCase().replace(/[^a-z]/g, "")}`;
+            return (
+              <div key={label}>
+                <label
+                  htmlFor={inputId}
+                  className="block text-xs mb-1.5 font-medium"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {label}
+                </label>
+                <input
+                  id={inputId}
+                  type="number"
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  placeholder="—"
+                  min={0}
+                  style={inputStyle}
+                />
+              </div>
+            );
+          })}
           {/* Glucides — calculé automatiquement */}
           <div>
             <label
+              htmlFor="obj-glucides"
               className="block text-xs mb-1.5 font-medium"
               style={{ color: "var(--text-secondary)" }}
             >
@@ -140,6 +146,7 @@ export default function ProfilObjectifsForm({ profil }: Props) {
               <span className="ml-1 opacity-50 font-normal">auto</span>
             </label>
             <input
+              id="obj-glucides"
               type="number"
               value={glucides}
               readOnly

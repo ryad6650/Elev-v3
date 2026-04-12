@@ -58,6 +58,8 @@ export default function WeightMiniChart({ data }: Props) {
         className="w-full"
         height={60}
         preserveAspectRatio="none"
+        role="img"
+        aria-label="Évolution du poids"
       >
         <defs>
           <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">

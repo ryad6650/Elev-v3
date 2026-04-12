@@ -72,6 +72,8 @@ export default function RoutineChart({ points, tab }: Props) {
       width="100%"
       viewBox={`0 0 ${W} ${H}`}
       style={{ overflow: "visible", display: "block" }}
+      role="img"
+      aria-label="Progression de la routine"
     >
       {[minVal, midVal, maxVal].map((v, i) => (
         <g key={i}>

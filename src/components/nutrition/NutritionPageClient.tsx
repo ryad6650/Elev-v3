@@ -200,8 +200,8 @@ export default function NutritionPageClient({ initialData }: Props) {
                 onClick={() => navigate(-1)}
                 className="active:scale-95 transition-transform flex items-center justify-center"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 44,
+                  height: 44,
                   borderRadius: "50%",
                   background: "var(--bg-secondary)",
                   fontSize: 18,
@@ -216,8 +216,8 @@ export default function NutritionPageClient({ initialData }: Props) {
                 disabled={isToday}
                 className="active:scale-95 transition-transform flex items-center justify-center"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 44,
+                  height: 44,
                   borderRadius: "50%",
                   background: "var(--bg-secondary)",
                   fontSize: 18,

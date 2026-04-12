@@ -48,7 +48,14 @@ export default function RestTimer() {
       }}
     >
       {/* Anneau SVG warm */}
-      <svg width={44} height={44} viewBox="0 0 44 44" className="shrink-0">
+      <svg
+        width={44}
+        height={44}
+        viewBox="0 0 44 44"
+        className="shrink-0"
+        role="img"
+        aria-label="Temps de repos"
+      >
         <circle
           cx={22}
           cy={22}
@@ -103,6 +110,7 @@ export default function RestTimer() {
             background: "rgba(0,0,0,0.06)",
             color: "var(--text-muted)",
           }}
+          aria-label="Sauter le repos"
         >
           <SkipForward size={12} />
         </button>
@@ -113,6 +121,7 @@ export default function RestTimer() {
             background: "rgba(0,0,0,0.04)",
             color: "var(--text-secondary)",
           }}
+          aria-label="Fermer le minuteur"
         >
           <X size={12} />
         </button>

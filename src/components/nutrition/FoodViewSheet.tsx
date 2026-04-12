@@ -46,7 +46,7 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
             >
               Fiche produit
             </p>
-            <button onClick={onClose} className="p-1">
+            <button onClick={onClose} className="p-1" aria-label="Fermer">
               <X size={20} style={{ color: "var(--text-muted)" }} />
             </button>
           </div>
@@ -171,6 +171,8 @@ export default function FoodViewSheet({ entry, onClose }: Props) {
                     width="80"
                     height="80"
                     viewBox="0 0 80 80"
+                    role="img"
+                    aria-label="Répartition macros"
                     style={{ transform: "rotate(-90deg)" }}
                   >
                     <circle

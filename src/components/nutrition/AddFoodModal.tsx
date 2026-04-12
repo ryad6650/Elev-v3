@@ -279,6 +279,7 @@ export default function AddFoodModal({
             <button
               onClick={isFormStep ? () => setStep("search") : handleClose}
               className="w-9 h-9 flex items-center justify-center active:opacity-70 transition-opacity"
+              aria-label="Fermer"
             >
               <X
                 size={20}

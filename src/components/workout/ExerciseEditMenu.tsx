@@ -37,6 +37,7 @@ export default function ExerciseEditMenu({
         onClick={onToggle}
         className="p-2 rounded-lg active:opacity-60 transition-opacity"
         style={{ color: "var(--text-secondary)" }}
+        aria-label="Options de l'exercice"
       >
         <MoreVertical size={18} />
       </button>

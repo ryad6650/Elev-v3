@@ -122,13 +122,19 @@ function SetRow({ set, isActive, index = 0, onUpdate, onToggle }: Props) {
       <div className="flex items-center justify-center">
         <button
           onClick={() => onToggle(set)}
-          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 active:scale-90"
-          style={{
-            background: set.completed ? "#74BF7A" : "#2C2C2E",
-            border: set.completed ? "none" : "1.5px solid #48484A",
-          }}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0 transition-all duration-200 active:scale-90"
         >
-          {set.completed && <Check size={15} strokeWidth={2.5} color="#fff" />}
+          <span
+            className="w-7 h-7 rounded-lg flex items-center justify-center"
+            style={{
+              background: set.completed ? "#74BF7A" : "#2C2C2E",
+              border: set.completed ? "none" : "1.5px solid #48484A",
+            }}
+          >
+            {set.completed && (
+              <Check size={15} strokeWidth={2.5} color="#fff" />
+            )}
+          </span>
         </button>
       </div>
     </div>

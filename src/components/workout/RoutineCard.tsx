@@ -63,6 +63,7 @@ export default function RoutineCard({
             onOptions();
           }}
           className="p-0.5 active:opacity-70 shrink-0 mt-0.5"
+          aria-label="Options de la routine"
         >
           <MoreVertical size={20} style={{ color: "var(--text-secondary)" }} />
         </button>

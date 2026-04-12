@@ -64,12 +64,14 @@ export default function ProfilInfosForm({ profil }: Props) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div>
           <label
+            htmlFor="profil-prenom"
             className="block text-sm mb-1.5 font-medium"
             style={{ color: "var(--text-secondary)" }}
           >
             Prénom
           </label>
           <input
+            id="profil-prenom"
             type="text"
             value={prenom}
             onChange={(e) => setPrenom(e.target.value)}
@@ -79,12 +81,14 @@ export default function ProfilInfosForm({ profil }: Props) {
         </div>
         <div>
           <label
+            htmlFor="profil-taille"
             className="block text-sm mb-1.5 font-medium"
             style={{ color: "var(--text-secondary)" }}
           >
             Taille (cm)
           </label>
           <input
+            id="profil-taille"
             type="number"
             value={taille}
             onChange={(e) => setTaille(e.target.value)}

@@ -130,6 +130,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
           onClick={() => setShowMenu(true)}
           className="p-1.5 rounded-lg transition-opacity active:opacity-70"
           style={{ color: "var(--text-muted)" }}
+          aria-label="Options de l'exercice"
         >
           <MoreVertical size={18} />
         </button>

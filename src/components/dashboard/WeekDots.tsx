@@ -90,7 +90,13 @@ export default memo(function WeekDots() {
               </span>
               <div style={dotStyle}>
                 {isDone && (
-                  <svg width="12" height="10" viewBox="0 0 10 8" fill="none">
+                  <svg
+                    width="12"
+                    height="10"
+                    viewBox="0 0 10 8"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M1 4L3.5 6.5L9 1"
                       stroke="white"

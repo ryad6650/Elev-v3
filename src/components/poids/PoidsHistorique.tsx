@@ -112,7 +112,31 @@ export default function PoidsHistorique({ entries, onEdit, onDeleted }: Props) {
   const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
   const recent = sorted.slice(0, 5);
 
-  if (recent.length === 0) return null;
+  if (recent.length === 0)
+    return (
+      <div
+        style={{
+          background: "var(--glass-bg)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          borderRadius: "var(--radius-card)",
+          border: "1px solid var(--glass-border)",
+          padding: "24px 20px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: 28, marginBottom: 6 }}>⚖️</p>
+        <p
+          style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontSize: 13,
+            color: "var(--text-secondary)",
+          }}
+        >
+          Enregistre ton premier poids pour suivre ta progression
+        </p>
+      </div>
+    );
 
   return (
     <div

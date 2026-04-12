@@ -74,6 +74,7 @@ export default function AddPoidsModal({
             onClick={onClose}
             className="p-2 rounded-full"
             style={{ background: "rgba(0,0,0,0.04)" }}
+            aria-label="Fermer"
           >
             <X size={18} style={{ color: "#78716c" }} />
           </button>

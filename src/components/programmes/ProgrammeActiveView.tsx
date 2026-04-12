@@ -48,6 +48,7 @@ export default function ProgrammeActiveView({
           <button
             onClick={onBack}
             className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            aria-label="Retour"
             style={{
               background: "rgba(255,255,255,0.55)",
               backdropFilter: "blur(12px)",
