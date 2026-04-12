@@ -1,16 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { withAuthUser } from "@/lib/supabase/auth";
 import { revalidatePath } from "next/cache";
 import type { MensurationsData } from "@/components/poids/MensurationsCard";
 
 export async function upsertPoids(date: string, poids: number): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: existing } = await supabase
     .from("poids_history")
@@ -37,11 +32,7 @@ export async function upsertPoids(date: string, poids: number): Promise<void> {
 }
 
 export async function deletePoids(id: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("poids_history")
@@ -55,11 +46,7 @@ export async function deletePoids(id: string): Promise<void> {
 }
 
 export async function saveMensurations(data: MensurationsData): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase.from("mensurations").upsert(
     {

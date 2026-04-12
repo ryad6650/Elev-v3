@@ -1,7 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { withAuthUser } from "@/lib/supabase/auth";
 
 export async function createExercise(data: {
   nom: string;
@@ -15,11 +14,7 @@ export async function createExercise(data: {
   equipement: string | null;
   gif_url: string | null;
 }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: ex, error } = await supabase
     .from("exercises")
@@ -54,13 +49,14 @@ export async function updateExercise(
   equipement: string | null;
   gif_url: string | null;
 }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
-  const updateData: Record<string, unknown> = {
+  const updateData: {
+    nom: string;
+    groupe_musculaire: string;
+    equipement: string | null;
+    gif_url?: string | null;
+  } = {
     nom: data.nom,
     groupe_musculaire: data.groupe_musculaire,
     equipement: data.equipement,

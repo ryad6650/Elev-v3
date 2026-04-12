@@ -19,15 +19,18 @@ const BARCODE_FORMATS = [
   "code_128_reader",
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type QuaggaInstance = any;
+interface QuaggaInstance {
+  init(config: Record<string, unknown>, cb: (err: Error | null) => void): void;
+  start(): void;
+  stop(): void;
+  onDetected(cb: (result: { codeResult?: { code?: string } }) => void): void;
+}
 
 /** Charge Quagga2 depuis le CDN (une seule fois, promise partagée) */
 let quaggaPromise: Promise<QuaggaInstance> | null = null;
 
 function loadQuagga(): Promise<QuaggaInstance> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const w = window as any;
+  const w = window as unknown as { Quagga?: QuaggaInstance };
   if (w.Quagga) return Promise.resolve(w.Quagga);
   if (quaggaPromise) return quaggaPromise;
 
@@ -72,8 +75,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     const next = !torch;
     try {
       await track.applyConstraints({
-        // @ts-expect-error – torch pas typé mais supporté mobile
-        advanced: [{ torch: next }],
+        advanced: [{ torch: next } as MediaTrackConstraintSet],
       });
       setTorch(next);
     } catch (e) {
@@ -83,8 +85,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
   useEffect(() => {
     let stopped = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let Q: any = null;
+    let Q: QuaggaInstance | null = null;
 
     async function start() {
       try {
@@ -92,7 +93,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         if (stopped || !scannerRef.current) return;
 
         await new Promise<void>((resolve, reject) => {
-          Q.init(
+          Q!.init(
             {
               inputStream: {
                 type: "LiveStream",
@@ -128,7 +129,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           const track = (video.srcObject as MediaStream).getVideoTracks()[0];
           trackRef.current = track;
           const caps = track?.getCapabilities?.() as
-            | Record<string, unknown>
+            | { torch?: boolean }
             | undefined;
           if (caps?.torch) setHasTorch(true);
         }

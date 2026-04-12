@@ -25,14 +25,17 @@ interface PRNotif {
 }
 
 export default function ActiveWorkout() {
-  const isActive = useWorkoutStore((s) => s.activeWorkout !== null);
-  const debutAt = useWorkoutStore((s) => s.activeWorkout?.debutAt ?? 0);
-  const exercises = useWorkoutStore(
-    useShallow((s) => s.activeWorkout?.exercises ?? []),
-  );
+  const { isActive, debutAt, exercises, minimizeWorkout, replaceExercise } =
+    useWorkoutStore(
+      useShallow((s) => ({
+        isActive: s.activeWorkout !== null,
+        debutAt: s.activeWorkout?.debutAt ?? 0,
+        exercises: s.activeWorkout?.exercises ?? [],
+        minimizeWorkout: s.minimizeWorkout,
+        replaceExercise: s.replaceExercise,
+      })),
+    );
   const exerciseUids = useMemo(() => exercises.map((e) => e.uid), [exercises]);
-  const minimizeWorkout = useWorkoutStore((s) => s.minimizeWorkout);
-  const replaceExercise = useWorkoutStore((s) => s.replaceExercise);
   const [showSearch, setShowSearch] = useState(false);
   const [replacingUid, setReplacingUid] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -59,7 +62,7 @@ export default function ActiveWorkout() {
       exerciseUids.forEach((uid) => next.add(uid));
       return next;
     });
-  }, [exerciseUids.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [exerciseUids]);
 
   const handleOpen = useCallback((uid: string) => {
     setOpenUids((prev) => {

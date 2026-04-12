@@ -72,7 +72,8 @@ export default function WorkoutPageClient({
       <div className="flex items-center gap-2 mb-7">
         <h1
           style={{
-            fontFamily: "var(--font-nunito), sans-serif",
+            fontFamily: "var(--font-lora), serif",
+            fontStyle: "italic",
             fontSize: 28,
             fontWeight: 700,
             color: "var(--text-primary)",

@@ -7,6 +7,7 @@ import { useWorkoutStore } from "@/store/workoutStore";
 import type { ActiveWorkout } from "@/store/workoutStore";
 import { useUiStore } from "@/store/uiStore";
 import { saveWorkout } from "@/app/actions/workout";
+import { toast } from "@/store/toastStore";
 
 interface Props {
   workout: ActiveWorkout;
@@ -75,10 +76,11 @@ export default function WorkoutSummary({
     if (result.success) {
       setSaved(true);
       clearWorkout();
+      toast.success("Séance enregistrée !");
       router.refresh();
     } else {
       setSaving(false);
-      alert(`Erreur lors de la sauvegarde.\n${result.error ?? ""}`);
+      toast.error(result.error ?? "Erreur lors de la sauvegarde");
     }
   };
 

@@ -22,6 +22,7 @@ interface Props {
   editAliment?: NutritionAliment;
   isForking?: boolean;
   onDelete?: () => void;
+  initialBarcode?: string;
 }
 
 type ValKey =
@@ -54,6 +55,7 @@ export default function CustomFoodForm({
   editAliment,
   isForking,
   onDelete,
+  initialBarcode,
 }: Props) {
   const isEdit = !!editAliment?.id;
   const isEditMode = isEdit || isForking;
@@ -68,7 +70,7 @@ export default function CustomFoodForm({
     sel: editAliment?.sel?.toString() ?? "",
     portionNom: editAliment?.portion_nom ?? "",
     portionG: editAliment?.taille_portion_g?.toString() ?? "",
-    codeBarres: editAliment?.code_barres ?? "",
+    codeBarres: editAliment?.code_barres ?? initialBarcode ?? "",
   });
   const [showScanner, setShowScanner] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -140,6 +142,7 @@ export default function CustomFoodForm({
             payload.sucres,
             payload.sel,
           );
+          if (!id) throw new Error("Création échouée");
           onCreated?.({
             id,
             nom: payload.nom,
@@ -157,8 +160,13 @@ export default function CustomFoodForm({
             source: undefined,
           });
         }
-      } catch {
-        setError("Erreur lors de l'enregistrement. Réessayez.");
+      } catch (err) {
+        console.error("CustomFoodForm save error:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erreur lors de l'enregistrement. Réessayez.",
+        );
       }
     });
   }

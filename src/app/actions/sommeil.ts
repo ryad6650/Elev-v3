@@ -1,15 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { withAuthUser } from "@/lib/supabase/auth";
 import { revalidatePath } from "next/cache";
 
 export async function saveSommeil(date: string, dureeMinutes: number) {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("sommeil")
@@ -23,11 +18,7 @@ export async function saveSommeil(date: string, dureeMinutes: number) {
 }
 
 export async function deleteSommeil(date: string) {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("sommeil")

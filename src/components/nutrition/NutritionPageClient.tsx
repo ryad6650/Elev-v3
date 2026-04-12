@@ -14,6 +14,7 @@ import type {
   NutritionPageData,
 } from "@/lib/nutrition-utils";
 import { useNutritionStore } from "@/store/nutritionStore";
+import { useShallow } from "zustand/react/shallow";
 
 const AddFoodModal = dynamic(() => import("./AddFoodModal"), { ssr: false });
 const EditEntryModal = dynamic(() => import("./EditEntryModal"), {
@@ -40,10 +41,14 @@ export default function NutritionPageClient({ initialData }: Props) {
   const today = new Date().toISOString().split("T")[0];
   const date = searchParams.get("date") ?? today;
 
-  const entries = useNutritionStore((s) => s.entries);
-  const profile = useNutritionStore((s) => s.profile);
-  const hasFetched = useNutritionStore((s) => s.hasFetched);
-  const fetchDay = useNutritionStore((s) => s.fetchDay);
+  const { entries, profile, hasFetched, fetchDay } = useNutritionStore(
+    useShallow((s) => ({
+      entries: s.entries,
+      profile: s.profile,
+      hasFetched: s.hasFetched,
+      fetchDay: s.fetchDay,
+    })),
+  );
   const [modalMeal, setModalMeal] = useState<number | null>(null);
   const [modalMealTime, setModalMealTime] = useState<string | null>(null);
   const [viewMealNumber, setViewMealNumber] = useState<number | null>(null);
@@ -55,9 +60,14 @@ export default function NutritionPageClient({ initialData }: Props) {
     const store = useNutritionStore.getState();
     if (!store.hasFetched || store.date !== initialData.date) {
       useNutritionStore.setState({
-        entries: initialData.entries,
-        profile: initialData.profile,
-        date: initialData.date,
+        entries: initialData.entries ?? [],
+        profile: initialData.profile ?? {
+          objectif_calories: 2000,
+          objectif_proteines: 150,
+          objectif_glucides: 250,
+          objectif_lipides: 70,
+        },
+        date: initialData.date ?? "",
         hasFetched: true,
         isLoading: false,
       });
@@ -68,8 +78,10 @@ export default function NutritionPageClient({ initialData }: Props) {
     if (date !== initialData.date) fetchDay(date);
   }, [date, initialData.date, fetchDay]);
 
-  const displayEntries = hasFetched ? entries : initialData.entries;
-  const displayProfile = hasFetched ? profile : initialData.profile;
+  const displayEntries = hasFetched ? entries : (initialData.entries ?? []);
+  const displayProfile = hasFetched
+    ? profile
+    : (initialData.profile ?? profile);
   const total = useMemo(() => sumEntries(displayEntries), [displayEntries]);
   const mealsFromEntries = useMemo(
     () => groupByMeal(displayEntries),
@@ -164,8 +176,8 @@ export default function NutritionPageClient({ initialData }: Props) {
                   fontWeight: 800,
                   lineHeight: 1.1,
                   color: "var(--text-primary)",
-                  fontFamily: "var(--font-nunito)",
-                  fontStyle: "normal",
+                  fontFamily: "var(--font-lora), serif",
+                  fontStyle: "italic",
                   textShadow:
                     "0 0 20px rgba(255,255,255,0.18), 0 0 40px rgba(255,255,255,0.07)",
                 }}
@@ -289,7 +301,7 @@ export default function NutritionPageClient({ initialData }: Props) {
               background: "#262220",
               borderRadius: 16,
               overflow: "hidden",
-              border: "2px solid #595F60",
+              border: "none",
             }}
           >
             {meals.map((meal, i) => (
@@ -299,7 +311,8 @@ export default function NutritionPageClient({ initialData }: Props) {
                     style={{
                       height: 1,
                       background: "var(--border)",
-                      marginLeft: 74,
+                      marginLeft: 35,
+                      marginRight: 35,
                     }}
                   />
                 )}

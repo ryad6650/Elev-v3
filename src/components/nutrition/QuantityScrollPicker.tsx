@@ -206,7 +206,9 @@ export default function QuantityScrollPicker({
         }}
       >
         {indices.map((i) => {
-          const v = clamp(value + i * step);
+          const raw = value + i * step;
+          const v = clamp(raw);
+          const outOfRange = raw < min || raw > max;
           const isCenter = i === 0;
           const dist = Math.abs(i);
           return (
@@ -266,12 +268,19 @@ export default function QuantityScrollPicker({
                         fontSize: compact ? 18 : 17,
                         fontWeight: isCenter ? 700 : 400,
                         color: isCenter ? "#C2C2C3" : "var(--text-secondary)",
-                        opacity: isCenter ? 1 : dist === 1 ? 0.6 : 0.25,
+                        opacity:
+                          outOfRange && !isCenter
+                            ? 0
+                            : isCenter
+                              ? 1
+                              : dist === 1
+                                ? 0.6
+                                : 0.25,
                         transition: "font-size 0.1s, opacity 0.1s",
                         lineHeight: 1,
                       }}
                     >
-                      {v}
+                      {outOfRange && !isCenter ? "" : v}
                     </span>
                     {isCenter && suffix && (
                       <span

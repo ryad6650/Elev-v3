@@ -107,9 +107,10 @@ export default function HistoriquePageClient({ initialData }: Props) {
         </div>
         <h1
           style={{
-            fontFamily: "var(--font-nunito), sans-serif",
+            fontFamily: "var(--font-lora), serif",
+            fontStyle: "italic",
             fontSize: 34,
-            fontWeight: 500,
+            fontWeight: 700,
             color: "var(--text-primary)",
             letterSpacing: "-0.5px",
             lineHeight: 1.1,

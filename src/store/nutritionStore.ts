@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createClient } from "@/lib/supabase/client";
 import { revalidateDashboard } from "@/app/actions/nutrition";
+import { toast } from "@/store/toastStore";
 import type {
   NutritionEntry,
   NutritionProfile,
@@ -188,6 +189,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
 
     if (error || !data) {
       set((s) => ({ entries: s.entries.filter((e) => e.id !== tempId) }));
+      toast.error("Erreur lors de l'ajout");
       return;
     }
 
@@ -198,8 +200,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       ),
     }));
 
+    toast.success("Aliment ajouté");
+
     // Invalider le cache dashboard pour qu'il affiche les données à jour
-    revalidateDashboard().catch(() => {});
+    try {
+      await revalidateDashboard();
+    } catch (err) {
+      console.error("[nutritionStore] addEntry revalidation failed:", err);
+    }
   },
 
   updateEntry: async (
@@ -256,8 +264,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
             : e,
         ),
       }));
+      toast.error("Erreur lors de la modification");
     } else {
-      revalidateDashboard().catch(() => {});
+      toast.success("Entrée modifiée");
+      try {
+        await revalidateDashboard();
+      } catch (err) {
+        console.error("[nutritionStore] updateEntry revalidation failed:", err);
+      }
     }
   },
 
@@ -300,8 +314,14 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         }
         return { entries: copy };
       });
+      toast.error("Erreur lors de la suppression");
     } else {
-      revalidateDashboard().catch(() => {});
+      toast.success("Aliment supprimé");
+      try {
+        await revalidateDashboard();
+      } catch (err) {
+        console.error("[nutritionStore] removeEntry revalidation failed:", err);
+      }
     }
   },
 

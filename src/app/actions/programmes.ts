@@ -1,7 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { withAuthUser } from "@/lib/supabase/auth";
 import { revalidatePath } from "next/cache";
 import { guardSupabase } from "@/lib/supabase/guard";
 
@@ -17,11 +16,7 @@ interface CreateProgrammeInput {
 export async function createProgramme(
   input: CreateProgrammeInput,
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: programme, error } = await supabase
     .from("programmes")
@@ -55,11 +50,7 @@ export async function createProgramme(
 }
 
 export async function activerProgramme(programmeId: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   guardSupabase(
     await supabase
@@ -76,11 +67,7 @@ export async function activerProgramme(programmeId: string): Promise<void> {
 }
 
 export async function desactiverProgramme(): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   guardSupabase(
     await supabase
@@ -94,11 +81,7 @@ export async function desactiverProgramme(): Promise<void> {
 }
 
 export async function deleteProgramme(programmeId: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   guardSupabase(
     await supabase

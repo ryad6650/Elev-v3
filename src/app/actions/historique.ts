@@ -1,7 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getUserFromMiddleware } from "@/lib/supabase/user";
+import { withAuthUser } from "@/lib/supabase/auth";
 import { revalidatePath } from "next/cache";
 
 export interface WorkoutDetailExercise {
@@ -29,11 +28,7 @@ export interface WorkoutDetail {
 export async function fetchWorkoutDetail(
   workoutId: string,
 ): Promise<WorkoutDetail> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const [workoutRes, setsRes] = await Promise.all([
     supabase
@@ -116,11 +111,7 @@ export async function fetchWorkoutDetail(
 }
 
 export async function deleteWorkout(workoutId: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("workouts")
@@ -137,11 +128,7 @@ export async function updateWorkoutSet(
   setId: string,
   data: { poids?: number | null; reps?: number | null },
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   // Vérifier que le set appartient à l'utilisateur
   const { data: set } = await supabase

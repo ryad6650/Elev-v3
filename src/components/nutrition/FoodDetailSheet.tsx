@@ -190,26 +190,28 @@ export default function FoodDetailSheet({
   const initMode: "g" | "portion" =
     initialPortionQty != null && hasPortion
       ? "portion"
-      : hasPortion && !initialQuantity
+      : hasPortion && initialQuantity == null
         ? "portion"
         : "g";
-  const initVal = initialQuantity
-    ? initMode === "portion" && initialPortionQty != null
-      ? initialPortionQty
-      : initMode === "portion"
-        ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
-        : initialQuantity
-    : hasPortion
-      ? 1
-      : 100;
+  const initVal =
+    initialQuantity != null
+      ? initMode === "portion" && initialPortionQty != null
+        ? initialPortionQty
+        : initMode === "portion"
+          ? Math.round((initialQuantity / portionG) * 2) / 2 || 1
+          : initialQuantity
+      : hasPortion
+        ? 1
+        : 100;
 
   const [mode, setMode] = useState<"g" | "portion">(initMode);
   const [val, setVal] = useState(initVal);
   const [fav, setFav] = useState(isFavorite ?? false);
-  const [showPicker, setShowPicker] = useState(false);
+  const [showPicker, setShowPicker] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleDragRef = useRef<{ startY: number } | null>(null);
-  const prevGValRef = useRef(initVal);
+  const prevGValRef = useRef(initMode === "g" ? initVal : 100);
+  const prevPortionValRef = useRef(initMode === "portion" ? initVal : 1);
 
   function onHandleTouchStart(e: React.TouchEvent) {
     handleDragRef.current = { startY: e.touches[0].clientY };
@@ -335,123 +337,162 @@ export default function FoodDetailSheet({
           }}
         >
           {/* Hero */}
-          <div
-            className="flex flex-col items-center px-5 py-16"
-            style={{
-              background: "linear-gradient(to right, #404040 0%, #242424 100%)",
-            }}
-          >
+          <div className="flex flex-col items-center px-5 pt-4 pb-5 text-center">
             <p
-              className="text-[20px] font-bold text-center leading-tight"
-              style={{
-                color: "var(--text-primary)",
-                fontFamily: "var(--font-sans)",
-              }}
+              className="text-[22px] font-extrabold leading-tight"
+              style={{ color: "#fff", fontFamily: "var(--font-sans)" }}
             >
               {aliment.nom}
             </p>
             {aliment.marque && (
               <p
-                className="text-[15px] text-center mt-2"
-                style={{
-                  color: "var(--text-secondary)",
-                  fontFamily: "var(--font-sans)",
-                }}
+                className="text-[16px] mt-1"
+                style={{ color: "#666", fontFamily: "var(--font-sans)" }}
               >
                 {aliment.marque}
               </p>
             )}
-          </div>
-
-          {/* Macros */}
-          <div className="flex px-4 py-5 mb-2">
-            {macros.map((m, i) => (
-              <div key={m.label} className="contents">
-                <div className="flex-1 flex flex-col items-center gap-1.5 px-1">
-                  <span
-                    className="text-[21px] leading-none"
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily:
-                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {m.val}
-                    <span
-                      className="text-[13px] ml-0.5"
-                      style={{
-                        color: "var(--text-primary)",
-                        fontFamily:
-                          "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {m.unit}
-                    </span>
-                  </span>
-                  <span
-                    className="text-[12px] text-center leading-tight"
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily:
-                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {m.label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Valeurs nutritives */}
-          <div className="px-4 pb-8">
+            <div className="flex items-baseline justify-center gap-1.5 mt-3">
+              <span
+                className="text-[30px] font-extrabold leading-none"
+                style={{ color: "#fff" }}
+              >
+                {cal}
+              </span>
+              <span
+                className="text-[16px] font-semibold"
+                style={{ color: "#888" }}
+              >
+                kcal
+              </span>
+            </div>
             <p
-              className="text-[17px] font-bold mb-4"
-              style={{
-                color: "var(--text-primary)",
-                fontFamily: "var(--font-sans)",
-              }}
+              className="text-[14px] font-semibold mt-1.5"
+              style={{ color: "#74BF7A" }}
             >
-              Valeurs nutritives
+              Pour{" "}
+              {mode === "portion"
+                ? `${val} ${unitLabel}`
+                : `${Math.round(qtyG)}g`}
             </p>
-            <div>
-              {nutriRows.map((r, i) => (
+          </div>
+
+          {/* Ring + Macros card */}
+          <div
+            className="mx-4 rounded-[20px] p-5 flex items-center gap-5"
+            style={{ background: "#262220" }}
+          >
+            <div
+              className="relative shrink-0"
+              style={{ width: 88, height: 88 }}
+            >
+              <svg width="88" height="88" viewBox="0 0 88 88">
+                <circle
+                  cx="44"
+                  cy="44"
+                  r="37"
+                  fill="none"
+                  stroke="#1B1715"
+                  strokeWidth="7"
+                />
+                <circle
+                  cx="44"
+                  cy="44"
+                  r="37"
+                  fill="none"
+                  stroke="#74BF7A"
+                  strokeWidth="7"
+                  strokeLinecap="round"
+                  strokeDasharray={`${Math.min(1, cal / (aliment.calories || 1)) * 232.5} ${232.5}`}
+                  transform="rotate(-90 44 44)"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span
+                  className="text-[22px] font-extrabold"
+                  style={{ color: "#fff" }}
+                >
+                  {cal}
+                </span>
+                <span
+                  className="text-[11px] uppercase tracking-wide"
+                  style={{ color: "#888" }}
+                >
+                  kcal
+                </span>
+              </div>
+            </div>
+            <div className="flex-1 flex gap-2">
+              {[
+                { val: gluc, label: "Glucides" },
+                { val: prot, label: "Protéines" },
+                { val: lip, label: "Lipides" },
+              ].map((m) => (
                 <div
-                  key={r.label + i}
-                  className={`flex items-center justify-between ${r.sub ? "py-[4px]" : "py-[10px]"}`}
-                  style={{
-                    borderBottom: "none",
-                  }}
+                  key={m.label}
+                  className="flex-1 rounded-[14px] py-3 px-1.5 flex flex-col items-center gap-1"
+                  style={{ background: "#1B1715" }}
                 >
                   <span
-                    className="text-[15px]"
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily:
-                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-                      fontWeight: 400,
-                      paddingLeft: r.sub ? 12 : 0,
-                    }}
+                    className="text-[18px] font-bold leading-none"
+                    style={{ color: "#74BF7A" }}
                   >
-                    {r.label}
+                    {m.val}g
                   </span>
-                  <span
-                    className="text-[15px]"
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily:
-                        "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {r.val}
+                  <span className="text-[13px]" style={{ color: "#888" }}>
+                    {m.label}
                   </span>
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="h-3" />
+
+          {/* Valeurs nutritives card */}
+          <div
+            className="mx-4 rounded-[20px] p-5 mb-6"
+            style={{ background: "#262220" }}
+          >
+            <p
+              className="text-[13px] font-bold uppercase tracking-wider pb-3 mb-1"
+              style={{
+                color: "#555",
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              Valeurs nutritives ({Math.round(qtyG)}g)
+            </p>
+            {nutriRows.map((r, i) => (
+              <div
+                key={r.label + i}
+                className="flex items-center justify-between"
+                style={{
+                  padding: r.sub ? "4px 0" : "11px 0",
+                  borderBottom:
+                    i < nutriRows.length - 1
+                      ? "1px solid rgba(255,255,255,0.05)"
+                      : "none",
+                }}
+              >
+                <span
+                  className="text-[16px]"
+                  style={{
+                    color: r.sub ? "#777" : "#bbb",
+                    fontSize: r.sub ? 15 : 16,
+                    paddingLeft: r.sub ? 16 : 0,
+                  }}
+                >
+                  {r.label}
+                </span>
+                <span
+                  className="text-[16px] font-semibold"
+                  style={{ color: r.sub ? "#888" : "#fff" }}
+                >
+                  {r.val}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -517,8 +558,11 @@ export default function FoodDetailSheet({
                 const newMode = mode === "g" ? "portion" : "g";
                 if (newMode === "portion") {
                   prevGValRef.current = val;
-                  setVal(1);
-                } else setVal(prevGValRef.current);
+                  setVal(prevPortionValRef.current);
+                } else {
+                  prevPortionValRef.current = val;
+                  setVal(prevGValRef.current);
+                }
                 setMode(newMode);
               }}
               className="flex-1 rounded-r-2xl flex items-center justify-between px-5 py-[6px] active:opacity-70 transition-opacity"
@@ -619,8 +663,11 @@ export default function FoodDetailSheet({
                       const newMode = idx === 0 ? "g" : "portion";
                       if (newMode === "portion") {
                         prevGValRef.current = val;
-                        setVal(1);
-                      } else setVal(prevGValRef.current);
+                        setVal(prevPortionValRef.current);
+                      } else {
+                        prevPortionValRef.current = val;
+                        setVal(prevGValRef.current);
+                      }
                       setMode(newMode);
                     }}
                   />

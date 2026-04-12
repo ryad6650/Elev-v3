@@ -124,7 +124,8 @@ function MacroCol({
           fontSize: 14,
           color: "var(--text-secondary)",
           fontWeight: 500,
-          fontFamily: "var(--font-sans)",
+          fontFamily:
+            "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
           textAlign: "center",
         }}
       >
@@ -152,7 +153,8 @@ function MacroCol({
         style={{
           fontSize: 12,
           color: "var(--text-secondary)",
-          fontFamily: "var(--font-sans)",
+          fontFamily:
+            "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
           textAlign: "center",
         }}
       >
@@ -187,7 +189,7 @@ export default function NutritionHeader({
       style={{
         background: "#262220",
         borderRadius: 16,
-        border: "2px solid #595F60",
+        border: "none",
         padding: "20px 16px",
       }}
     >

@@ -28,20 +28,24 @@ function setCachedOFF(q: string, data: NutritionAliment[]): void {
 const SELECT_COLS =
   "id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global";
 
-function normalizeOFF(p: Record<string, unknown>): NutritionAliment | null {
-  const nom = (
-    (p.product_name_fr as string) ||
-    (p.product_name as string) ||
-    ""
-  ).trim();
+interface OFFProduct {
+  product_name_fr?: string;
+  product_name?: string;
+  brands?: string;
+  code?: string;
+  nutriments?: Record<string, number>;
+}
+
+function normalizeOFF(p: OFFProduct): NutritionAliment | null {
+  const nom = (p.product_name_fr || p.product_name || "").trim();
   if (!nom || nom.length < 2) return null;
-  const n = (p.nutriments as Record<string, number>) ?? {};
+  const n = p.nutriments ?? {};
   const kcal = n["energy-kcal_100g"] ?? n["energy_value"] ?? 0;
   if (!kcal || kcal <= 0 || kcal > 9000) return null;
   return {
     id: "",
     nom,
-    marque: p.brands ? (p.brands as string).split(",")[0].trim() || null : null,
+    marque: p.brands ? p.brands.split(",")[0].trim() || null : null,
     calories: Math.round(kcal),
     proteines: n["proteins_100g"] ?? null,
     glucides: n["carbohydrates_100g"] ?? null,
@@ -153,31 +157,32 @@ export async function GET(request: NextRequest) {
   }
 
   // Recherche via RPC (trigram + ILIKE, priorité aliments utilisés)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: rpcData, error: rpcError } = (await (supabase.rpc as any)(
-    "search_aliments",
+  interface SearchAlimentsResult {
+    id: string;
+    nom: string;
+    marque: string | null;
+    calories: number;
+    proteines: number | null;
+    glucides: number | null;
+    lipides: number | null;
+    fibres: number | null;
+    sucres: number | null;
+    sel: number | null;
+    code_barres: string | null;
+    is_global: boolean;
+    usage_count: number;
+    match_rank: number;
+  }
+
+  const { data: rpcData, error: rpcError } = (await supabase.rpc(
+    "search_aliments" as never,
     {
       search_query: q,
       user_uuid: user.id,
       max_results: 25,
-    },
+    } as never,
   )) as {
-    data: Array<{
-      id: string;
-      nom: string;
-      marque: string | null;
-      calories: number;
-      proteines: number | null;
-      glucides: number | null;
-      lipides: number | null;
-      fibres: number | null;
-      sucres: number | null;
-      sel: number | null;
-      code_barres: string | null;
-      is_global: boolean;
-      usage_count: number;
-      match_rank: number;
-    }> | null;
+    data: SearchAlimentsResult[] | null;
     error: { message: string } | null;
   };
 

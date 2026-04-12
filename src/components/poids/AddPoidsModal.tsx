@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { X } from "lucide-react";
 import { upsertPoids } from "@/app/actions/poids";
+import { toast } from "@/store/toastStore";
 
 interface Props {
   defaultDate?: string;
@@ -33,6 +34,7 @@ export default function AddPoidsModal({
     startTransition(async () => {
       try {
         await upsertPoids(date, val);
+        toast.success("Poids enregistré");
         onSaved?.(date, val);
         onClose();
       } catch {

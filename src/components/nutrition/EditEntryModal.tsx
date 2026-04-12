@@ -106,8 +106,7 @@ export default function EditEntryModal({ entry, onClose }: Props) {
   if (step === "edit") {
     return (
       <NutriInfoForm
-        editAliment={isCustom ? aliment : { ...aliment, id: "" }}
-        isForking={!isCustom}
+        editAliment={aliment}
         onEdited={handleEdited}
         onCreated={handleCreated}
         onBack={() => setStep("detail")}

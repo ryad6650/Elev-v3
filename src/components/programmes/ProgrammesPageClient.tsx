@@ -52,7 +52,8 @@ export default function ProgrammesPageClient({ data }: Props) {
         <h1
           className="text-3xl leading-tight"
           style={{
-            fontFamily: "var(--font-nunito), sans-serif",
+            fontFamily: "var(--font-lora), serif",
+            fontStyle: "italic",
             color: "var(--text-primary)",
           }}
         >

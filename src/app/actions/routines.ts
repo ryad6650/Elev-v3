@@ -1,5 +1,6 @@
 "use server";
 
+import { withAuthUser } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
@@ -102,11 +103,7 @@ export async function getUserExerciseSettings(
 export async function getRoutineExercises(
   routineId: string,
 ): Promise<RoutineExerciseData[]> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data, error } = await supabase
     .from("routine_exercises")
@@ -157,11 +154,7 @@ export async function createRoutine(
     ordre: number;
   }[],
 ): Promise<{ id: string }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: routine, error } = await supabase
     .from("routines")
@@ -201,11 +194,7 @@ export async function updateRoutine(
     ordre: number;
   }[],
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: owned } = await supabase
     .from("routines")
@@ -239,11 +228,7 @@ export async function updateRoutine(
 }
 
 export async function deleteRoutine(routineId: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   guardSupabase(
     await supabase
@@ -259,11 +244,7 @@ export async function saveExerciseRest(
   exerciseId: string,
   restDuration: number | null,
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   if (restDuration == null || restDuration <= 0) {
     // Vérifier si des notes existent avant de supprimer
@@ -309,11 +290,7 @@ export async function saveExerciseNote(
   exerciseId: string,
   note: string,
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const trimmed = note.trim();
   if (!trimmed) {

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Check } from "lucide-react";
 import { updateInfosProfil } from "@/app/actions/profil";
+import { toast } from "@/store/toastStore";
 import type { ProfilData } from "@/lib/profil";
 
 interface Props {
@@ -27,6 +28,7 @@ export default function ProfilInfosForm({ profil }: Props) {
           taille: taille ? parseFloat(taille) : null,
         });
         setSuccess(true);
+        toast.success("Profil mis à jour");
         setTimeout(() => setSuccess(false), 2000);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur");

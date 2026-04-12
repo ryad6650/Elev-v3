@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from "react";
+import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { Plus, Check } from "lucide-react";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
@@ -20,18 +20,33 @@ export default memo(function FoodSearchResults({
   emptyMessage = "Aucun résultat",
 }: Props) {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((t) => clearTimeout(t));
+    };
+  }, []);
 
   const handleQuickAdd = useCallback(
     (a: NutritionAliment) => {
       const key = a.id || a.nom;
       setAddedIds((prev) => new Set(prev).add(key));
-      setTimeout(() => {
-        setAddedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(key);
-          return next;
-        });
-      }, 600);
+      const prev = timersRef.current.get(key);
+      if (prev) clearTimeout(prev);
+      timersRef.current.set(
+        key,
+        setTimeout(() => {
+          timersRef.current.delete(key);
+          setAddedIds((p) => {
+            const next = new Set(p);
+            next.delete(key);
+            return next;
+          });
+        }, 600),
+      );
       onQuickAdd ? onQuickAdd(a) : onSelect(a);
     },
     [onQuickAdd, onSelect],

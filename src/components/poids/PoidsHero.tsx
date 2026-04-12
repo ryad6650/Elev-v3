@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { upsertPoids } from "@/app/actions/poids";
+import { toast } from "@/store/toastStore";
 
 interface Props {
   poidsActuel: number | null;
@@ -33,6 +34,7 @@ export default function PoidsHero({
     setError("");
     startTransition(async () => {
       await upsertPoids(today, num);
+      toast.success("Poids enregistré");
       setValue("");
       onSaved?.(today, num);
     });

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, SquarePen, Camera } from "lucide-react";
 import { sumEntries } from "@/lib/nutrition-utils";
 import type {
@@ -9,7 +8,7 @@ import type {
   NutritionProfile,
 } from "@/lib/nutrition-utils";
 import SwipeableFoodItem from "./SwipeableFoodItem";
-import { useUiStore } from "@/store/uiStore";
+import { useModalAnimation } from "@/hooks/useModalAnimation";
 import MealNutriSection from "./MealNutriSection";
 
 const MEAL_META: Record<number, { emoji: string; name: string; pct: number }> =
@@ -41,27 +40,7 @@ export default function MealDetailView({
     pct: 0.25,
   };
   const total = sumEntries(meal.entries);
-  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
-  const [visible, setVisible] = useState(false);
-  const closingRef = useRef(false);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    setFullscreenModal(true);
-    const t = requestAnimationFrame(() => setVisible(true));
-    return () => {
-      cancelAnimationFrame(t);
-      document.body.style.overflow = "";
-      setFullscreenModal(false);
-    };
-  }, [setFullscreenModal]);
-
-  function handleClose() {
-    if (closingRef.current) return;
-    closingRef.current = true;
-    setVisible(false);
-    setTimeout(onClose, 320);
-  }
+  const { visible, handleClose } = useModalAnimation(onClose);
 
   const objCal = profile.objectif_calories ?? 2000;
   const objProt = profile.objectif_proteines ?? 44;

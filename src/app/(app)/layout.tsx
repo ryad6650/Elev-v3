@@ -1,9 +1,9 @@
 import BottomNav from "@/components/layout/BottomNav";
 import OfflineBanner from "@/components/layout/OfflineBanner";
 import ActiveWorkoutBanner from "@/components/layout/ActiveWorkoutBanner";
-import AccentInit from "@/components/layout/AccentInit";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import VisibilityRefresh from "@/components/layout/VisibilityRefresh";
+import ToastContainer from "@/components/ui/Toast";
 
 export default async function AppLayout({
   children,
@@ -13,12 +13,12 @@ export default async function AppLayout({
   return (
     <div className="min-h-dvh pb-20">
       <ServiceWorkerRegistration />
-      <AccentInit />
       <OfflineBanner />
       <VisibilityRefresh />
       {children}
       <ActiveWorkoutBanner />
       <BottomNav />
+      <ToastContainer />
     </div>
   );
 }

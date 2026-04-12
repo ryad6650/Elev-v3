@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, Camera, Search } from "lucide-react";
 import {
   getRecentAliments,
@@ -13,7 +13,7 @@ import FoodSearchStep from "./FoodSearchStep";
 import FoodDetailSheet from "./FoodDetailSheet";
 import CustomFoodForm from "./CustomFoodForm";
 import { useNutritionStore } from "@/store/nutritionStore";
-import { useUiStore } from "@/store/uiStore";
+import { useModalAnimation } from "@/hooks/useModalAnimation";
 import type { NutritionAliment } from "@/lib/nutrition-utils";
 
 const BarcodeScanner = dynamic(() => import("./BarcodeScanner"), {
@@ -53,8 +53,6 @@ export default function AddFoodModal({
   const addEntry = useNutritionStore((s) => s.addEntry);
 
   const [step, setStep] = useState<Step>("search");
-  const [isVisible, setIsVisible] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [lastUsed, setLastUsed] = useState<Record<string, number>>({});
   const [query, setQuery] = useState("");
@@ -68,19 +66,12 @@ export default function AddFoodModal({
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [pending, setPending] = useState(false);
-
-  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    setFullscreenModal(true);
-    const t = requestAnimationFrame(() => setIsVisible(true));
-    return () => {
-      cancelAnimationFrame(t);
-      document.body.style.overflow = "";
-      setFullscreenModal(false);
-    };
-  }, [setFullscreenModal]);
+  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
+  const sessionCountRef = useRef(0);
+  sessionCountRef.current = sessionCount;
+  const { visible, closing, handleClose } = useModalAnimation(() =>
+    onClose(sessionCountRef.current),
+  );
 
   useEffect(() => {
     let ignore = false;
@@ -134,12 +125,16 @@ export default function AddFoodModal({
         `/api/aliments?barcode=${encodeURIComponent(code)}`,
       );
       if (!res.ok) {
-        setQuery(code);
+        setScannedBarcode(code);
+        setStep("custom");
         return;
       }
       const data: NutritionAliment[] = await res.json();
       if (data.length > 0) handleSelect(data[0]);
-      else setQuery(code);
+      else {
+        setScannedBarcode(code);
+        setStep("custom");
+      }
     } finally {
       setLoading(false);
     }
@@ -160,6 +155,7 @@ export default function AddFoodModal({
         const { id } = await upsertExternalAliment(aliment);
         alimentId = id;
       }
+      if (!alimentId) return;
       addEntry(mealNumber, aliment, alimentId, qty, date, mealTime, null);
       setLastUsed((prev) => ({ ...prev, [alimentId]: qty }));
       setSessionCount((c) => c + 1);
@@ -180,6 +176,7 @@ export default function AddFoodModal({
         const { id } = await upsertExternalAliment(selected);
         alimentId = id;
       }
+      if (!alimentId) return;
       addEntry(
         mealNumber,
         selected,
@@ -230,11 +227,6 @@ export default function AddFoodModal({
     }
   }
 
-  function handleClose() {
-    setIsClosing(true);
-    setTimeout(() => onClose(sessionCount), 320);
-  }
-
   const isCustom = selected?.is_global === false && !!selected?.id;
   const mealLabel = MEAL_NAMES[mealNumber] ?? `Repas ${mealNumber}`;
   const isFormStep = step === "custom" || step === "edit";
@@ -244,10 +236,9 @@ export default function AddFoodModal({
       className="fixed inset-0 z-50 flex flex-col"
       style={{
         background: "#1B1715",
-        transform:
-          isClosing || !isVisible ? "translateY(100%)" : "translateY(0)",
-        opacity: isClosing ? 0 : isVisible ? 1 : 0,
-        transition: isVisible
+        transform: closing || !visible ? "translateY(100%)" : "translateY(0)",
+        opacity: closing ? 0 : visible ? 1 : 0,
+        transition: visible
           ? "transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease"
           : "none",
       }}
@@ -342,12 +333,14 @@ export default function AddFoodModal({
           />
         )}
         {step === "custom" && (
-          <CustomFoodForm onCreated={handleCustomCreated} />
+          <CustomFoodForm
+            onCreated={handleCustomCreated}
+            initialBarcode={scannedBarcode ?? undefined}
+          />
         )}
         {step === "edit" && selected && (
           <CustomFoodForm
-            editAliment={isCustom ? selected : { ...selected, id: "" }}
-            isForking={!isCustom}
+            editAliment={selected}
             onEdited={handleEdited}
             onCreated={handleCustomCreated}
           />
@@ -380,7 +373,7 @@ export default function AddFoodModal({
             <div
               className="absolute bottom-0 left-0 right-0"
               style={{
-                background: "#181B1B",
+                background: "#1B1715",
                 paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
                 paddingTop: 8,
               }}

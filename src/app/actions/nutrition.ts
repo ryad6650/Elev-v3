@@ -1,5 +1,6 @@
 "use server";
 
+import { withAuthUser } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
@@ -18,11 +19,7 @@ export async function addNutritionEntry(
   date: string,
   mealTime?: string,
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase.from("nutrition_entries").insert({
     user_id: user.id,
@@ -41,11 +38,7 @@ export async function updateEntryAlimentId(
   entryId: string,
   newAlimentId: string,
 ): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("nutrition_entries")
@@ -58,11 +51,7 @@ export async function updateEntryAlimentId(
 }
 
 export async function deleteNutritionEntry(id: string): Promise<void> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase
     .from("nutrition_entries")
@@ -90,11 +79,7 @@ export async function upsertExternalAliment(aliment: {
   sel?: number | null;
   code_barres?: string | null;
 }): Promise<{ id: string }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   // Si code-barres fourni, chercher d'abord un aliment existant (global ou user)
   if (aliment.code_barres) {
@@ -168,11 +153,7 @@ export async function createCustomAliment(
   sucres?: number | null,
   sel?: number | null,
 ): Promise<{ id: string }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data, error } = await supabase
     .from("aliments")
@@ -213,11 +194,7 @@ export async function updateCustomAliment(
   sucres?: number | null,
   sel?: number | null,
 ): Promise<{ id: string }> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data, error } = await supabase
     .from("aliments")
@@ -235,7 +212,6 @@ export async function updateCustomAliment(
       code_barres: code_barres ?? null,
     })
     .eq("id", id)
-    .eq("user_id", user.id)
     .select("id")
     .single();
 
@@ -354,11 +330,7 @@ export async function getFavoriteAliments(): Promise<
 export async function toggleFavoriteAliment(
   alimentId: string,
 ): Promise<boolean> {
-  const [supabase, user] = await Promise.all([
-    createClient(),
-    getUserFromMiddleware(),
-  ]);
-  if (!user) throw new Error("Non authentifié");
+  const { supabase, user } = await withAuthUser();
 
   const { data: existing } = await supabase
     .from("user_aliment_favorites")

@@ -3,6 +3,7 @@
 import { memo, useState, useCallback } from "react";
 import { Timer, MoreVertical } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
+import { useShallow } from "zustand/react/shallow";
 import type { WorkoutSet } from "@/store/workoutStore";
 import { saveExerciseRest, saveExerciseNote } from "@/app/actions/routines";
 import SwipeableSetRow from "./SwipeableSetRow";
@@ -26,19 +27,29 @@ interface Props {
 }
 
 function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
-  const exercise = useWorkoutStore((s) =>
-    s.activeWorkout?.exercises.find((e) => e.uid === uid),
+  const {
+    exercise,
+    addSet,
+    removeSet,
+    removeExercise,
+    updateSet,
+    toggleComplete,
+    setExerciseRestDuration,
+    setExerciseNote,
+    addWarmupSets,
+  } = useWorkoutStore(
+    useShallow((s) => ({
+      exercise: s.activeWorkout?.exercises.find((e) => e.uid === uid),
+      addSet: s.addSet,
+      removeSet: s.removeSet,
+      removeExercise: s.removeExercise,
+      updateSet: s.updateSet,
+      toggleComplete: s.toggleComplete,
+      setExerciseRestDuration: s.setExerciseRestDuration,
+      setExerciseNote: s.setExerciseNote,
+      addWarmupSets: s.addWarmupSets,
+    })),
   );
-  const addSet = useWorkoutStore((s) => s.addSet);
-  const removeSet = useWorkoutStore((s) => s.removeSet);
-  const removeExercise = useWorkoutStore((s) => s.removeExercise);
-  const updateSet = useWorkoutStore((s) => s.updateSet);
-  const toggleComplete = useWorkoutStore((s) => s.toggleComplete);
-  const setExerciseRestDuration = useWorkoutStore(
-    (s) => s.setExerciseRestDuration,
-  );
-  const setExerciseNote = useWorkoutStore((s) => s.setExerciseNote);
-  const addWarmupSets = useWorkoutStore((s) => s.addWarmupSets);
   const [showPicker, setShowPicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 

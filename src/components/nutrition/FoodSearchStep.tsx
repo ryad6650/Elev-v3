@@ -184,12 +184,17 @@ export default function FoodSearchStep({
 
       {/* Liste aliments */}
       <div
-        className="flex-1 overflow-y-auto px-4"
+        className="flex-1 overflow-y-auto mx-4 scrollbar-hide"
         style={
           {
+            background: "#262220",
+            borderRadius: 16,
             overscrollBehavior: "contain",
             WebkitOverflowScrolling: "touch",
-            paddingBottom: 160,
+            paddingBottom: 180,
+            paddingLeft: 16,
+            paddingRight: 16,
+            marginBottom: 8,
           } as React.CSSProperties
         }
       >
@@ -212,11 +217,10 @@ export default function FoodSearchStep({
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              background: "#74BF7A",
             }}
           >
-            <Plus size={15} style={{ color: "var(--text-secondary)" }} />
+            <Plus size={15} style={{ color: "#fff" }} />
           </div>
           <div className="text-left">
             <p
