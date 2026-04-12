@@ -90,7 +90,7 @@ export default function FoodSearchStep({
         <div
           className="flex items-center gap-3 rounded-2xl px-4 h-[50px]"
           style={{
-            background: "#262828",
+            background: "#262220",
             border: "2px solid #74BF7A",
             boxShadow: q ? "0 0 0 3px rgba(116,191,122,0.12)" : "none",
             transition: "box-shadow 0.2s",
@@ -137,8 +137,8 @@ export default function FoodSearchStep({
               onClick={() => setTile(tile_item.label)}
               className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl py-5 active:scale-95 transition-transform"
               style={{
-                background: tile === tile_item.label ? "#384250" : "#262828",
-                border: "1px solid var(--border)",
+                background: tile === tile_item.label ? "#3a3532" : "#262220",
+                border: `1px solid ${tile === tile_item.label ? "#4a4542" : "var(--border)"}`,
                 cursor: "pointer",
                 aspectRatio: "1",
               }}
@@ -162,7 +162,7 @@ export default function FoodSearchStep({
       <div className="px-4 pb-3">
         <div
           className="flex rounded-xl p-1 gap-0.5"
-          style={{ background: "#1F2A37" }}
+          style={{ background: "#262220" }}
         >
           {TABS.map((t) => (
             <button
@@ -170,7 +170,7 @@ export default function FoodSearchStep({
               onClick={() => setTab(t.id)}
               className="flex-1 py-2 rounded-[10px] text-[12px] font-semibold transition-colors"
               style={{
-                background: tab === t.id ? "#384250" : "#1F2A37",
+                background: tab === t.id ? "#3a3532" : "transparent",
                 color:
                   tab === t.id ? "var(--text-primary)" : "var(--text-muted)",
                 fontFamily: "var(--font-sans)",

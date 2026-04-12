@@ -123,15 +123,14 @@ function ScrollPicker({
           className="absolute inset-x-0 top-0 z-10 pointer-events-none"
           style={{
             height: topPad,
-            background:
-              "linear-gradient(to bottom, var(--bg-card), transparent)",
+            background: "linear-gradient(to bottom, #1B1715, transparent)",
           }}
         />
         <div
           className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
           style={{
             height: topPad,
-            background: "linear-gradient(to top, var(--bg-card), transparent)",
+            background: "linear-gradient(to top, #1B1715, transparent)",
           }}
         />
 
@@ -243,7 +242,7 @@ export default function SleepModal({
         <div
           className="rounded-3xl p-5"
           style={{
-            background: "var(--bg-card)",
+            background: "#1B1715",
             border: "1px solid var(--border)",
             boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
           }}
@@ -264,9 +263,9 @@ export default function SleepModal({
             <button
               onClick={onClose}
               className="p-1.5 rounded-full"
-              style={{ background: "var(--bg-elevated)" }}
+              style={{ background: "rgba(116,191,122,0.15)" }}
             >
-              <X size={16} style={{ color: "var(--text-secondary)" }} />
+              <X size={16} style={{ color: "#74BF7A" }} />
             </button>
           </div>
           <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
@@ -307,15 +306,19 @@ export default function SleepModal({
           <button
             onClick={handleSave}
             disabled={isPending || totalMinutes === 0}
-            className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${isPending || totalMinutes === 0 ? "" : "btn-accent"}`}
-            style={
-              isPending || totalMinutes === 0
-                ? {
-                    background: "var(--bg-elevated)",
-                    color: "var(--text-muted)",
-                  }
-                : undefined
-            }
+            className="w-full py-[15px] rounded-full text-[16px] font-bold active:scale-[0.98] transition-transform"
+            style={{
+              background:
+                isPending || totalMinutes === 0
+                  ? "var(--bg-elevated)"
+                  : "#74BF7A",
+              color:
+                isPending || totalMinutes === 0
+                  ? "var(--text-muted)"
+                  : "#ffffff",
+              opacity: isPending ? 0.6 : 1,
+              fontFamily: "var(--font-sans)",
+            }}
           >
             {isPending ? "Sauvegarde…" : "Enregistrer"}
           </button>
