@@ -33,6 +33,7 @@ export default function DashboardNextRoutine({ routine }: Props) {
             background: "#262220",
             border: "1px solid var(--border)",
             borderRadius: 16,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
             padding: "24px 16px",
             textAlign: "center",
           }}
@@ -107,6 +108,7 @@ export default function DashboardNextRoutine({ routine }: Props) {
           background: "#262220",
           border: "1px solid var(--border)",
           borderRadius: 16,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
           padding: 16,
         }}
       >

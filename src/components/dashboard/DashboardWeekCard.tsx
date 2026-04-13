@@ -53,6 +53,7 @@ export default function DashboardWeekCard({ streakJours }: Props) {
           background: "#262220",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 20,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
           padding: "18px 16px",
         }}
       >

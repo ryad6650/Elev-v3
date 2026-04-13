@@ -2,65 +2,215 @@
 
 import type { NutritionProfile } from "@/lib/nutrition-utils";
 
-function CalorieRing({
-  eaten,
-  remaining,
-  total,
-}: {
-  eaten: number;
-  remaining: number;
-  total: number;
-}) {
-  const r = 63;
-  const cx = 70;
-  const cy = 70;
+function SideRing({ pct }: { pct: number }) {
+  const r = 18;
+  const sw = 4;
+  const size = r * 2 + sw + 2;
+  const cx = size / 2;
+  const cy = size / 2;
   const circ = 2 * Math.PI * r;
-  const trackArc = (270 / 360) * circ;
+  const trackArc = 0.7 * circ;
   const gapArc = circ - trackArc;
-  const pct = total > 0 ? Math.min(eaten / total, 1) : 0;
-  const progressArc = pct * trackArc;
-  const dotAngleRad = (225 + pct * 270 - 90) * (Math.PI / 180);
-  const dotX = cx + r * Math.cos(dotAngleRad);
-  const dotY = cy + r * Math.sin(dotAngleRad);
-
+  const progress = Math.min(pct, 1) * trackArc;
   return (
-    <div style={{ position: "relative", width: 140, height: 140 }}>
-      <svg
-        width="140"
-        height="140"
-        viewBox="0 0 140 140"
-        role="img"
-        aria-label="Progression calories"
-      >
-        {/* Track 270° */}
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="#3a3532"
+        strokeWidth={sw}
+        strokeLinecap="round"
+        strokeDasharray={`${trackArc} ${gapArc}`}
+        transform={`rotate(144 ${cx} ${cy})`}
+      />
+      {pct > 0 && (
         <circle
           cx={cx}
           cy={cy}
           r={r}
           fill="none"
-          stroke="#3a3532"
-          strokeWidth="8"
+          stroke="#74BF7A"
+          strokeWidth={sw}
           strokeLinecap="round"
-          strokeDasharray={`${trackArc} ${gapArc}`}
-          transform={`rotate(135 ${cx} ${cy})`}
+          strokeDasharray={`${progress} ${circ - progress}`}
+          transform={`rotate(144 ${cx} ${cy})`}
+          style={{ transition: "stroke-dasharray 700ms ease" }}
         />
-        {/* Progression */}
-        {pct > 0 && (
+      )}
+    </svg>
+  );
+}
+
+function SideCard({
+  value,
+  label,
+  pct,
+}: {
+  value: number;
+  label: string;
+  pct: number;
+}) {
+  return (
+    <div
+      style={{
+        background: "#262220",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 14,
+        padding: "8px 10px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 4,
+        width: "fit-content",
+        margin: "0 auto",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 19,
+          fontWeight: 700,
+          lineHeight: 1,
+          color: "#E0E0E0",
+          fontFamily:
+            "-apple-system, 'SF Pro Display', BlinkMacSystemFont, sans-serif",
+        }}
+      >
+        {value.toLocaleString("fr-FR")}
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          color: "var(--text-muted)",
+          fontWeight: 400,
+          fontFamily:
+            "-apple-system, 'SF Pro Display', BlinkMacSystemFont, sans-serif",
+        }}
+      >
+        {label}
+      </div>
+      <SideRing pct={pct} />
+    </div>
+  );
+}
+
+function CalorieRing({ eaten, total }: { eaten: number; total: number }) {
+  const rOuter = 72;
+  const rInner = 62;
+  const sw = 6;
+  const size = (rOuter + sw / 2) * 2 + 4;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circOuter = 2 * Math.PI * rOuter;
+  const circInner = 2 * Math.PI * rInner;
+  const half = total / 2;
+  const diff = eaten - total;
+
+  // Inner = first 50%, Outer = second 50%
+  const innerPct = Math.min(eaten / half, 1);
+  const outerPct = eaten > half ? Math.min((eaten - half) / half, 1) : 0;
+  const progressInner = innerPct * circInner;
+
+  // Si dépassé : portion rouge sur l'extérieur
+  const overPct = eaten > total ? Math.min((eaten - total) / total, 1) : 0;
+  const overArc = overPct * circOuter;
+  // Le vert s'arrête à 100% de l'extérieur quand atteint
+  const greenOuterPct = eaten > total ? 1 : outerPct;
+  const greenOuterArc = greenOuterPct * circOuter;
+
+  return (
+    <div style={{ position: "relative", width: size, height: size }}>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        aria-label="Progression calories"
+      >
+        <defs>
+          <filter
+            id="ring-glow"
+            filterUnits="userSpaceOnUse"
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+          >
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        {/* Outer track + green progress */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={rOuter}
+          fill="none"
+          stroke="#3a3532"
+          strokeWidth={sw}
+        />
+        {greenOuterArc > 0 && (
           <circle
             cx={cx}
             cy={cy}
-            r={r}
+            r={rOuter}
             fill="none"
             stroke="#74BF7A"
-            strokeWidth="8"
+            strokeWidth={sw}
             strokeLinecap="round"
-            strokeDasharray={`${progressArc} ${circ - progressArc}`}
-            transform={`rotate(135 ${cx} ${cy})`}
+            filter="url(#ring-glow)"
+            strokeDasharray={`${greenOuterArc} ${circOuter - greenOuterArc}`}
+            transform={`rotate(-90 ${cx} ${cy})`}
             style={{ transition: "stroke-dasharray 1s ease" }}
           />
         )}
-        {/* Point */}
-        <circle cx={dotX} cy={dotY} r="5" fill="#74BF7A" />
+        {/* Outer red overflow */}
+        {overArc > 0 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={rOuter}
+            fill="none"
+            stroke="#EF4444"
+            strokeWidth={sw}
+            strokeLinecap="round"
+            strokeDasharray={`${overArc} ${circOuter - overArc}`}
+            strokeDashoffset={-greenOuterArc}
+            transform={`rotate(-90 ${cx} ${cy})`}
+            style={{
+              transition: "stroke-dasharray 1s ease, stroke-dashoffset 1s ease",
+            }}
+          />
+        )}
+        {/* Inner track + progress */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={rInner}
+          fill="none"
+          stroke="#3a3532"
+          strokeWidth={sw}
+        />
+        {progressInner > 0 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={rInner}
+            fill="none"
+            stroke="#74BF7A"
+            opacity={0.4}
+            strokeWidth={sw}
+            strokeLinecap="round"
+            filter="url(#ring-glow)"
+            strokeDasharray={`${progressInner} ${circInner - progressInner}`}
+            transform={`rotate(-90 ${cx} ${cy})`}
+            style={{ transition: "stroke-dasharray 1s ease" }}
+          />
+        )}
       </svg>
       <div
         style={{
@@ -70,36 +220,103 @@ function CalorieRing({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 6,
-          paddingBottom: 4,
+          gap: 3,
         }}
       >
         <span
           style={{
-            fontSize: 24,
-            fontWeight: 800,
-            lineHeight: 1,
+            fontSize: 17,
             color: "var(--text-primary)",
-            fontFamily:
-              "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+            fontWeight: 700,
+            lineHeight: 1,
           }}
         >
-          {remaining.toLocaleString("fr-FR")}
+          Calories
         </span>
         <span
           style={{
-            fontSize: 12,
-            lineHeight: 1,
-            color: "var(--text-muted)",
-            fontFamily:
-              "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
+            fontSize: 15,
             fontWeight: 400,
+            lineHeight: 1,
+            color: "var(--text-primary)",
+            fontFamily:
+              "-apple-system, 'SF Pro Display', BlinkMacSystemFont, sans-serif",
           }}
         >
-          Restantes
+          {eaten.toLocaleString("fr-FR")} / {total.toLocaleString("fr-FR")}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            lineHeight: 1,
+            fontWeight: 600,
+            color: "#74BF7A",
+          }}
+        >
+          {diff > 0
+            ? `Surplus: +${diff} kcal`
+            : `Encore: ${Math.abs(diff)} kcal`}
         </span>
       </div>
     </div>
+  );
+}
+
+function MacroArc({
+  pct,
+  color,
+  side,
+}: {
+  pct: number;
+  color: string;
+  side: "left" | "right";
+}) {
+  const r = 32;
+  const sw = 5.5;
+  const size = r * 2 + sw + 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circ = 2 * Math.PI * r;
+  const arcLen = 0.3 * circ;
+  const progress = Math.min(pct, 1) * arcLen;
+  const startAngle = side === "left" ? 126 : -54;
+  const cropW = Math.ceil(r * 0.42 + sw / 2 + 2);
+  const vb =
+    side === "left"
+      ? `0 0 ${cropW} ${size}`
+      : `${size - cropW} 0 ${cropW} ${size}`;
+
+  return (
+    <svg width={cropW} height={size} viewBox={vb} style={{ flexShrink: 0 }}>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="#3a3532"
+        strokeWidth={sw}
+        strokeDasharray={`${arcLen} ${circ - arcLen}`}
+        transform={`rotate(${startAngle} ${cx} ${cy})`}
+      />
+      {pct > 0 && (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeDasharray={`${progress} ${circ - progress}`}
+          strokeDashoffset={side === "right" ? -(arcLen - progress) : 0}
+          transform={`rotate(${startAngle} ${cx} ${cy})`}
+          style={{
+            transition:
+              "stroke-dasharray 700ms ease, stroke-dashoffset 700ms ease",
+          }}
+        />
+      )}
+    </svg>
   );
 }
 
@@ -116,56 +333,95 @@ function MacroCol({
 }) {
   const pct = max > 0 ? Math.min(value / max, 1) : 0;
   return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-        alignItems: "center",
-      }}
-    >
-      <span
-        style={{
-          fontSize: 14,
-          color: "var(--text-secondary)",
-          fontWeight: 500,
-          fontFamily:
-            "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-          textAlign: "center",
-        }}
-      >
-        {label}
-      </span>
+    <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+      <div style={{ flexShrink: 0, marginRight: -3 }}>
+        <MacroArc pct={pct} color={color} side="left" />
+      </div>
       <div
         style={{
-          width: "100%",
-          height: 6,
-          borderRadius: 99,
-          background: "#3a3532",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <div
           style={{
-            width: `${pct * 100}%`,
-            height: "100%",
-            borderRadius: 99,
-            background: color,
-            transition: "width 700ms ease",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 2,
+            paddingBottom: 2,
           }}
-        />
+        >
+          <span
+            style={{
+              fontSize: 14,
+              color: "var(--text-primary)",
+              fontWeight: 600,
+              textAlign: "center",
+            }}
+          >
+            {label}
+          </span>
+        </div>
+        <div
+          style={{
+            width: "35%",
+            height: 5,
+            borderRadius: 99,
+            background: "#3a3532",
+            marginTop: 4,
+          }}
+        >
+          <div
+            style={{
+              width: `${Math.min(pct, 1) * 100}%`,
+              height: "100%",
+              borderRadius: 99,
+              background: color,
+              transition: "width 700ms ease",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 2,
+            paddingTop: 4,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 13,
+              color: "var(--text-primary)",
+              textAlign: "center",
+            }}
+          >
+            {Math.round(value)} / {max} g
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              textAlign: "center",
+              color: value >= max ? "#74BF7A" : "var(--text-muted)",
+            }}
+          >
+            {value >= max
+              ? `Atteint (+${Math.round(value - max)}g)`
+              : `Encore ${Math.round(max - value)}g`}
+          </span>
+        </div>
       </div>
-      <span
-        style={{
-          fontSize: 12,
-          color: "var(--text-secondary)",
-          fontFamily:
-            "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-          textAlign: "center",
-        }}
-      >
-        {Math.round(value)} / {max} g
-      </span>
+      <div style={{ flexShrink: 0, marginLeft: -3 }}>
+        <MacroArc pct={pct} color={color} side="right" />
+      </div>
     </div>
   );
 }
@@ -188,7 +444,6 @@ export default function NutritionHeader({
   profile,
 }: Props) {
   const objectif = profile.objectif_calories ?? 2000;
-  const restantes = Math.max(0, objectif - totalCalories);
 
   return (
     <div
@@ -197,6 +452,7 @@ export default function NutritionHeader({
         borderRadius: 16,
         border: "none",
         padding: "20px 16px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
       }}
     >
       {/* Mangées | Anneau | Objectif */}
@@ -208,77 +464,15 @@ export default function NutritionHeader({
           marginBottom: 16,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: 700,
-              lineHeight: 1,
-              color: "#E0E0E0",
-              fontFamily:
-                "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-            }}
-          >
-            {totalCalories.toLocaleString("fr-FR")}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--text-muted)",
-              fontFamily:
-                "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-              fontWeight: 400,
-            }}
-          >
-            Mangées
-          </div>
-        </div>
-
-        <CalorieRing
-          eaten={totalCalories}
-          remaining={restantes}
-          total={objectif}
+        <SideCard
+          value={totalCalories}
+          label="Mangées"
+          pct={objectif > 0 ? totalCalories / objectif : 0}
         />
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: 700,
-              lineHeight: 1,
-              color: "#E0E0E0",
-              fontFamily:
-                "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-            }}
-          >
-            {objectif.toLocaleString("fr-FR")}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--text-muted)",
-              fontFamily:
-                "-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif",
-              fontWeight: 400,
-            }}
-          >
-            Objectif
-          </div>
-        </div>
+        <CalorieRing eaten={totalCalories} total={objectif} />
+
+        <SideCard value={objectif} label="Objectif" pct={1} />
       </div>
 
       {/* Séparateur */}
@@ -296,19 +490,19 @@ export default function NutritionHeader({
           label="Glucides"
           value={totalGlucides}
           max={profile.objectif_glucides ?? 250}
-          color="#74BF7A"
+          color="#ECC761"
         />
         <MacroCol
           label="Protéines"
           value={totalProteines}
           max={profile.objectif_proteines ?? 150}
-          color="#74BF7A"
+          color="#C85F57"
         />
         <MacroCol
           label="Lipides"
           value={totalLipides}
           max={profile.objectif_lipides ?? 70}
-          color="#74BF7A"
+          color="#5F94C6"
         />
       </div>
     </div>

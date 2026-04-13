@@ -140,6 +140,8 @@ export default function DashboardSummaryRow({
                 border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 18,
                 padding: "8px 8px 8px",
+                boxShadow:
+                  "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
                 cursor: isSommeil ? "pointer" : "default",
               }}
               {...(isSommeil ? { onClick: () => setSleepOpen(true) } : {})}

@@ -20,6 +20,7 @@ export default memo(function WeekDots() {
         WebkitBackdropFilter: "var(--glass-blur)",
         borderRadius: "var(--radius-card)",
         border: "1px solid var(--glass-border)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
         padding: "22px 24px",
       }}
     >

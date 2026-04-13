@@ -252,7 +252,7 @@ export default function NutritionPageClient({ initialData }: Props) {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: "#1E9D4C",
+                color: "#74BF7A",
                 fontFamily: "var(--font-sans)",
               }}
             >
@@ -289,7 +289,7 @@ export default function NutritionPageClient({ initialData }: Props) {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: "#1E9D4C",
+                color: "#74BF7A",
                 fontFamily: "var(--font-sans)",
               }}
             >
@@ -302,6 +302,8 @@ export default function NutritionPageClient({ initialData }: Props) {
               borderRadius: 16,
               overflow: "hidden",
               border: "none",
+              boxShadow:
+                "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
             }}
           >
             {meals.map((meal, i) => (
