@@ -29,7 +29,7 @@ export default function DashboardHeader({
       : "Objectif semaine atteint ! 💪";
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div style={{ marginBottom: 6 }}>
       <div className="flex items-start justify-between">
         <div>
           <div
@@ -66,8 +66,7 @@ export default function DashboardHeader({
           style={{
             width: 48,
             height: 48,
-            background: "rgba(5,137,214,0.1)",
-            border: "1.5px solid rgba(5,137,214,0.25)",
+            background: "rgba(116,191,122,0.1)",
             marginTop: 4,
           }}
         >

@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 
-const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const JOURS = ["L", "M", "M", "J", "V", "S", "D"];
 
 function getDayIndex(): number {
   const d = new Date().getDay();
@@ -38,10 +38,10 @@ export default function DashboardWeekCard({ streakJours }: Props) {
             gap: 5,
             padding: "6px 14px",
             borderRadius: 9999,
-            background: "rgba(30,157,76,0.1)",
+            background: "rgba(30,157,76,0.15)",
             fontSize: 14,
             fontWeight: 700,
-            color: "#1E9D4C",
+            color: "#74BF7A",
           }}
         >
           🔥 {streakJours} jour{streakJours > 1 ? "s" : ""}
@@ -51,7 +51,7 @@ export default function DashboardWeekCard({ streakJours }: Props) {
       <div
         style={{
           background: "#262220",
-          border: "1px solid var(--border)",
+          border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 20,
           padding: "18px 16px",
         }}
@@ -60,14 +60,20 @@ export default function DashboardWeekCard({ streakJours }: Props) {
           {JOURS.map((jour, i) => {
             const isPast = i < todayIdx;
             const isToday = i === todayIdx;
+            const isCompleted = isPast;
 
             return (
-              <div key={jour} className="flex flex-col items-center gap-2">
+              <div
+                key={`${jour}-${i}`}
+                className="flex flex-col items-center gap-2"
+              >
                 <span
                   style={{
                     fontSize: 13,
                     fontWeight: 700,
-                    color: "var(--text-muted)",
+                    color: isToday
+                      ? "var(--text-primary)"
+                      : "var(--text-muted)",
                   }}
                 >
                   {jour}
@@ -75,20 +81,25 @@ export default function DashboardWeekCard({ streakJours }: Props) {
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 10,
-                    ...(isPast
-                      ? { background: "transparent", border: "1.5px solid var(--text-muted)" }
-                      : isToday
-                        ? {
-                            background: "transparent",
-                            border: "1.5px solid var(--text-muted)",
-                          }
-                        : { background: "rgba(255,255,255,0.04)" }),
+                    width: 36,
+                    height: 36,
+                    borderRadius: "50%",
+                    ...(isCompleted
+                      ? {
+                          border: "2px solid #74BF7A",
+                          background: isToday
+                            ? "rgba(116,191,122,0.12)"
+                            : "transparent",
+                        }
+                      : {
+                          border: "1.5px solid rgba(255,255,255,0.1)",
+                          background: "transparent",
+                        }),
                   }}
                 >
-                  {isPast && <Check size={16} strokeWidth={3} color="#fff" />}
+                  {isCompleted && (
+                    <Check size={16} strokeWidth={3} color="#74BF7A" />
+                  )}
                 </div>
               </div>
             );
