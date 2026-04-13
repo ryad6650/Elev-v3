@@ -3,10 +3,12 @@
 export default function ProfilPreferences() {
   return (
     <section
-      className="rounded-2xl p-5 mb-4"
+      className="p-5 mb-4"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
+        background: "#262220",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 20,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
       }}
     >
       <h2

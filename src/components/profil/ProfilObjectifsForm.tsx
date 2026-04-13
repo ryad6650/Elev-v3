@@ -73,8 +73,8 @@ export default function ProfilObjectifsForm({ profil }: Props) {
   }
 
   const inputStyle = {
-    background: "var(--bg-elevated)",
-    border: "1px solid var(--border)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.08)",
     color: "var(--text-primary)",
     borderRadius: 10,
     padding: "11px 14px",
@@ -85,7 +85,7 @@ export default function ProfilObjectifsForm({ profil }: Props) {
 
   const inputStyleReadonly = {
     ...inputStyle,
-    background: "var(--bg-card)",
+    background: "rgba(255,255,255,0.03)",
     color: "var(--text-muted)",
     cursor: "default",
   };
@@ -98,10 +98,12 @@ export default function ProfilObjectifsForm({ profil }: Props) {
 
   return (
     <section
-      className="rounded-2xl p-5 mb-4"
+      className="p-5 mb-4"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
+        background: "#262220",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 20,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
       }}
     >
       <h2
@@ -164,12 +166,8 @@ export default function ProfilObjectifsForm({ profil }: Props) {
         <button
           type="submit"
           disabled={isPending}
-          className={`${success ? "" : "btn-accent"} flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 mt-1`}
-          style={
-            success
-              ? { background: "var(--success)", color: "#fff" }
-              : undefined
-          }
+          className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 mt-1"
+          style={{ background: "#74BF7A", color: "#fff" }}
         >
           {success ? (
             <>

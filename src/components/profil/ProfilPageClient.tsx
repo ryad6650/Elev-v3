@@ -17,10 +17,11 @@ interface Props {
 function PreferencesSkeleton() {
   return (
     <div
-      className="rounded-2xl p-5 mb-5 animate-pulse"
+      className="p-5 mb-5 animate-pulse"
       style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border)",
+        background: "#262220",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 20,
         height: 200,
       }}
     />

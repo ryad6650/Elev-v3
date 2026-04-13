@@ -71,7 +71,7 @@ export default function ProfilHeader({ profil }: Props) {
         ) : (
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "#74BF7A" }}
           >
             {initiale}
           </div>

@@ -59,8 +59,8 @@ export default function ProfilCompte() {
   }
 
   const inputStyle = {
-    background: "var(--bg-elevated)",
-    border: "1px solid var(--border)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.08)",
     color: "var(--text-primary)",
     borderRadius: 10,
     padding: "11px 14px",
@@ -71,10 +71,12 @@ export default function ProfilCompte() {
 
   return (
     <section
-      className="rounded-2xl mb-4 overflow-hidden"
+      className="mb-4 overflow-hidden"
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border)",
+        background: "#262220",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 20,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)",
       }}
     >
       <h2
@@ -91,7 +93,7 @@ export default function ProfilCompte() {
         style={{ borderTop: "1px solid var(--border)" }}
       >
         <div className="flex items-center gap-3">
-          <KeyRound size={18} style={{ color: "var(--accent)" }} />
+          <KeyRound size={18} style={{ color: "#74BF7A" }} />
           <span
             className="text-sm font-medium"
             style={{ color: "var(--text-primary)" }}
@@ -156,12 +158,8 @@ export default function ProfilCompte() {
           <button
             type="submit"
             disabled={isPending}
-            className={`${pwSuccess ? "" : "btn-accent"} flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50`}
-            style={
-              pwSuccess
-                ? { background: "var(--success)", color: "#fff" }
-                : undefined
-            }
+            className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
+            style={{ background: "#74BF7A", color: "#fff" }}
           >
             {pwSuccess ? (
               <>
@@ -209,7 +207,7 @@ export default function ProfilCompte() {
               onClick={() => setShowLogoutConfirm(false)}
               className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
               style={{
-                background: "var(--bg-elevated)",
+                background: "rgba(255,255,255,0.06)",
                 color: "var(--text-primary)",
               }}
             >
