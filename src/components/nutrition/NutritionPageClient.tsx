@@ -54,8 +54,10 @@ export default function NutritionPageClient({ initialData }: Props) {
   const [viewMealNumber, setViewMealNumber] = useState<number | null>(null);
   const [viewEntry, setViewEntry] = useState<NutritionEntry | null>(null);
 
+  // Hydrater le store avec les données serveur quand la date initiale change
   const hydratedDateRef = useRef<string | null>(null);
-  if (hydratedDateRef.current !== initialData.date) {
+  useEffect(() => {
+    if (hydratedDateRef.current === initialData.date) return;
     hydratedDateRef.current = initialData.date;
     const store = useNutritionStore.getState();
     if (!store.hasFetched || store.date !== initialData.date) {
@@ -72,7 +74,7 @@ export default function NutritionPageClient({ initialData }: Props) {
         isLoading: false,
       });
     }
-  }
+  }, [initialData]);
 
   useEffect(() => {
     if (date !== initialData.date) fetchDay(date);

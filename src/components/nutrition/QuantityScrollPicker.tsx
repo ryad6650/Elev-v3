@@ -61,6 +61,12 @@ export default function QuantityScrollPicker({
     valueRef.current = value;
   }, [value]);
 
+  // Ref stable pour onChange — évite de ré-enregistrer le listener à chaque render
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   const clamp = useCallback(
     (v: number) => {
       const rounded = Math.round(v / step) * step;
@@ -87,12 +93,12 @@ export default function QuantityScrollPicker({
       );
       const steps = -Math.round(dy / ITEM);
       const newVal = clamp(touchRef.current.startVal + steps * step);
-      if (newVal !== valueRef.current) onChange(newVal);
+      if (newVal !== valueRef.current) onChangeRef.current(newVal);
     }
 
     el.addEventListener("touchmove", handleTouchMove, { passive: false });
     return () => el.removeEventListener("touchmove", handleTouchMove);
-  }, [clamp, step, onChange, compact]);
+  }, [clamp, step, compact]);
 
   function onTouchStart(e: React.TouchEvent) {
     touchRef.current = {

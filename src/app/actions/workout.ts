@@ -20,6 +20,20 @@ export async function saveWorkout(
     (Date.now() - debutAt - totalPausedMs) / 60000,
   );
   const date = new Date(debutAt).toISOString().split("T")[0];
+  const debutIso = new Date(debutAt).toISOString();
+
+  // Guard idempotence : empêcher la double soumission
+  const { data: existing } = await supabase
+    .from("workouts")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("date", date)
+    .eq("duree_minutes", dureeMinutes)
+    .gte("created_at", debutIso)
+    .limit(1)
+    .maybeSingle();
+
+  if (existing) return { success: true, id: existing.id };
 
   const { data: workout, error: wError } = await supabase
     .from("workouts")

@@ -24,6 +24,7 @@ interface QuaggaInstance {
   start(): void;
   stop(): void;
   onDetected(cb: (result: { codeResult?: { code?: string } }) => void): void;
+  offDetected(cb: (result: { codeResult?: { code?: string } }) => void): void;
 }
 
 /** Charge Quagga2 depuis le CDN (une seule fois, promise partagée) */
@@ -86,6 +87,9 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
   useEffect(() => {
     let stopped = false;
     let Q: QuaggaInstance | null = null;
+    let detectionHandler:
+      | ((result: { codeResult?: { code?: string } }) => void)
+      | null = null;
 
     async function start() {
       try {
@@ -138,7 +142,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         setLoading(false);
 
         // 2 lectures identiques consécutives avant validation
-        Q.onDetected((result: { codeResult?: { code?: string } }) => {
+        detectionHandler = (result: { codeResult?: { code?: string } }) => {
           if (stopped || detectedRef.current) return;
           const code = result?.codeResult?.code;
           if (!code) return;
@@ -148,7 +152,8 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           } else {
             lastCodeRef.current = code;
           }
-        });
+        };
+        Q.onDetected(detectionHandler);
       } catch (err) {
         if (stopped) return;
         if (err instanceof Error && err.name === "NotAllowedError") {
@@ -166,11 +171,16 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
     return () => {
       stopped = true;
-      trackRef.current = null;
       try {
+        if (Q && detectionHandler) Q.offDetected(detectionHandler);
         Q?.stop();
       } catch (e) {
         console.warn("Quagga stop échoué:", e);
+      }
+      // Arrêter le stream vidéo pour libérer la caméra
+      if (trackRef.current) {
+        trackRef.current.stop();
+        trackRef.current = null;
       }
     };
   }, [stableOnDetected]);

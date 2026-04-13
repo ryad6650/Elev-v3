@@ -6,8 +6,9 @@ import { ChevronRight } from "lucide-react";
 import { useWorkoutStore, type ActiveWorkout } from "@/store/workoutStore";
 import { useShallow } from "zustand/react/shallow";
 
-const subscribe = () => () => {};
-const getSnapshot = () => true;
+// Hydration guard : détecte quand le store persist a fini de réhydrater
+const subscribe = (cb: () => void) => useWorkoutStore.subscribe(cb);
+const getSnapshot = () => useWorkoutStore.persist.hasHydrated();
 const getServerSnapshot = () => false;
 
 // Timer partagé : un seul setInterval pour tous les abonnés

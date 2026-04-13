@@ -1,11 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import {
-  computeStreak,
-  computePRs,
-  aggregateNutrition,
-} from "./historique-helpers";
+import { computePRs, aggregateNutrition } from "./historique-helpers";
 import type { WorkoutJoin, NutriEntryJoin } from "./historique-helpers";
+import { computeStreak } from "./date-utils";
 
 export interface HistoriqueWorkout {
   id: string;

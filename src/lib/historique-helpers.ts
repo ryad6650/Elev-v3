@@ -35,23 +35,6 @@ type NutriEntryJoin = {
 
 export type { NutriEntryJoin };
 
-export function computeStreak(dates: string[]): number {
-  if (dates.length === 0) return 0;
-  const sorted = [...new Set(dates)].sort((a, b) => b.localeCompare(a));
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-  if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const curr = new Date(sorted[i] + "T12:00:00");
-    const prev = new Date(sorted[i - 1] + "T12:00:00");
-    const diff = Math.round((prev.getTime() - curr.getTime()) / 86400000);
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
-}
-
 export function computePRs(workouts: WorkoutJoin[]): PRRecord[] {
   const map = new Map<string, { nom: string; poids: number; reps: number }>();
   for (const w of workouts) {

@@ -83,6 +83,9 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
       return;
     }
 
+    // Vérifier avant de lancer les requêtes (évite un fetch inutile)
+    if (requestId !== fetchDayRequestId) return;
+
     const sb = getSupabase();
     const [entriesRes, profileRes] = await Promise.all([
       sb
@@ -103,7 +106,7 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
         .single(),
     ]);
 
-    // Ignorer la réponse si une requête plus récente a été lancée
+    // Ignorer la réponse si une requête plus récente a été lancée entre-temps
     if (requestId !== fetchDayRequestId) return;
 
     if (entriesRes.error || profileRes.error) {
