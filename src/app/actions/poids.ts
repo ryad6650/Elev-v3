@@ -2,9 +2,12 @@
 
 import { withAuthUser } from "@/lib/supabase/auth";
 import { revalidatePath } from "next/cache";
+import { validateDate, validateWeight } from "@/lib/validation";
 import type { MensurationsData } from "@/components/poids/MensurationsCard";
 
 export async function upsertPoids(date: string, poids: number): Promise<void> {
+  validateDate(date);
+  validateWeight(poids);
   const { supabase, user } = await withAuthUser();
 
   const { data: existing } = await supabase

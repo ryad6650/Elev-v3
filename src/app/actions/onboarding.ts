@@ -1,6 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import {
+  validateCalories,
+  validateWeight,
+  validateHeight,
+  validateMacro,
+} from "@/lib/validation";
 
 export async function saveOnboarding(data: {
   prenom: string;
@@ -11,6 +17,12 @@ export async function saveOnboarding(data: {
   objectif_glucides: number | null;
   objectif_lipides: number | null;
 }): Promise<void> {
+  if (data.taille != null) validateHeight(data.taille);
+  if (data.poids != null) validateWeight(data.poids);
+  validateCalories(data.objectif_calories);
+  if (data.objectif_proteines != null) validateMacro(data.objectif_proteines);
+  if (data.objectif_glucides != null) validateMacro(data.objectif_glucides);
+  if (data.objectif_lipides != null) validateMacro(data.objectif_lipides);
   const supabase = await createClient();
   const {
     data: { user },

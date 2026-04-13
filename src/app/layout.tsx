@@ -36,6 +36,18 @@ export const metadata: Metadata = {
   icons: {
     apple: "/icons/apple-touch-icon.png",
   },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    title: "Élev — Fitness Tracker",
+    description: "Suivi musculation, nutrition et poids — app mobile-first PWA",
+    siteName: "Élev",
+  },
+  twitter: {
+    card: "summary",
+    title: "Élev — Fitness Tracker",
+    description: "Suivi musculation, nutrition et poids — app mobile-first PWA",
+  },
 };
 
 export const viewport: Viewport = {

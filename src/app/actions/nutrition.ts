@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserFromMiddleware } from "@/lib/supabase/user";
 import { revalidatePath } from "next/cache";
 import { guardSupabase } from "@/lib/supabase/guard";
+import {
+  validateDate,
+  validateMealNumber,
+  validateQuantity,
+  validateCalories,
+} from "@/lib/validation";
 
 /** Invalide le Router Cache pour que les pages affichent les données à jour */
 export async function revalidateDashboard() {
@@ -19,6 +25,9 @@ export async function addNutritionEntry(
   date: string,
   mealTime?: string,
 ): Promise<void> {
+  validateMealNumber(mealNumber);
+  validateQuantity(quantiteG);
+  validateDate(date);
   const { supabase, user } = await withAuthUser();
 
   const { error } = await supabase.from("nutrition_entries").insert({
@@ -153,6 +162,7 @@ export async function createCustomAliment(
   sucres?: number | null,
   sel?: number | null,
 ): Promise<{ id: string }> {
+  validateCalories(calories);
   const { supabase, user } = await withAuthUser();
 
   const { data, error } = await supabase
@@ -279,29 +289,14 @@ export async function getFrequentAliments() {
   ]);
   if (!user) return [];
 
-  const { data } = await supabase
-    .from("nutrition_entries")
-    .select(
-      "aliment_id, aliments(id, nom, marque, calories, proteines, glucides, lipides, fibres, sucres, sel, code_barres, is_global, portion_nom, taille_portion_g)",
-    )
-    .eq("user_id", user.id)
-    .limit(200);
+  const { data } = await supabase.rpc(
+    "get_frequent_aliments" as never,
+    { user_uuid: user.id, max_results: 20 } as never,
+  );
 
   if (!data) return [];
 
-  const counts = new Map<string, number>();
-  const alimentMap = new Map<string, EntryWithAliment["aliments"]>();
-  for (const e of data as EntryWithAliment[]) {
-    if (!e.aliments) continue;
-    counts.set(e.aliment_id, (counts.get(e.aliment_id) ?? 0) + 1);
-    alimentMap.set(e.aliment_id, e.aliments);
-  }
-
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 20)
-    .map(([id]) => alimentMap.get(id)!)
-    .filter(Boolean);
+  return (data as unknown as EntryWithAliment["aliments"][]).filter(Boolean);
 }
 
 export async function getFavoriteAliments(): Promise<
