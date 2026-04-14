@@ -163,7 +163,7 @@ export default function EditRoutineModal({ routine, onClose }: Props) {
   return (
     <div
       className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col overflow-hidden"
-      style={{ background: "#000000", height: "100dvh" }}
+      style={{ background: "#1B1715", height: "100dvh" }}
     >
       {/* Header iOS-style */}
       <div

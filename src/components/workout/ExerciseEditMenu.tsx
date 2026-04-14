@@ -50,7 +50,7 @@ export default function ExerciseEditMenu({
               style={{
                 top: pos.top,
                 right: pos.right,
-                background: "#262220",
+                background: "#1B1715",
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
             >

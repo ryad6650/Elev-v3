@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import { Timer, MoreVertical } from "lucide-react";
+import { Timer, MoreVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
 import { useShallow } from "zustand/react/shallow";
 import type { WorkoutSet } from "@/store/workoutStore";
@@ -29,9 +29,12 @@ interface Props {
 function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   const {
     exercise,
+    exerciseIndex,
+    totalExercises,
     addSet,
     removeSet,
     removeExercise,
+    moveExercise,
     updateSet,
     toggleComplete,
     setExerciseRestDuration,
@@ -40,9 +43,13 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   } = useWorkoutStore(
     useShallow((s) => ({
       exercise: s.activeWorkout?.exercises.find((e) => e.uid === uid),
+      exerciseIndex:
+        s.activeWorkout?.exercises.findIndex((e) => e.uid === uid) ?? -1,
+      totalExercises: s.activeWorkout?.exercises.length ?? 0,
       addSet: s.addSet,
       removeSet: s.removeSet,
       removeExercise: s.removeExercise,
+      moveExercise: s.moveExercise,
       updateSet: s.updateSet,
       toggleComplete: s.toggleComplete,
       setExerciseRestDuration: s.setExerciseRestDuration,
@@ -52,6 +59,7 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
   );
   const [showPicker, setShowPicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [reordering, setReordering] = useState(false);
 
   const handleToggle = useCallback(
     (set: WorkoutSet) => {
@@ -126,17 +134,45 @@ function ExerciseCard({ uid, isOpen, onOpen, onPR, onReplace }: Props) {
         >
           {exercise.nom}
         </span>
-        <button
-          onClick={() => setShowMenu(true)}
-          className="p-1.5 rounded-lg transition-opacity active:opacity-70"
-          style={{ color: "var(--text-muted)" }}
-          aria-label="Options de l'exercice"
-        >
-          <MoreVertical size={18} />
-        </button>
+        {reordering ? (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => moveExercise(uid, -1)}
+              disabled={exerciseIndex === 0}
+              className="p-1.5 rounded-lg active:opacity-70 disabled:opacity-20"
+              style={{ color: "var(--text-primary)" }}
+            >
+              <ChevronUp size={20} />
+            </button>
+            <button
+              onClick={() => moveExercise(uid, 1)}
+              disabled={exerciseIndex === totalExercises - 1}
+              className="p-1.5 rounded-lg active:opacity-70 disabled:opacity-20"
+              style={{ color: "var(--text-primary)" }}
+            >
+              <ChevronDown size={20} />
+            </button>
+            <button
+              onClick={() => setReordering(false)}
+              className="ml-1 px-3 py-1 rounded-lg text-[13px] font-semibold active:opacity-70"
+              style={{ background: "#1E9D4C", color: "#fff" }}
+            >
+              OK
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowMenu(true)}
+            className="p-1.5 rounded-lg transition-opacity active:opacity-70"
+            style={{ color: "var(--text-muted)" }}
+            aria-label="Options de l'exercice"
+          >
+            <MoreVertical size={18} />
+          </button>
+        )}
         {showMenu && (
           <ExerciseMenuSheet
-            onReorganize={() => {}}
+            onReorganize={() => setReordering(true)}
             onReplace={() => onReplace?.(uid)}
             onAddSuperset={() => {}}
             onAddWarmup={() => addWarmupSets(uid)}

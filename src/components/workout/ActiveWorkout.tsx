@@ -4,11 +4,13 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { ChevronDown, AlarmClock, X } from "lucide-react";
 import { useWorkoutStore } from "@/store/workoutStore";
+import { useUiStore } from "@/store/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import {
   getUserExerciseSettings,
   getExerciseLastRefs,
 } from "@/app/actions/routines";
+import { Plus } from "lucide-react";
 import ExerciseCard from "./ExerciseCard";
 import WorkoutTimer from "./WorkoutTimer";
 import RestTimer from "./RestTimer";
@@ -44,6 +46,13 @@ export default function ActiveWorkout() {
   const [openUids, setOpenUids] = useState<Set<string>>(
     () => new Set(exerciseUids),
   );
+
+  const setFullscreenModal = useUiStore((s) => s.setFullscreenModal);
+  useEffect(() => {
+    if (!isActive) return;
+    setFullscreenModal(true);
+    return () => setFullscreenModal(false);
+  }, [isActive, setFullscreenModal]);
 
   useEffect(() => {
     if (!prNotif) return;
@@ -301,6 +310,21 @@ export default function ActiveWorkout() {
               onReplace={handleReplace}
             />
           ))}
+          {exerciseUids.length > 0 && (
+            <div className="px-4 pt-3 pb-6">
+              <button
+                onClick={() => {
+                  setReplacingUid(null);
+                  setShowSearch(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[15px] font-semibold active:opacity-70 transition-opacity"
+                style={{ background: "#1E9D4C", color: "#fff" }}
+              >
+                <Plus size={18} strokeWidth={2.5} />
+                Ajouter un exercice
+              </button>
+            </div>
+          )}
         </div>
 
         {/* PR notification */}

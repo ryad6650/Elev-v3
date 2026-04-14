@@ -78,6 +78,7 @@ interface WorkoutStore {
   dismissRestTimer: () => void;
   setRestDuration: (seconds: number) => void;
   setExerciseRestDuration: (uid: string, duration: number | null) => void;
+  moveExercise: (uid: string, direction: -1 | 1) => void;
   setExerciseNote: (uid: string, note: string) => void;
   clearWorkout: () => void;
 }
@@ -378,6 +379,22 @@ export const useWorkoutStore = create<WorkoutStore>()(
             exercises: activeWorkout.exercises.map((e) =>
               e.uid === uid ? { ...e, restDuration: duration } : e,
             ),
+          },
+        });
+      },
+      moveExercise: (uid, direction) => {
+        const { activeWorkout } = get();
+        if (!activeWorkout) return;
+        const exs = [...activeWorkout.exercises];
+        const idx = exs.findIndex((e) => e.uid === uid);
+        if (idx < 0) return;
+        const newIdx = idx + direction;
+        if (newIdx < 0 || newIdx >= exs.length) return;
+        [exs[idx], exs[newIdx]] = [exs[newIdx], exs[idx]];
+        set({
+          activeWorkout: {
+            ...activeWorkout,
+            exercises: exs.map((e, i) => ({ ...e, ordre: i })),
           },
         });
       },

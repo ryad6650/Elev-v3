@@ -166,7 +166,7 @@ export default function ExerciseSearch({
   return (
     <div
       className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[60] flex flex-col"
-      style={{ background: "#000" }}
+      style={{ background: "#1B1715" }}
     >
       {/* Header iOS */}
       <div style={{ paddingTop: "env(safe-area-inset-top)" }}>
@@ -391,8 +391,12 @@ function ExerciseRow({ ex, onSelect }: { ex: Exercise; onSelect: () => void }) {
   return (
     <button
       onClick={onSelect}
-      className="w-full flex items-center gap-4 px-4 py-3 active:opacity-60"
-      style={{ borderBottom: "1px solid #151312" }}
+      className="w-full flex items-center gap-4 px-4 py-3 mx-4 rounded-xl active:opacity-60"
+      style={{
+        background: "#262220",
+        width: "calc(100% - 2rem)",
+        marginBottom: 8,
+      }}
     >
       <ExerciseGif gifUrl={ex.gif_url} nom={ex.nom} size="md" circle />
       <div className="flex-1 min-w-0 text-left">
